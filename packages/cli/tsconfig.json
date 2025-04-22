@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "exactOptionalPropertyTypes": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "lib": [
+      "ESNext"
+    ],
+    "paths": {
+      "$cli/*": [
+        "./src/*"
+      ]
+    },
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "outDir": "./dist",
+    "resolveJsonModule": true,
+    "rootDir": "src",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "ESNext",
+    "tsBuildInfoFile": "node_modules/.tsbuildinfo",
+    "verbatimModuleSyntax": true
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "ts-node": {
+    "esm": true
+  }
+}

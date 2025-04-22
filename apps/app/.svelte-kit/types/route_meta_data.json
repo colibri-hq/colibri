@@ -1,0 +1,247 @@
+{
+	"/(library)": [
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/": [
+		"src/routes/+layout.server.ts"
+	],
+	"/.well-known/colibri-server": [
+		"src/routes/.well-known/colibri-server/+server.ts"
+	],
+	"/.well-known/oauth-authorization-server": [
+		"src/routes/.well-known/oauth-authorization-server/+server.ts"
+	],
+	"/.well-known/openid-configuration": [
+		"src/routes/.well-known/openid-configuration/+server.ts"
+	],
+	"/api/docs": [
+		"src/routes/+layout.server.ts"
+	],
+	"/api/ingest": [
+		"src/routes/api/ingest/+server.ts"
+	],
+	"/(library)/authors": [
+		"src/routes/(library)/authors/+page.server.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/authors/[author]": [
+		"src/routes/(library)/authors/[author]/+page.server.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/authors/[author]/picture": [
+		"src/routes/(library)/authors/[author]/picture/+server.ts"
+	],
+	"/auth": [
+		"src/routes/auth/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/auth/assertion/generate": [
+		"src/routes/auth/assertion/generate/+server.ts"
+	],
+	"/auth/assertion/verify": [
+		"src/routes/auth/assertion/verify/+server.ts"
+	],
+	"/auth/attestation": [
+		"src/routes/auth/attestation/+page.ts",
+		"src/routes/auth/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/auth/attestation/generate": [
+		"src/routes/auth/attestation/generate/+server.ts"
+	],
+	"/auth/attestation/verify": [
+		"src/routes/auth/attestation/verify/+server.ts"
+	],
+	"/auth/login": [
+		"src/routes/auth/login/+page.server.ts",
+		"src/routes/auth/login/+layout.server.ts",
+		"src/routes/auth/+layout.server.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/auth/login/+layout.server.ts",
+		"src/routes/auth/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/auth/login/unknown": [
+		"src/routes/auth/login/+layout.server.ts",
+		"src/routes/auth/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/auth/logout": [
+		"src/routes/auth/logout/+server.ts"
+	],
+	"/auth/oauth": [
+		"src/routes/auth/oauth/+layout.server.ts",
+		"src/routes/auth/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/auth/oauth/authorize": [
+		"src/routes/auth/oauth/authorize/+page.server.ts",
+		"src/routes/auth/oauth/+layout.server.ts",
+		"src/routes/auth/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/auth/oauth/device": [
+		"src/routes/auth/oauth/device/+page.ts",
+		"src/routes/auth/oauth/device/+page.server.ts",
+		"src/routes/auth/oauth/+layout.server.ts",
+		"src/routes/auth/+layout.server.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/auth/oauth/device/+server.ts"
+	],
+	"/auth/oauth/par": [
+		"src/routes/auth/oauth/par/+server.ts"
+	],
+	"/auth/oauth/register": [
+		"src/routes/auth/oauth/register/+server.ts"
+	],
+	"/auth/oauth/tokeninfo": [
+		"src/routes/auth/oauth/tokeninfo/+server.ts"
+	],
+	"/auth/oauth/token": [
+		"src/routes/auth/oauth/token/+server.ts"
+	],
+	"/auth/oauth/token/revoke": [
+		"src/routes/auth/oauth/token/revoke/+server.ts"
+	],
+	"/auth/oauth/userinfo": [
+		"src/routes/auth/oauth/userinfo/+server.ts"
+	],
+	"/(library)/books": [
+		"src/routes/(library)/books/+page.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/books/add": [
+		"src/routes/(library)/books/add/+page.server.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/books/[book=id]": [
+		"src/routes/(library)/books/[book=id]/+page.ts",
+		"src/routes/(library)/books/[book=id]/+page.server.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/books/[book=id]/cover": [
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/books/[book=id]/cover/file": [
+		"src/routes/(library)/books/[book=id]/cover/file/+server.ts"
+	],
+	"/(library)/books/[book=id]/download/[[asset]]": [
+		"src/routes/(library)/books/[book=id]/download/[[asset]]/+server.ts"
+	],
+	"/(library)/books/[book=id]/edit": [
+		"src/routes/(library)/books/[book=id]/edit/+page.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/books/[book=id]/llms.txt": [
+		"src/routes/(library)/books/[book=id]/llms.txt/+server.ts"
+	],
+	"/(library)/collections": [
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/collections/[collection]": [
+		"src/routes/(library)/collections/[collection]/+page.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/creators": [
+		"src/routes/(library)/creators/+page.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/creators/[creator=id]": [
+		"src/routes/(library)/creators/[creator=id]/+page.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/creators/[creator=id]/picture": [
+		"src/routes/(library)/creators/[creator=id]/picture/+server.ts"
+	],
+	"/device": [
+		"src/routes/device/+server.ts"
+	],
+	"/(library)/discover": [
+		"src/routes/(library)/discover/+layout.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/(library)/discover/+layout.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/discover/featured": [
+		"src/routes/(library)/discover/featured/+page.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/discover/[catalog=id]": [
+		"src/routes/(library)/discover/[catalog=id]/+page.server.ts",
+		"src/routes/(library)/discover/+layout.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/discover/[catalog=id]/[vanity]/[...segments=encoded_path]": [
+		"src/routes/(library)/discover/[catalog=id]/[vanity]/[...segments=encoded_path]/+page.ts",
+		"src/routes/(library)/discover/+layout.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/help": [
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/instance": [
+		"src/routes/(library)/instance/+layout.server.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/instance/profile": [
+		"src/routes/(library)/instance/profile/+page.ts",
+		"src/routes/(library)/instance/profile/+page.server.ts",
+		"src/routes/(library)/instance/+layout.server.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/instance/settings": [
+		"src/routes/(library)/instance/settings/+page.ts",
+		"src/routes/(library)/instance/+layout.server.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/publishers": [
+		"src/routes/(library)/publishers/+page.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/publishers/[publisher]": [
+		"src/routes/(library)/publishers/[publisher]/+page.ts",
+		"src/routes/(library)/publishers/[publisher]/+page.server.ts",
+		"src/routes/(library)/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/(library)/publishers/[publisher]/picture": [
+		"src/routes/(library)/publishers/[publisher]/picture/+server.ts"
+	],
+	"/site.webmanifest": [
+		"src/routes/site.webmanifest/+server.ts"
+	]
+}

@@ -1,0 +1,72 @@
+{
+  "name": "@colibri-hq/sdk",
+  "version": "0.0.1",
+  "type": "module",
+  "license": "MIT",
+  "description": "The Colibri SDK",
+  "keywords": [
+    "colibri",
+    "server",
+    "ebooks",
+    "ebook-management",
+    "epub",
+    "opds"
+  ],
+  "homepage": "https://github.com/colibri-hq/colibri",
+  "author": {
+    "name": "Moritz Mazetti",
+    "email": "m@9dev.de",
+    "url": "https://mazetti.me"
+  },
+  "repository": {
+    "url": "git+https://github.com/colibri-hq/colibri.git",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "packageManager": "pnpm@10.6.5",
+  "scripts": {
+    "build": "unbuild",
+    "dev": "unbuild --watch",
+    "prepack": "unbuild",
+    "types": "kysely-codegen --dialect postgres --env-file ../../.env --url 'env(DB_URL)' --out-file ./src/schema.d.ts --type-only-imports --default-schema public --exclude-pattern \"auth.*\" --include-pattern \"(public|authentication).*\""
+  },
+  "dependencies": {
+    "@colibri-hq/oauth": "workspace:*",
+    "@colibri-hq/shared": "workspace:*",
+    "jsonwebtoken": "catalog:",
+    "kysely": "^0.27.6",
+    "pg": "^8.14.1",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@simplewebauthn/server": "^13.1.1",
+    "@types/jsonwebtoken": "catalog:",
+    "@types/pg": "^8.11.11",
+    "kanel": "^3.11.1",
+    "kanel-kysely": "^0.7.0",
+    "kysely-codegen": "^0.18.3",
+    "unbuild": "catalog:"
+  },
+  "module": "dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./schema": {
+      "import": "./src/schema.d.ts",
+      "types": "./src/schema.d.ts"
+    },
+    "./oauth": {
+      "import": "./dist/oauth/index.mjs",
+      "types": "./dist/oauth/index.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ]
+}

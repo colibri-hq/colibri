@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/apps/app/playwright" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/apps/app/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/apps/app/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/cli/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/cli/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/sdk/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/shared/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/ui/e2e" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/ui/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/supabase/migrations" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/.svelte-kit/generated" />
+      <excludeFolder url="file://$MODULE_DIR$/.svelte-kit/output" />
+      <excludeFolder url="file://$MODULE_DIR$/apps/app/.svelte-kit/adapter-node" />
+      <excludeFolder url="file://$MODULE_DIR$/apps/app/.svelte-kit/generated" />
+      <excludeFolder url="file://$MODULE_DIR$/apps/app/.svelte-kit/output" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/cli/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/sdk/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/shared/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/ui/.svelte-kit/__package__" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/ui/.svelte-kit/generated" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/ui/.svelte-kit/output" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/ui/build" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/ui/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/supabase/.temp" />
+      <excludeFolder url="file://$MODULE_DIR$/test-results" />
+      <excludePattern pattern="´" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

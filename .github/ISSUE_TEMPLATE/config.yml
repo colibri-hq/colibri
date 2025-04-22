@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 👨‍💻 Contact
+    url: https://mazetti.me
+    about: Get direct help from the author of Calibre
+  - name: ❓ Questions
+    url: https://github.com/colibri-hq/colibri/discussions/new?category=Q-A
+    about: Ask a question or discuss about Pinia
+  - name: 💡 Ideas
+    url: https://github.com/colibri-hq/colibri/discussions/new?category=Ideas
+    about: Start a discussion to improve Pinia

@@ -1,0 +1,60 @@
+{
+  "name": "@colibri-hq/shared",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "The Colibri SDK",
+  "keywords": [
+    "colibri",
+    "server",
+    "ebooks",
+    "ebook-management",
+    "epub",
+    "opds"
+  ],
+  "homepage": "https://github.com/colibri-hq/colibri",
+  "author": {
+    "name": "Moritz Mazetti",
+    "email": "m@9dev.de",
+    "url": "https://mazetti.me"
+  },
+  "repository": {
+    "url": "git+https://github.com/colibri-hq/colibri.git",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "packageManager": "pnpm@10.6.5",
+  "scripts": {
+    "build": "unbuild",
+    "dev": "unbuild --watch",
+    "prepack": "unbuild",
+    "test": "vitest --config ./tsconfig.test.json",
+    "test:coverage": "vitest run --config ./tsconfig.test.json --coverage",
+    "test:ui": "vitest --config ./tsconfig.test.json --ui"
+  },
+  "dependencies": {
+    "blurhash": "^2.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
+    "unbuild": "catalog:",
+    "vitest": "catalog:"
+  },
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@colibri-hq/create",
+  "version": "0.0.1",
+  "type": "module",
+  "license": "MIT",
+  "description": "The Colibri server",
+  "keywords": [
+    "colibri",
+    "server",
+    "ebooks",
+    "ebook-management",
+    "epub",
+    "opds"
+  ],
+  "homepage": "https://github.com/colibri-hq/colibri",
+  "author": {
+    "name": "Moritz Mazetti",
+    "email": "m@9dev.de",
+    "url": "https://mazetti.me"
+  },
+  "repository": {
+    "url": "git+https://github.com/colibri-hq/colibri.git",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "packageManager": "pnpm@10.6.5"
+}

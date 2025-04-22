@@ -9,12 +9,11 @@ node_modules
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-src/database.d.ts
+packages/*/node_modules
+packages/*/dist
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
+
+*storybook.log

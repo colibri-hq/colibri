@@ -1,0 +1,125 @@
+<script lang="ts" module>
+  import type { Catalog } from './+page.svelte';
+
+  export type CatalogActivityEvent = CustomEvent<{ catalog: Catalog }>;
+  export type EnableCatalogEvent = CatalogActivityEvent;
+  export type DisableCatalogEvent = CatalogActivityEvent;
+</script>
+
+<script lang="ts">
+  import Toggle, { type ToggleEvent } from '$lib/components/Form/Toggle.svelte';
+  import { createEventDispatcher } from 'svelte';
+    import { Icon } from '@colibri-hq/ui';
+  import { parseCssColor, rgbToCssColor } from '$lib/colors';
+
+  interface Props {
+    catalog: Catalog;
+    disabled?: boolean;
+  }
+
+  let { catalog, disabled = false }: Props = $props();
+
+  const dispatch = createEventDispatcher<{
+    enable: EnableCatalogEvent['detail'];
+    disable: DisableCatalogEvent['detail'];
+  }>();
+
+  function toggle({ detail: active }: ToggleEvent) {
+    if (disabled || catalog.active === active) {
+      return;
+    }
+
+    dispatch(active ? 'enable' : 'disable', { catalog });
+  }
+
+  let backgroundColor = $derived(
+    catalog.color
+      ? rgbToCssColor(parseCssColor(`rgb${catalog.color}`), 0.25)
+      : undefined,
+  );
+  let title = $derived(catalog.title ?? new URL(catalog.feed_url).hostname);
+</script>
+
+<li
+  class="rounded-3xl bg-gray-50 shadow-inner-sm dark:bg-gray-900 dark:shadow-none dark:ring
+  dark:ring-gray-700/50"
+>
+  <div
+    class="flex items-start rounded-3xl p-4"
+    style:background="linear-gradient(120deg, {backgroundColor} 5%, transparent 50%)"
+  >
+    <!-- region Catalog image -->
+    <div
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-white"
+    >
+      {#if catalog.image_url}
+        <img
+          src={catalog.image_url}
+          class="h-auto w-8 overflow-hidden rounded-full object-cover"
+          alt="Logo of the catalog feed of {catalog.title}"
+        />
+      {:else}
+        <Icon name="local_library" class="text-gray-500 dark:text-gray-400" />
+      {/if}
+    </div>
+    <!-- endregion -->
+
+    <!-- region Catalog metadata -->
+    <div class="mx-2 flex flex-col overflow-hidden">
+      <!-- region Catalog title -->
+      <div class="flex flex-col items-start md:flex-row md:items-center">
+        <strong class="leading-none text-inherit">{title}</strong>
+        {#if catalog.credentials_required}
+          <span
+            class="mt-1 flex items-center whitespace-nowrap rounded border border-current pl-1 pr-0.5 text-xs font-semibold
+            uppercase text-orange-500 md:ml-2 md:mt-0 dark:text-orange-400"
+          >
+            <span>
+              Requires Auth<span class="hidden md:inline">entication</span>
+            </span>
+            <Icon
+              name="lock"
+              class="ml-0.5 text-xs leading-none text-orange-500 dark:text-orange-400"
+              weight={800}
+            />
+          </span>
+        {/if}
+      </div>
+      <!-- endregion -->
+
+      <!-- region Catalog feed URL -->
+      <a
+        class="max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm
+        opacity-50 outline-none hover:underline focus-visible:text-gray-400
+        focus-visible:underline dark:focus-visible:text-gray-300"
+        href={catalog.feed_url}
+        rel="noopener nofollow"
+        target="_blank">{catalog.feed_url}</a
+      >
+      <!-- endregion -->
+
+      {#if catalog.description}
+        <p class="mt-1">{catalog.description}</p>
+      {/if}
+
+      <a
+        class="mt-2 text-blue-500 hover:underline dark:text-blue-400"
+        href={catalog.url}
+      >
+        Visit website &raquo;
+      </a>
+    </div>
+    <!-- endregion -->
+
+    <!-- region Toggle -->
+    <div class="ml-auto flex items-center justify-center self-center">
+      <Toggle
+        {disabled}
+        on:change={toggle}
+        size="medium"
+        value={catalog.active}
+      />
+    </div>
+    <!-- endregion -->
+  </div>
+</li>

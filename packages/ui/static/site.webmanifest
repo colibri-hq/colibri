@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "name": "Colibri",
+  "short_name": "Colibri",
+  "icons": [
+    {
+      "src": "/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "theme_color": "#EDEBE4",
+  "background_color": "#EDEBE4",
+  "display": "standalone"
+}

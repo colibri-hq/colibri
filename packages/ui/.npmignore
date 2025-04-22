@@ -1,0 +1,3 @@
+**/*.stories.svelte
+**/*.stories.svelte.d.ts
+**/*.stories.svelte.d.ts.map

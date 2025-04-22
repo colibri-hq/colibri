@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+pnpm run --filter "@colibri-hq/app" start

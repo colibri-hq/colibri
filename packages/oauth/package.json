@@ -1,0 +1,75 @@
+{
+  "name": "@colibri-hq/oauth",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "OAuth 2.0 authorization server implementation",
+  "keywords": [
+    "colibri",
+    "server",
+    "ebooks",
+    "ebook-management",
+    "epub",
+    "opds"
+  ],
+  "homepage": "https://github.com/colibri-hq/colibri",
+  "author": {
+    "name": "Moritz Mazetti",
+    "email": "m@9dev.de",
+    "url": "https://mazetti.me"
+  },
+  "repository": {
+    "url": "git+https://github.com/colibri-hq/colibri.git",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "packageManager": "pnpm@10.6.5",
+  "scripts": {
+    "build": "unbuild",
+    "dev": "unbuild --watch",
+    "prepack": "unbuild",
+    "test": "vitest",
+    "test:coverage": "vitest run --config ./tsconfig.test.json --coverage",
+    "test:ui": "vitest --config ./tsconfig.test.json --ui",
+    "lint": "eslint src",
+    "format": "prettier --write src"
+  },
+  "dependencies": {
+    "@colibri-hq/shared": "workspace:*",
+    "jsonwebtoken": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@fastify/cors": "^11.0.1",
+    "@fastify/formbody": "^8.0.2",
+    "@types/jsonwebtoken": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
+    "eslint": "catalog:",
+    "fastify": "^5.2.2",
+    "prettier": "catalog:",
+    "supertest": "^7.1.0",
+    "typescript": "catalog:",
+    "unbuild": "catalog:",
+    "vitest": "catalog:"
+  },
+  "module": "dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./grantType": {
+      "import": "./dist/grantTypes/grantType.mjs",
+      "types": "./dist/grantTypes/grantType.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ]
+}

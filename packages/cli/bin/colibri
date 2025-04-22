@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+set -e
+
+abort() {
+  echo "${1}" >&2
+  echo "" >&2
+  exit 1
+}
+
+base_path=$(dirname "$(realpath "$0")")
+node_path=$(command -v node || abort "Node.js executable not found. Please install Node.js to run this script.")
+exec "${node_path}" "${base_path}/../dist/index.mjs" "$@"
+
