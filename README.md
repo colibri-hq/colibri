@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./apps/app/static/favicon-96x96.png" alt="The Colibri Logo; a small Colibri bird stylised as a letter 'C'.">
+</p>
+
 # Colibri
 
 Self-hosted ebook library with a gorgeous web interface, book collections, and metadata editing.
@@ -7,6 +11,14 @@ Self-hosted ebook library with a gorgeous web interface, book collections, and m
 Colibri allows you to manage your books, sort them into collections, and to read and download them. It is built on
 [SvelteKit](https://kit.svelte.dev) and can run in serverless environments. Colibri also employs password-less
 authentication via [Passkeys](https://www.passkeys.io).
+
+> **Hey there!** 👋
+> Colibri is **still under active development** and not ready for prime-time yet. I'm also looking for contributors and
+> co-maintainers on the project: There is *a lot* left to do, and I have big plans for the app (none of them involve
+> making it a paid product, by the way).
+>
+> If you'd like to be a part of this effort and contribute something—code, design-wise, or anything else really—please
+> contact me!
 
 Features
 --------
