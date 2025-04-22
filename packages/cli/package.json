@@ -69,7 +69,7 @@
     "@oclif/plugin-not-found": "^3.2.49",
     "@oclif/plugin-plugins": "^5.4.36",
     "ansis": "^3.17.0",
-    "open": "^10.1.0",
+    "open": "^10.1.1",
     "ora": "^8.2.0",
     "zod": "catalog:"
   },
