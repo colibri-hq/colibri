@@ -46,7 +46,7 @@
     "dayjs": "^1.11.13",
     "debounce": "^2.2.0",
     "jsonwebtoken": "catalog:",
-    "mdsvex": "^0.12.3",
+    "mdsvex": "^0.12.5",
     "pdfjs-dist": "^5.1.91",
     "playwright": "^1.51.1",
     "svelte-file-dropzone": "^2.0.9",
