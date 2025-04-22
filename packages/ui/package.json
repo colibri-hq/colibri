@@ -93,7 +93,7 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-svelte": "catalog:",
     "prettier-plugin-tailwindcss": "catalog:",
-    "publint": "^0.3.9",
+    "publint": "^0.3.12",
     "storybook": "^8.6.11",
     "svelte": "catalog:",
     "svelte-check": "catalog:",
