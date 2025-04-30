@@ -1,7 +1,6 @@
-test-results
-node_modules
-
-# Output
+node_modules/
+.turbo/
+.cache/
 .output
 .vercel
 .netlify
@@ -9,8 +8,7 @@ node_modules
 /.svelte-kit
 /build
 /dist
-
-# OS
+test-results
 .DS_Store
 Thumbs.db
 

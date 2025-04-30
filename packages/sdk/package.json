@@ -51,7 +51,7 @@
     "kanel": "^3.13.0",
     "kanel-kysely": "^0.7.1",
     "kysely-codegen": "^0.18.3",
-    "prettier": "catalog:",
+    "prettier": "catalog:"
   },
   "module": "dist/index.js",
   "exports": {
