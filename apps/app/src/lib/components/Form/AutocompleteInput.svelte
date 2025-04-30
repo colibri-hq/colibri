@@ -1,17 +1,6 @@
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
-<script context="module" lang="ts">
-  interface Entity {
-    id: string;
-    value: string;
-  }
-
-  // eslint-disable-next-line no-undef
-  type T = $$Generic<Entity> & { id: string; value: string };
-</script>
-
-<script lang="ts">
-  import { Field } from '@colibri-hq/ui';
-  import { Icon } from '@colibri-hq/ui';
+<script lang="ts" generics="T extends { id: string; value: string; }">
+  import { Field, Icon } from '@colibri-hq/ui';
   import { onMount } from 'svelte';
   import { createCombobox } from 'svelte-headlessui';
   import { debounceTimer } from 'svelte-reactive-debounce';
@@ -126,7 +115,7 @@
   </svelte:fragment>
 
   <button
-    class="absolute inset-y-0 right-0 flex h-full items-end pb-1 pr-1"
+    class="absolute inset-y-0 right-0 flex h-full items-end pr-1 pb-1"
     type="button"
     use:combobox.button
   >
@@ -158,9 +147,9 @@
       use:combobox.items
       class="absolute top-full z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white/50 py-1 text-base shadow-lg backdrop-blur-2xl backdrop-saturate-200 focus:outline-none sm:text-sm dark:bg-black/25"
     >
-      {#each items as item}
+      {#each items as item, index (index)}
         <li
-          class="relative cursor-default select-none py-2 pl-10 pr-4 {$combobox
+          class="relative cursor-default py-2 pr-4 pl-10 select-none {$combobox
             .active?.id === item.id
             ? 'bg-blue-600/25 text-white backdrop-blur-2xl backdrop-saturate-200'
             : 'text-gray-900 dark:text-gray-400'}"

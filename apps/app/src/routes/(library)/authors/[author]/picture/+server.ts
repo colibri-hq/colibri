@@ -1,4 +1,4 @@
-import { error, redirect, type RequestHandler } from '@sveltejs/kit';
+import { error, redirect, type RequestHandler } from "@sveltejs/kit";
 
 const handler: RequestHandler = async function ({
   params,
@@ -6,18 +6,18 @@ const handler: RequestHandler = async function ({
 }): Promise<Response> {
   const id = params.author;
 
-  if (typeof id !== 'string') {
-    return error(400, 'Invalid creator ID');
+  if (typeof id !== "string") {
+    return error(400, "Invalid creator ID");
   }
 
   const creator = await database
-    .selectFrom('creator')
+    .selectFrom("creator")
     .selectAll()
-    .where('id', '=', id)
+    .where("id", "=", id)
     .executeTakeFirstOrThrow();
 
   if (creator.image === null) {
-    return error(404, 'No picture available');
+    return error(404, "No picture available");
   }
 
   throw redirect(307, creator.image);

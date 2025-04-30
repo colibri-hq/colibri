@@ -1,7 +1,7 @@
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import PaginationButton from '$lib/components/Pagination/PaginationButton.svelte';
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
   import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher<{
@@ -109,7 +109,7 @@
         </li>
       {/if}
 
-      {#each pages as page}
+      {#each pages as page, index (index)}
         <li class="group/pagination contents">
           <PaginationButton
             label="Page {page}{isCurrent(page) ? ' (current)' : ''}"

@@ -1,4 +1,5 @@
-import { paginatable, paginatedResults, procedure, t } from '$lib/trpc/t';
+import { env } from "$env/dynamic/private";
+import { paginatable, paginatedResults, procedure, t } from "$lib/trpc/t";
 import {
   createUser,
   findUserByIdentifier,
@@ -7,11 +8,10 @@ import {
   removeAuthenticator,
   type UpdatableUser,
   updateUser,
-} from '@colibri-hq/sdk';
-import type { AuthenticationUserRole } from '@colibri-hq/sdk/schema';
-import { signUrl } from '@colibri-hq/shared';
-import { z } from 'zod';
-import { APP_SECRET_KEY } from '$env/static/private';
+} from "@colibri-hq/sdk";
+import type { AuthenticationUserRole } from "@colibri-hq/sdk/schema";
+import { signUrl } from "@colibri-hq/shared";
+import { z } from "zod";
 
 export const users = t.router({
   list: procedure()
@@ -62,7 +62,7 @@ export const users = t.router({
     .input(
       z.object({
         name: z.string().optional(),
-        colorScheme: z.enum(['system', 'light', 'dark']).optional(),
+        colorScheme: z.enum(["system", "light", "dark"]).optional(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -94,25 +94,25 @@ export const users = t.router({
         email: z.string().email(),
         role: z
           .enum([
-            'admin' as AuthenticationUserRole,
-            'adult' as AuthenticationUserRole,
-            'child' as AuthenticationUserRole,
+            "admin" as AuthenticationUserRole,
+            "adult" as AuthenticationUserRole,
+            "child" as AuthenticationUserRole,
           ] as const)
-          .default('adult'),
+          .default("adult"),
         expiresAt: z.coerce.date().optional(),
       }),
     )
     .query(({ input: { email, role, expiresAt }, ctx: { url, userId } }) => {
       const link = new URL(`/invitations/accept`, url);
-      link.searchParams.set('by', userId);
-      link.searchParams.set('to', email);
-      link.searchParams.set('as', role);
+      link.searchParams.set("by", userId);
+      link.searchParams.set("to", email);
+      link.searchParams.set("as", role);
 
       if (expiresAt) {
-        link.searchParams.set('ttl', expiresAt.toISOString());
+        link.searchParams.set("ttl", expiresAt.toISOString());
       }
 
-      return signUrl(link, APP_SECRET_KEY);
+      return signUrl(link, env.APP_SECRET_KEY);
     }),
 
   createUser: procedure()
@@ -123,11 +123,11 @@ export const users = t.router({
         birthDate: z.coerce.date().optional(),
         role: z
           .enum([
-            'admin' as AuthenticationUserRole,
-            'adult' as AuthenticationUserRole,
-            'child' as AuthenticationUserRole,
+            "admin" as AuthenticationUserRole,
+            "adult" as AuthenticationUserRole,
+            "child" as AuthenticationUserRole,
           ] as const)
-          .default('adult'),
+          .default("adult"),
       }),
     )
     .mutation(

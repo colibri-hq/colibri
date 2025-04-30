@@ -16,7 +16,7 @@
 </script>
 
 <ul>
-  {#each filteredIssues as { message, path }}
+  {#each filteredIssues as { message, path }, index (index)}
     <li>{path[0]}: {message}</li>
   {/each}
 </ul>

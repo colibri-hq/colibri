@@ -2,7 +2,7 @@
   interface Props {
     class: string;
 
-    [key: string]: any;
+    [key: string]: unknown;
   }
 
   let { class: className, ...rest }: Props = $props();

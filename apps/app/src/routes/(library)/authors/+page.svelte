@@ -15,7 +15,7 @@
   </header>
 
   <ul class="grid grid-cols-3 gap-4">
-    {#each data.authors as author}
+    {#each data.authors as author, index (index)}
       <AuthorLink {author} />
     {/each}
   </ul>

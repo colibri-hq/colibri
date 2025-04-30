@@ -28,21 +28,33 @@
   },
   "packageManager": "pnpm@10.6.5",
   "scripts": {
-    "build": "unbuild",
-    "dev": "unbuild --watch",
+    "build": "tsc",
+    "dev": "tsc --watch",
     "prepack": "unbuild",
     "test": "vitest --config ./tsconfig.test.json",
     "test:coverage": "vitest run --config ./tsconfig.test.json --coverage",
-    "test:ui": "vitest --config ./tsconfig.test.json --ui"
+    "test:ui": "vitest --config ./tsconfig.test.json --ui",
+    "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
+    "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
+    "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
+    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content ."
   },
   "dependencies": {
     "blurhash": "^2.0.5"
   },
   "devDependencies": {
+    "@eslint/js": "catalog:",
+    "@sveltejs/kit": "catalog:",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
-    "unbuild": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "eslint-plugin-oxlint": "^0.16.8",
+    "eslint-plugin-svelte": "catalog:",
+    "globals": "catalog:",
+    "oxlint": "^0.16.8",
+    "typescript-eslint": "catalog:",
     "vitest": "catalog:"
   },
   "module": "dist/index.js",
@@ -50,6 +62,15 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./prettier.config": {
+      "default": "./prettier.config.js",
+      "types": "./config.d.ts"
+    },
+    "./eslint.config": {
+      "import": "./eslint.config.ts",
+      "default": "./eslint.config.ts",
+      "types": "./config.d.ts"
     }
   },
   "sideEffects": false,

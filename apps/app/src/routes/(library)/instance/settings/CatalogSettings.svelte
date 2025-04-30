@@ -62,7 +62,7 @@
       </p>
     </div>
 
-    <Button class="mr-auto mt-4 md:mr-0 md:mt-0" onClick={showCatalogModal}>
+    <Button class="mt-4 mr-auto md:mt-0 md:mr-0" onClick={showCatalogModal}>
       Add new catalog
     </Button>
   </header>
@@ -70,7 +70,7 @@
   <PaginatedList {data}>
     {#snippet children({ items })}
       <ul class="space-y-4">
-        {#each items as catalog}
+        {#each items as catalog, index (index)}
           <CatalogListItem
             {catalog}
             disabled={isLoading(catalog)}

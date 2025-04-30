@@ -1,5 +1,5 @@
-import { trpc } from '$lib/trpc/client';
-import type { PageLoad } from './$types';
+import { trpc } from "$lib/trpc/client";
+import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async function load(event) {
   const router = trpc(event);
@@ -12,7 +12,7 @@ export const load: PageLoad = async function load(event) {
     .query(collectionId)
     .catch(() => []);
 
-  event.depends('trpc:comments.loadComments', 'trpc:collections.load');
+  event.depends("trpc:comments.loadComments", "trpc:collections.load");
 
   return {
     comments,

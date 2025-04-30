@@ -1,4 +1,4 @@
-import type { StorybookConfig } from '@storybook/sveltekit';
+import type { StorybookConfig } from "@storybook/sveltekit";
 
 const config = {
   core: {
@@ -6,18 +6,18 @@ const config = {
     enableCrashReports: false,
     disableTelemetry: true,
   },
-  stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|ts|svelte)'],
+  stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|ts|svelte)"],
   addons: [
-    '@storybook/addon-svelte-csf',
-    '@storybook/addon-essentials',
-    '@storybook/addon-interactions',
+    "@storybook/addon-svelte-csf",
+    "@storybook/addon-essentials",
+    "@storybook/addon-interactions",
   ],
   framework: {
-    name: '@storybook/sveltekit',
+    name: "@storybook/sveltekit",
     options: {},
   },
   docs: {
-    defaultName: 'Documentation',
+    defaultName: "Documentation",
   },
 } satisfies StorybookConfig;
 

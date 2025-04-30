@@ -1,25 +1,25 @@
-import type { WorkerMessage } from '$lib/workers/workers';
+import type { WorkerMessage } from "$lib/workers/workers";
 import {
   createArrayBufferFromStream,
   encodeImageToBlurHash,
   getImageDimensions,
-} from '@colibri-hq/shared';
+} from "@colibri-hq/shared";
 
 onmessage = async ({ data }: MessageEvent<WorkerMessage>) => {
   const transfer: Transferable[] = [];
   let response: WorkerMessage;
 
   switch (data.type) {
-    case 'dimensions':
+    case "dimensions":
       response = {
-        type: 'dimensions',
+        type: "dimensions",
         payload: await dimensions(data.payload),
       };
       break;
 
-    case 'blurhash':
+    case "blurhash":
       response = {
-        type: 'blurhash',
+        type: "blurhash",
         payload: await blurhash(data.payload),
       };
       break;
@@ -56,7 +56,7 @@ async function blurhash({
   canvas,
   data,
 }: BlurhashRequest): Promise<BlurhashResponse> {
-  const context = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
+  const context = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D;
   const hash = await encodeImageToBlurHash(data, context);
 
   return { hash };

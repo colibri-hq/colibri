@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { trpc } from '$lib/trpc/client';
-import type { PageLoad } from './$types';
+import { trpc } from "$lib/trpc/client";
+import type { PageLoad } from "./$types";
 
 export const load = async function load(event: Parameters<PageLoad>[0]) {
   const bookId = event.params.book;

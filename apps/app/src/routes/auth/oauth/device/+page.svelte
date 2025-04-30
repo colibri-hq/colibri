@@ -3,7 +3,7 @@
   import { Button } from '@colibri-hq/ui';
   import { enhance } from '$app/forms';
   import DigitInput from '$lib/components/Auth/Digits/DigitInput.svelte';
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
   import AuthorizationPrompt from '$lib/components/Auth/OAuth/AuthorizationPrompt.svelte';
   import { tick } from 'svelte';
 

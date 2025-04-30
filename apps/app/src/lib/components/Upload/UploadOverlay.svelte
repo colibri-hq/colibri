@@ -75,7 +75,7 @@
 />
 
 <div
-  class="fixed left-0 top-0 z-50 flex h-full w-full bg-blue-500/25 p-8
+  class="fixed top-0 left-0 z-50 flex h-full w-full bg-blue-500/25 p-8
      backdrop-blur-xl backdrop-saturate-200 transition"
   class:opacity-0={!showDragOverlay}
   class:opacity-100={showDragOverlay}

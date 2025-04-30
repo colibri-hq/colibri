@@ -13,7 +13,7 @@
     form: ActionData;
   }
 
-  let { form }: Props = $props();
+  let { data, form }: Props = $props();
 
   let issues = $state<ZodIssue[]>(form?.issues ?? []);
   let webauthnAvailable = $state(true);
@@ -49,7 +49,7 @@
 </script>
 
 <article
-  class="mx-auto max-w-sm rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-2xl shadow-gray-500/5"
+  class="mx-auto max-w-sm rounded-2xl bg-white p-6 shadow-2xl shadow-gray-500/5 dark:bg-gray-800"
 >
   <PageHeader title="Sign in" />
 

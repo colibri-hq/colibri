@@ -23,6 +23,6 @@
   {...rest}
   class="error mb-8 flex max-w-lg items-start rounded bg-red-500 px-4 py-2 text-white shadow-md {className}"
 >
-  <Icon class="mr-4 mt-1" name={icon} />
+  <Icon class="mt-1 mr-4" name={icon} />
   {#if children}{@render children()}{:else}<span>{message}</span>{/if}
 </div>

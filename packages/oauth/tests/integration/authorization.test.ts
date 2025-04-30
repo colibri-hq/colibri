@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { createMockPersistence, createTestServer } from "../utilities";
-import { AuthorizationCodeGrant, type Entities } from "../../src";
+import { type Entities } from "../../src";
 import type { FastifyInstance } from "fastify";
 
 describe("OAuth Integration Tests", () => {
@@ -31,8 +31,8 @@ describe("OAuth Integration Tests", () => {
       scopes: ["read"],
       user_id: "",
       used_at: null,
-      code_challenge: null,
-      code_challenge_method: null,
+      challenge: "test-challenge",
+      challenge_method: "S256",
     };
 
     persistence.loadAuthorizationCode.mockResolvedValue(mockCode);

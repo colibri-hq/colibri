@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Field } from '@colibri-hq/ui';
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
   import { clickOutside } from '$lib/utilities';
   import type { Snippet } from 'svelte';
 
@@ -469,13 +469,13 @@
   let filteredGroups = $derived(
     filterTerm
       ? iconGroups
-        .map(({ name, icons }) => ({
-          icons: name.toLowerCase().startsWith(filterTerm)
-            ? icons
-            : icons.filter((icon) => icon.includes(filterTerm)),
-          name,
-        }))
-        .filter(({ icons }) => icons.length > 0)
+          .map(({ name, icons }) => ({
+            icons: name.toLowerCase().startsWith(filterTerm)
+              ? icons
+              : icons.filter((icon) => icon.includes(filterTerm)),
+            name,
+          }))
+          .filter(({ icons }) => icons.length > 0)
       : iconGroups,
   );
 
@@ -499,13 +499,17 @@
 <svelte:window onkeyup={handleEscape} />
 
 <div class="relative">
-  <button type="button" class="contents cursor-pointer" onclick={() => (open = true)}>
+  <button
+    type="button"
+    class="contents cursor-pointer"
+    onclick={() => (open = true)}
+  >
     {@render activator?.({ open })}
   </button>
 
   {#if open}
     <article
-      class="absolute left-0 top-full mt-2"
+      class="absolute top-full left-0 mt-2"
       use:clickOutside
       onclickOutside={() => (open = false)}
     >
@@ -525,7 +529,7 @@
         </header>
 
         <div class="gap-y-8">
-          {#each filteredGroups as group}
+          {#each filteredGroups as group, index (index)}
             <section class="">
               <header
                 class="sticky top-0 mb-2 border-b border-gray-200 bg-white px-6 py-2 dark:border-gray-800 dark:bg-black"
@@ -533,7 +537,7 @@
                 <h4 class="font-bold">{group.name}</h4>
               </header>
               <div class="grid grid-cols-6 px-2 pb-2">
-                {#each group.icons as icon}
+                {#each group.icons as icon, index (index)}
                   <button
                     class="icon-button"
                     class:active={value === icon}
@@ -558,17 +562,17 @@
 </div>
 
 <style lang="postcss">
-    @reference "../../style.css";
+  @reference "../../style.css";
 
-    .chevron {
-        @apply relative ml-5 w-4 border-x-8 border-b-8 border-t-0 border-solid border-x-transparent border-b-gray-200 after:absolute after:-left-2 after:top-0.5 after:block after:w-4 after:border-x-8 after:border-b-8 after:border-t-0 after:border-solid after:border-x-transparent after:border-b-white after:content-[attr(none)] dark:border-b-gray-800 after:dark:border-b-black;
+  .chevron {
+    @apply relative ml-5 w-4 border-x-8 border-t-0 border-b-8 border-solid border-x-transparent border-b-gray-200 after:absolute after:top-0.5 after:-left-2 after:block after:w-4 after:border-x-8 after:border-t-0 after:border-b-8 after:border-solid after:border-x-transparent after:border-b-white after:content-[attr(none)] dark:border-b-gray-800 after:dark:border-b-black;
+  }
+
+  .icon-button {
+    @apply rounded-lg pt-3 pb-1 hover:bg-gray-200 dark:hover:bg-gray-900;
+
+    &.active {
+      @apply text-blue-500;
     }
-
-    .icon-button {
-        @apply rounded-lg pb-1 pt-3 hover:bg-gray-200 dark:hover:bg-gray-900;
-
-        &.active {
-            @apply text-blue-500;
-        }
-    }
+  }
 </style>

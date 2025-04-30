@@ -65,14 +65,18 @@
     onActivate?.();
   }
 
-  const classes = $derived.by(() => twMerge(
-    'mx-2 group-first:ml-0 group-last:mr-0 px-0.5 py-2 border-b-2 border-transparent ' +
-    'focus:outline-none transition hover:border-b-blue-500/50 focus-visible:border-b-blue-500/50',
-    context.classes,
-    open ? 'border-b-blue-500 hover:border-b-blue-500' : 'border-b-transparent',
-    isDisabled ? 'opacity-50' : '',
-    open && isDisabled ? 'border-b-gray-500' : '',
-  ));
+  const classes = $derived.by(() =>
+    twMerge(
+      'mx-2 group-first:ml-0 group-last:mr-0 px-0.5 py-2 border-b-2 border-transparent ' +
+        'focus:outline-none transition hover:border-b-blue-500/50 focus-visible:border-b-blue-500/50',
+      context.classes,
+      open
+        ? 'border-b-blue-500 hover:border-b-blue-500'
+        : 'border-b-transparent',
+      isDisabled ? 'opacity-50' : '',
+      open && isDisabled ? 'border-b-gray-500' : '',
+    ),
+  );
 </script>
 
 <li class="group contents" role="presentation">

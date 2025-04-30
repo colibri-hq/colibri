@@ -1,14 +1,14 @@
-import { dev } from '$app/environment';
-import { env } from '$env/dynamic/private';
-import { sendMail } from '$lib/server/mail';
-import type { User } from '@colibri-hq/sdk';
-import { generateRandomString } from '@colibri-hq/shared';
-import type { Cookies } from '@sveltejs/kit';
-import type { JwtPayload } from 'jsonwebtoken';
-import jwt from 'jsonwebtoken';
+import { dev } from "$app/environment";
+import { env } from "$env/dynamic/private";
+import { sendMail } from "$lib/server/mail";
+import type { User } from "@colibri-hq/sdk";
+import { generateRandomString } from "@colibri-hq/shared";
+import type { Cookies } from "@sveltejs/kit";
+import type { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
-const defaultSessionIdCookieName = 'ksid';
-const defaultJwtCookieName = 'jwt';
+const defaultSessionIdCookieName = "ksid";
+const defaultJwtCookieName = "jwt";
 
 interface AccessTokenPayload extends JwtPayload {
   name: string;
@@ -26,7 +26,7 @@ interface AccessTokenPayload extends JwtPayload {
  * @param user
  */
 export function issueUserToken(
-  user: Pick<User, 'id' | 'name' | 'email' | 'role'>,
+  user: Pick<User, "id" | "name" | "email" | "role">,
 ) {
   const payload: Partial<AccessTokenPayload> = {
     name: user.name || user.email,
@@ -40,15 +40,15 @@ export function issueUserToken(
 
 export function verifyToken(token: string) {
   if (!token) {
-    throw new Error('Missing or invalid access token');
+    throw new Error("Missing or invalid access token");
   }
 
   const { payload } = jwt.verify(token, env.JWT_SECRET, {
     complete: true,
   });
 
-  if (typeof payload === 'string') {
-    throw new Error('Unexpected token payload');
+  if (typeof payload === "string") {
+    throw new Error("Unexpected token payload");
   }
 
   return payload as AccessTokenPayload;
@@ -70,10 +70,10 @@ export function setAuthSessionIdCookie(cookies: Cookies, sessionId: string) {
   const name = env.SESSION_ID_COOKIE_NAME || defaultSessionIdCookieName;
 
   cookies.set(name, sessionId, {
-    path: '/auth',
+    path: "/auth",
     maxAge: 60 * 5,
     httpOnly: true,
-    sameSite: 'strict',
+    sameSite: "strict",
   });
 }
 
@@ -87,7 +87,7 @@ export function setJwtCookie(cookies: Cookies, token: string) {
   const name = env.JWT_COOKIE_NAME || defaultJwtCookieName;
 
   cookies.set(name, token, {
-    path: '/',
+    path: "/",
     secure: !dev,
     httpOnly: true,
   });
@@ -101,7 +101,7 @@ export function getJwtCookie(cookies: Cookies) {
 
 export function resolveUserId(cookies: Cookies) {
   try {
-    const { sub } = verifyToken(getJwtCookie(cookies) || '');
+    const { sub } = verifyToken(getJwtCookie(cookies) || "");
 
     return sub;
   } catch {
@@ -116,7 +116,7 @@ export async function dispatchPasscode(
 ) {
   await sendMail({
     to: user.email,
-    subject: 'Verify passcode',
+    subject: "Verify passcode",
     text:
       `Colibri\r\n=====\r\nHi ${user.name}!\r\nYour verification code:\r\n` +
       `${code}\r\n\r\nAccess to your account isn't possible without this ` +

@@ -1,6 +1,6 @@
-import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
-import { homedir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
+import { homedir } from "node:os";
+import { dirname, join } from "node:path";
 
 interface InstanceConfig {
   databaseUri: string;
@@ -13,26 +13,25 @@ export interface Config {
 }
 
 const defaultFileVariant = join(
-  process.env.XDG_CONFIG_HOME || join(homedir(), '.config'),
-  'colibri',
-  'config.json',
+  process.env.XDG_CONFIG_HOME || join(homedir(), ".config"),
+  "colibri",
+  "config.json",
 );
 const configFileVariants = [
-  '.colibri.json',
+  ".colibri.json",
   defaultFileVariant,
-  join(homedir(), '.colibri', 'config.json'),
-  '/etc/colibri/config.json',
+  join(homedir(), ".colibri", "config.json"),
+  "/etc/colibri/config.json",
 ];
 
 export async function saveConfig(config: Config) {
-  const configFile = await findConfigFile() ?? defaultFileVariant;
+  const configFile = (await findConfigFile()) ?? defaultFileVariant;
 
   await mkdir(dirname(configFile), { recursive: true });
-  await writeFile(configFile, serializeConfig(config), 'utf8');
+  await writeFile(configFile, serializeConfig(config), "utf8");
 }
 
 export async function loadConfig(configFile?: string) {
-
   // If a config file is provided, we are in strict mode: If the file cannot be
   // found or is invalid, we will throw an error instead of silently returning
   // a new config object.
@@ -47,7 +46,7 @@ export async function loadConfig(configFile?: string) {
   }
 
   try {
-    const content = await readFile(configFile, 'utf8');
+    const content = await readFile(configFile, "utf8");
 
     return parseConfig(content);
   } catch (error) {
@@ -62,14 +61,13 @@ export async function loadConfig(configFile?: string) {
       );
     }
 
-    if ('code' in error && error.code === 'ENOENT') {
+    if ("code" in error && error.code === "ENOENT") {
       return createDefaultConfig();
     }
 
-    throw new Error(
-      `Failed to load configuration file: ${error}`,
-      { cause: error },
-    );
+    throw new Error(`Failed to load configuration file: ${error}`, {
+      cause: error,
+    });
   }
 }
 
@@ -83,8 +81,8 @@ async function findConfigFile() {
     } catch (error) {
       if (
         !(error instanceof Error) ||
-        !('code' in error) ||
-        error.code !== 'ENOENT'
+        !("code" in error) ||
+        error.code !== "ENOENT"
       ) {
         throw error;
       }

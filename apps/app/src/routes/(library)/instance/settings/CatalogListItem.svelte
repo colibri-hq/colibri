@@ -9,7 +9,7 @@
 <script lang="ts">
   import Toggle, { type ToggleEvent } from '$lib/components/Form/Toggle.svelte';
   import { createEventDispatcher } from 'svelte';
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
   import { parseCssColor, rgbToCssColor } from '$lib/colors';
 
   interface Props {
@@ -71,8 +71,8 @@
         <strong class="leading-none text-inherit">{title}</strong>
         {#if catalog.credentials_required}
           <span
-            class="mt-1 flex items-center whitespace-nowrap rounded border border-current pl-1 pr-0.5 text-xs font-semibold
-            uppercase text-orange-500 md:ml-2 md:mt-0 dark:text-orange-400"
+            class="mt-1 flex items-center rounded border border-current pr-0.5 pl-1 text-xs font-semibold whitespace-nowrap
+            text-orange-500 uppercase md:mt-0 md:ml-2 dark:text-orange-400"
           >
             <span>
               Requires Auth<span class="hidden md:inline">entication</span>
@@ -89,7 +89,7 @@
 
       <!-- region Catalog feed URL -->
       <a
-        class="max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm
+        class="max-w-full overflow-hidden text-sm text-ellipsis whitespace-nowrap
         opacity-50 outline-none hover:underline focus-visible:text-gray-400
         focus-visible:underline dark:focus-visible:text-gray-300"
         href={catalog.feed_url}

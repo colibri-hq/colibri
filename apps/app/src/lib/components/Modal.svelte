@@ -4,7 +4,7 @@
   import Portal from '$lib/components/Portal.svelte';
   import { clickOutside } from '$lib/utilities';
   import { browser } from '$app/environment';
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
 
   interface Props {
     class?: string;
@@ -58,7 +58,7 @@
 
     if (key === 'Tab') {
       // trap focus
-      // eslint-disable-next-line no-undef -- for some reason eslint doesn't recognize NodeListOf
+       
       const nodes = dialog.querySelectorAll('*') as NodeListOf<HTMLElement>;
       const tabbable = Array.from(nodes).filter((n) => n.tabIndex >= 0);
 
@@ -96,17 +96,17 @@
 <Portal>
   <dialog
     bind:this={dialog}
-    class="mt-[5vh] max-h-[calc(100%_-_5vh_-_2rem)] max-w-[calc(100%_-_4rem)] rounded-3xl bg-white shadow-xl
-    will-change-auto backdrop:pointer-events-none backdrop:bg-black/30 backdrop:backdrop-blur
-    transparency-reduce:backdrop:bg-white transparency-reduce:backdrop:backdrop-blur-0 dark:bg-gray-950
-    dark:text-gray-100 dark:backdrop:bg-white/5 transform-gpu
+    class="transparency-reduce:backdrop:backdrop-blur-0 mt-[5vh] max-h-[calc(100%_-_5vh_-_2rem)] max-w-[calc(100%_-_4rem)] transform-gpu rounded-3xl
+    bg-white shadow-xl will-change-auto backdrop:pointer-events-none
+    backdrop:bg-black/30 backdrop:backdrop-blur dark:bg-gray-950
+    dark:text-gray-100 dark:backdrop:bg-white/5 transparency-reduce:backdrop:bg-white
     transparency-reduce:dark:backdrop:bg-black"
     onclickOutside={close}
     use:clickOutside
   >
     <header
       class="sticky top-0 z-10 flex min-w-72 items-center justify-between border-b
-      bg-white/80 pb-1 pl-4 pr-2 pt-2 shadow-sm backdrop-blur dark:border-b-gray-900 dark:bg-black/70"
+      bg-white/80 pt-2 pr-2 pb-1 pl-4 shadow-sm backdrop-blur dark:border-b-gray-900 dark:bg-black/70"
     >
       <div>
         {@render header?.()}
@@ -114,8 +114,8 @@
 
       <button
         aria-label="Close the dialog"
-        class="flex items-center justify-center rounded-full bg-gray-50 p-2 outline-none
-        ring-blue-500 transition hover:bg-gray-100 focus-visible:ring-2 dark:bg-black/20 dark:hover:bg-black/60"
+        class="flex items-center justify-center rounded-full bg-gray-50 p-2 ring-blue-500
+        transition outline-none hover:bg-gray-100 focus-visible:ring-2 dark:bg-black/20 dark:hover:bg-black/60"
         onclick={close}
         type="button"
       >

@@ -28,18 +28,26 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "format": "prettier --write --cache ./.cache/prettier",
-    "lint": "eslint --cache ./.cache/eslint",
-    "dev": "pnpm --recursive --parallel --if-present --stream --resume-from=@colibri-hq/app run dev",
-    "docs": "pnpm --filter=docs run docs",
+    "fmt": "turbo fmt",
+    "lint": "turbo lint",
+    "dev": "turbo dev",
+    "build": "turbo build",
     "storybook": "pnpm --filter=@colibri-hq/ui run storybook"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "esbuild"
+      "esbuild",
+      "msw",
+      "svelte-preprocess"
     ],
     "ignoredBuiltDependencies": [
-      "svelte-preprocess"
+      "svelte-preprocess",
+      "unrs-resolver",
+      "yarn"
     ]
+  },
+  "packageManager": "pnpm@10.9.0+sha512.0486e394640d3c1fb3c9d43d49cf92879ff74f8516959c235308f5a8f62e2e19528a65cdc2a3058f587cde71eba3d5b56327c8c33a97e4c4051ca48a10ca2d5f",
+  "devDependencies": {
+    "turbo": "^2.5.2"
   }
 }

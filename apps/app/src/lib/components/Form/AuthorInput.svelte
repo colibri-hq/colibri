@@ -1,6 +1,6 @@
 <script lang="ts">
   import AutocompleteInput from '$lib/components/Form/AutocompleteInput.svelte';
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
   import { trpc } from '$lib/trpc/client';
   import type { Author } from '@prisma/client';
   import type { SvelteComponentTyped } from 'svelte';
@@ -46,7 +46,7 @@
 />
 {#if nameFixable}
   <div
-    class="flex cursor-pointer select-none items-center justify-end pt-1 text-xs text-blue-500"
+    class="flex cursor-pointer items-center justify-end pt-1 text-xs text-blue-500 select-none"
     onclick={() => input.updateQuery(fixedName)}
   >
     <Icon name="lightbulb" class="mr-1 text-sm" />

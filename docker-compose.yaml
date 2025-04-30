@@ -1,0 +1,16 @@
+services:
+  colibri:
+    build:
+      context: .
+      args:
+        PORT: 3000
+    environment:
+      DB_URL: "postgres://postgres:password@db:5432/colibri"
+    ports:
+      - published: 3000
+        target: 3000
+        protocol: tcp
+        app_protocol: http
+        name: web
+        mode: ingress
+        host_ip: "127.0.0.1"

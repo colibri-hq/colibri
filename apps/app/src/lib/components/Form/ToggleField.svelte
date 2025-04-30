@@ -9,7 +9,7 @@
     label?: string;
     readonly?: boolean;
 
-    [key: string]: any;
+    [key: string]: unknown;
   }
 
   let {
@@ -30,13 +30,13 @@
 <Field {...rest} class={classList} {label} {readonly}>
   <!-- @migration-task: migrate this slot by hand, `label` would shadow a prop on the parent component -->
   <span
-    class="max-w-[75%] shrink grow select-none overflow-hidden overflow-ellipsis whitespace-nowrap
-    pr-2 text-base"
+    class="max-w-[75%] shrink grow overflow-hidden pr-2 text-base overflow-ellipsis
+    whitespace-nowrap select-none"
     slot="label">{label}</span
   >
 
   {#snippet control({ id: id, disabled: disabled })}
-    <Toggle {id} {disabled} bind:value class="ml-auto mr-0 mt-1" />
+    <Toggle {id} {disabled} bind:value class="mt-1 mr-0 ml-auto" />
   {/snippet}
 
   {#snippet messages({
@@ -47,8 +47,8 @@
     hintAttributes,
   })}
     <span
-      class="-bottom-6 left-0 order-6 mt-1 w-full shrink-0 select-none overflow-hidden
-      text-ellipsis whitespace-nowrap text-xs text-gray-500"
+      class="-bottom-6 left-0 order-6 mt-1 w-full shrink-0 overflow-hidden text-xs
+      text-ellipsis whitespace-nowrap text-gray-500 select-none"
       {...attributes}
     >
       {#if error}

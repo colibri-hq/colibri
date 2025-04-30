@@ -1,12 +1,12 @@
-import { fetchCatalog } from '$lib/catalogs/catalog';
-import { paginatable, paginatedResults, procedure, t } from '$lib/trpc/t';
+import { fetchCatalog } from "$lib/catalogs/catalog";
+import { paginatable, paginatedResults, procedure, t } from "$lib/trpc/t";
 import {
   createCatalog,
   loadCatalog,
   loadCatalogs,
   updateCatalog,
-} from '@colibri-hq/sdk';
-import { z } from 'zod';
+} from "@colibri-hq/sdk";
+import { z } from "zod";
 
 export const catalogs = t.router({
   list: procedure()
@@ -53,7 +53,7 @@ export const catalogs = t.router({
   fetchRemoteCatalog: procedure()
     .input(
       z.object({
-        feedUrl: z.string().url('Invalid feed URL'),
+        feedUrl: z.string().url("Invalid feed URL"),
         resolveRoot: z.boolean().optional(),
       }),
     )
@@ -64,10 +64,10 @@ export const catalogs = t.router({
   addCatalog: procedure()
     .input(
       z.object({
-        feedUrl: z.string().url('Invalid feed URL'),
+        feedUrl: z.string().url("Invalid feed URL"),
         title: z.string().optional(),
         description: z.string().optional(),
-        imageUrl: z.string().url('Invalid image URL').optional(),
+        imageUrl: z.string().url("Invalid image URL").optional(),
       }),
     )
     .mutation(

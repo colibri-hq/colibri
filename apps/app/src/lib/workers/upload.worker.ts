@@ -1,10 +1,10 @@
-import { log } from '$lib/logging';
-import { detectType, type Metadata } from '$lib/parsing';
-import { getMetadata as getEpubMetadata } from '$lib/parsing/epub';
-import { getMetadata as getPdfMetadata } from '$lib/parsing/pdf';
-import { trpc as t } from '$lib/trpc/client';
-import { encodeToBase64 } from '@colibri-hq/shared';
-import type { WorkerMessage } from '$lib/workers/workers';
+import { log } from "$lib/logging";
+import { detectType, type Metadata } from "$lib/parsing";
+import { getMetadata as getEpubMetadata } from "$lib/parsing/epub";
+import { getMetadata as getPdfMetadata } from "$lib/parsing/pdf";
+import { trpc as t } from "$lib/trpc/client";
+import type { WorkerMessage } from "$lib/workers/workers";
+import { encodeToBase64 } from "@colibri-hq/shared";
 
 const trpc = t({
   fetch,
@@ -16,33 +16,33 @@ let root: FileSystemDirectoryHandle | null = null;
 
 // declare const self: WorkerGlobalScope;
 
-self.addEventListener('unhandledrejection', ({ reason }) => {
+self.addEventListener("unhandledrejection", ({ reason }) => {
   throw reason;
 });
 
-self.addEventListener('message', handleMessage);
+self.addEventListener("message", handleMessage);
 
 async function handleMessage({
   data: { type, payload },
 }: MessageEvent<UploadRequest | ResumeRequest | CancelUploadRequest>) {
-  console.log('Handling messsage', { type, payload });
+  console.log("Handling messsage", { type, payload });
   switch (type) {
-    case 'cancel':
+    case "cancel":
       return payload.id
         ? await handleCancelUpload({ id: payload.id })
         : await handleCancelAllUploads(payload);
 
-    case 'upload':
-      console.log('upload worker', { payload });
+    case "upload":
+      console.log("upload worker", { payload });
       return await handleUpload(payload);
 
-    case 'resume':
+    case "resume":
       return handleResumption(payload);
   }
 }
 
 async function handleUpload({ files }: UploadPayload) {
-  log('worker:upload', 'info', `Uploading ${files.length} books`);
+  log("worker:upload", "info", `Uploading ${files.length} books`);
 
   const uploadsDirectory = await getUploadsDirectory();
 
@@ -65,9 +65,9 @@ async function handleUpload({ files }: UploadPayload) {
       handle = await writeFile(new File([buffer], name), container);
     } catch (cause) {
       return self.postMessage({
-        type: 'upload',
+        type: "upload",
         payload: {
-          error: 'Upload Cancelled',
+          error: "Upload Cancelled",
           failed: true,
           id,
         },
@@ -80,7 +80,7 @@ async function handleUpload({ files }: UploadPayload) {
     // TODO: Write the metadata into a file in the OPFS, then return the data.
     //       If the operation is aborted mid-flight, we'll be able to resume the
     //       operation by reading the metadata file and resuming the upload.c
-    const checksum = await crypto.subtle.digest('SHA-256', buffer);
+    const checksum = await crypto.subtle.digest("SHA-256", buffer);
     const reply = await trpc.books.create.mutate({
       asset: {
         checksum: encodeToBase64(checksum),
@@ -88,7 +88,7 @@ async function handleUpload({ files }: UploadPayload) {
         size: asset.size,
       },
       contributors: result.metadata.contributors,
-      title: result.metadata.title ?? 'Untitled',
+      title: result.metadata.title ?? "Untitled",
       numberOfPages: result.metadata.numberOfPages,
       language: result.metadata.language,
       legalInformation: result.metadata.legalInformation,
@@ -96,7 +96,7 @@ async function handleUpload({ files }: UploadPayload) {
 
     if (!reply) {
       self.postMessage({
-        type: 'upload',
+        type: "upload",
         payload: { duplicate: true, failed: false, id },
       } satisfies UploadResponse);
 
@@ -105,7 +105,7 @@ async function handleUpload({ files }: UploadPayload) {
 
     const { assetUrl } = reply;
 
-    console.log('Saved book, got upload URL', {
+    console.log("Saved book, got upload URL", {
       assetUrl,
     });
 
@@ -114,7 +114,7 @@ async function handleUpload({ files }: UploadPayload) {
     await finalizeUpload(id);
 
     self.postMessage({
-      type: 'upload',
+      type: "upload",
       payload: { failed: false, result, id },
     } satisfies UploadResponse);
 
@@ -124,7 +124,7 @@ async function handleUpload({ files }: UploadPayload) {
   try {
     const files = await Promise.all(operations);
 
-    console.log('Got local copies of all files!', { files });
+    console.log("Got local copies of all files!", { files });
   } catch (cause) {
     throw new Error(`Failed to upload files: ${(cause as Error).message}`, {
       cause,
@@ -136,13 +136,13 @@ async function uploadAsset(url: string, asset: File, signal?: AbortSignal) {
   const controller = new AbortController();
   const { signal: uploadSignal } = controller;
 
-  signal?.addEventListener('abort', () => controller.abort());
+  signal?.addEventListener("abort", () => controller.abort());
 
   const response = await fetch(url, {
     signal: uploadSignal,
-    method: 'PUT',
+    method: "PUT",
     headers: {
-      'Content-Type': asset.type,
+      "Content-Type": asset.type,
     },
     body: await asset.arrayBuffer(),
 
@@ -157,7 +157,7 @@ async function uploadAsset(url: string, asset: File, signal?: AbortSignal) {
   });
 
   if (!response.ok) {
-    console.error('Failed to upload asset', {
+    console.error("Failed to upload asset", {
       status: response.status,
       statusText: response.statusText,
       url,
@@ -175,8 +175,8 @@ async function finalizeUpload(id: string) {
 
 async function handleResumption({ ids }: ResumePayload) {
   log(
-    'worker:upload',
-    'info',
+    "worker:upload",
+    "info",
     `Resuming pending upload of ${ids.length} books`,
     { ids },
   );
@@ -195,7 +195,7 @@ async function handleResumption({ ids }: ResumePayload) {
 
   results.forEach(([id, result]) =>
     self.postMessage({
-      type: 'upload',
+      type: "upload",
       payload: {
         failed: false,
         result,
@@ -206,31 +206,31 @@ async function handleResumption({ ids }: ResumePayload) {
 }
 
 async function handleCancelUpload({ id }: Required<CancelPayload>) {
-  log('worker:upload', 'warning', `Cancelling upload for #${id}`);
+  log("worker:upload", "warning", `Cancelling upload for #${id}`);
   const upload = pending.get(id);
 
   if (!upload) {
     return;
   }
 
-  upload.abort('cancelled');
+  upload.abort("cancelled");
   self.postMessage({
     id,
     failed: true,
-    error: 'Upload Cancelled',
+    error: "Upload Cancelled",
   } satisfies UploadResponsePayload);
 }
 
 async function handleCancelAllUploads(_payload: CancelPayload) {
-  log('worker:upload', 'warning', 'Cancelling all pending uploads');
+  log("worker:upload", "warning", "Cancelling all pending uploads");
 
   for (const [id, controller] of pending.entries()) {
-    controller.abort('cancelled');
+    controller.abort("cancelled");
 
     self.postMessage({
       id,
       failed: true,
-      error: 'Upload Cancelled',
+      error: "Upload Cancelled",
     } satisfies UploadResponsePayload);
   }
 }
@@ -241,7 +241,7 @@ async function processFile(
   container: FileSystemDirectoryHandle,
   signal?: AbortSignal,
 ) {
-  log('worker:upload', 'info', `Processing uploaded file`, { id, file });
+  log("worker:upload", "info", `Processing uploaded file`, { id, file });
   let metadata: Metadata;
   let cover: Blob | undefined = undefined;
 
@@ -284,7 +284,7 @@ async function writeMetadataFile(
   container: FileSystemDirectoryHandle,
 ) {
   const metadataFile = new File([JSON.stringify(metadata)], metadataFilename, {
-    type: 'application/json',
+    type: "application/json",
   });
 
   return writeFile(metadataFile, container);
@@ -327,10 +327,10 @@ async function writeFile(
   const writable = await handle.createWritable({ keepExistingData: false });
   const promise = writable.write(file);
 
-  signal?.addEventListener('abort', async (cause) => {
+  signal?.addEventListener("abort", async (cause) => {
     await writable.abort(cause);
 
-    throw new Error('Write operation aborted', { cause });
+    throw new Error("Write operation aborted", { cause });
   });
 
   await promise;
@@ -346,14 +346,14 @@ async function resolveMetadata(file: File, signal?: AbortSignal) {
   const type = await detectType(file);
 
   switch (type) {
-    case 'pdf':
+    case "pdf":
       return getPdfMetadata(file);
 
-    case 'mobi':
+    case "mobi":
       // TODO: Add mobi support
-      return { title: 'Untitled mobi file' } as Metadata;
+      return { title: "Untitled mobi file" } as Metadata;
 
-    case 'epub':
+    case "epub":
       return getEpubMetadata(file, signal);
 
     default:
@@ -372,7 +372,7 @@ async function getFilesystemRoot() {
 async function getUploadsDirectory() {
   const root = await getFilesystemRoot();
 
-  return root.getDirectoryHandle('uploads', { create: true });
+  return root.getDirectoryHandle("uploads", { create: true });
 }
 
 async function resolveResumableFiles(
@@ -388,7 +388,7 @@ async function resolveResumableFiles(
 
       for await (const entry of container.values()) {
         if (
-          entry.kind === 'file' &&
+          entry.kind === "file" &&
           ![metadataFilename, coverFilename].includes(entry.name)
         ) {
           file = await entry.getFile();
@@ -401,12 +401,12 @@ async function resolveResumableFiles(
   );
 
   return fragments.filter(
-    (fragment): fragment is Resumable => typeof fragment.file !== 'undefined',
+    (fragment): fragment is Resumable => typeof fragment.file !== "undefined",
   );
 }
 
-const metadataFilename = 'metadata.json';
-const coverFilename = 'cover';
+const metadataFilename = "metadata.json";
+const coverFilename = "cover";
 
 type Resumable = {
   id: string;
@@ -417,17 +417,17 @@ type Resumable = {
 type UploadPayload = {
   files: { id: string; name: string; buffer: ArrayBuffer }[];
 };
-export type UploadRequest = WorkerMessage<'upload', UploadPayload>;
+export type UploadRequest = WorkerMessage<"upload", UploadPayload>;
 
 type ResumePayload = {
   ids: string[];
 };
-export type ResumeRequest = WorkerMessage<'resume', ResumePayload>;
+export type ResumeRequest = WorkerMessage<"resume", ResumePayload>;
 
 type CancelPayload = {
   id?: string;
 };
-export type CancelUploadRequest = WorkerMessage<'cancel', CancelPayload>;
+export type CancelUploadRequest = WorkerMessage<"cancel", CancelPayload>;
 
 type UploadResponsePayload =
   | {
@@ -445,4 +445,4 @@ type UploadResponsePayload =
       failed: false;
       result: Record<string, unknown>;
     };
-export type UploadResponse = WorkerMessage<'upload', UploadResponsePayload>;
+export type UploadResponse = WorkerMessage<"upload", UploadResponsePayload>;

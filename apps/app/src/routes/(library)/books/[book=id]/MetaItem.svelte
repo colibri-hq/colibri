@@ -14,7 +14,7 @@
   <div
     class="flex grow flex-col items-center justify-center dark:text-gray-300"
   >
-    <span class="text-2xl font-bold leading-none">
+    <span class="text-2xl leading-none font-bold">
       <slot>{value}</slot>
     </span>
 

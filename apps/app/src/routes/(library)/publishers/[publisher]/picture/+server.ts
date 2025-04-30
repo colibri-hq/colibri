@@ -1,5 +1,5 @@
-import type { RequestHandler } from '@sveltejs/kit';
-import { error, redirect } from '@sveltejs/kit';
+import type { RequestHandler } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
 
 const handler: RequestHandler = async function ({ params }): Promise<Response> {
   const publisher = await prisma.publisher.findFirstOrThrow({

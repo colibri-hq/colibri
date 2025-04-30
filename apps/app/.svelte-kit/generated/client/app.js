@@ -42,21 +42,23 @@ export const nodes = [
 	() => import('./nodes/38'),
 	() => import('./nodes/39'),
 	() => import('./nodes/40'),
-	() => import('./nodes/41')
+	() => import('./nodes/41'),
+	() => import('./nodes/42')
 ];
 
 export const server_loads = [0,11,12,13,9];
 
 export const dictionary = {
 		"/(library)": [15,[2],[3]],
-		"/api/docs": [36],
+		"/api": [~36],
+		"/api/docs": [37],
 		"/(library)/authors": [~16,[2,4],[3]],
 		"/(library)/authors/[author]": [~17,[2,4],[3]],
-		"/auth/attestation": [37,[11]],
-		"/auth/login": [~38,[11,12]],
-		"/auth/login/unknown": [39,[11,12]],
-		"/auth/oauth/authorize": [~40,[11,13],[,,14]],
-		"/auth/oauth/device": [~41,[11,13]],
+		"/auth/attestation": [38,[11]],
+		"/auth/login": [~39,[11,12]],
+		"/auth/login/unknown": [40,[11,12]],
+		"/auth/oauth/authorize": [~41,[11,13],[,,14]],
+		"/auth/oauth/device": [~42,[11,13]],
 		"/(library)/books": [18,[2,5],[3]],
 		"/(library)/books/add": [~22,[2,5],[3]],
 		"/(library)/books/[book=id]": [~19,[2],[3]],

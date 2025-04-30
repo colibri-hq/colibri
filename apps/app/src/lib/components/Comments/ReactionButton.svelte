@@ -11,7 +11,7 @@
 
 <button
   class="flex cursor-pointer items-center rounded-full
-  px-1 py-0.5 outline-none transition hover:ring focus-visible:ring active:ring-blue-700
+  px-1 py-0.5 transition outline-none hover:ring focus-visible:ring active:ring-blue-700
   {active
     ? 'bg-blue-300 dark:bg-blue-800 dark:hover:bg-blue-800/75'
     : 'bg-gray-200 dark:bg-gray-800 dark:hover:bg-blue-950'}"

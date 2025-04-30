@@ -1,8 +1,6 @@
-import { PUBLIC_GUTENDEX_INSTANCE_URL } from '$env/static/public';
-import { log } from '$lib/logging';
-import type { Shop, SupportsFeaturedBooks } from '$lib/shops/index';
-
-const baseUrl = new URL('books', PUBLIC_GUTENDEX_INSTANCE_URL);
+import { env } from "$env/dynamic/public";
+import { log } from "$lib/logging";
+import type { Shop, SupportsFeaturedBooks } from "$lib/shops/index";
 
 function serializeOptions(options: Partial<SearchParameters>) {
   const parameters = new URLSearchParams();
@@ -10,7 +8,7 @@ function serializeOptions(options: Partial<SearchParameters>) {
   for (const [key, value] of Object.entries(options)) {
     parameters.set(
       key,
-      Array.isArray(value) ? value.join(',') : value.toString(),
+      Array.isArray(value) ? value.join(",") : value.toString(),
     );
   }
 
@@ -21,7 +19,7 @@ export async function searchBooks(
   query: string,
   options?: Partial<SearchParameters>,
 ) {
-  const url = new URL(baseUrl);
+  const url = new URL("books", env.PUBLIC_GUTENDEX_INSTANCE_URL);
   url.search = serializeOptions({ ...options, search: query });
 
   const { results, count: total } = await request<ListingResponse>(
@@ -32,18 +30,22 @@ export async function searchBooks(
 }
 
 export async function retrieveBook(id: number) {
+  const baseUrl = new URL("books", env.PUBLIC_GUTENDEX_INSTANCE_URL);
+
   return await request<BookResponse>(new Request(`${baseUrl}/${id}`));
 }
 
 export async function getFeaturedBooks(amount: number = 10) {
+  const baseUrl = new URL("books", env.PUBLIC_GUTENDEX_INSTANCE_URL);
+
   try {
     const { results } = await request<ListingResponse>(new Request(baseUrl));
 
     return results.slice(0, amount);
   } catch (error) {
     log(
-      'gutendex',
-      'error',
+      "gutendex",
+      "error",
       `Failed to fetch featured books from Gutendex API: ${(error as Error).message}`,
     );
 
@@ -70,7 +72,7 @@ async function request<T>(request: Request) {
   let plainBody: string;
   let body: T;
 
-  log('gutendex', 'debug', `Fetching data from Gutendex API: ${request.url}`);
+  log("gutendex", "debug", `Fetching data from Gutendex API: ${request.url}`);
 
   try {
     response = await fetch(request);
@@ -101,7 +103,7 @@ async function request<T>(request: Request) {
     );
   }
 
-  log('gutendex', 'debug', `Fetched data from Gutendex API: ${request.url}`, {
+  log("gutendex", "debug", `Fetched data from Gutendex API: ${request.url}`, {
     body,
   });
 
@@ -124,7 +126,7 @@ interface SearchParameters {
    * available copyright information. These can be combined with commas. For example,
    * /books?copyright=true,false gives books with available copyright information.
    */
-  copyright: ('true' | 'false' | 'null')[];
+  copyright: ("true" | "false" | "null")[];
 
   /**
    * Use this to list books with Project Gutenberg ID numbers in a given list of numbers. They must
@@ -160,7 +162,7 @@ interface SearchParameters {
    * descending for IDs highest to lowest, or popular (the default) for most popular to least
    * popular by number of downloads.
    */
-  sort: 'ascending' | 'descending' | 'popular';
+  sort: "ascending" | "descending" | "popular";
 
   /**
    * Use this to search for a case-insensitive key-phrase in books' bookshelves or subjects.

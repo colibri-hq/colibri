@@ -1,1 +1,1 @@
-export { default as LoadingIndicator } from './LoadingIndicator.svelte';
+export { default as LoadingIndicator } from "./LoadingIndicator.svelte";

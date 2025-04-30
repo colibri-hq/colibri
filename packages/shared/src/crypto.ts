@@ -110,7 +110,6 @@ export async function signPayload<T extends Record<string, unknown>>(
     JSON.stringify({ ...payload, nonce }),
     secretKey,
   );
-  console.log({ ...payload, nonce, signature });
 
   return { ...payload, nonce, signature };
 }
@@ -120,7 +119,6 @@ export async function verifySignedPayload<T extends Record<string, unknown>>(
   secretKey: string,
 ) {
   const { nonce, signature, ...data } = payload;
-  console.log({ nonce, signature, data });
   const verified = await verifySignature(
     JSON.stringify({ ...data, nonce }),
     signature,

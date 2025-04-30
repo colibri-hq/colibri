@@ -34,9 +34,9 @@
   aria-label={label}
   role={'href' in rest ? 'link' : 'button'}
   class={twMerge(
-    'dark:focus-visible:bg-gray-700 hidden rounded-md bg-white p-1.5 leading-none outline-0 transition ' +
+    'dark:focus-visible:bg-gray-700 hidden rounded-md bg-white dark:bg-black p-1.5 leading-none outline-0 transition ' +
     'cursor-pointer select-none hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:ring-2 ring ring-gray-300 ' +
-     'md:flex items-center justify-center shadow-md dark:hover:bg-gray-700 text-gray-600 '+
+     'dark:ring-gray-800 md:flex items-center justify-center shadow-md dark:hover:bg-gray-700 text-gray-600 '+
      'aria-[current=page]:text-blue-500',
      className,
   )}

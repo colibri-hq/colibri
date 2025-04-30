@@ -50,14 +50,20 @@
 
     loadingIndicator?: Snippet;
     children?: Snippet<[{ items: T[]; pagination: PaginationData }]>;
-    paginator?: Snippet<[{
-      items: T[];
-      pagination: PaginationData;
-      updatePage: (to?: number) => (event: CustomEvent<number | void>) => unknown;
-      max: number | `${number}`;
-      firstLast: boolean | 'auto';
-      prevNext: boolean;
-    }]>;
+    paginator?: Snippet<
+      [
+        {
+          items: T[];
+          pagination: PaginationData;
+          updatePage: (
+            to?: number,
+          ) => (event: CustomEvent<number | void>) => unknown;
+          max: number | `${number}`;
+          firstLast: boolean | 'auto';
+          prevNext: boolean;
+        },
+      ]
+    >;
   }
 
   const {

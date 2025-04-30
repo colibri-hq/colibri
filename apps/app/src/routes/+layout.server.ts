@@ -1,6 +1,6 @@
-import { getJwtCookie, verifyToken } from '$lib/server/auth';
-import { findUserByIdentifier, type User } from '@colibri-hq/sdk';
-import type { LayoutServerLoad } from './$types';
+import { getJwtCookie, verifyToken } from "$lib/server/auth";
+import { findUserByIdentifier, type User } from "@colibri-hq/sdk";
+import type { LayoutServerLoad } from "./$types";
 
 export type AuthData =
   | { isAuthenticated?: false; user?: never }
@@ -11,10 +11,10 @@ export const load = async function load({
   depends,
   locals: { database },
 }) {
-  depends('auth:user');
+  depends("auth:user");
 
   try {
-    const token = getJwtCookie(cookies) || '';
+    const token = getJwtCookie(cookies) || "";
     const { sub } = verifyToken(token);
     const user = await findUserByIdentifier(database, sub as string);
 

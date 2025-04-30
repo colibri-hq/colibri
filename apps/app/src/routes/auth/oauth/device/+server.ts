@@ -1,6 +1,6 @@
-import { oauth } from '$lib/server/oauth';
-import { OAuthError } from '@colibri-hq/oauth';
-import type { RequestHandler } from './$types';
+import { oauth } from "$lib/server/oauth";
+import { OAuthError } from "@colibri-hq/oauth";
+import type { RequestHandler } from "./$types";
 
 export const POST = async function handle({ request, locals: { database } }) {
   try {
@@ -12,7 +12,7 @@ export const POST = async function handle({ request, locals: { database } }) {
       return response;
     }
 
-    throw new Error('Failed to handle device authorization request', { cause });
+    throw new Error("Failed to handle device authorization request", { cause });
   }
 
   // let body: FormData;

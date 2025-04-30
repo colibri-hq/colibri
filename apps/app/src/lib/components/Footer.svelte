@@ -4,11 +4,13 @@
   import { Icon } from '@colibri-hq/ui';
 </script>
 
-<footer class="w-full mt-auto py-4 text-gray-400 dark:text-gray-600 text-sm">
+<footer class="mt-auto w-full py-4 text-sm text-gray-400 dark:text-gray-600">
   <ContentSection>
     <div class="flex items-center gap-4">
       <a href={PACKAGE_HOMEPAGE_URL} target="_blank" rel="noopener noreferrer">
-        <ColibriLogo class="size-10 text-gray-100 hover:text-gray-200 dark:text-gray-800 dark:hover:text-gray-700" />
+        <ColibriLogo
+          class="size-10 text-gray-100 hover:text-gray-200 dark:text-gray-800 dark:hover:text-gray-700"
+        />
       </a>
 
       <span class="me-auto">
@@ -19,7 +21,7 @@
         <ul class="contents">
           <li>
             <a
-              class="flex items-baseline gap-0.5 group focus-visible:outline-none"
+              class="group flex items-baseline gap-0.5 focus-visible:outline-none"
               href={PACKAGE_BUGS_URL}
               target="_blank"
               rel="noopener noreferrer"
@@ -32,7 +34,7 @@
           </li>
           <li>
             <a
-              class="flex items-baseline gap-0.5 group focus-visible:outline-none"
+              class="group flex items-baseline gap-0.5 focus-visible:outline-none"
               href={`${PACKAGE_BUGS_URL}/new?template=bug_report.yml`}
               target="_blank"
               rel="noopener noreferrer"
@@ -45,7 +47,7 @@
           </li>
           <li>
             <a
-              class="flex items-baseline gap-0.5 group focus-visible:outline-none"
+              class="group flex items-baseline gap-0.5 focus-visible:outline-none"
               href={`${PACKAGE_REPOSITORY_URL}/new?template=feature_request.yml`}
               target="_blank"
               rel="noopener noreferrer"

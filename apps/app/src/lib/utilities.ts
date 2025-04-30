@@ -1,4 +1,4 @@
-import type { Action } from 'svelte/action';
+import type { Action } from "svelte/action";
 
 /** Dispatch event on click outside of node */
 export const clickOutside: Action = function clickOutside(node: HTMLElement) {
@@ -9,18 +9,18 @@ export const clickOutside: Action = function clickOutside(node: HTMLElement) {
       !event.defaultPrevented
     ) {
       node.dispatchEvent(
-        new CustomEvent('clickOutside', {
+        new CustomEvent("clickOutside", {
           detail: { node },
         }),
       );
     }
   };
 
-  document.addEventListener('click', handleClick, true);
+  document.addEventListener("click", handleClick, true);
 
   return {
     destroy() {
-      document.removeEventListener('click', handleClick, true);
+      document.removeEventListener("click", handleClick, true);
     },
   };
 };
@@ -32,19 +32,19 @@ export const sticky: Action<
   node,
   { stickToTop, top = 0 }: { stickToTop: boolean; top?: number },
 ) {
-  node.style.position = 'sticky';
+  node.style.position = "sticky";
   node.style.top = `${top}px`;
 
-  const stickySentinelTop = document.createElement('div');
-  stickySentinelTop.classList.add('__stickySentinelTop__');
-  stickySentinelTop.style.position = 'absolute';
-  stickySentinelTop.style.height = '1px';
+  const stickySentinelTop = document.createElement("div");
+  stickySentinelTop.classList.add("__stickySentinelTop__");
+  stickySentinelTop.style.position = "absolute";
+  stickySentinelTop.style.height = "1px";
   node.parentNode?.prepend(stickySentinelTop);
 
-  const stickySentinelBottom = document.createElement('div');
-  stickySentinelBottom.classList.add('__stickySentinelBottom__');
-  stickySentinelBottom.style.position = 'absolute';
-  stickySentinelBottom.style.height = '1px';
+  const stickySentinelBottom = document.createElement("div");
+  stickySentinelBottom.classList.add("__stickySentinelBottom__");
+  stickySentinelBottom.style.position = "absolute";
+  stickySentinelBottom.style.height = "1px";
   node.parentNode?.append(stickySentinelBottom);
 
   const mutationObserver = new MutationObserver((mutations) =>
@@ -66,7 +66,7 @@ export const sticky: Action<
 
   const intersectionObserver = new IntersectionObserver(([entry]) =>
     node.dispatchEvent(
-      new CustomEvent('stuck', {
+      new CustomEvent("stuck", {
         detail: {
           isStuck: !entry.isIntersecting && isValidYPosition(entry),
         },

@@ -1,11 +1,12 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true,
+    "composite": true,
     "types": ["vitest/globals"]
   },
   "include": [
     "src/**/*.test.ts",
     "src/**/*.spec.ts"
-  ]
+  ],
+  "exclude": []
 } 

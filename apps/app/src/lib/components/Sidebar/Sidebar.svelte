@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { Field, NavigationKnob, NavigationLink, NavigationSection } from '@colibri-hq/ui';
+  import {
+    Field,
+    NavigationKnob,
+    NavigationLink,
+    NavigationSection,
+  } from '@colibri-hq/ui';
   import AccountPromotionBanner from '$lib/components/Sidebar/AccountPromotionBanner.svelte';
   import AddBookButton from '$lib/components/Sidebar/AddBookButton.svelte';
   import CollectionsList from '$lib/components/Sidebar/CollectionsList.svelte';
@@ -26,8 +31,10 @@
   let searchTerm = $state('');
 </script>
 
-<nav class="{twMerge(className, 'flex flex-col py-2 gap-2')}">
-  <div class="flex items-center justify-center sm:justify-between ps-2 pe-4 pt-2 sm:pt-0">
+<nav class={twMerge(className, 'flex flex-col gap-2 py-2')}>
+  <div
+    class="flex items-center justify-center px-4 pt-2 sm:justify-between sm:pt-0"
+  >
     <SiteBranding />
 
     <NavigationKnob
@@ -38,19 +45,18 @@
     />
   </div>
 
-  <div class="flex h-full max-h-full flex-col md:gap-y-4 overflow-y-auto ps-2 pe-4 py-1">
+  <div
+    class="flex h-full max-h-full flex-col overflow-y-auto px-4 py-1 md:gap-y-4"
+  >
     <!-- region Search Bar -->
     <div class="hidden md:contents">
-      <Field
-        bind:value={searchTerm}
-        placeholder="Search"
-        type="search"
-      >
+      <Field bind:value={searchTerm} placeholder="Search" type="search">
         {#snippet appendIcon()}
           <kbd
-            class="-me-1 bg-gray-100 dark:bg-gray-800/75 text-gray-400 dark:text-gray-500 border
-            border-gray-200/50 dark:border-transparent rounded leading-1 inline-flex items-center px-1.5 h-6 my-auto
-            font-sans self-center">
+            class="my-auto -me-1 inline-flex h-6 items-center self-center
+            rounded border border-gray-200/50 bg-gray-100 px-1.5 font-sans leading-1 text-gray-400 dark:border-transparent
+            dark:bg-gray-800/75 dark:text-gray-500"
+          >
             <span>⌘</span>
             <span>&thinsp;</span>
             <span>K</span>
@@ -62,11 +68,7 @@
 
     <!-- region Discovery -->
     <NavigationSection label="Discovery" open>
-      <NavigationLink
-        icon="explore"
-        title="Featured"
-        to="/discover/featured"
-      />
+      <NavigationLink icon="explore" title="Featured" to="/discover/featured" />
       <NavigationLink icon="local_library" title="Browse" to="/discover" />
     </NavigationSection>
     <!-- endregion -->

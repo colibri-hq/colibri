@@ -1,12 +1,15 @@
-import { Args } from '@oclif/core';
-import { z } from 'zod';
+import { Args } from "@oclif/core";
+import { z } from "zod";
 
 export const userIdentifier = Args.custom<{ email: string } | { id: number }>({
-  name: 'user',
+  name: "user",
   async parse(input) {
-    const schema = z.string().email({
-      message: 'Invalid email address',
-    }).or(z.coerce.number().int().positive().gt(0));
+    const schema = z
+      .string()
+      .email({
+        message: "Invalid email address",
+      })
+      .or(z.coerce.number().int().positive().gt(0));
     const result = schema.safeParse(input);
 
     if (!result.success) {

@@ -1,0 +1,12 @@
+**/node_modules/
+**/dist/
+**/.idea/
+**/.vscode/
+.github/
+**/test/
+**/e2e/
+**/.coverage/
+docker-compose.yaml
+Dockerfile
+.gitignore
+README.md

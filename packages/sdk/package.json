@@ -27,9 +27,12 @@
   },
   "packageManager": "pnpm@10.6.5",
   "scripts": {
-    "build": "unbuild",
-    "dev": "unbuild --watch",
-    "prepack": "unbuild",
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
+    "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
+    "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
+    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content .",
     "types": "kysely-codegen --dialect postgres --env-file ../../.env --url 'env(DB_URL)' --out-file ./src/schema.d.ts --type-only-imports --default-schema public --exclude-pattern \"auth.*\" --include-pattern \"(public|authentication).*\""
   },
   "dependencies": {
@@ -37,22 +40,23 @@
     "@colibri-hq/shared": "workspace:*",
     "jsonwebtoken": "catalog:",
     "kysely": "^0.27.6",
-    "pg": "^8.14.1",
+    "pg": "^8.15.6",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@simplewebauthn/server": "^13.1.1",
     "@types/jsonwebtoken": "catalog:",
-    "@types/pg": "^8.11.11",
-    "kanel": "^3.11.1",
-    "kanel-kysely": "^0.7.0",
+    "@types/pg": "^8.11.14",
+    "eslint": "catalog:",
+    "kanel": "^3.13.0",
+    "kanel-kysely": "^0.7.1",
     "kysely-codegen": "^0.18.3",
-    "unbuild": "catalog:"
+    "prettier": "catalog:",
   },
-  "module": "dist/index.mjs",
+  "module": "dist/index.js",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
+      "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
     "./schema": {
@@ -60,7 +64,7 @@
       "types": "./src/schema.d.ts"
     },
     "./oauth": {
-      "import": "./dist/oauth/index.mjs",
+      "import": "./dist/oauth/index.js",
       "types": "./dist/oauth/index.d.ts"
     }
   },

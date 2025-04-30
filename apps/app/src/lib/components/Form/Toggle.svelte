@@ -20,7 +20,7 @@
     disabled?: boolean | null | undefined;
     size?: 'small' | 'medium' | 'large';
 
-    [key: string]: any;
+    [key: string]: unknown;
   }
 
   let {
@@ -93,7 +93,7 @@
 <div {...rest} class="flex flex-col items-center justify-center {className}">
   <button
     class="group relative inline-flex shrink-0 cursor-pointer rounded-full
-    border-transparent shadow-inner outline-none transition duration-200 ease-in-out focus-visible:ring
+    border-transparent shadow-inner transition duration-200 ease-in-out outline-none focus-visible:ring
     disabled:cursor-default {toggleClasses}"
     {disabled}
     {id}

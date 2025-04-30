@@ -1,11 +1,11 @@
+import { procedure, t } from "$lib/trpc/t";
 import {
   listPublishers,
   loadBooksForPublisher,
   loadCreatorsForPublisher,
   loadPublisher,
-} from '@colibri-hq/sdk';
-import { procedure, t } from '$lib/trpc/t';
-import { z } from 'zod';
+} from "@colibri-hq/sdk";
+import { z } from "zod";
 
 export const publishers = t.router({
   list: procedure()

@@ -8,7 +8,7 @@
     label?: string | undefined;
     name: string;
 
-    [key: string]: any;
+    [key: string]: unknown;
   }
 
   let {

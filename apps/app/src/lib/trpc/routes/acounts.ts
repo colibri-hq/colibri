@@ -1,11 +1,11 @@
-import { dispatchPasscode } from '$lib/server/auth';
-import { procedure, t } from '$lib/trpc/t';
-import { userExists } from '@colibri-hq/sdk';
+import { dispatchPasscode } from "$lib/server/auth";
+import { procedure, t } from "$lib/trpc/t";
+import { userExists } from "@colibri-hq/sdk";
 import {
   generateRandomDigits,
   inferNameFromEmailAddress,
-} from '@colibri-hq/shared';
-import { z } from 'zod';
+} from "@colibri-hq/shared";
+import { z } from "zod";
 
 export const accounts = t.router({
   exists: procedure()
@@ -24,7 +24,7 @@ export const accounts = t.router({
         data: {
           name: name || inferNameFromEmailAddress(emailAddress),
           email: emailAddress,
-          passwordHash: '',
+          passwordHash: "",
         },
       });
 
@@ -60,7 +60,7 @@ export const accounts = t.router({
           data: {
             name: inferNameFromEmailAddress(emailAddress),
             email: emailAddress,
-            passwordHash: '',
+            passwordHash: "",
           },
         });
       }

@@ -11,9 +11,9 @@
 </script>
 
 <ul class="group flex items-center space-x-1" role="list">
-  {#each users as user}
+  {#each users as user, index (index)}
     <li
-      class="-translate-x-1/2 transition first:translate-x-0 group-hover:translate-x-0"
+      class="-translate-x-1/2 transition group-hover:translate-x-0 first:translate-x-0"
       title={user.name}
     >
       <Avatar {user} {size} />

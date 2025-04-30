@@ -3,7 +3,7 @@
 
   import Dropzone from '$lib/components/Form/Dropzone.svelte';
   import { Field } from '@colibri-hq/ui';
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
   import { getImageDimensions } from '@colibri-hq/shared';
 
   interface Props {
@@ -105,7 +105,7 @@
   <div class="append">
     {#if hasPreview}
       <button
-        class="absolute bottom-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-2xl backdrop-saturate-200"
+        class="absolute right-4 bottom-4 flex h-8 w-8 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-2xl backdrop-saturate-200"
         type="button"
         onclick={stopPropagation(preventDefault(clear))}
       >

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
 
   let status: number = $derived($page.status ?? 500);
 

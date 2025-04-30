@@ -11,13 +11,13 @@
     loading?: boolean;
     comments: CommentWithUserAndReactions[];
     onReaction?: (event: { commentId: string; emoji: string }) => unknown;
-    onReactionRemoved?: (event: { commentId: string; emoji: string }) => unknown;
+    onReactionRemoved?: (event: {
+      commentId: string;
+      emoji: string;
+    }) => unknown;
     onOpen?: () => unknown;
     onClose?: () => unknown;
-    onSubmit?: (event: {
-      content: string;
-      reset: () => void;
-    }) => unknown;
+    onSubmit?: (event: { content: string; reset: () => void }) => unknown;
   }
 
   let {
@@ -52,7 +52,7 @@
 </script>
 
 <footer
-  class="fixed bottom-0 right-0 mt-auto w-4/5 transition duration-100 ease-in"
+  class="fixed right-0 bottom-0 mt-auto w-4/5 transition duration-100 ease-in"
   class:translate-y-0={expanded}
   class:translate-y-[calc(100%_-_3.5rem)]={!expanded}
   onClickOutside={close}

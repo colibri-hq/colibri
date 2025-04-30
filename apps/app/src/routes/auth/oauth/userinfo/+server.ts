@@ -1,11 +1,10 @@
-import { env } from '$env/dynamic/private';
-import { oauthError } from '$lib/server/oauth';
-import { checkAuthorization, claimUrl } from '@colibri-hq/oauth';
-import { resolveAcceptedMediaTypes } from '@colibri-hq/shared';
-import { type Database, findUserByIdentifier } from '@colibri-hq/sdk';
-import { error, json } from '@sveltejs/kit';
-import jwt from 'jsonwebtoken';
-import type { RequestHandler } from './$types';
+import { env } from "$env/dynamic/private";
+import { oauth, oauthError } from "$lib/server/oauth";
+import { type Database, findUserByIdentifier } from "@colibri-hq/sdk";
+import { resolveAcceptedMediaTypes } from "@colibri-hq/shared";
+import { error, json } from "@sveltejs/kit";
+import jwt from "jsonwebtoken";
+import type { RequestHandler } from "./$types";
 
 export const GET = async function handler({
   request,
@@ -31,7 +30,7 @@ async function handleUserInfo(request: Request, url: URL, database: Database) {
 
   try {
     ({ user_id: authorizedUserId, client_id: authorizedClientId } =
-      await checkAuthorization(database, request));
+      await oauth(database).checkAuthorization(request));
   } catch (error) {
     if (!(error instanceof Error)) {
       throw error;
@@ -39,11 +38,11 @@ async function handleUserInfo(request: Request, url: URL, database: Database) {
 
     const { message, cause } = error;
 
-    return oauthError('invalid_client', message + (cause ? `: ${cause}` : ''));
+    return oauthError("invalid_client", message + (cause ? `: ${cause}` : ""));
   }
 
   if (!authorizedUserId) {
-    return oauthError('access_denied', 'The user is not authenticated');
+    return oauthError("access_denied", "The user is not authenticated");
   }
 
   const {
@@ -57,7 +56,7 @@ async function handleUserInfo(request: Request, url: URL, database: Database) {
   } = await findUserByIdentifier(database, authorizedUserId);
 
   for (const mediaType of resolveAcceptedMediaTypes(request)) {
-    if (mediaType.startsWith('application/json') || mediaType === '*/*') {
+    if (mediaType.startsWith("application/json") || mediaType === "*/*") {
       return json({
         sub,
         name,
@@ -66,11 +65,11 @@ async function handleUserInfo(request: Request, url: URL, database: Database) {
         preferred_username: email,
         birthdate: birthdate?.toDateString(),
         updated_at: Math.floor((updated_at ?? new Date()).getTime() / 1_000),
-        [claimUrl(url, 'role').toString()]: role,
+        [new URL("role", url).toString()]: role,
       });
     }
 
-    if (mediaType === 'application/jwt') {
+    if (mediaType === "application/jwt") {
       const jsonWebToken = jwt.sign(
         {
           name,
@@ -79,7 +78,7 @@ async function handleUserInfo(request: Request, url: URL, database: Database) {
           preferred_username: email,
           birthdate: birthdate?.toDateString(),
           updated_at: Math.floor((updated_at ?? new Date()).getTime() / 1_000),
-          [claimUrl(url, 'role').toString()]: role,
+          [new URL("role", url).toString()]: role,
         },
         env.JWT_SECRET,
         {
@@ -93,5 +92,5 @@ async function handleUserInfo(request: Request, url: URL, database: Database) {
     }
   }
 
-  throw error(406, 'Unsupported media type requested');
+  throw error(406, "Unsupported media type requested");
 }

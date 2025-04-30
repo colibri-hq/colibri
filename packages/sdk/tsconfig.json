@@ -5,7 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "target": "ESNext",
-    "noEmit": true,
+    "outDir": "./dist",
     "allowJs": true,
     "checkJs": true,
     "esModuleInterop": true,

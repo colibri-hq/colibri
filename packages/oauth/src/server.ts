@@ -43,45 +43,22 @@ class AuthorizationServer<
   C extends Entities.Client,
   A extends Entities.AccessToken,
 > {
+  public readonly baseUri: URL;
   /**
    * Missing still: 'urn:ietf:params:oauth:grant-type:token-exchange'
    */
   #grantTypes: Map<GrantType["type"], GrantType<GrantTypeOptions, C>> =
     new Map();
-
   readonly #options: Required<AuthorizationServerOptions<C, A>>;
 
   public constructor(options: AuthorizationServerOptions<C, A>) {
-    if (options.authorizationCode) {
-      this.enableGrantType(AuthorizationCodeGrant, {
-        ttl: 300,
-        ...options.authorizationCode,
-      });
-    }
-
-    if (options.deviceCode) {
-      this.enableGrantType(DeviceCodeGrant, {
-        ttl: 900,
-        devicePollingInterval: 5,
-        ...options.deviceCode,
-      });
-    }
-
-    if (options.refreshToken) {
-      this.enableGrantType(RefreshTokenGrant, options.refreshToken);
-    }
-
-    if (options.clientCredentials) {
-      this.enableGrantType(ClientCredentialsGrant, options.clientCredentials);
-    }
-
-    const baseUri = new URL(
-      options.baseUri ?? new URL("oauth/", options.issuer),
-    );
+    this.baseUri = options.baseUri
+      ? new URL(options.baseUri, options.issuer)
+      : new URL("oauth/", options.issuer);
 
     this.#options = {
       accessTokenTtl: 3_600,
-      baseUri,
+      baseUri: this.baseUri,
       clientCredentials: false,
       clientManagement: false,
       clientRegistration: false,
@@ -109,17 +86,35 @@ class AuthorizationServer<
       userInfo: false,
       ...options,
     };
-  }
 
-  public get baseUrl() {
-    return new URL(this.#options.baseUri);
+    if (options.authorizationCode) {
+      this.enableGrantType(AuthorizationCodeGrant, {
+        ttl: 300,
+        ...options.authorizationCode,
+      });
+    }
+
+    if (options.deviceCode) {
+      this.enableGrantType(DeviceCodeGrant, {
+        ttl: 900,
+        devicePollingInterval: 5,
+        ...options.deviceCode,
+      });
+    }
+
+    if (options.refreshToken) {
+      this.enableGrantType(RefreshTokenGrant, options.refreshToken);
+    }
+
+    if (options.clientCredentials) {
+      this.enableGrantType(ClientCredentialsGrant, options.clientCredentials);
+    }
   }
 
   /**
    * Retrieves the server configuration
    */
   public get configuration() {
-    const url = this.baseUrl;
     const {
       deviceCode,
       documentationUri,
@@ -140,7 +135,7 @@ class AuthorizationServer<
       ? {
           authorizationEndpoint: new URL(
             authorizationCode.endpoint ?? "./authorize",
-            url,
+            this.baseUri,
           ),
           authorizationResponseIssParameterSupported: true,
           codeChallengeMethodsSupported:
@@ -158,7 +153,7 @@ class AuthorizationServer<
       ? {
           deviceAuthorizationEndpoint: new URL(
             deviceCode.endpoint ?? "./device",
-            url,
+            this.baseUri,
           ),
         }
       : undefined;
@@ -167,7 +162,7 @@ class AuthorizationServer<
       ? {
           pushedAuthorizationRequestEndpoint: new URL(
             pushedAuthorizationRequests.endpoint ?? "./par",
-            url,
+            this.baseUri,
           ),
           requirePushedAuthorizationRequests:
             pushedAuthorizationRequests.required,
@@ -178,7 +173,7 @@ class AuthorizationServer<
       ? {
           introspectionEndpoint: new URL(
             tokenIntrospection.endpoint ?? "./tokeninfo",
-            url,
+            this.baseUri,
           ),
           introspectionEndpointAuthMethodsSupported:
             tokenIntrospection.authMethodsSupported,
@@ -191,7 +186,7 @@ class AuthorizationServer<
       ? {
           revocationEndpoint: new URL(
             tokenRevocation.endpoint ?? "./token/revoke",
-            url,
+            this.baseUri,
           ),
           revocationEndpointAuthMethodsSupported:
             tokenRevocation.authMethodsSupported,
@@ -201,7 +196,7 @@ class AuthorizationServer<
       : undefined;
 
     const tokenEndpointOptions = {
-      tokenEndpoint: new URL(token.endpoint!, url),
+      tokenEndpoint: new URL(token.endpoint!, this.baseUri),
       tokenEndpointAuthMethodsSupported: token.authMethodsSupported!,
       tokenEndpointAuthSigningAlgValuesSupported:
         token.authSigningAlgValuesSupported!,
@@ -217,20 +212,22 @@ class AuthorizationServer<
 
       grantTypesSupported: Array.from(this.#grantTypes.keys()),
 
-      issuer: url,
-      jwksUri: jwksUri ? new URL(jwksUri, url) : undefined,
-      opPolicyUri: policyUri ? new URL(policyUri, url) : undefined,
-      opTosUri: termsOfServiceUri ? new URL(termsOfServiceUri, url) : undefined,
-
-      registrationEndpoint: clientRegistration
-        ? new URL(clientRegistration.endpoint ?? "./register", url)
+      issuer: this.baseUri,
+      jwksUri: jwksUri ? new URL(jwksUri, this.baseUri) : undefined,
+      opPolicyUri: policyUri ? new URL(policyUri, this.baseUri) : undefined,
+      opTosUri: termsOfServiceUri
+        ? new URL(termsOfServiceUri, this.baseUri)
         : undefined,
 
-      serviceDocumentation: new URL(documentationUri, url),
+      registrationEndpoint: clientRegistration
+        ? new URL(clientRegistration.endpoint ?? "./register", this.baseUri)
+        : undefined,
+
+      serviceDocumentation: new URL(documentationUri, this.baseUri),
 
       uiLocalesSupported,
       userinfoEndpoint: userInfo
-        ? new URL(userInfo.endpoint ?? "./userinfo", url)
+        ? new URL(userInfo.endpoint ?? "./userinfo", this.baseUri)
         : undefined,
     };
   }

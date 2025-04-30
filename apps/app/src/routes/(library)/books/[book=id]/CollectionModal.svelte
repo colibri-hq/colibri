@@ -64,12 +64,12 @@
   {/snippet}
 
   <ul class="w-96">
-    {#each collections as collection}
+    {#each collections as collection, index (index)}
       {@const entries = Number(collection.entry_count)}
       <li>
         <button
           class="flex w-full cursor-pointer items-center justify-between rounded-md p-2
-          outline-none transition hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:ring
+          transition outline-none hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:ring
           dark:hover:bg-gray-800 dark:focus-visible:bg-gray-800"
           onclick={addToCollection(collection)}
         >

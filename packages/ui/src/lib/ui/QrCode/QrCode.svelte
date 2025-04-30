@@ -152,7 +152,8 @@
     class:hidden={squares}
     class:invisible={squares}
   >
-    <div style:margin="5px 0 0 5px" style:--width={`${28 * maskXToYRatio}%`}>
+    <!-- eslint-disable-next-line svelte/no-inline-styles -->
+    <div class="mt-[5px] ms-[5px]" style:--width={`${28 * maskXToYRatio}%`}>
       {@render children?.()}
     </div>
   </div>

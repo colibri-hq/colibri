@@ -1,0 +1,20 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "extends": [
+    "//"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": [
+        "@colibri-hq/ui#build"
+      ]
+    },
+    "dev": {
+      "persistent": true,
+      "cache": false,
+      "dependsOn": [
+        "@colibri-hq/ui#build"
+      ]
+    }
+  }
+}

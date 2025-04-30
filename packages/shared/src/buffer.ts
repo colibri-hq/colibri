@@ -1,5 +1,5 @@
 export function arrayBufferToHex(buffer: ArrayBufferLike | Uint8Array<ArrayBuffer>) {
-  // @ts-ignore
+  // @ts-expect-error -- Buffer conversion works as intended
   return Array.from(new Uint8Array(buffer)).reduce(
     (acc, byte) => acc + byte.toString(16).padStart(2, '0'),
     '',

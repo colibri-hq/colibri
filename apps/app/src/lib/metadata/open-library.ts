@@ -1,6 +1,6 @@
-import { log } from '$lib/logging';
+import { log } from "$lib/logging";
 
-const baseURL = 'https://openlibrary.org';
+const baseURL = "https://openlibrary.org";
 
 type BookSearchParams = {
   title: string;
@@ -12,20 +12,20 @@ type BookSearchParams = {
 
 export async function searchBook(params: BookSearchParams) {
   const parameterNames: Record<keyof BookSearchParams, string> = {
-    title: 'title_suggest',
-    authors: 'author',
-    genre: 'subject',
-    isbn: 'isbn',
-    language: 'lang',
+    title: "title_suggest",
+    authors: "author",
+    genre: "subject",
+    isbn: "isbn",
+    language: "lang",
   };
-  const url = new URL('search.json', baseURL);
+  const url = new URL("search.json", baseURL);
 
   Object.entries(params)
     .filter(
       <K extends keyof BookSearchParams>(
         item: [unknown, unknown],
       ): item is [K, Exclude<BookSearchParams[K], undefined>] =>
-        typeof item[1] !== 'undefined',
+        typeof item[1] !== "undefined",
     )
     .flatMap(([key, value]) => {
       const parameterName = parameterNames[key];
@@ -64,8 +64,8 @@ async function request<T>(request: Request) {
   let body: T;
 
   log(
-    'open-library',
-    'debug',
+    "open-library",
+    "debug",
     `Fetching data from Open Library API: ${request.url}`,
   );
 
@@ -98,8 +98,8 @@ async function request<T>(request: Request) {
   }
 
   log(
-    'open-library',
-    'debug',
+    "open-library",
+    "debug",
     `Fetched data from Open Library API: ${request.url}`,
     { body },
   );

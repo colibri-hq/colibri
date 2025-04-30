@@ -1,18 +1,15 @@
-import { env } from '$env/dynamic/private';
-import {
-  getAuthSessionIdFromCookie,
-  resolveUserId,
-} from '$lib/server/auth';
+import { env } from "$env/dynamic/private";
+import { getAuthSessionIdFromCookie, resolveUserId } from "$lib/server/auth";
 import {
   createChallenge,
   findUserByIdentifier,
   listAuthenticatorsForUser,
-} from '@colibri-hq/sdk';
-import type { GenerateRegistrationOptionsOpts } from '@simplewebauthn/server';
-import { generateRegistrationOptions } from '@simplewebauthn/server';
-import { isoUint8Array } from '@simplewebauthn/server/helpers';
-import { error, json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
+} from "@colibri-hq/sdk";
+import type { GenerateRegistrationOptionsOpts } from "@simplewebauthn/server";
+import { generateRegistrationOptions } from "@simplewebauthn/server";
+import { isoUint8Array } from "@simplewebauthn/server/helpers";
+import { error, json } from "@sveltejs/kit";
+import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async function handler({
   url,
@@ -22,19 +19,19 @@ export const GET: RequestHandler = async function handler({
   const sessionId = getAuthSessionIdFromCookie(cookies);
 
   if (!sessionId) {
-    throw error(403, 'Not authorized');
+    throw error(403, "Not authorized");
   }
 
   const userId = resolveUserId(cookies);
 
   if (!userId) {
-    return error(401, 'Not authenticated');
+    return error(401, "Not authenticated");
   }
 
   const user = await findUserByIdentifier(database, userId);
   const authenticators = await listAuthenticatorsForUser(database, user);
   const options = await generateRegistrationOptions({
-    rpName: env.FIDO_NAME || 'Colibri',
+    rpName: env.FIDO_NAME || "Colibri",
     rpID: url.hostname,
 
     userID: isoUint8Array.fromUTF8String(user.id),
@@ -42,7 +39,7 @@ export const GET: RequestHandler = async function handler({
     userDisplayName: user.name || user.email,
 
     timeout: 60_000,
-    attestationType: 'none',
+    attestationType: "none",
 
     /**
      * Passing in a user's list of already-registered authenticator IDs here prevents users from
@@ -52,7 +49,7 @@ export const GET: RequestHandler = async function handler({
      */
     excludeCredentials: authenticators.map(
       ({ identifier: id, transports }) => ({
-        type: 'public-key',
+        type: "public-key",
         transports,
         id,
       }),
@@ -63,8 +60,8 @@ export const GET: RequestHandler = async function handler({
      * authenticators that users to can use for registration
      */
     authenticatorSelection: {
-      residentKey: 'required',
-      userVerification: 'preferred',
+      residentKey: "required",
+      userVerification: "preferred",
     },
 
     /**

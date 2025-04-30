@@ -33,8 +33,12 @@
     "test": "vitest",
     "test:coverage": "vitest run --config ./tsconfig.test.json --coverage",
     "test:ui": "vitest --config ./tsconfig.test.json --ui",
-    "lint": "eslint src",
-    "format": "prettier --write src"
+    "coverage": "npx make-coverage-badge --output-path ./badges/coverage.svg",
+    "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
+    "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
+    "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
+    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content ."
+
   },
   "dependencies": {
     "@colibri-hq/shared": "workspace:*",
@@ -50,20 +54,21 @@
     "@vitest/ui": "catalog:",
     "eslint": "catalog:",
     "fastify": "^5.3.2",
+    "msw": "^2.7.5",
     "prettier": "catalog:",
     "supertest": "^7.1.0",
     "typescript": "catalog:",
     "unbuild": "catalog:",
     "vitest": "catalog:"
   },
-  "module": "dist/index.mjs",
+  "module": "dist/index.js",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
+      "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
     "./grantType": {
-      "import": "./dist/grantTypes/grantType.mjs",
+      "import": "./dist/grantTypes/grantType.js",
       "types": "./dist/grantTypes/grantType.d.ts"
     }
   },

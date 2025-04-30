@@ -1,5 +1,5 @@
-import { redirectToPreviousLocation } from '$lib/server/utilities';
-import type { LayoutServerLoad } from './$types';
+import { redirectToPreviousLocation } from "$lib/server/utilities";
+import type { LayoutServerLoad } from "./$types";
 
 export const load = async function load({ parent, url, cookies }) {
   const data = await parent();

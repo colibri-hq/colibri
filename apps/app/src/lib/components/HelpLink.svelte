@@ -1,12 +1,12 @@
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { Button } from '@colibri-hq/ui';
-    import { Icon } from '@colibri-hq/ui';
-  import { PUBLIC_HELP_CENTER_BASE_URL } from '$env/static/public';
+  import { Icon } from '@colibri-hq/ui';
+  import { env } from '$env/dynamic/public';
 
-  const helpCenterUrl = PUBLIC_HELP_CENTER_BASE_URL.endsWith('/')
-    ? PUBLIC_HELP_CENTER_BASE_URL
-    : `${PUBLIC_HELP_CENTER_BASE_URL}/`;
+  const helpCenterUrl = env.PUBLIC_HELP_CENTER_BASE_URL.endsWith('/')
+    ? env.PUBLIC_HELP_CENTER_BASE_URL
+    : `${env.PUBLIC_HELP_CENTER_BASE_URL}/`;
   export let topic: string;
   export let label = 'Help';
   export let icon = 'help';

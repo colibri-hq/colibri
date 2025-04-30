@@ -1,7 +1,7 @@
-import { createContext } from '$lib/trpc/context';
-import { router } from '$lib/trpc/router';
-import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import { createContext } from "$lib/trpc/context";
+import { router } from "$lib/trpc/router";
+import { error } from "@sveltejs/kit";
+import type { PageServerLoad } from "./$types";
 
 export const load = async function load(event) {
   const caller = router.createCaller(await createContext(event));
@@ -12,6 +12,6 @@ export const load = async function load(event) {
 
     return { author };
   } catch {
-    throw error(404, 'Author not found');
+    throw error(404, "Author not found");
   }
 } satisfies PageServerLoad;

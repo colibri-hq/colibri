@@ -1,12 +1,12 @@
 /* eslint-disable jsdoc/check-param-names */
-import ansis from 'ansis';
+import ansis from "ansis";
 
 /**
  * Divider
  *
  * A special value that can be used to render a divider line in the table.
  */
-export const divider = Symbol.for('divider');
+export const divider = Symbol.for("divider");
 
 /**
  * Renders a table with the given rows and columns.
@@ -23,22 +23,23 @@ export function table<T extends Row>(
   const defaultOptions = {
     format: {
       format: String,
-      formatBoolean: (value: boolean) => value ? ansis.green('✓') : ansis.red('✗'),
+      formatBoolean: (value: boolean) =>
+        value ? ansis.green("✓") : ansis.red("✗"),
       formatDate: (value: Date) => value.toLocaleDateString(),
-      formatNull: () => ansis.gray('—'),
+      formatNull: () => ansis.gray("—"),
       formatNumber: (value: number) => value.toLocaleString(),
       formatString: (value: string) => value.toLocaleString(),
     } satisfies TableFormatOptions<T>,
     interiorBorders: false,
     theme: boxTheme,
-    width: 'auto' as const,
+    width: "auto" as const,
   };
   const { format, interiorBorders, theme } = {
     ...defaultOptions,
     ...options,
     format: {
       ...defaultOptions.format,
-      ...(typeof options?.format === 'function'
+      ...(typeof options?.format === "function"
         ? { format: options.format }
         : {}),
     },
@@ -48,44 +49,47 @@ export function table<T extends Row>(
     },
   } satisfies Required<TableOptions<T>>;
   const header = columns.map(({ name }) => ansis.bold(name));
-  const renderedRows = rows.map(
-    (row) => row === divider ? divider : columns.map(
-      (column) => formatValue(row, column, format),
+  const renderedRows = rows.map((row) =>
+    row === divider
+      ? divider
+      : columns.map((column) => formatValue(row, column, format)),
+  );
+  const columnWidths = columns.map((_column, index) =>
+    Math.max(
+      ansis.strip(header[index]).length,
+      ...renderedRows
+        .filter((row) => row !== divider)
+        .map((row) => ansis.strip(row[index]).length),
     ),
   );
-  const columnWidths = columns.map((_column, index) => Math.max(
-    ansis.strip(header[index]).length,
-    ...renderedRows
-      .filter((row) => row !== divider)
-      .map((row) => ansis.strip(row[index]).length),
-  ));
 
   return [
-    renderSeparator(columnWidths, theme, 'top'),
-    renderRow(header.map((cell, index) => align(
-      cell,
-      columnWidths[index],
-      columns[index],
+    renderSeparator(columnWidths, theme, "top"),
+    renderRow(
+      header.map((cell, index) =>
+        align(cell, columnWidths[index], columns[index], theme),
+      ),
       theme,
-    )), theme),
-    renderSeparator(columnWidths, theme, 'head'),
+    ),
+    renderSeparator(columnWidths, theme, "head"),
     ...renderedRows
-      .map((row) => row === divider
-        ? divider
-        : row.map((cell, index) => align(
-          cell,
-          columnWidths[index],
-          columns[index],
-          theme,
-        )))
-      .flatMap((cells, index) => [
-        cells === divider || (index > 0 && interiorBorders)
-          ? renderSeparator(columnWidths, theme, 'mid')
-          : undefined,
-        cells === divider ? undefined : renderRow(cells, theme),
-      ].filter((line): line is string => line !== undefined)),
-    renderSeparator(columnWidths, theme, 'bottom'),
-  ].join('\n');
+      .map((row) =>
+        row === divider
+          ? divider
+          : row.map((cell, index) =>
+              align(cell, columnWidths[index], columns[index], theme),
+            ),
+      )
+      .flatMap((cells, index) =>
+        [
+          cells === divider || (index > 0 && interiorBorders)
+            ? renderSeparator(columnWidths, theme, "mid")
+            : undefined,
+          cells === divider ? undefined : renderRow(cells, theme),
+        ].filter((line): line is string => line !== undefined),
+      ),
+    renderSeparator(columnWidths, theme, "bottom"),
+  ].join("\n");
 }
 
 /**
@@ -105,23 +109,23 @@ export function table<T extends Row>(
  * ```
  */
 export const boxTheme: TableTheme = {
-  crossing: '┼',
-  crossingBottomEnd: '┘',
-  crossingBottomMid: '┴',
-  crossingBottomStart: '└',
-  crossingHeadEndBottom: '┤',
-  crossingHeadMidBottom: '┼',
-  crossingHeadStartBottom: '├',
-  crossingMidEnd: '┤',
-  crossingMidStart: '├',
-  crossingTopEnd: '┐',
-  crossingTopMid: '┬',
-  crossingTopStart: '┌',
-  horizontalInsideBorder: '─',
-  horizontalOutsideBorder: '─',
-  padding: ' ',
-  verticalInsideBorder: '│',
-  verticalOutsideBorder: '│',
+  crossing: "┼",
+  crossingBottomEnd: "┘",
+  crossingBottomMid: "┴",
+  crossingBottomStart: "└",
+  crossingHeadEndBottom: "┤",
+  crossingHeadMidBottom: "┼",
+  crossingHeadStartBottom: "├",
+  crossingMidEnd: "┤",
+  crossingMidStart: "├",
+  crossingTopEnd: "┐",
+  crossingTopMid: "┬",
+  crossingTopStart: "┌",
+  horizontalInsideBorder: "─",
+  horizontalOutsideBorder: "─",
+  padding: " ",
+  verticalInsideBorder: "│",
+  verticalOutsideBorder: "│",
 };
 
 /**
@@ -140,23 +144,23 @@ export const boxTheme: TableTheme = {
  * ╚═════════════╧═════════════╧═════════════╝
  */
 export const doubleBoxTheme: TableTheme = {
-  crossing: '┼',
-  crossingBottomEnd: '╝',
-  crossingBottomMid: '╧',
-  crossingBottomStart: '╚',
-  crossingHeadEndBottom: '╣',
-  crossingHeadMidBottom: '╪',
-  crossingHeadStartBottom: '╠',
-  crossingMidEnd: '╢',
-  crossingMidStart: '╟',
-  crossingTopEnd: '╗',
-  crossingTopMid: '╤',
-  crossingTopStart: '╔',
-  horizontalInsideBorder: '─',
-  horizontalOutsideBorder: '═',
-  padding: ' ',
-  verticalInsideBorder: '│',
-  verticalOutsideBorder: '║',
+  crossing: "┼",
+  crossingBottomEnd: "╝",
+  crossingBottomMid: "╧",
+  crossingBottomStart: "╚",
+  crossingHeadEndBottom: "╣",
+  crossingHeadMidBottom: "╪",
+  crossingHeadStartBottom: "╠",
+  crossingMidEnd: "╢",
+  crossingMidStart: "╟",
+  crossingTopEnd: "╗",
+  crossingTopMid: "╤",
+  crossingTopStart: "╔",
+  horizontalInsideBorder: "─",
+  horizontalOutsideBorder: "═",
+  padding: " ",
+  verticalInsideBorder: "│",
+  verticalOutsideBorder: "║",
 };
 
 /**
@@ -175,23 +179,23 @@ export const doubleBoxTheme: TableTheme = {
  * +-------------+-------------+-------------+
  */
 export const ansiTheme: TableTheme = {
-  crossing: '+',
-  crossingBottomEnd: '+',
-  crossingBottomMid: '+',
-  crossingBottomStart: '+',
-  crossingHeadEndBottom: '+',
-  crossingHeadMidBottom: '+',
-  crossingHeadStartBottom: '+',
-  crossingMidEnd: '+',
-  crossingMidStart: '+',
-  crossingTopEnd: '+',
-  crossingTopMid: '+',
-  crossingTopStart: '+',
-  horizontalInsideBorder: '-',
-  horizontalOutsideBorder: '-',
-  padding: ' ',
-  verticalInsideBorder: '|',
-  verticalOutsideBorder: '|',
+  crossing: "+",
+  crossingBottomEnd: "+",
+  crossingBottomMid: "+",
+  crossingBottomStart: "+",
+  crossingHeadEndBottom: "+",
+  crossingHeadMidBottom: "+",
+  crossingHeadStartBottom: "+",
+  crossingMidEnd: "+",
+  crossingMidStart: "+",
+  crossingTopEnd: "+",
+  crossingTopMid: "+",
+  crossingTopStart: "+",
+  horizontalInsideBorder: "-",
+  horizontalOutsideBorder: "-",
+  padding: " ",
+  verticalInsideBorder: "|",
+  verticalOutsideBorder: "|",
 };
 
 /**
@@ -202,10 +206,10 @@ export const ansiTheme: TableTheme = {
  *
  * @returns A string representing the rendered row.
  */
-function renderRow(row: string[], {
-  verticalInsideBorder: inside,
-  verticalOutsideBorder: outside,
-}: TableTheme) {
+function renderRow(
+  row: string[],
+  { verticalInsideBorder: inside, verticalOutsideBorder: outside }: TableTheme,
+) {
   return outside + row.join(inside) + outside;
 }
 
@@ -237,14 +241,16 @@ function renderSeparator(
     horizontalOutsideBorder: outside,
     padding,
   }: TableTheme,
-  type: 'bottom' | 'head' | 'mid' | 'top' = 'mid',
+  type: "bottom" | "head" | "mid" | "top" = "mid",
 ) {
   const [start, crossing, end, horizontal] = {
     bottom: [bottomStart, crossingBottom, bottomEnd, outside],
-    head: [headStartBottom ?? midStart,
+    head: [
+      headStartBottom ?? midStart,
       headMidBottom ?? crossingMid,
       headEndBottom ?? midEnd,
-      outside],
+      outside,
+    ],
     mid: [midStart, crossingMid, midEnd, inside],
     top: [topStart, crossingTop, topEnd, outside],
   }[type];
@@ -276,19 +282,20 @@ function formatValue<T extends Row>(
     formatString,
   }: TableFormatOptions<T>,
 ) {
-  const value = column.accessor instanceof Function
-    ? column.accessor(row)
-    : row[column.accessor ?? column.name];
+  const value =
+    column.accessor instanceof Function
+      ? column.accessor(row)
+      : row[column.accessor ?? column.name];
 
   if (value === null || value === undefined) {
     return formatNull(value as null | undefined, row, column);
   }
 
-  if (typeof value === 'number') {
+  if (typeof value === "number") {
     return formatNumber(value, row, column);
   }
 
-  if (typeof value === 'boolean') {
+  if (typeof value === "boolean") {
     return formatBoolean(value, row, column);
   }
 
@@ -296,7 +303,7 @@ function formatValue<T extends Row>(
     return formatDate(value, row, column);
   }
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return formatString(value, row, column);
   }
 
@@ -320,15 +327,14 @@ function align<T extends Row>(
   { padding: fillString }: TableTheme,
 ) {
   const plainValue = ansis.strip(value);
-  const pad = (amount: number = plainValue.length) => fillString.repeat(
-    width - amount + fillString.length,
-  );
+  const pad = (amount: number = plainValue.length) =>
+    fillString.repeat(width - amount + fillString.length);
 
-  if (alignment === 'start') {
+  if (alignment === "start") {
     return fillString + value + pad();
   }
 
-  if (alignment === 'end') {
+  if (alignment === "end") {
     return pad() + value + fillString;
   }
 
@@ -336,7 +342,6 @@ function align<T extends Row>(
 
   return pad(width - padding) + value + pad(plainValue.length + padding);
 }
-
 
 type Row = { [key: string]: unknown };
 
@@ -347,7 +352,6 @@ type Row = { [key: string]: unknown };
  * data accessor and display rendering.
  */
 type Column<T extends Row> = {
-
   /**
    * A function that returns the value to be displayed in the column.
    * If not provided, the column will use the value of the property
@@ -355,13 +359,15 @@ type Column<T extends Row> = {
    *
    * Note that the result of this function is passed to the format function.
    */
-  accessor?: ((row: T) => boolean | Date | null | number | string | undefined) | keyof T;
+  accessor?:
+    | ((row: T) => boolean | Date | null | number | string | undefined)
+    | keyof T;
 
   /**
    * The alignment of the column's content. This can be 'start', 'center',
    * or 'end'. The default is 'center'.
    */
-  align?: 'center' | 'end' | 'start';
+  align?: "center" | "end" | "start";
 
   /**
    * A function that formats the value for display in the table. If no formatter
@@ -375,7 +381,7 @@ type Column<T extends Row> = {
    * is provided, this will be used as the default accessor.
    */
   name: string;
-}
+};
 
 /**
  * Table Theme
@@ -453,7 +459,6 @@ type TableFormatter<T extends Row, V = T[keyof T]> = (
  * and will override the default format function if provided.
  */
 type TableFormatOptions<T extends Row> = {
-
   /**
    * A function that formats an unknown value for display in the table.
    *
@@ -485,7 +490,7 @@ type TableFormatOptions<T extends Row> = {
    * A function that formats a string value for display in the table.
    */
   formatString: TableFormatter<T, string>;
-}
+};
 
 /**
  * Table Options
@@ -493,7 +498,6 @@ type TableFormatOptions<T extends Row> = {
  * Options for customizing the appearance and behavior of the table.
  */
 type TableOptions<T extends Row> = {
-
   /**
    * Either a function that formats the value for display in the table,
    * or an object with functions for formatting different types of values.
@@ -519,5 +523,5 @@ type TableOptions<T extends Row> = {
    * fit the table to the terminal width, or a specific number to set
    * a fixed width.
    */
-  width?: 'auto' | number;
-}
+  width?: "auto" | number;
+};

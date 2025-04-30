@@ -1,22 +1,22 @@
-import type { Relator } from '$lib/parsing/contributions';
-import { isZipFile } from '$lib/parsing/epub';
-import { isMobiFile } from '$lib/parsing/mobi';
-import { isPdfFile } from '$lib/parsing/pdf';
+import type { Relator } from "$lib/parsing/contributions";
+import { isZipFile } from "$lib/parsing/epub";
+import { isMobiFile } from "$lib/parsing/mobi";
+import { isPdfFile } from "$lib/parsing/pdf";
 
 export async function detectType(file: File) {
   if (await isPdfFile(file)) {
-    return 'pdf';
+    return "pdf";
   }
 
   if (await isMobiFile(file)) {
-    return 'mobi';
+    return "mobi";
   }
 
   if (await isZipFile(file)) {
-    return 'epub';
+    return "epub";
   }
 
-  throw new Error('Unsupported file format');
+  throw new Error("Unsupported file format");
 }
 
 export type Metadata = {

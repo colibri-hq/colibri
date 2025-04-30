@@ -1,33 +1,33 @@
-import { type Relator, relatorRoles } from '$lib/parsing/contributions';
-import { wrapArray } from '@colibri-hq/shared';
-import { DOMParser } from 'xmldom';
+import { type Relator, relatorRoles } from "$lib/parsing/contributions";
+import { wrapArray } from "@colibri-hq/shared";
+import { DOMParser } from "xmldom";
 import {
   cfiToElement,
   cfiToRange,
   parseCfi,
   parseCfiFromElements,
   type RegularCfi,
-} from './cfi';
+} from "./cfi";
 
 const NS = {
-  CONTAINER: 'urn:oasis:names:tc:opendocument:xmlns:container',
-  XHTML: 'http://www.w3.org/1999/xhtml',
-  OPF: 'http://www.idpf.org/2007/opf',
-  EPUB: 'http://www.idpf.org/2007/ops',
-  DC: 'http://purl.org/dc/elements/1.1/',
-  DCTERMS: 'http://purl.org/dc/terms/',
-  ENC: 'http://www.w3.org/2001/04/xmlenc#',
-  NCX: 'http://www.daisy.org/z3986/2005/ncx/',
-  XLINK: 'http://www.w3.org/1999/xlink',
-  SMIL: 'http://www.w3.org/ns/SMIL',
+  CONTAINER: "urn:oasis:names:tc:opendocument:xmlns:container",
+  XHTML: "http://www.w3.org/1999/xhtml",
+  OPF: "http://www.idpf.org/2007/opf",
+  EPUB: "http://www.idpf.org/2007/ops",
+  DC: "http://purl.org/dc/elements/1.1/",
+  DCTERMS: "http://purl.org/dc/terms/",
+  ENC: "http://www.w3.org/2001/04/xmlenc#",
+  NCX: "http://www.daisy.org/z3986/2005/ncx/",
+  XLINK: "http://www.w3.org/1999/xlink",
+  SMIL: "http://www.w3.org/ns/SMIL",
 };
 const MIME = {
-  XML: 'application/xml' as DOMParserSupportedType,
-  NCX: 'application/x-dtbncx+xml' as DOMParserSupportedType,
-  XHTML: 'application/xhtml+xml' as DOMParserSupportedType,
-  HTML: 'text/html' as DOMParserSupportedType,
-  CSS: 'text/css' as DOMParserSupportedType,
-  SVG: 'image/svg+xml' as DOMParserSupportedType,
+  XML: "application/xml" as DOMParserSupportedType,
+  NCX: "application/x-dtbncx+xml" as DOMParserSupportedType,
+  XHTML: "application/xhtml+xml" as DOMParserSupportedType,
+  HTML: "text/html" as DOMParserSupportedType,
+  CSS: "text/css" as DOMParserSupportedType,
+  SVG: "image/svg+xml" as DOMParserSupportedType,
   JS: /\/(x-)?(javascript|ecmascript)/,
 };
 
@@ -42,13 +42,13 @@ function camel<T extends string>(value: T) {
 // https://infra.spec.whatwg.org/#strip-and-collapse-ascii-whitespace
 function normalizeWhitespace(value: string) {
   if (!value) {
-    return '';
+    return "";
   }
 
   return value
-    .replace(/[\t\n\f\r ]+/g, ' ')
-    .replace(/^[\t\n\f\r ]+/, '')
-    .replace(/[\t\n\f\r ]+$/, '');
+    .replace(/[\t\n\f\r ]+/g, " ")
+    .replace(/^[\t\n\f\r ]+/, "")
+    .replace(/[\t\n\f\r ]+$/, "");
 }
 
 function filterAttribute(
@@ -61,26 +61,26 @@ function filterAttribute(
 ) {
   if (isList) {
     return (_element: Element) => {
-      return typeof value === 'function'
+      return typeof value === "function"
         ? (element: Element) =>
             element
               .getAttribute(attribute)
               ?.split(/\s/)
               ?.includes(
-                value(element.getAttribute(attribute))?.toString() ?? '',
+                value(element.getAttribute(attribute))?.toString() ?? "",
               ) ?? false
         : (element: Element) =>
             element
               .getAttribute(attribute)
               ?.split(/\s/)
-              ?.includes(value ?? '') ?? false;
+              ?.includes(value ?? "") ?? false;
     };
   }
 
-  return typeof value === 'function'
+  return typeof value === "function"
     ? (element: Element) => !!value(element.getAttribute(attribute))
     : (element: Element) =>
-        typeof value === 'undefined'
+        typeof value === "undefined"
           ? !element.hasAttribute(attribute)
           : element.getAttribute(attribute) === value;
 }
@@ -99,7 +99,7 @@ function getAttributes<K extends string>(attributes: K[]) {
 }
 
 function getElementText(element: Node | undefined) {
-  return normalizeWhitespace(element?.textContent ?? '');
+  return normalizeWhitespace(element?.textContent ?? "");
 }
 
 function elementAccessor(document: Element | Document, namespace: string) {
@@ -139,16 +139,16 @@ function elementAccessor(document: Element | Document, namespace: string) {
 
 function resolveURL(uri: string | URL, relativeTo: string | URL) {
   try {
-    if (relativeTo.toString().includes(':')) {
+    if (relativeTo.toString().includes(":")) {
       return new URL(uri, relativeTo).toString();
     }
 
     // the base needs to be a valid URL, so set a base URL and then remove it
-    const root = 'https://invalid.invalid/';
+    const root = "https://invalid.invalid/";
     const url = new URL(uri, root + relativeTo);
-    url.search = '';
+    url.search = "";
 
-    return decodeURI(url.href.replace(root, ''));
+    return decodeURI(url.href.replace(root, ""));
   } catch (error) {
     console.warn(error);
 
@@ -166,22 +166,22 @@ function pathRelative(from: string | undefined, to: string) {
     return to;
   }
 
-  const as = from.replace(/\/$/, '').split('/');
-  const bs = to.replace(/\/$/, '').split('/');
+  const as = from.replace(/\/$/, "").split("/");
+  const bs = to.replace(/\/$/, "").split("/");
   const i = (as.length > bs.length ? as : bs).findIndex(
     (_, i) => as[i] !== bs[i],
   );
 
   return i < 0
-    ? ''
+    ? ""
     : Array(as.length - i)
-        .fill('..')
+        .fill("..")
         .concat(bs.slice(i))
-        .join('/');
+        .join("/");
 }
 
 function pathDirname(value: string) {
-  return value.slice(0, value.lastIndexOf('/') + 1);
+  return value.slice(0, value.lastIndexOf("/") + 1);
 }
 
 /**
@@ -208,36 +208,36 @@ async function replaceSeries(
 }
 
 function regexEscape(value: string) {
-  return value.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+  return value.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
 }
 
 const LANGS = {
-  attrs: ['dir', 'xml:lang'],
+  attrs: ["dir", "xml:lang"],
 } satisfies Partial<MetadataDescriptor>;
 const ALTS = {
-  name: 'alternate-script',
+  name: "alternate-script",
   multiple: true,
   ...LANGS,
-  props: ['file-as'],
+  props: ["file-as"],
 } satisfies MetadataDescriptor;
 const CONTRIB = {
   multiple: true,
   ...LANGS,
-  props: [{ name: 'role', multiple: true, attrs: ['scheme'] }, 'file-as', ALTS],
+  props: [{ name: "role", multiple: true, attrs: ["scheme"] }, "file-as", ALTS],
   setLegacyAttrs: (metadata, element) => {
     if (
-      !('role' in metadata) ||
+      !("role" in metadata) ||
       !Array.isArray(metadata.role) ||
       !metadata.role?.length
     ) {
-      const value = element.getAttributeNS(NS.OPF, 'role');
+      const value = element.getAttributeNS(NS.OPF, "role");
 
       if (value) {
         metadata.role = value;
       }
     }
 
-    const fileAs = element.getAttributeNS(NS.OPF, 'file-as');
+    const fileAs = element.getAttributeNS(NS.OPF, "file-as");
 
     if (fileAs && !metadata.fileAs) {
       metadata.fileAs = fileAs;
@@ -246,18 +246,18 @@ const CONTRIB = {
 } satisfies Partial<MetadataDescriptor>;
 const METADATA = [
   {
-    name: 'title',
+    name: "title",
     multiple: true,
     ...LANGS,
-    props: ['title-type', 'display-seq', 'file-as', ALTS],
+    props: ["title-type", "display-seq", "file-as", ALTS],
   },
   {
-    name: 'identifier',
+    name: "identifier",
     multiple: true,
-    props: [{ name: 'identifier-type', attrs: ['scheme'] }],
+    props: [{ name: "identifier-type", attrs: ["scheme"] }],
     setLegacyAttrs: (obj, element) => {
       if (!obj.identifierType) {
-        const value = element.getAttributeNS(NS.OPF, 'scheme');
+        const value = element.getAttributeNS(NS.OPF, "scheme");
 
         if (value) {
           obj.identifierType = { value };
@@ -265,66 +265,66 @@ const METADATA = [
       }
     },
   },
-  { name: 'language', multiple: true },
-  { name: 'creator', ...CONTRIB },
-  { name: 'contributor', ...CONTRIB },
-  { name: 'publisher', ...LANGS, props: ['file-as', ALTS] },
-  { name: 'description', ...LANGS, props: [ALTS] },
-  { name: 'rights', ...LANGS, props: [ALTS] },
-  { name: 'date' },
-  { name: 'dcterms:modified', type: 'meta' },
+  { name: "language", multiple: true },
+  { name: "creator", ...CONTRIB },
+  { name: "contributor", ...CONTRIB },
+  { name: "publisher", ...LANGS, props: ["file-as", ALTS] },
+  { name: "description", ...LANGS, props: [ALTS] },
+  { name: "rights", ...LANGS, props: [ALTS] },
+  { name: "date" },
+  { name: "dcterms:modified", type: "meta" },
   {
-    name: 'subject',
+    name: "subject",
     multiple: true,
     ...LANGS,
-    props: ['term', 'authority', ALTS],
+    props: ["term", "authority", ALTS],
     setLegacyAttrs: (obj, element) => {
-      const term = element.getAttributeNS(NS.OPF, 'term');
+      const term = element.getAttributeNS(NS.OPF, "term");
 
       if (term && !obj.term) {
         obj.term = term;
       }
 
-      const authority = element.getAttributeNS(NS.OPF, 'authority');
+      const authority = element.getAttributeNS(NS.OPF, "authority");
 
       if (authority && !obj.authority) {
         obj.authority = authority;
       }
     },
   },
-  { name: 'source', multiple: true },
+  { name: "source", multiple: true },
   {
-    name: 'belongs-to-collection',
-    type: 'meta',
+    name: "belongs-to-collection",
+    type: "meta",
     multiple: true,
     ...LANGS,
     props: [
-      'collection-type',
-      'group-position',
-      'dcterms:identifier',
-      'file-as',
+      "collection-type",
+      "group-position",
+      "dcterms:identifier",
+      "file-as",
       ALTS,
-      { name: 'belongs-to-collection', recursive: true },
+      { name: "belongs-to-collection", recursive: true },
     ],
   },
 ] satisfies MetadataDescriptor[];
 
 const contributorLabels = {
-  art: 'artist',
-  aut: 'author',
-  bkp: 'producer',
-  clr: 'colorist',
-  ctb: 'contributor',
-  edt: 'editor',
-  ill: 'illustrator',
-  nrt: 'narrator',
-  pbl: 'publisher',
-  trl: 'translator',
+  art: "artist",
+  aut: "author",
+  bkp: "producer",
+  clr: "colorist",
+  ctb: "contributor",
+  edt: "editor",
+  ill: "illustrator",
+  nrt: "narrator",
+  pbl: "publisher",
+  trl: "translator",
 } as const;
 
 function getMetadata(opf: Document) {
   const { $, $$ } = elementAccessor(opf, NS.OPF);
-  const $metadata = $(opf.documentElement, 'metadata')!;
+  const $metadata = $(opf.documentElement, "metadata")!;
   const elements = Array.from($metadata?.childNodes ?? []).filter(
     (element): element is Element => element.nodeType === element.ELEMENT_NODE,
   );
@@ -344,9 +344,9 @@ function getMetadata(opf: Document) {
       return { value };
     }
 
-    const id = element.getAttribute('id');
+    const id = element.getAttribute("id");
     const refines = id
-      ? elements.filter(filterAttribute('refines', `#${id}`))
+      ? elements.filter(filterAttribute("refines", `#${id}`))
       : [];
     const result: MetadataValue = {
       // Include the value
@@ -357,11 +357,11 @@ function getMetadata(opf: Document) {
         props
           .map((prop) => {
             const propertyData =
-              typeof prop === 'string'
+              typeof prop === "string"
                 ? ({ name: prop } as MetadataDescriptorProp)
                 : prop;
             const { name, multiple, recursive } = propertyData;
-            const filter = filterAttribute('property', name);
+            const filter = filterAttribute("property", name);
             const subObject = recursive ? descriptor : propertyData;
             const value = multiple
               ? refines
@@ -394,17 +394,17 @@ function getMetadata(opf: Document) {
   }
 
   const refinedElements = elements.filter(
-    filterAttribute('refines', undefined),
+    filterAttribute("refines", undefined),
   );
 
   const metadata = Object.fromEntries(
     METADATA.map((obj) => {
       const { type, name, multiple } = obj;
       const filter =
-        type === 'meta'
+        type === "meta"
           ? (element: Element) =>
               element.namespaceURI === NS.OPF &&
-              element.getAttribute('property') === name
+              element.getAttribute("property") === name
           : (element: Element) =>
               element.namespaceURI === NS.DC && element.localName === name;
 
@@ -421,20 +421,20 @@ function getMetadata(opf: Document) {
     ),
   );
 
-  const $$meta = $$($metadata, 'meta');
+  const $$meta = $$($metadata, "meta");
 
   function getMetaElementsByPrefix(prefix: string) {
     return $$meta
       .filter(
         filterAttribute(
-          'property',
+          "property",
           (value) => value?.startsWith(prefix) ?? false,
         ),
       )
       .map(
         (element) =>
           [
-            element.getAttribute('property')?.replace(prefix, ''),
+            element.getAttribute("property")?.replace(prefix, ""),
             element,
           ] as const,
       )
@@ -442,24 +442,24 @@ function getMetadata(opf: Document) {
   }
 
   const rendition = Object.fromEntries(
-    getMetaElementsByPrefix('rendition:').map(
+    getMetaElementsByPrefix("rendition:").map(
       ([key, element]) => [key, getElementText(element)] as const,
     ),
   );
 
   const media: MediaDescriptor = { narrator: [], duration: {} };
 
-  for (const [key, element] of getMetaElementsByPrefix('media:')) {
+  for (const [key, element] of getMetaElementsByPrefix("media:")) {
     const value = getElementText(element);
 
-    if (key === 'duration') {
-      media.duration[element?.getAttribute('refines')?.split('#')?.[1] ?? ''] =
+    if (key === "duration") {
+      media.duration[element?.getAttribute("refines")?.split("#")?.[1] ?? ""] =
         parseClock(value) ?? 0;
-    } else if (key === 'active-class') {
+    } else if (key === "active-class") {
       media.activeClass = value;
-    } else if (key === 'narrator') {
+    } else if (key === "narrator") {
       media.narrator.push(value);
-    } else if (key === 'playback-active-class') {
+    } else if (key === "playback-active-class") {
       media.playbackActiveClass = value;
     }
   }
@@ -479,43 +479,43 @@ function parseNav(
 
   function parseListItem(getType?: boolean) {
     return ($li: Element): NavigationEntry => {
-      const $a = $($li, 'a') ?? $($li, 'span');
-      const $ol = $($li, 'ol');
+      const $a = $($li, "a") ?? $($li, "span");
+      const $ol = $($li, "ol");
 
       // TODO: get and concat alt/title texts in content
       return {
-        label: getElementText($a) ?? $a?.getAttribute('title') ?? undefined,
-        href: resolveHref($a?.getAttribute('href') ?? undefined),
+        label: getElementText($a) ?? $a?.getAttribute("title") ?? undefined,
+        href: resolveHref($a?.getAttribute("href") ?? undefined),
         subitems: parseOrderedList($ol),
         type: getType
-          ? ($a?.getAttributeNS(NS.EPUB, 'type')?.split(/\s/) ?? undefined)
+          ? ($a?.getAttributeNS(NS.EPUB, "type")?.split(/\s/) ?? undefined)
           : undefined,
       };
     };
   }
 
   function parseOrderedList($ol: Element | undefined, getType?: boolean) {
-    return $ol ? $$($ol, 'li').map(parseListItem(getType)) : undefined;
+    return $ol ? $$($ol, "li").map(parseListItem(getType)) : undefined;
   }
 
   function parseNav($nav: Element, getType?: boolean) {
-    return parseOrderedList($($nav, 'ol'), getType);
+    return parseOrderedList($($nav, "ol"), getType);
   }
 
-  const $$nav = $$$(document, 'nav');
+  const $$nav = $$$(document, "nav");
   let toc: NavigationEntry[] | undefined = undefined;
   let pageList: NavigationEntry[] | undefined = undefined;
   let landmarks: NavigationEntry[] | undefined = undefined;
   const others = [];
 
   for (const $nav of $$nav) {
-    const type = $nav.getAttributeNS(NS.EPUB, 'type')?.split(/\s/) ?? [];
+    const type = $nav.getAttributeNS(NS.EPUB, "type")?.split(/\s/) ?? [];
 
-    if (type.includes('toc')) {
+    if (type.includes("toc")) {
       toc ??= parseNav($nav);
-    } else if (type.includes('page-list')) {
+    } else if (type.includes("page-list")) {
       pageList ??= parseNav($nav);
-    } else if (type.includes('landmarks')) {
+    } else if (type.includes("landmarks")) {
       landmarks ??= parseNav($nav, true);
     } else {
       others.push({
@@ -537,13 +537,13 @@ function parseNCX(doc: Document, resolve = (url: string) => url) {
   }
 
   function parseItem(element: Element): ParsedNcxItem {
-    const $label = $(element, 'navLabel');
-    const $content = $(element, 'content');
+    const $label = $(element, "navLabel");
+    const $content = $(element, "content");
     const label = getElementText($label);
-    const href = resolveHref($content?.getAttribute('src') ?? undefined);
+    const href = resolveHref($content?.getAttribute("src") ?? undefined);
 
-    if (element.localName === 'navPoint') {
-      const elements = $$(element, 'navPoint');
+    if (element.localName === "navPoint") {
+      const elements = $$(element, "navPoint");
 
       return {
         label,
@@ -566,11 +566,11 @@ function parseNCX(doc: Document, resolve = (url: string) => url) {
   }
 
   return {
-    toc: getSingle('navMap', 'navPoint'),
-    pageList: getSingle('pageList', 'pageTarget'),
-    others: $$(doc.documentElement, 'navList').map((element) => ({
-      label: getElementText($(element, 'navLabel')),
-      list: parseList(element, 'navTarget'),
+    toc: getSingle("navMap", "navPoint"),
+    pageList: getSingle("pageList", "pageTarget"),
+    others: $$(doc.documentElement, "navList").map((element) => ({
+      label: getElementText($(element, "navLabel")),
+      list: parseList(element, "navTarget"),
     })),
   };
 }
@@ -580,7 +580,7 @@ function parseClock(value: string | undefined) {
     return;
   }
 
-  const parts = value.split(':').map((x) => parseFloat(x));
+  const parts = value.split(":").map((x) => parseFloat(x));
 
   if (parts.length === 3) {
     const [h, m, s] = parts;
@@ -597,7 +597,7 @@ function parseClock(value: string | undefined) {
   const [x, unit] = value.split(/(?=[^\d.])/);
   const n = parseFloat(x);
   const f =
-    unit === 'h' ? 60 * 60 : unit === 'min' ? 60 : unit === 'ms' ? 0.001 : 1;
+    unit === "h" ? 60 * 60 : unit === "min" ? 60 : unit === "ms" ? 0.001 : 1;
 
   return n * f;
 }
@@ -664,7 +664,7 @@ class MediaOverlay extends EventTarget {
 
       for (let j = 0; j < items.length; j++) {
         if (
-          items[j].text.split('#')[0] === href &&
+          items[j].text.split("#")[0] === href &&
           filter(items[j], j, items)
         ) {
           return this.#play(i, j).catch((error: unknown) => this.#error(error));
@@ -735,21 +735,21 @@ class MediaOverlay extends EventTarget {
     const { $, $$$ } = elementAccessor(document, NS.SMIL);
     this.#audioIndex = -1;
     this.#itemIndex = -1;
-    this.#entries = $$$(document, 'par').reduce<
+    this.#entries = $$$(document, "par").reduce<
       { src: string; items: { text: string; begin: number; end: number }[] }[]
     >((items, $par) => {
       const text = resolve(
-        $($par, 'text')?.getAttribute('src') ?? undefined,
+        $($par, "text")?.getAttribute("src") ?? undefined,
       )?.toString();
-      const $audio = $($par, 'audio');
+      const $audio = $($par, "audio");
 
       if (!text || !$audio) {
         return items;
       }
 
-      const src = resolve($audio.getAttribute('src') ?? undefined)?.toString();
-      const begin = parseClock($audio.getAttribute('clipBegin') ?? undefined)!;
-      const end = parseClock($audio.getAttribute('clipEnd') ?? undefined)!;
+      const src = resolve($audio.getAttribute("src") ?? undefined)?.toString();
+      const begin = parseClock($audio.getAttribute("clipBegin") ?? undefined)!;
+      const end = parseClock($audio.getAttribute("clipEnd") ?? undefined)!;
       const last = items.at(-1)!;
 
       if (last?.src === src) {
@@ -765,18 +765,18 @@ class MediaOverlay extends EventTarget {
 
   #error(error: unknown) {
     console.error(error);
-    this.dispatchEvent(new CustomEvent('error', { detail: error }));
+    this.dispatchEvent(new CustomEvent("error", { detail: error }));
   }
 
   #highlight() {
     this.dispatchEvent(
-      new CustomEvent('highlight', { detail: this.#activeItem }),
+      new CustomEvent("highlight", { detail: this.#activeItem }),
     );
   }
 
   #unhighlight() {
     this.dispatchEvent(
-      new CustomEvent('unhighlight', { detail: this.#activeItem }),
+      new CustomEvent("unhighlight", { detail: this.#activeItem }),
     );
   }
 
@@ -799,7 +799,7 @@ class MediaOverlay extends EventTarget {
     const audio = new Audio(url);
     this.#audio = audio;
 
-    audio.addEventListener('timeupdate', () => {
+    audio.addEventListener("timeupdate", () => {
       if (audio.paused) {
         return;
       }
@@ -829,12 +829,12 @@ class MediaOverlay extends EventTarget {
         this.#highlight();
       }
     });
-    audio.addEventListener('error', () =>
+    audio.addEventListener("error", () =>
       this.#error(new Error(`Failed to load ${src}`)),
     );
-    audio.addEventListener('playing', () => this.#highlight());
-    audio.addEventListener('pause', () => this.#unhighlight());
-    audio.addEventListener('ended', () => {
+    audio.addEventListener("playing", () => this.#highlight());
+    audio.addEventListener("pause", () => this.#unhighlight());
+    audio.addEventListener("ended", () => {
       this.#unhighlight();
       URL.revokeObjectURL(url);
       this.#audio = undefined;
@@ -842,7 +842,7 @@ class MediaOverlay extends EventTarget {
         this.#error(error),
       );
     });
-    audio.addEventListener('canplaythrough', () => {
+    audio.addEventListener("canplaythrough", () => {
       audio.currentTime = this.#activeItem.begin ?? 0;
       audio.volume = this.#volume;
       audio.playbackRate = this.#rate;
@@ -852,8 +852,8 @@ class MediaOverlay extends EventTarget {
 }
 
 function getUuid(opf: Document) {
-  for (const element of opf.getElementsByTagNameNS(NS.DC, 'identifier')) {
-    const [id] = getElementText(element).split(':').slice(-1);
+  for (const element of opf.getElementsByTagNameNS(NS.DC, "identifier")) {
+    const [id] = getElementText(element).split(":").slice(-1);
 
     if (
       /([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{12})/.test(
@@ -864,14 +864,14 @@ function getUuid(opf: Document) {
     }
   }
 
-  return '';
+  return "";
 }
 
 function extractMetadataValue(
   entry: MetadataValue | MetadataValue[] | undefined,
-  accessor: string | ((entry: MetadataValue) => boolean) = 'value',
+  accessor: string | ((entry: MetadataValue) => boolean) = "value",
 ): string | string[] | undefined {
-  if (typeof entry === 'string' || typeof entry === 'undefined') {
+  if (typeof entry === "string" || typeof entry === "undefined") {
     return entry;
   }
 
@@ -882,7 +882,7 @@ function extractMetadataValue(
 
         return Array.isArray(values) ? values : [values];
       })
-      .filter((value): value is string => typeof value !== 'undefined');
+      .filter((value): value is string => typeof value !== "undefined");
 
     switch (values.length) {
       case 0:
@@ -896,11 +896,11 @@ function extractMetadataValue(
     }
   }
 
-  if (entry === null || typeof entry !== 'object') {
+  if (entry === null || typeof entry !== "object") {
     return undefined;
   }
 
-  if (typeof accessor === 'string') {
+  if (typeof accessor === "string") {
     return accessor in entry ? (entry[accessor] as string) : undefined;
   }
 
@@ -912,8 +912,8 @@ function extractMetadataValue(
 function getIdentifier(opf: Document) {
   return getElementText(
     opf.getElementById(
-      opf.documentElement.getAttribute('unique-identifier')!,
-    ) ?? opf.getElementsByTagNameNS(NS.DC, 'identifier')[0],
+      opf.documentElement.getAttribute("unique-identifier")!,
+    ) ?? opf.getElementsByTagNameNS(NS.DC, "identifier")[0],
   );
 }
 
@@ -931,25 +931,25 @@ async function deobfuscate(key: Uint8Array, length: number, blob: Blob) {
 
 async function sha1Hash(value: string) {
   const data = new TextEncoder().encode(value);
-  const buffer = await globalThis.crypto.subtle.digest('sha1', data);
+  const buffer = await globalThis.crypto.subtle.digest("sha1", data);
 
   return new Uint8Array(buffer);
 }
 
 function deobfuscators(): Record<string, Algorithm> {
   return {
-    'http://www.idpf.org/2008/embedding': {
+    "http://www.idpf.org/2008/embedding": {
       key: (opf) =>
         sha1Hash(
           getIdentifier(opf)
-            // eslint-disable-next-line no-control-regex
-            .replaceAll(/[\u0020\u0009\u000d\u000a]/g, ''),
+             
+            .replaceAll(/[\u0020\u0009\u000d\u000a]/g, ""),
         ),
       decode: (key, blob) => deobfuscate(key, 1040, blob),
     },
-    'http://ns.adobe.com/pdf/enc#RC': {
+    "http://ns.adobe.com/pdf/enc#RC": {
       key: (opf) => {
-        const uuid = getUuid(opf).replaceAll('-', '');
+        const uuid = getUuid(opf).replaceAll("-", "");
 
         return Uint8Array.from({ length: 16 }, (_, i) =>
           parseInt(uuid.slice(i * 2, i * 2 + 2), 16),
@@ -972,14 +972,14 @@ class Encryption {
 
   async init(encryption: Document, opf: Document) {
     const data = Array.from(
-      encryption.getElementsByTagNameNS(NS.ENC, 'EncryptedData'),
+      encryption.getElementsByTagNameNS(NS.ENC, "EncryptedData"),
       (element: Element) => ({
         algorithm: element
-          .getElementsByTagNameNS(NS.ENC, 'EncryptionMethod')[0]
-          ?.getAttribute('Algorithm')!,
+          .getElementsByTagNameNS(NS.ENC, "EncryptionMethod")[0]
+          ?.getAttribute("Algorithm")!,
         uri: element
-          .getElementsByTagNameNS(NS.ENC, 'CipherReference')[0]
-          ?.getAttribute('URI')!,
+          .getElementsByTagNameNS(NS.ENC, "CipherReference")[0]
+          ?.getAttribute("URI")!,
       }),
     );
 
@@ -1017,7 +1017,7 @@ class Resources {
   public opf: Document;
   public manifest: ManifestItem[];
   public spine: SpineItem[];
-  public pageProgressionDirection?: 'ltr' | 'rtl' | 'auto';
+  public pageProgressionDirection?: "ltr" | "rtl" | "auto";
   public cover: ManifestItem | undefined = undefined;
   public guide: NavigationEntry[] | undefined = undefined;
   public navPath: string | undefined = undefined;
@@ -1028,70 +1028,70 @@ class Resources {
     this.opf = opf;
     const { $, $$, $$$ } = elementAccessor(opf, NS.OPF);
 
-    const $manifest = $(opf.documentElement, 'manifest')!;
-    const $spine = $(opf.documentElement, 'spine')!;
-    const $$itemRef = $$($spine, 'itemref');
+    const $manifest = $(opf.documentElement, "manifest")!;
+    const $spine = $(opf.documentElement, "spine")!;
+    const $$itemRef = $$($spine, "itemref");
 
-    this.manifest = $$($manifest, 'item')
+    this.manifest = $$($manifest, "item")
       .map(
         getAttributes([
-          'href',
-          'id',
-          'media-type',
-          'properties',
-          'media-overlay',
+          "href",
+          "id",
+          "media-type",
+          "properties",
+          "media-overlay",
         ]),
       )
       .map((item) => ({
         ...item,
         mediaType:
           (item.mediaType as DOMParserSupportedType | undefined) ?? MIME.XML,
-        href: linkResolver(item?.href ?? ''),
+        href: linkResolver(item?.href ?? ""),
         properties: item?.properties?.split(/\s/) ?? [],
       }));
 
     this.spine = $$itemRef
-      .map(getAttributes(['idref', 'id', 'linear', 'properties']))
+      .map(getAttributes(["idref", "id", "linear", "properties"]))
       .map((item) => ({
         ...item,
         properties: item?.properties?.split(/\s/) ?? [],
       }));
 
-    const direction = $spine!.getAttribute('page-progression-direction') as
-      | 'ltr'
-      | 'rtl'
-      | 'auto'
+    const direction = $spine!.getAttribute("page-progression-direction") as
+      | "ltr"
+      | "rtl"
+      | "auto"
       | undefined;
-    this.pageProgressionDirection = direction ?? 'auto';
+    this.pageProgressionDirection = direction ?? "auto";
 
-    this.navPath = this.getItemByProperty('nav')?.href;
+    this.navPath = this.getItemByProperty("nav")?.href;
     this.ncxPath = (
-      this.getItemByID($spine.getAttribute('toc')!) ??
+      this.getItemByID($spine.getAttribute("toc")!) ??
       this.manifest.find((item) => item.mediaType === MIME.NCX)
     )?.href;
 
-    const $guide = $(opf.documentElement, 'guide');
+    const $guide = $(opf.documentElement, "guide");
 
     if ($guide) {
-      this.guide = $$($guide, 'reference')
-        .map(getAttributes(['type', 'title', 'href']))
+      this.guide = $$($guide, "reference")
+        .map(getAttributes(["type", "title", "href"]))
         .map(({ type, title, href }) => ({
           label: title,
           type: type?.split(/\s/) ?? [],
-          href: linkResolver(href ?? ''),
+          href: linkResolver(href ?? ""),
         }));
     }
 
     this.cover =
-      this.getItemByProperty('cover-image') ??
+      this.getItemByProperty("cover-image") ??
       // EPUB 2 compatibility
       this.getItemByID(
-        $$$(opf, 'meta')
-          .find(filterAttribute('name', 'cover'))
-          ?.getAttribute('content') ?? '',
+        $$$(opf, "meta")
+          .find(filterAttribute("name", "cover"))
+          ?.getAttribute("content") ?? "",
       ) ??
       this.getItemByHref(
-        this.guide?.find(({ type }) => type?.includes('cover'))?.href ?? '',
+        this.guide?.find(({ type }) => type?.includes("cover"))?.href ?? "",
       );
 
     this.cfis = parseCfiFromElements($$itemRef);
@@ -1117,12 +1117,12 @@ class Resources {
     // make sure it's an idref; if not, try again without the ID assertion mainly because Epub.js
     // used to generate wrong ID assertions. See also:
     // https://github.com/futurepress/epub.js/issues/1236
-    if ($itemref && $itemref.nodeName !== 'idref') {
+    if ($itemref && $itemref.nodeName !== "idref") {
       top.at(-1)!.id = undefined;
       $itemref = cfiToElement(this.opf, top) as Element | undefined;
     }
 
-    const idref = $itemref?.getAttribute('idref');
+    const idref = $itemref?.getAttribute("idref");
     const index = this.spine.findIndex((item) => item.idref === idref);
 
     function anchor(doc: Document) {
@@ -1199,7 +1199,7 @@ class Loader {
     const count = (this.#refCount.get(href) ?? 0) - 1;
 
     if (count < 1) {
-      URL.revokeObjectURL(this.#cache.get(href) ?? '');
+      URL.revokeObjectURL(this.#cache.get(href) ?? "");
       this.#cache.delete(href);
       this.#refCount.delete(href);
 
@@ -1233,7 +1233,7 @@ class Loader {
       return undefined;
     }
 
-    const parent = parents.at(-1) ?? '';
+    const parent = parents.at(-1) ?? "";
 
     if (this.#cache.has(href)) {
       return this.ref(href, parent);
@@ -1267,8 +1267,8 @@ class Loader {
   }
 
   async loadReplaced(item: ManifestItem, parents: string[] = []) {
-    const { href, mediaType = '' as DOMParserSupportedType } = item;
-    const parent = parents.at(-1) ?? '';
+    const { href, mediaType = "" as DOMParserSupportedType } = item;
+    const parent = parents.at(-1) ?? "";
     const value = await this.loadText(href);
 
     if (!value) {
@@ -1291,10 +1291,10 @@ class Loader {
       // change to HTML if it's not valid XHTML
       if (
         mediaType === MIME.XHTML &&
-        document.getElementsByTagName('parsererror').length > 0
+        document.getElementsByTagName("parsererror").length > 0
       ) {
         const parserError =
-          document.getElementsByTagName('parsererror')[0]?.textContent;
+          document.getElementsByTagName("parsererror")[0]?.textContent;
         console.warn(`Could not parse XHTML: ${parserError}`);
 
         item.mediaType = MIME.HTML;
@@ -1329,37 +1329,37 @@ class Loader {
       // replace hrefs (excluding anchors)
       // TODO: srcset?
       const replace = async (element: Element, attribute: string) => {
-        const uri = element.getAttribute(attribute) ?? '';
-        const value = (await this.loadHref(uri, href, parents)) ?? '';
+        const uri = element.getAttribute(attribute) ?? "";
+        const value = (await this.loadHref(uri, href, parents)) ?? "";
 
         return element.setAttribute(attribute, value);
       };
 
       await Promise.all([
-        ...Array.from(document.querySelectorAll('link[href]')).map(
-          async (element) => replace(element, 'href'),
+        ...Array.from(document.querySelectorAll("link[href]")).map(
+          async (element) => replace(element, "href"),
         ),
-        ...Array.from(document.querySelectorAll('[src]')).map(async (element) =>
-          replace(element, 'src'),
+        ...Array.from(document.querySelectorAll("[src]")).map(async (element) =>
+          replace(element, "src"),
         ),
-        ...Array.from(document.querySelectorAll('[poster]')).map(
-          async (element) => replace(element, 'poster'),
+        ...Array.from(document.querySelectorAll("[poster]")).map(
+          async (element) => replace(element, "poster"),
         ),
-        ...Array.from(document.querySelectorAll('object[data]')).map(
-          async (element) => replace(element, 'data'),
+        ...Array.from(document.querySelectorAll("object[data]")).map(
+          async (element) => replace(element, "data"),
         ),
       ]);
 
-      for (const element of document.querySelectorAll('[*|href]:not([href])')) {
-        const link = element.getAttributeNS(NS.XLINK, 'href') ?? '';
-        const namespace = (await this.loadHref(link, href, parents)) ?? '';
+      for (const element of document.querySelectorAll("[*|href]:not([href])")) {
+        const link = element.getAttributeNS(NS.XLINK, "href") ?? "";
+        const namespace = (await this.loadHref(link, href, parents)) ?? "";
 
-        element.setAttributeNS(NS.XLINK, 'href', namespace);
+        element.setAttributeNS(NS.XLINK, "href", namespace);
       }
 
       // replace inline styles
       await Promise.all([
-        ...Array.from(document.getElementsByTagName('style')).map(
+        ...Array.from(document.getElementsByTagName("style")).map(
           async (element) => {
             if (element.textContent) {
               element.textContent = await this.replaceCSS(
@@ -1371,16 +1371,16 @@ class Loader {
           },
         ),
 
-        ...Array.from(document.querySelectorAll('[style]')).map(
+        ...Array.from(document.querySelectorAll("[style]")).map(
           async (element) => {
-            const styles = element.getAttribute('style');
+            const styles = element.getAttribute("style");
 
             if (!styles) {
               return;
             }
 
             element.setAttribute(
-              'style',
+              "style",
               await this.replaceCSS(styles, href, parents),
             );
           },
@@ -1421,15 +1421,15 @@ class Loader {
     return (
       replacedImports
         // un-prefix as most of the props are (only) supported unprefixed
-        .replace(/(?<=[{\s;])-epub-/gi, '')
+        .replace(/(?<=[{\s;])-epub-/gi, "")
         // replace vw and vh as they cause problems with layout
         .replace(
           /(\d*\.?\d+)vw/gi,
-          (_, d) => (parseFloat(d) * width) / 100 + 'px',
+          (_, d) => (parseFloat(d) * width) / 100 + "px",
         )
         .replace(
           /(\d*\.?\d+)vh/gi,
-          (_, d) => (parseFloat(d) * height) / 100 + 'px',
+          (_, d) => (parseFloat(d) * height) / 100 + "px",
         )
         // `page-break-*` unsupported in columns; replace with `column-break-*`
         .replace(
@@ -1438,7 +1438,7 @@ class Loader {
         )
         .replace(
           /break-(after|before|inside)\s*:\s*(avoid-)?page/gi,
-          (_, x, y) => `break-${x}: ${y ?? ''}column`,
+          (_, x, y) => `break-${x}: ${y ?? ""}column`,
         )
     );
   }
@@ -1462,7 +1462,7 @@ class Loader {
         // href was decoded and resolved when parsing the manifest
         const relative = pathRelative(pathDirname(href), asset.href);
         const relativeEnc = encodeURI(relative);
-        const rootRelative = '/' + asset.href;
+        const rootRelative = "/" + asset.href;
         const rootRelativeEnc = encodeURI(rootRelative);
         const set = new Set([
           relative,
@@ -1484,15 +1484,15 @@ class Loader {
       return Promise.resolve(value);
     }
 
-    const regex = new RegExp(urls.map(regexEscape).join('|'), 'g');
+    const regex = new RegExp(urls.map(regexEscape).join("|"), "g");
 
     return replaceSeries(value, regex, async (match) => {
       const item = await this.loadItem(
-        assetMap.get(match.replace(/^\//, ''))!,
+        assetMap.get(match.replace(/^\//, ""))!,
         parents.concat(href),
       );
 
-      return item ?? '';
+      return item ?? "";
     });
   }
 
@@ -1516,18 +1516,18 @@ function getHTMLFragment(document_: Document, id: string) {
 
 function getPageSpread(properties: string[]) {
   for (const property of properties) {
-    if (['page-spread-left', 'rendition:page-spread-left'].includes(property)) {
-      return 'left';
+    if (["page-spread-left", "rendition:page-spread-left"].includes(property)) {
+      return "left";
     }
 
     if (
-      ['page-spread-right', 'rendition:page-spread-right'].includes(property)
+      ["page-spread-right", "rendition:page-spread-right"].includes(property)
     ) {
-      return 'right';
+      return "right";
     }
 
-    if (property === 'rendition:page-spread-center') {
-      return 'center';
+    if (property === "rendition:page-spread-center") {
+      return "center";
     }
   }
 }
@@ -1556,7 +1556,7 @@ export class Epub {
   public landmarks: NavigationEntry[] | undefined;
   public rendition: Record<string, string> | undefined;
   public media: MediaDescriptor | undefined;
-  public direction: 'ltr' | 'rtl' | 'auto' | undefined;
+  public direction: "ltr" | "rtl" | "auto" | undefined;
   readonly #encryption: Encryption;
   readonly #parser = new DOMParser();
   #resources: Resources | undefined;
@@ -1676,16 +1676,16 @@ export class Epub {
     const displayOptions = await this.#resolveDisplayOptions();
 
     if (displayOptions) {
-      if (displayOptions.fixedLayout === 'true') {
-        this.rendition.layout ??= 'pre-paginated';
+      if (displayOptions.fixedLayout === "true") {
+        this.rendition.layout ??= "pre-paginated";
       }
 
-      if (displayOptions.openToSpread === 'false') {
+      if (displayOptions.openToSpread === "false") {
         const sections = await this.sections;
-        const section = sections.find((section) => section.linear !== 'no');
+        const section = sections.find((section) => section.linear !== "no");
 
         if (section) {
-          section.pageSpread ??= this.direction === 'rtl' ? 'left' : 'right';
+          section.pageSpread ??= this.direction === "rtl" ? "left" : "right";
         }
       }
     }
@@ -1707,7 +1707,7 @@ export class Epub {
   }
 
   resolveHref(href: string) {
-    const [path, hash] = href.split('#');
+    const [path, hash] = href.split("#");
     const item = this.#resources!.getItemByHref(decodeURI(path));
 
     if (!item) {
@@ -1715,7 +1715,7 @@ export class Epub {
     }
 
     const index = this.#resources!.spine.findIndex(
-      (spineItem) => 'idref' in spineItem && spineItem.idref === item.id,
+      (spineItem) => "idref" in spineItem && spineItem.idref === item.id,
     );
     const anchor = hash
       ? (document: Document) => getHTMLFragment(document, hash)
@@ -1725,7 +1725,7 @@ export class Epub {
   }
 
   splitTocHref(href: string | undefined) {
-    return href?.split('#') ?? [];
+    return href?.split("#") ?? [];
   }
 
   getTocFragment(document: Document, id: string) {
@@ -1747,8 +1747,8 @@ export class Epub {
   }
 
   async getCalibreBookmarks() {
-    const txt = await this.loadText('META-INF/calibre_bookmarks.txt');
-    const magic = 'encoding=json+base64:';
+    const txt = await this.loadText("META-INF/calibre_bookmarks.txt");
+    const magic = "encoding=json+base64:";
     if (txt?.startsWith(magic)) {
       const json = atob(txt.slice(magic.length));
 
@@ -1765,12 +1765,12 @@ export class Epub {
 
     try {
       document = await this.#loadXml(
-        'META-INF/com.apple.ibooks.display-options.xml',
+        "META-INF/com.apple.ibooks.display-options.xml",
       );
 
       if (!document) {
         document = await this.#loadXml(
-          'META-INF/com.kobobooks.display-options.xml',
+          "META-INF/com.kobobooks.display-options.xml",
         );
       }
     } catch {
@@ -1781,44 +1781,44 @@ export class Epub {
   }
 
   async #loadResources() {
-    const $container = await this.#loadXml('META-INF/container.xml');
+    const $container = await this.#loadXml("META-INF/container.xml");
 
     if (!$container) {
-      throw new Error('Failed to load container file');
+      throw new Error("Failed to load container file");
     }
 
     const opfs = Array.from(
-      $container.getElementsByTagNameNS(NS.CONTAINER, 'rootfile'),
-      getAttributes(['full-path', 'media-type']),
+      $container.getElementsByTagNameNS(NS.CONTAINER, "rootfile"),
+      getAttributes(["full-path", "media-type"]),
     ).filter(
       (
         file,
       ): file is {
         fullPath: string | undefined;
-        mediaType: 'application/oebps-package+xml';
-      } => file && file.mediaType === 'application/oebps-package+xml',
+        mediaType: "application/oebps-package+xml";
+      } => file && file.mediaType === "application/oebps-package+xml",
     );
 
     if (!opfs.length) {
-      throw new Error('No package document defined in container');
+      throw new Error("No package document defined in container");
     }
 
     const opfPath = opfs[0].fullPath;
 
     if (!opfPath) {
-      throw new Error('Failed to load package document: Missing path');
+      throw new Error("Failed to load package document: Missing path");
     }
 
     const opf = await this.#loadXml(opfPath);
 
     if (!opf) {
-      throw new Error('Failed to load package document');
+      throw new Error("Failed to load package document");
     }
 
     let $encryption: Document | undefined;
 
     try {
-      $encryption = await this.#loadXml('META-INF/encryption.xml');
+      $encryption = await this.#loadXml("META-INF/encryption.xml");
     } catch {
       $encryption = undefined;
     }
@@ -1875,13 +1875,13 @@ export class Epub {
           (title) =>
             !!(
               title &&
-              typeof title !== 'string' &&
-              'titleType' in title &&
-              title.titleType === 'subtitle'
+              typeof title !== "string" &&
+              "titleType" in title &&
+              title.titleType === "subtitle"
             ),
         ),
       ).shift(),
-      sortAs: wrapArray(extractMetadataValue(titleValues, 'fileAs')).shift(),
+      sortAs: wrapArray(extractMetadataValue(titleValues, "fileAs")).shift(),
       language: extractMetadataValue(documentMetadata?.language),
       identifier: getIdentifier(resources.opf),
       description: wrapArray(
@@ -1892,7 +1892,7 @@ export class Epub {
         .map(
           (publisher): ContributorMetadata => ({
             name: publisher,
-            roles: ['bkp'],
+            roles: ["bkp"],
             fileAs: publisher,
             sortAs: publisher,
           }),
@@ -1908,13 +1908,13 @@ export class Epub {
             | { value: string; term?: string; authority?: string }
             | { value?: string; term: string; authority?: string } =>
             !!(
-              typeof subject !== 'string' &&
-              ('term' in subject || 'value' in subject) &&
+              typeof subject !== "string" &&
+              ("term" in subject || "value" in subject) &&
               (subject.term || subject.value)
             ),
         )
         ?.map(({ value, term, authority }) => ({
-          name: value ?? term ?? '',
+          name: value ?? term ?? "",
           term,
           authority,
         })),
@@ -1925,7 +1925,7 @@ export class Epub {
 
     function mapContributor(this: void, defaultRole: Relator) {
       return (item: MetadataValue) => {
-        if (typeof item === 'string' || Array.isArray(item)) {
+        if (typeof item === "string" || Array.isArray(item)) {
           return;
         }
 
@@ -1935,13 +1935,13 @@ export class Epub {
           ...new Set(
             wrapArray(item.role)
               .map((value) =>
-                typeof value === 'string'
+                typeof value === "string"
                   ? { value }
                   : (value as { value: string; scheme?: string }),
               )
               .filter(
                 (role): role is { value: Relator } =>
-                  (!role.scheme || role.scheme === 'marc:relators') &&
+                  (!role.scheme || role.scheme === "marc:relators") &&
                   relatorRoles.includes(role.value as Relator),
               )
               .map(({ value }) => value),
@@ -1957,10 +1957,10 @@ export class Epub {
     }
 
     const authors = wrapArray(documentMetadata?.creator ?? []).map(
-      mapContributor('aut'),
+      mapContributor("aut"),
     );
     const contributors = wrapArray(documentMetadata?.contributor ?? []).map(
-      mapContributor('ctb'),
+      mapContributor("ctb"),
     );
     metadata.contributors = [...authors, ...contributors].filter(
       (item): item is ContributorMetadata => !!item,
@@ -1978,11 +1978,11 @@ export class Epub {
 
     const document = this.#parser.parseFromString(plainText, MIME.XML);
 
-    if (document.getElementsByTagName('parsererror').length > 0) {
+    if (document.getElementsByTagName("parsererror").length > 0) {
       const error =
-        document.getElementsByTagName('parsererror')[0]?.textContent;
+        document.getElementsByTagName("parsererror")[0]?.textContent;
 
-      throw new Error(`XML parsing error: ${uri}\n${error ?? 'Unknown error'}`);
+      throw new Error(`XML parsing error: ${uri}\n${error ?? "Unknown error"}`);
     }
 
     return document;
@@ -1993,7 +1993,7 @@ type IsGap<T extends string> = Uppercase<T> extends Lowercase<T> ? true : false;
 type CamelCase<S extends string> =
   S extends Lowercase<S>
     ? S extends `${infer F}-${infer RF}${infer R}`
-      ? RF extends '-'
+      ? RF extends "-"
         ? `${F}-${CamelCase<`-${R}`>}`
         : `${F}${IsGap<RF> extends true ? `-${RF}` : Uppercase<RF>}${CamelCase<R>}`
       : S

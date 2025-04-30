@@ -1,14 +1,14 @@
-import { PUBLIC_PASSCODE_LENGTH } from '$env/static/public';
+import { env } from "$env/dynamic/public";
 import {
   dispatchPasscode,
   issueUserToken,
   setJwtCookie,
-} from '$lib/server/auth';
+} from "$lib/server/auth";
 import {
   redirectToPreviousLocation,
   resolvePreviousLocation,
   storePreviousLocation,
-} from '$lib/server/utilities';
+} from "$lib/server/utilities";
 import {
   createPasscode,
   findUserByEmail,
@@ -17,10 +17,10 @@ import {
   NoResultError,
   type User,
   verifyPasscode,
-} from '@colibri-hq/sdk';
-import { error, fail, redirect } from '@sveltejs/kit';
-import { z, type ZodIssue } from 'zod';
-import type { Actions } from './$types';
+} from "@colibri-hq/sdk";
+import { error, fail, redirect } from "@sveltejs/kit";
+import { z, type ZodIssue } from "zod";
+import type { Actions } from "./$types";
 
 export const actions = {
   /**
@@ -38,7 +38,7 @@ export const actions = {
           .string()
           .email({
             message:
-              'The email address seems to be invalid. Please check it and try again.',
+              "The email address seems to be invalid. Please check it and try again.",
           })
           .toLowerCase(),
       })
@@ -60,17 +60,17 @@ export const actions = {
       }
 
       if (cause instanceof NoResultError) {
-        throw redirect(302, new URL('login/unknown', url));
+        throw redirect(302, new URL("login/unknown", url));
       }
 
       return fail(400, {
         message: cause.message,
         issues: [
           {
-            code: 'custom',
-            path: ['email'],
+            code: "custom",
+            path: ["email"],
             message:
-              'The email address is unknown. Please check it and try again.',
+              "The email address is unknown. Please check it and try again.",
           } satisfies ZodIssue,
         ],
       });
@@ -113,7 +113,7 @@ export const actions = {
         email: z.string().email().toLowerCase(),
         passcode: z
           .string()
-          .length(Number(PUBLIC_PASSCODE_LENGTH))
+          .length(Number(env.PUBLIC_PASSCODE_LENGTH))
           .regex(/^\d+$/),
       })
       .safeParse(Object.fromEntries(body.entries()));
@@ -138,12 +138,12 @@ export const actions = {
 
       if (cause instanceof NoResultError) {
         return fail(400, {
-          error: 'Passcode expired or invalid',
+          error: "Passcode expired or invalid",
           email,
         });
       }
 
-      throw error(401, { message: 'Authentication failed' });
+      throw error(401, { message: "Authentication failed" });
     }
     // endregion
 
@@ -165,13 +165,13 @@ export const actions = {
       return redirectToPreviousLocation(
         cookies,
         url,
-        payload.data.previous ? new URL(payload.data.previous, url) : '/',
+        payload.data.previous ? new URL(payload.data.previous, url) : "/",
       );
     }
 
     storePreviousLocation(cookies, resolvePreviousLocation(cookies, url));
     const target = new URL(url);
-    target.pathname = '/auth/attestation';
+    target.pathname = "/auth/attestation";
 
     throw redirect(303, target);
     // endregion

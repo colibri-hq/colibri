@@ -5,7 +5,7 @@
   interface Props {
     class: string;
     blurhash: string | undefined | null;
-    [key: string]: any;
+    [key: string]: unknown;
   }
 
   let { class: className, blurhash, ...rest }: Props = $props();

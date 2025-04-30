@@ -29,7 +29,7 @@
   <header
     class="mb-8 flex flex-wrap items-start justify-between lg:flex-row lg:flex-nowrap lg:items-center"
   >
-    <p class="mb-4 mr-auto w-full lg:mb-0 lg:w-auto">
+    <p class="mr-auto mb-4 w-full lg:mb-0 lg:w-auto">
       On this page, you can manage the accounts of your family&nbsp;members.
     </p>
 
@@ -37,15 +37,14 @@
       Create&nbsp;Account
     </Button>
     <Button class="ml-2" onClick={showInvitationModal}
-    >Invite&nbsp;someone
-    </Button
-    >
+      >Invite&nbsp;someone
+    </Button>
   </header>
 
   <PaginatedList data={users}>
     {#snippet children({ items })}
       <ul role="group" class="grid gap-4 lg:grid-cols-2">
-        {#each items as user}
+        {#each items as user, index (index)}
           <li role="presentation">
             <article
               class="relative flex flex-col rounded-3xl bg-gray-50 p-2 pl-3 shadow-md
@@ -61,7 +60,7 @@
 
                 <div
                   role="presentation"
-                  class="absolute right-0 top-0 m-2 flex h-8 w-8 items-center justify-center
+                  class="absolute top-0 right-0 m-2 flex h-8 w-8 items-center justify-center
                   rounded-full bg-gray-200 leading-none dark:bg-gray-700"
                 >
                   <Icon name="shield_person" />

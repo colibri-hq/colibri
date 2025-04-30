@@ -37,7 +37,7 @@
           </p>
         {:else}
           <div
-            class="mt-1 flex cursor-pointer select-none items-center justify-start text-sm text-blue-500"
+            class="mt-1 flex cursor-pointer items-center justify-start text-sm text-blue-500 select-none"
           >
             <div class="mr-1">
               {#if authorInfoLoading}
@@ -62,7 +62,7 @@
       </header>
 
       <ul class="grid grid-cols-2 gap-8 md:grid-cols-4 xl:grid-cols-6">
-        {#each data.author.books as book}
+        {#each data.author.books as book, index (index)}
           <li class="contents">
             <Book {book} />
           </li>

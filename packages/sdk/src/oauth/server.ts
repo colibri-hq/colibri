@@ -66,6 +66,7 @@ export function server(database: Database, {
         {
           clientId,
           challenge,
+          challengeMethod,
           redirectUri,
           scopes,
           ttl,
@@ -80,6 +81,7 @@ export function server(database: Database, {
           scopes,
           challenge,
           ttl,
+          challengeMethod,
         );
       },
     },

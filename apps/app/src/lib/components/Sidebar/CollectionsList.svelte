@@ -36,7 +36,7 @@
       {/snippet}
     </NavigationLink>
   {:then collections}
-    {#each collections as collection}
+    {#each collections as collection, index (index)}
       <NavigationLink
         to="/collections/{collection.id}"
         title={collection.name}

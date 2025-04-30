@@ -1,5 +1,5 @@
-import { beforeAll, afterAll } from 'vitest';
-import { cleanup } from '@oclif/test';
+import { cleanup } from "@oclif/test";
+import { afterAll, beforeAll } from "vitest";
 
 beforeAll(() => {
   // Any global setup before tests
@@ -8,4 +8,4 @@ beforeAll(() => {
 afterAll(async () => {
   // Clean up after all tests
   await cleanup();
-}); 
+});

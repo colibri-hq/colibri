@@ -23,7 +23,7 @@
   <PaginatedList data={creators}>
     {#snippet children({ items })}
       <ul class="grid grid-cols-3 gap-4">
-        {#each items as creator}
+        {#each items as creator, index (index)}
           <li>
             <CreatorLink {creator} />
           </li>

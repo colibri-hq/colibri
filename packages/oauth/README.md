@@ -36,6 +36,7 @@ with any web framework that supports standard Web API interfaces.
 - [ ] JWT-based access tokens
 
 ### Installation
+
 Install the package using your favorite package manager:
 
 ```bash
@@ -43,6 +44,7 @@ npm install @colibri-hq/oauth
 ```
 
 ### Usage
+
 To create a new authorization server instance, use the `createAuthorizationServer` function:
 
 ```typescript
@@ -139,16 +141,13 @@ We welcome contributions to the Colibri OAuth module! Here's how you can help:
 
 1. Clone the repository
 2. Install dependencies:
-
-```bash
-pnpm install
-```
-
+    ```bash
+    pnpm install
+    ```
 3. Run tests:
-
-```bash
-pnpm test
-```
+    ```bash
+    pnpm test
+    ```
 
 ### Guidelines
 
@@ -170,4 +169,3 @@ pnpm test
 
 Please be respectful and considerate of others when contributing. We follow
 the [Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) code of conduct.
-

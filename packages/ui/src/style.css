@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import './theme.css';
+@import "tailwindcss";
+@import "@colibri-hq/tailwind";
 
 @layer base {
     html {

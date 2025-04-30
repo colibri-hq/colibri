@@ -17,7 +17,7 @@
     <slot name="before" />
 
     <div
-      class="w-full pb-4 text-sm text-gray-400 lg:w-1/3 lg:pb-0 lg:pr-8 xl:w-1/4 dark:text-gray-600"
+      class="w-full pb-4 text-sm text-gray-400 lg:w-1/3 lg:pr-8 lg:pb-0 xl:w-1/4 dark:text-gray-600"
     >
       {#if $$slots?.help}
         <slot name="help">{help}</slot>

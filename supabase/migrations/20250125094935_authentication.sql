@@ -113,6 +113,9 @@ alter table only authentication.authenticator
 -- endregion
 
 -- region Authorization Codes
+create type authentication.pkce_challenge_method as enum ( 'S256' );
+alter type authentication.pkce_challenge_method owner to postgres;
+comment on type authentication.pkce_challenge_method is 'The PKCE challenge method used to generate the code challenge.';
 create table authentication.authorization_code
 (
     id           bigint                                 not null,
@@ -125,7 +128,8 @@ create table authentication.authorization_code
     expires_at   timestamp with time zone               not null,
     created_at   timestamp with time zone default now() not null,
     redirect_uri text                                   not null,
-    challenge    text                                   not null
+    challenge    text                                   not null,
+    challenge_method authentication.pkce_challenge_method default 'S256'::authentication.pkce_challenge_method not null
 );
 alter table authentication.authorization_code
     owner to postgres;

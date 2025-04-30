@@ -2,6 +2,7 @@ import type { Database, Schema } from '../../database';
 import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { type Insertable } from 'kysely';
 import { generateRandomBytes, generateRandomString } from '@colibri-hq/shared';
+import type { PkceCodeChallengeMethod } from '@colibri-hq/oauth';
 
 // region Authorization Codes
 export function storeAuthorizationCode(
@@ -23,19 +24,25 @@ export function createAuthorizationCode(
   scopes: string[],
   challenge: string,
   ttl: number,
+  challengeMethod?: PkceCodeChallengeMethod,
 ) {
+  if (challengeMethod === 'plain') {
+    throw new Error('The plain challenge method is not supported');
+  }
+
   const expiration = new Date();
   expiration.setSeconds(expiration.getSeconds() + ttl);
   const code = generateRandomBytes(32);
 
   return storeAuthorizationCode(database, {
-    redirect_uri: redirectUri,
-    expires_at: expiration,
-    client_id: clientId,
-    user_id: userId,
     challenge,
-    scopes,
+    challenge_method: challengeMethod,
+    client_id: clientId,
     code,
+    expires_at: expiration,
+    redirect_uri: redirectUri,
+    scopes,
+    user_id: userId,
   });
 }
 

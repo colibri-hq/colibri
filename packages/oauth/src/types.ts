@@ -551,6 +551,7 @@ export namespace Entities {
     scopes: string[];
     used_at: Date | null;
     challenge: string;
+    challenge_method: PkceCodeChallengeMethod;
   }
 
   /**

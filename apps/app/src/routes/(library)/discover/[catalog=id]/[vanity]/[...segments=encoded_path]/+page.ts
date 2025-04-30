@@ -1,7 +1,7 @@
-import { browser } from '$app/environment';
-import { trpc } from '$lib/trpc/client';
-import type { PageLoad } from './$types';
-import { decodeBreadcrumbs, encodeBreadcrumbs } from './breadcrumbs';
+import { browser } from "$app/environment";
+import { trpc } from "$lib/trpc/client";
+import type { PageLoad } from "./$types";
+import { decodeBreadcrumbs, encodeBreadcrumbs } from "./breadcrumbs";
 
 export const load = async function load(event) {
   // region Catalog retrieval
@@ -17,7 +17,7 @@ export const load = async function load(event) {
   // This makes it possible to keep state on the current page, its parent pages, and enable the user
   // to navigate back up the hierarchy without keeping any state on the server.
   const segments = event.params.segments
-    .split('/')
+    .split("/")
     .filter((value) => !!value)
     .map((value) => decodeBreadcrumbs(value));
   const breadcrumbs: { link: string; title: string | null }[] = segments.reduce(

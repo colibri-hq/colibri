@@ -1,5 +1,5 @@
-import { resolveAuthSessionId } from '$lib/server/auth';
-import type { LayoutServerLoad } from './$types';
+import { resolveAuthSessionId } from "$lib/server/auth";
+import type { LayoutServerLoad } from "./$types";
 
 interface AuthSessionData {
   sessionId: string;

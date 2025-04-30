@@ -12,7 +12,7 @@
 </script>
 
 <section
-  class="rounded-3xl bg-gray-50 px-4 pb-6 pt-4 shadow-inner-sm dark:bg-gray-900"
+  class="rounded-3xl bg-gray-50 px-4 pt-4 pb-6 shadow-inner-sm dark:bg-gray-900"
 >
   <header class="mb-2 px-3">
     <h3 class="font-serif text-xl font-bold dark:text-gray-200">Ratings</h3>
@@ -23,7 +23,7 @@
   {:then ratings}
     {#if ratings.length}
       <ul class="flex flex-col space-y-2">
-        {#each ratings as rating}
+        {#each ratings as rating, index (index)}
           <li class="flex items-center space-x-2">
             <Avatar user={{ email: rating.user_email }} size={16} />
             <StarRating

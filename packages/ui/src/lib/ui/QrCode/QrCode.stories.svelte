@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import { type Args, defineMeta, type StoryContext } from '@storybook/addon-svelte-csf';
+  import { type Args, defineMeta } from '@storybook/addon-svelte-csf';
   import QrCode from './QrCode.svelte';
 
   // More on how to set up stories at: https://storybook.js.org/docs/writing-stories
@@ -115,7 +115,7 @@
   });
 </script>
 
-{#snippet template(args: Args<typeof Story>, _context: StoryContext<typeof Story>)}
+{#snippet template(args: Args<typeof Story>)}
   <div class="max-w-2xs mx-auto">
     <QrCode {...args} value={args.value ?? ''} />
   </div>

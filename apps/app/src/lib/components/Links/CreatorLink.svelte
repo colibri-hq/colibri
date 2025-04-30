@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
   import type { Creator } from '@colibri-hq/sdk';
 
   interface Props {

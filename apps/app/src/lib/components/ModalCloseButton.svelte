@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
 
   interface Props {
     open?: boolean;

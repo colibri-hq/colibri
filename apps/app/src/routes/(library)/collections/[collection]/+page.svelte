@@ -36,7 +36,6 @@
   }
 
   async function updateCollectionIcon({ value: icon }: { value: string }) {
-
     await trpc($page).collections.save.mutate(
       savable({
         id: collection.id,
@@ -60,7 +59,13 @@
     }
   }
 
-  async function addComment({ content, reset }: { content: string; reset: () => void; }) {
+  async function addComment({
+    content,
+    reset,
+  }: {
+    content: string;
+    reset: () => void;
+  }) {
     loading = true;
 
     try {
@@ -77,12 +82,24 @@
     }
   }
 
-  async function addReaction({ commentId, emoji }: { commentId: string; emoji: string; }) {
+  async function addReaction({
+    commentId,
+    emoji,
+  }: {
+    commentId: string;
+    emoji: string;
+  }) {
     await trpc($page).comments.addReaction.mutate({ commentId, emoji });
     await refreshComments();
   }
 
-  async function removeReaction({ commentId, emoji }: { commentId: string; emoji: string; }) {
+  async function removeReaction({
+    commentId,
+    emoji,
+  }: {
+    commentId: string;
+    emoji: string;
+  }) {
     await trpc($page).comments.removeReaction.mutate({ commentId, emoji });
     await refreshComments();
   }
@@ -105,7 +122,7 @@
 
     <div class="ml-4 flex flex-col">
       <h1
-        class="font-serif text-4xl font-medium leading-none dark:text-gray-300"
+        class="font-serif text-4xl leading-none font-medium dark:text-gray-300"
       >
         {collection.name}
       </h1>
@@ -113,8 +130,8 @@
       <div class="mt-1 flex items-center space-x-2">
         {#if !collection.shared}
           <span
-            class="cursor-help select-none rounded-full border border-red-500 bg-red-400 px-2 pb-0.5 text-sm
-          font-medium leading-none text-red-50 shadow shadow-red-300/25 dark:border-transparent dark:bg-red-700/75 dark:text-red-200"
+            class="cursor-help rounded-full border border-red-500 bg-red-400 px-2 pb-0.5 text-sm leading-none
+          font-medium text-red-50 shadow shadow-red-300/25 select-none dark:border-transparent dark:bg-red-700/75 dark:text-red-200"
             title="This collection is private and only visible to you."
           >
             private

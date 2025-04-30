@@ -1,6 +1,6 @@
-import { logger } from '$lib/trpc/middleware/logger';
-import { procedure, t, unguardedProcedure } from '$lib/trpc/t';
-import { z } from 'zod';
+import { logger } from "$lib/trpc/middleware/logger";
+import { procedure, t, unguardedProcedure } from "$lib/trpc/t";
+import { z } from "zod";
 
 export const authors = t.router({
   autocomplete: unguardedProcedure()
@@ -11,7 +11,7 @@ export const authors = t.router({
           id: true,
           name: true,
         },
-        orderBy: { name: 'desc' },
+        orderBy: { name: "desc" },
         where: {
           name: {
             contains: input,
@@ -30,7 +30,7 @@ export const authors = t.router({
           updatedAt: true,
           _count: { select: { books: true } },
         },
-        orderBy: { updatedAt: 'desc' },
+        orderBy: { updatedAt: "desc" },
         where: input ? { name: { contains: input } } : undefined,
       }),
     ),
@@ -39,7 +39,7 @@ export const authors = t.router({
     prisma.author
       .findMany({
         select: { id: true, name: true },
-        orderBy: [{ name: 'asc' }],
+        orderBy: [{ name: "asc" }],
       })
       .then((authors) =>
         authors.map(({ id, name }) => ({
@@ -63,7 +63,7 @@ export const authors = t.router({
   fetchInfo: procedure()
     .input(z.string())
     .query(({ input, ctx: { platform } }) =>
-      query(platform, input, ['Person']),
+      query(platform, input, ["Person"]),
     ),
 
   update: procedure()

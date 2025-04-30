@@ -1,4 +1,4 @@
-import { Feed, parseFeed } from '$lib/catalogs/atom';
+import { Feed, parseFeed } from "$lib/catalogs/atom";
 
 export async function fetchCatalog(url: string | URL, resolveRoot = true) {
   // TODO: Avoid URL injection issues here.

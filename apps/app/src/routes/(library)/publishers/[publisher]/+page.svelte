@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
   import Book from '$lib/components/Links/BookLink.svelte';
   import type { PageData } from './$types';
   import MarkdownContent from '$lib/components/MarkdownContent.svelte';
@@ -60,7 +60,7 @@
         </div>
       {:else}
         <div
-          class="flex cursor-pointer select-none items-center self-start text-sm text-blue-500"
+          class="flex cursor-pointer items-center self-start text-sm text-blue-500 select-none"
         >
           <div class="mr-1">
             {#if publisherInfoLoading}
@@ -90,7 +90,7 @@
           <p>No authors found.</p>
         {:else}
           <ul class="grid grid-cols-3 gap-4">
-            {#each creators as creator}
+            {#each creators as creator, index (index)}
               <li class="contents">
                 <CreatorLink {creator} />
               </li>
@@ -109,7 +109,7 @@
         <span>Loading...</span>
       {:then books}
         <ul class="grid grid-cols-2 gap-8 md:grid-cols-4 xl:grid-cols-6">
-          {#each books as book}
+          {#each books as book, index (index)}
             <li class="contents">
               <Book {book} />
             </li>

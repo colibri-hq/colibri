@@ -1,5 +1,5 @@
-import type { Trpc } from '$lib/trpc/t';
-import { TRPCError } from '@trpc/server';
+import type { Trpc } from "$lib/trpc/t";
+import { TRPCError } from "@trpc/server";
 
 export function auth(t: Trpc) {
   return t.middleware(async function auth({ next, ctx, meta }) {
@@ -9,7 +9,7 @@ export function auth(t: Trpc) {
 
     if (!ctx.userId) {
       throw new TRPCError({
-        code: 'UNAUTHORIZED',
+        code: "UNAUTHORIZED",
       });
     }
 

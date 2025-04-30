@@ -69,15 +69,15 @@
 </div>
 
 <style>
-    @reference "../../../style.css";
+  @reference "../../../style.css";
 
-    .dropzone-container {
-        & > :global(.book-upload-dropzone) {
-            @apply flex h-full items-center justify-center rounded-lg border-2 border-dashed border-gray-100 bg-white p-0 dark:border-gray-700 dark:bg-black;
-        }
-
-        &.ghost > :global(.book-upload-dropzone) {
-            @apply border-blue-500 bg-blue-50 dark:bg-blue-900;
-        }
+  .dropzone-container {
+    & > :global(.book-upload-dropzone) {
+      @apply flex h-full items-center justify-center rounded-lg border-2 border-dashed border-gray-100 bg-white p-0 dark:border-gray-700 dark:bg-black;
     }
+
+    &.ghost > :global(.book-upload-dropzone) {
+      @apply border-blue-500 bg-blue-50 dark:bg-blue-900;
+    }
+  }
 </style>

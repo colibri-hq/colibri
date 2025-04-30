@@ -35,7 +35,7 @@
     <Button size="small">Add to library</Button>
 
     {#if entry.lastUpdatedAt}
-      <time datetime={timestamp} class="ml-auto mr-2 text-xs text-gray-500">
+      <time datetime={timestamp} class="mr-2 ml-auto text-xs text-gray-500">
         Updated {timeAgo}
       </time>
     {/if}

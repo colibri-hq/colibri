@@ -60,21 +60,21 @@ export function rgbToCssColor<
   B extends number,
   C extends Color<R, G, B>,
 >([r, g, b]: C, a?: number): CssColor<C, typeof a> {
-  return typeof a !== 'undefined'
+  return typeof a !== "undefined"
     ? `rgba(${r}, ${g}, ${b}, ${a})`
     : `rgb(${r}, ${g}, ${b})`;
 }
 
 export function parseCssColor(color: string) {
-  if (color.startsWith('#')) {
-    let hex = color.replace(/^#/, '');
+  if (color.startsWith("#")) {
+    let hex = color.replace(/^#/, "");
 
     if (hex.length === 3) {
-      hex = hex.replace(/(.)/g, '$1$1');
+      hex = hex.replace(/(.)/g, "$1$1");
     }
 
     if (!/^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8}|[A-Fa-f0-9]{3})$/.test(hex)) {
-      throw new Error('Invalid hex color format');
+      throw new Error("Invalid hex color format");
     }
 
     // Convert the hex value to decimal
@@ -90,7 +90,7 @@ export function parseCssColor(color: string) {
   );
 
   if (!result) {
-    throw new Error('Invalid rgb color format');
+    throw new Error("Invalid rgb color format");
   }
 
   const { r, g, b, a } = result.groups!;
@@ -179,7 +179,7 @@ function hslToRgb(h: number, s: number, l: number) {
 }
 
 export function rgbToHex([r, g, b]: Color) {
-  return '#' + [r, g, b].map((x) => x.toString(16).padStart(2, '0')).join('');
+  return "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("");
 }
 
 function deriveLuminance(color: Color) {

@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { PageData } from './$types';
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
   import BookLink from '$lib/components/Links/BookLink.svelte';
 
   interface Props {
@@ -42,7 +42,7 @@
       <span>Loading...</span>
     {:then contributions}
       <ul class="grid grid-cols-2 gap-8 md:grid-cols-4 xl:grid-cols-6">
-        {#each contributions as work}
+        {#each contributions as work, index (index)}
           <li class="contents">
             <BookLink
               book={work.book_id ?? ''}

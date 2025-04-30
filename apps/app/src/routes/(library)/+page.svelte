@@ -7,7 +7,7 @@
 
 <ContentSection padding>
   <header class="mb-8">
-    <h1 class="text-6xl font-serif font-bold">
+    <h1 class="font-serif text-6xl font-bold">
       {#if data.isAuthenticated}
         Continue reading
       {:else}
@@ -17,14 +17,16 @@
   </header>
 
   {#if !data.isAuthenticated}
-    <div class="leading-relaxed text-lg max-w-5xl flex flex-col gap-2">
+    <div class="flex max-w-5xl flex-col gap-2 text-lg leading-relaxed">
       <p>
-        Colibri is a digital library that allows you to read and share books with your friends. You can upload your own
-        books, browse the library, and discover new titles.
+        Colibri is a digital library that allows you to read and share books
+        with your friends. You can upload your own books, browse the library,
+        and discover new titles.
       </p>
       <p>
-        To get started, create an account or log in to your existing account. Once you're logged in, you can start
-        uploading books and exploring the library.
+        To get started, create an account or log in to your existing account.
+        Once you're logged in, you can start uploading books and exploring the
+        library.
       </p>
     </div>
   {/if}

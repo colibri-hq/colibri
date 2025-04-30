@@ -1,6 +1,6 @@
-import { oauth } from '$lib/server/oauth';
-import { OAuthError } from '@colibri-hq/oauth';
-import { type RequestHandler } from '@sveltejs/kit';
+import { oauth } from "$lib/server/oauth";
+import { OAuthError } from "@colibri-hq/oauth";
+import { type RequestHandler } from "@sveltejs/kit";
 
 export const POST = async function handle({ request, locals: { database } }) {
   try {
@@ -12,6 +12,6 @@ export const POST = async function handle({ request, locals: { database } }) {
       return response;
     }
 
-    throw new Error('Failed to handle pushed authorization request', { cause });
+    throw new Error("Failed to handle pushed authorization request", { cause });
   }
 } satisfies RequestHandler;

@@ -1,4 +1,4 @@
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json, type RequestHandler } from "@sveltejs/kit";
 
 export const POST = async function handle({ request }) {
   // TODO: Implement RFC 7591, "OAuth 2.0 Dynamic Client Registration Protocol"
@@ -16,7 +16,7 @@ export const POST = async function handle({ request }) {
     status: 200,
     body: {
       integrity: request.integrity,
-      message: 'Hello from the server!',
+      message: "Hello from the server!",
     },
   });
 } satisfies RequestHandler;

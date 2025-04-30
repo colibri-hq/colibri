@@ -1,5 +1,5 @@
-import { trpc } from '$lib/trpc/client';
-import type { LayoutLoad } from './$types';
+import { trpc } from "$lib/trpc/client";
+import type { LayoutLoad } from "./$types";
 
 export const load = async function load(event) {
   const catalogs = trpc(event)

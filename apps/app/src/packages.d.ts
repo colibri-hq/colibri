@@ -1,5 +1,5 @@
-declare module 'svelte-file-dropzone' {
-  import { type Snippet, SvelteComponent } from 'svelte';
+declare module "svelte-file-dropzone" {
+  import { SvelteComponent, type Snippet } from "svelte";
 
   export = SvelteComponent<{
     accept?: string;
@@ -10,8 +10,8 @@ declare module 'svelte-file-dropzone' {
   }>;
 }
 
-declare module 'svelte-gravatar' {
-  import { SvelteComponent } from 'svelte';
+declare module "svelte-gravatar" {
+  import { SvelteComponent } from "svelte";
 
   /**
    * Gravatar component
@@ -37,15 +37,15 @@ declare module 'svelte-gravatar' {
     domain?: string;
     size?: number;
     default?:
-      | '404'
-      | 'mp'
-      | 'identicon'
-      | 'monsterid'
-      | 'wavatar'
-      | 'retro'
-      | 'robohash'
-      | 'blank';
-    rating?: 'g' | 'pg' | 'r' | 'x';
+      | "404"
+      | "mp"
+      | "identicon"
+      | "monsterid"
+      | "wavatar"
+      | "retro"
+      | "robohash"
+      | "blank";
+    rating?: "g" | "pg" | "r" | "x";
     class?: string;
     style?: string;
   }>;

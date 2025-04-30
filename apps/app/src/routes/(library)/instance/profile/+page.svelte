@@ -2,7 +2,7 @@
   import { goto, invalidateAll } from '$app/navigation';
   import { Button } from '@colibri-hq/ui';
   import { Field } from '@colibri-hq/ui';
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
   import { savable, trpc } from '$lib/trpc/client';
   import Gravatar from 'svelte-gravatar';
   import type { PageData } from './$types';
@@ -76,7 +76,7 @@
     />
 
     <h1
-      class="ml-4 mt-8 flex items-center text-4xl font-bold dark:text-gray-300"
+      class="mt-8 ml-4 flex items-center text-4xl font-bold dark:text-gray-300"
     >
       {data.user.name}
     </h1>
@@ -146,7 +146,7 @@
     {/snippet}
 
     <ul class="mb-6 divide-y divide-gray-200 lg:mb-8 dark:divide-gray-800">
-      {#each data?.authenticators as authenticator}
+      {#each data?.authenticators as authenticator, index (index)}
         <li class="group" role="presentation">
           <AuthenticatorListItem
             {authenticator}

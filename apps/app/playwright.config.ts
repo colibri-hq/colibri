@@ -1,21 +1,25 @@
-import { defineConfig, devices } from '@playwright/test';
-import { join } from 'node:path';
+import { defineConfig, devices } from "@playwright/test";
+import { join } from "node:path";
 
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-import 'dotenv/config';
+import "dotenv/config";
 
-export const storageState = join(import.meta.dirname, 'tests', '.storageState.json');
+export const storageState = join(
+  import.meta.dirname,
+  "tests",
+  ".storageState.json",
+);
 
 // noinspection JSUnusedGlobalSymbols
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  name: 'Colibri',
-  testDir: './tests',
+  name: "Colibri",
+  testDir: "./tests",
 
   //  Run tests in files in parallel
   fullyParallel: true,
@@ -32,64 +36,62 @@ export default defineConfig({
   timeout: 5_000,
 
   //  Reporter to use. See https://playwright.dev/docs/test-reporters
-  reporter: [
-    ['html', {outputFolder: 'test-results'}]
-  ],
+  reporter: [["html", { outputFolder: "test-results" }]],
 
   // Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions.
   use: {
     //  Base URL to use in actions like `await page.goto('/')`.
-    baseURL: 'http://localhost:5173',
+    baseURL: "http://localhost:5173",
 
     // Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer
-    trace: 'on-first-retry',
+    trace: "on-first-retry",
   },
 
   //  Configure projects for major browsers
   projects: [
     {
-      name: 'setup database',
-      testMatch: 'database.setup.ts',
-      teardown: 'teardown database',
+      name: "setup database",
+      testMatch: "database.setup.ts",
+      teardown: "teardown database",
     },
     {
-      name: 'teardown database',
-      testMatch: 'database.teardown.ts',
+      name: "teardown database",
+      testMatch: "database.teardown.ts",
     },
     {
-      name: 'setup authentication',
-      testMatch: 'authentication.setup.ts',
-      dependencies: ['setup database'],
+      name: "setup authentication",
+      testMatch: "authentication.setup.ts",
+      dependencies: ["setup database"],
     },
     {
-      name: 'authentication',
-      testMatch: ['auth/*.spec.ts', 'auth/**/*.spec.ts'],
+      name: "authentication",
+      testMatch: ["auth/*.spec.ts", "auth/**/*.spec.ts"],
       use: {
-        ...devices['Desktop Chrome'],
+        ...devices["Desktop Chrome"],
         storageState,
       },
-      dependencies: ['setup database', 'setup authentication'],
+      dependencies: ["setup database", "setup authentication"],
     },
 
     {
-      name: 'chromium',
-      testMatch: ['app/*.spec.ts', 'app/**/*.spec.ts'],
-      use: { ...devices['Desktop Chrome'], storageState },
-      dependencies: ['setup database', 'setup authentication'],
+      name: "chromium",
+      testMatch: ["app/*.spec.ts", "app/**/*.spec.ts"],
+      use: { ...devices["Desktop Chrome"], storageState },
+      dependencies: ["setup database", "setup authentication"],
     },
 
     {
-      name: 'firefox',
-      testMatch: 'app/**/*.spec.ts',
-      use: { ...devices['Desktop Firefox'], storageState },
-      dependencies: ['setup database', 'setup authentication'],
+      name: "firefox",
+      testMatch: "app/**/*.spec.ts",
+      use: { ...devices["Desktop Firefox"], storageState },
+      dependencies: ["setup database", "setup authentication"],
     },
 
     {
-      name: 'webkit',
-      testMatch: 'app/**/*.spec.ts',
-      use: { ...devices['Desktop Safari'], storageState },
-      dependencies: ['setup database', 'setup authentication'],
+      name: "webkit",
+      testMatch: "app/**/*.spec.ts",
+      use: { ...devices["Desktop Safari"], storageState },
+      dependencies: ["setup database", "setup authentication"],
     },
 
     //  Test against mobile viewports.
@@ -116,11 +118,11 @@ export default defineConfig({
   //  Run your local dev server before starting the tests
   webServer: {
     env: {
-      ORIGIN: 'http://localhost:5173',
+      ORIGIN: "http://localhost:5173",
     },
     ignoreHTTPSErrors: false,
-    command: 'npm run dev',
-    url: 'http://localhost:5173',
+    command: "npm run dev",
+    url: "http://localhost:5173",
     reuseExistingServer: !process.env.CI,
   },
 });

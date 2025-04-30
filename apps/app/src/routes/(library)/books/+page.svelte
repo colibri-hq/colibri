@@ -27,7 +27,7 @@
   </header>
 
   <ul class="grid grid-cols-2 gap-8 md:grid-cols-4 xl:grid-cols-6">
-    {#each books as book}
+    {#each books as book, index (index)}
       <li class="contents">
         <BookLink
           book={book.book_id ?? book.id}

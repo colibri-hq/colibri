@@ -71,7 +71,7 @@
         class="-mt-px flex h-24 grow items-center space-x-2"
         data-animatable="header-links"
       >
-        <HeaderButton class="-ml-1 mr-auto" href="." tag="a">
+        <HeaderButton class="mr-auto -ml-1" href="." tag="a">
           <Icon name="chevron_left" />
           <span class="ml-1">Back</span>
         </HeaderButton>
@@ -108,7 +108,7 @@
           </h1>
           {#await creators}
             <span class="text-lg text-gray-600 dark:text-gray-300"
-            >Loading...</span
+              >Loading...</span
             >
           {:then creators}
             {@const essentialCreators = creators.filter(
@@ -120,9 +120,9 @@
               data-animatable="creators"
             >
               by
-              {#each essentialCreators as creator, index}
+              {#each essentialCreators as creator, index (index)}
                 <a href="/creators/{creator.id}" class="hover:underline"
-                >{creator.name}</a
+                  >{creator.name}</a
                 >
                 <span>{index < essentialCreators.length - 1 ? ' & ' : ''}</span>
               {/each}
@@ -184,135 +184,135 @@
 <CollectionModal bind:open={collectionModalOpen} {book} />
 
 <style lang="postcss">
-    article :global([data-animatable]) {
-        /*noinspection CssInvalidFunction*/
-        animation-timeline: scroll();
-        animation-fill-mode: both;
-        animation-timing-function: linear;
-        animation-range: 0% 12rem;
+  article :global([data-animatable]) {
+    /*noinspection CssInvalidFunction*/
+    animation-timeline: scroll();
+    animation-fill-mode: both;
+    animation-timing-function: linear;
+    animation-range: 0% 12rem;
+  }
+
+  article :global([data-animatable='blur']) {
+    animation-name: squeeze-blur;
+  }
+
+  article :global([data-animatable='cover']) {
+    animation-name: squeeze-cover;
+    transform-origin: top center;
+  }
+
+  article :global([data-animatable='header']) {
+    animation-name: squeeze-header;
+  }
+
+  article :global([data-animatable='header-links']) {
+    animation-name: squeeze-header-links;
+  }
+
+  article :global([data-animatable='title']) {
+    animation-name: squeeze-title;
+    display: block;
+    transform-origin: top left;
+  }
+
+  article :global([data-animatable='creators']) {
+    animation-name: squeeze-creators;
+  }
+
+  article :global([data-animatable='ratings']) {
+    animation-name: squeeze-ratings;
+  }
+
+  @keyframes squeeze-blur {
+    0% {
+      transform: translateY(0);
     }
 
-    article :global([data-animatable='blur']) {
-        animation-name: squeeze-blur;
+    100% {
+      transform: translateY(-12rem);
+    }
+  }
+
+  @keyframes squeeze-cover {
+    0% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
     }
 
-    article :global([data-animatable='cover']) {
-        animation-name: squeeze-cover;
-        transform-origin: top center;
+    60%,
+    100% {
+      opacity: 0;
     }
 
-    article :global([data-animatable='header']) {
-        animation-name: squeeze-header;
+    100% {
+      transform: scale(0.75) translateY(-8rem);
+    }
+  }
+
+  @keyframes squeeze-header {
+    0%,
+    40% {
+      transform: translateY(0);
     }
 
-    article :global([data-animatable='header-links']) {
-        animation-name: squeeze-header-links;
+    100% {
+      transform: translateY(-1.5rem);
+    }
+  }
+
+  @keyframes squeeze-header-links {
+    0% {
+      opacity: 1;
     }
 
-    article :global([data-animatable='title']) {
-        animation-name: squeeze-title;
-        display: block;
-        transform-origin: top left;
+    40%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes squeeze-title {
+    0% {
+      transform: scale(1);
     }
 
-    article :global([data-animatable='creators']) {
-        animation-name: squeeze-creators;
+    40%,
+    100% {
+      transform: scale(0.8);
+    }
+  }
+
+  @keyframes squeeze-header {
+    0%,
+    40% {
+      transform: translateY(0);
     }
 
-    article :global([data-animatable='ratings']) {
-        animation-name: squeeze-ratings;
+    100% {
+      transform: translateY(-1.5rem);
+    }
+  }
+
+  @keyframes squeeze-creators {
+    0% {
+      transform: translateY(0);
     }
 
-    @keyframes squeeze-blur {
-        0% {
-            transform: translateY(0);
-        }
+    60%,
+    100% {
+      transform: translateY(-0.5rem);
+    }
+  }
 
-        100% {
-            transform: translateY(-12rem);
-        }
+  @keyframes squeeze-ratings {
+    0% {
+      opacity: 1;
     }
 
-    @keyframes squeeze-cover {
-        0% {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-        }
-
-        60%,
-        100% {
-            opacity: 0;
-        }
-
-        100% {
-            transform: scale(0.75) translateY(-8rem);
-        }
+    60%,
+    100% {
+      opacity: 0;
+      visibility: hidden;
     }
-
-    @keyframes squeeze-header {
-        0%,
-        40% {
-            transform: translateY(0);
-        }
-
-        100% {
-            transform: translateY(-1.5rem);
-        }
-    }
-
-    @keyframes squeeze-header-links {
-        0% {
-            opacity: 1;
-        }
-
-        40%,
-        100% {
-            opacity: 0;
-        }
-    }
-
-    @keyframes squeeze-title {
-        0% {
-            transform: scale(1);
-        }
-
-        40%,
-        100% {
-            transform: scale(0.8);
-        }
-    }
-
-    @keyframes squeeze-header {
-        0%,
-        40% {
-            transform: translateY(0);
-        }
-
-        100% {
-            transform: translateY(-1.5rem);
-        }
-    }
-
-    @keyframes squeeze-creators {
-        0% {
-            transform: translateY(0);
-        }
-
-        60%,
-        100% {
-            transform: translateY(-0.5rem);
-        }
-    }
-
-    @keyframes squeeze-ratings {
-        0% {
-            opacity: 1;
-        }
-
-        60%,
-        100% {
-            opacity: 0;
-            visibility: hidden;
-        }
-    }
+  }
 </style>

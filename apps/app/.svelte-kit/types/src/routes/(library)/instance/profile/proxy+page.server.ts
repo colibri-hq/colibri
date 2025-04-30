@@ -1,8 +1,8 @@
 // @ts-nocheck
-import { createContext } from '$lib/trpc/context';
-import { createCaller } from '$lib/trpc/router';
-import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import { createContext } from "$lib/trpc/context";
+import { createCaller } from "$lib/trpc/router";
+import { error } from "@sveltejs/kit";
+import type { PageServerLoad } from "./$types";
 
 export const load = async (event: Parameters<PageServerLoad>[0]) => {
   const caller = createCaller(await createContext(event));
@@ -13,6 +13,6 @@ export const load = async (event: Parameters<PageServerLoad>[0]) => {
     return { user };
   } catch (err) {
     console.error(err);
-    throw error(404, 'User not found');
+    throw error(404, "User not found");
   }
 };

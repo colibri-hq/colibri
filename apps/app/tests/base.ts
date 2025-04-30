@@ -1,5 +1,5 @@
-import { type Database, initialize } from '@colibri-hq/sdk';
-import { test as base } from '@playwright/test';
+import { type Database, initialize } from "@colibri-hq/sdk";
+import { test as base } from "@playwright/test";
 
 type DatabaseFixtures = {
   database: Database;

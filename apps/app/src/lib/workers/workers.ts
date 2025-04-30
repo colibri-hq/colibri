@@ -12,19 +12,19 @@ export interface WebWorker<I extends WorkerMessage, O extends WorkerMessage>
   postMessage(message: I, options?: StructuredSerializeOptions): unknown;
 
   addEventListener(
-    type: 'message',
+    type: "message",
     listener: (this: Worker, ev: MessageEvent<O>) => unknown,
     options?: boolean | AddEventListenerOptions,
   ): unknown;
 
   addEventListener(
-    type: 'messageerror',
+    type: "messageerror",
     listener: (this: Worker, ev: MessageEvent) => unknown,
     options?: boolean | AddEventListenerOptions,
   ): unknown;
 
   addEventListener(
-    type: 'error',
+    type: "error",
     listener: (this: Worker, ev: ErrorEvent) => unknown,
     options?: boolean | AddEventListenerOptions,
   ): unknown;
@@ -50,19 +50,19 @@ interface TypedMessagePort<I extends WorkerMessage, O extends WorkerMessage>
   postMessage(message: I, options?: StructuredSerializeOptions): unknown;
 
   addEventListener(
-    type: 'message',
+    type: "message",
     listener: (this: TypedMessagePort<I, O>, ev: MessageEvent<O>) => unknown,
     options?: boolean | AddEventListenerOptions,
   ): unknown;
 
   addEventListener(
-    type: 'messageerror',
+    type: "messageerror",
     listener: (this: TypedMessagePort<I, O>, ev: MessageEvent) => unknown,
     options?: boolean | AddEventListenerOptions,
   ): unknown;
 
   addEventListener(
-    type: 'error',
+    type: "error",
     listener: (this: TypedMessagePort<I, O>, ev: ErrorEvent) => unknown,
     options?: boolean | AddEventListenerOptions,
   ): unknown;
@@ -79,19 +79,19 @@ interface TypedSharedWorker<I extends WorkerMessage, O extends WorkerMessage>
   port: TypedMessagePort<I, O>;
 
   addEventListener(
-    type: 'message',
+    type: "message",
     listener: (this: SharedWorker, ev: MessageEvent<O>) => unknown,
     options?: boolean | AddEventListenerOptions,
   ): unknown;
 
   addEventListener(
-    type: 'messageerror',
+    type: "messageerror",
     listener: (this: SharedWorker, ev: MessageEvent) => unknown,
     options?: boolean | AddEventListenerOptions,
   ): unknown;
 
   addEventListener(
-    type: 'error',
+    type: "error",
     listener: (this: SharedWorker, ev: ErrorEvent) => unknown,
     options?: boolean | AddEventListenerOptions,
   ): unknown;
@@ -139,10 +139,10 @@ export async function loadSharedWorker<
 >(module: Promise<SharedWorkerModule<I, O>>): Promise<SharedWebWorker<I, O>> {
   const Worker = await module;
 
-  // eslint-disable-next-line
+   
   console.debug(
-    'Loading shared worker… To inspect the worker, open the developer tools from ' +
-      'chrome://inspect/#workers',
+    "Loading shared worker… To inspect the worker, open the developer tools from " +
+      "chrome://inspect/#workers",
   );
 
   return new SharedWorkerImpl(new Worker.default());
@@ -199,9 +199,9 @@ export function dispatchRequest<
 export async function expectResponse<
   I extends WorkerMessage,
   O extends WorkerMessage,
->(worker: WebWorker<I, O>, expectedType: O['type']) {
+>(worker: WebWorker<I, O>, expectedType: O["type"]) {
   return new Promise((resolve, reject) => {
-    worker.addEventListener('message', (event) => {
+    worker.addEventListener("message", (event) => {
       const { type, payload } = event.data;
 
       if (type !== expectedType) {
@@ -210,7 +210,7 @@ export async function expectResponse<
 
       resolve(payload);
     });
-  }) satisfies Promise<O['payload']>;
+  }) satisfies Promise<O["payload"]>;
 }
 
 export async function workerOperation<

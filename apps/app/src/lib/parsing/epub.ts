@@ -1,13 +1,13 @@
-import { Epub } from '$lib/parsing/epub/index';
-import type { Metadata } from '$lib/parsing/index';
-import { wrapArray } from '@colibri-hq/shared';
+import { Epub } from "$lib/parsing/epub/index";
+import type { Metadata } from "$lib/parsing/index";
+import { wrapArray } from "@colibri-hq/shared";
 import {
   BlobReader,
   BlobWriter,
   TextWriter,
   Writer,
   ZipReader,
-} from '@zip.js/zip.js';
+} from "@zip.js/zip.js";
 
 export async function isZipFile(file: File) {
   const slices = new Uint8Array(await file.slice(0, 4).arrayBuffer());
@@ -26,7 +26,7 @@ export async function getMetadata(file: File, signal?: AbortSignal) {
   const metadata = await book.metadata;
   const cover = await book.getCover();
 
-  const title = wrapArray(metadata.title).shift() ?? 'Untitled Book';
+  const title = wrapArray(metadata.title).shift() ?? "Untitled Book";
   const contributors = (metadata.contributors ?? []).map(
     ({ name, roles, sortAs }) => ({
       name,
@@ -34,7 +34,7 @@ export async function getMetadata(file: File, signal?: AbortSignal) {
       sortingKey: sortAs,
     }),
   );
-  const rights = metadata.rights ?? '';
+  const rights = metadata.rights ?? "";
 
   return {
     title,

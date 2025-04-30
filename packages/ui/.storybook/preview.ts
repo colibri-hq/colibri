@@ -1,13 +1,13 @@
-import '@fontsource-variable/material-symbols-outlined/full.css';
-import '@fontsource/neuton/400-italic.css';
-import '@fontsource/neuton/400.css';
-import '@fontsource/neuton/700.css';
-import '@fontsource/titillium-web';
-import type { Preview } from '@storybook/svelte';
-import '../src/storybook.css';
+import "@fontsource-variable/material-symbols-outlined/full.css";
+import "@fontsource/neuton/400-italic.css";
+import "@fontsource/neuton/400.css";
+import "@fontsource/neuton/700.css";
+import "@fontsource/titillium-web";
+import type { Preview } from "@storybook/svelte";
+import "../src/storybook.css";
 
 const preview = {
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   parameters: {
     controls: {
       matchers: {

@@ -1,22 +1,7 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "target": "ESNext",
-    "noEmit": true,
-    "allowJs": true,
-    "checkJs": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-    "strict": true,
-    "exactOptionalPropertyTypes": true,
+    "outDir": "./dist",
     "lib": [
       "DOM",
       "ESNext"
@@ -28,5 +13,13 @@
   "exclude": [
     "src/**/*.test.ts",
     "src/**/*.spec.ts"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.test.json"
+    }
   ]
 }

@@ -1,20 +1,21 @@
-@colibri-hq/cli
-=================
+# @colibri-hq/cli
 
 The command-line interface for Colibri, an ebook management app
-
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 [![Version](https://img.shields.io/npm/v/@colibri-hq/cli.svg)](https://npmjs.org/package/@colibri-hq/cli)
 [![Downloads/week](https://img.shields.io/npm/dw/@colibri-hq/cli.svg)](https://npmjs.org/package/@colibri-hq/cli)
 
-
 <!-- toc -->
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
+
 # Usage
+
 <!-- usage -->
+
 ```sh-session
 $ npm install -g @colibri-hq/cli
 $ colibri COMMAND
@@ -26,23 +27,27 @@ USAGE
   $ colibri COMMAND
 ...
 ```
+
 <!-- usagestop -->
+
 # Commands
+
 <!-- commands -->
-* [`colibri hello PERSON`](#colibri-hello-person)
-* [`colibri hello world`](#colibri-hello-world)
-* [`colibri help [COMMAND]`](#colibri-help-command)
-* [`colibri login`](#colibri-login)
-* [`colibri plugins`](#colibri-plugins)
-* [`colibri plugins add PLUGIN`](#colibri-plugins-add-plugin)
-* [`colibri plugins:inspect PLUGIN...`](#colibri-pluginsinspect-plugin)
-* [`colibri plugins install PLUGIN`](#colibri-plugins-install-plugin)
-* [`colibri plugins link PATH`](#colibri-plugins-link-path)
-* [`colibri plugins remove [PLUGIN]`](#colibri-plugins-remove-plugin)
-* [`colibri plugins reset`](#colibri-plugins-reset)
-* [`colibri plugins uninstall [PLUGIN]`](#colibri-plugins-uninstall-plugin)
-* [`colibri plugins unlink [PLUGIN]`](#colibri-plugins-unlink-plugin)
-* [`colibri plugins update`](#colibri-plugins-update)
+
+- [`colibri hello PERSON`](#colibri-hello-person)
+- [`colibri hello world`](#colibri-hello-world)
+- [`colibri help [COMMAND]`](#colibri-help-command)
+- [`colibri login`](#colibri-login)
+- [`colibri plugins`](#colibri-plugins)
+- [`colibri plugins add PLUGIN`](#colibri-plugins-add-plugin)
+- [`colibri plugins:inspect PLUGIN...`](#colibri-pluginsinspect-plugin)
+- [`colibri plugins install PLUGIN`](#colibri-plugins-install-plugin)
+- [`colibri plugins link PATH`](#colibri-plugins-link-path)
+- [`colibri plugins remove [PLUGIN]`](#colibri-plugins-remove-plugin)
+- [`colibri plugins reset`](#colibri-plugins-reset)
+- [`colibri plugins uninstall [PLUGIN]`](#colibri-plugins-uninstall-plugin)
+- [`colibri plugins unlink [PLUGIN]`](#colibri-plugins-unlink-plugin)
+- [`colibri plugins update`](#colibri-plugins-update)
 
 ## `colibri hello PERSON`
 
@@ -412,4 +417,5 @@ DESCRIPTION
 ```
 
 _See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.36/src/commands/plugins/update.ts)_
+
 <!-- commandsstop -->

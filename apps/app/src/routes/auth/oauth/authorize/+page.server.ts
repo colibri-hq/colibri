@@ -1,10 +1,10 @@
-import { getJwtCookie, verifyToken } from '$lib/server/auth';
-import { oauth } from '$lib/server/oauth';
-import { storePreviousLocation } from '$lib/server/utilities';
-import { OAuthAuthorizationError, OAuthError } from '@colibri-hq/oauth';
-import { findUserByIdentifier, type User } from '@colibri-hq/sdk';
-import { error, redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import { getJwtCookie, verifyToken } from "$lib/server/auth";
+import { oauth } from "$lib/server/oauth";
+import { storePreviousLocation } from "$lib/server/utilities";
+import { OAuthAuthorizationError, OAuthError } from "@colibri-hq/oauth";
+import { findUserByIdentifier, type User } from "@colibri-hq/sdk";
+import { error, redirect } from "@sveltejs/kit";
+import type { PageServerLoad } from "./$types";
 
 /**
  * Authorization endpoint
@@ -26,7 +26,7 @@ export const load = async function load({
   let sub;
 
   try {
-    const token = getJwtCookie(cookies) || '';
+    const token = getJwtCookie(cookies) || "";
     ({ sub } = verifyToken(token));
     user = await findUserByIdentifier(database, sub as string);
   } catch {
@@ -37,7 +37,7 @@ export const load = async function load({
   if (!user) {
     storePreviousLocation(cookies, url);
     const target = new URL(url);
-    target.pathname = '/auth/login';
+    target.pathname = "/auth/login";
 
     throw redirect(303, target);
   }
@@ -45,7 +45,10 @@ export const load = async function load({
 
   // region Validate the authorization request
   try {
-    return oauth(database).handleAuthorizationRequest(request, user.id.toString());
+    return oauth(database).handleAuthorizationRequest(
+      request,
+      user.id.toString(),
+    );
   } catch (cause) {
     if (cause instanceof OAuthAuthorizationError) {
       const { response } = cause;

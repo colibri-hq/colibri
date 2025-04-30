@@ -1,39 +1,30 @@
-import {
-  JWT_SECRET,
-  OAUTH_ACCESS_TOKEN_TTL,
-  OAUTH_AUTHORIZATION_CODE_TTL,
-  OAUTH_ISSUER,
-  OAUTH_REFRESH_TOKEN_TTL,
-} from '$env/static/private';
-import { type OAuthErrorCode, statusMap } from '@colibri-hq/oauth';
-import type { Database } from '@colibri-hq/sdk';
-import { server } from '@colibri-hq/sdk/oauth';
-import { resolveAcceptedMediaTypes } from '@colibri-hq/shared';
-import { error, json, redirect } from '@sveltejs/kit';
-import { type ZodCustomIssue, ZodError, type ZodIssue } from 'zod';
+import { env } from "$env/dynamic/private";
+import { type OAuthErrorCode, statusMap } from "@colibri-hq/oauth";
+import type { Database } from "@colibri-hq/sdk";
+import { server } from "@colibri-hq/sdk/oauth";
+import { resolveAcceptedMediaTypes } from "@colibri-hq/shared";
+import { error, json, redirect } from "@sveltejs/kit";
+import { type ZodCustomIssue, ZodError, type ZodIssue } from "zod";
 
-export function oauth(database: Database) {
+export function oauth(database: Database, url?: URL) {
   return server(database, {
-    issuer: OAUTH_ISSUER ?? 'https://colibri.dev',
-    jwtSecret: JWT_SECRET,
-    accessTokenTtl: OAUTH_ACCESS_TOKEN_TTL
-      ? Number(OAUTH_ACCESS_TOKEN_TTL)
+    issuer: env.OAUTH_ISSUER ?? url?.origin ?? "https://colibri.dev",
+    jwtSecret: env.JWT_SECRET,
+    accessTokenTtl: env.OAUTH_ACCESS_TOKEN_TTL
+      ? Number(env.OAUTH_ACCESS_TOKEN_TTL)
       : undefined,
-    refreshTokenTtl: OAUTH_REFRESH_TOKEN_TTL
-      ? Number(OAUTH_REFRESH_TOKEN_TTL)
-      : undefined,
-    authorizationCodeTtl: OAUTH_AUTHORIZATION_CODE_TTL
-      ? Number(OAUTH_AUTHORIZATION_CODE_TTL)
+    refreshTokenTtl: env.OAUTH_REFRESH_TOKEN_TTL
+      ? Number(env.OAUTH_REFRESH_TOKEN_TTL)
       : undefined,
   });
 }
 
 function formatErrorDescription(error: ZodError | string | undefined) {
-  if (!error || typeof error === 'string') {
+  if (!error || typeof error === "string") {
     return error;
   }
 
-  return error.format()._errors.join(', ');
+  return error.format()._errors.join(", ");
 }
 
 export function handleOAuthValidationErrors(
@@ -44,33 +35,33 @@ export function handleOAuthValidationErrors(
 
     // Determine the OAuth error code
     const errorCode =
-      'params' in issue && issue.params?.oauth_error
+      "params" in issue && issue.params?.oauth_error
         ? issue.params.oauth_error
-        : 'invalid_request';
+        : "invalid_request";
 
     // Handle specific field errors
-    if (path.includes('client_id')) {
-      if (errorCode === 'invalid_request' && message?.includes('missing')) {
-        return oauthError('invalid_request', message);
+    if (path.includes("client_id")) {
+      if (errorCode === "invalid_request" && message?.includes("missing")) {
+        return oauthError("invalid_request", message);
       }
 
-      return oauthError('invalid_client', message);
+      return oauthError("invalid_client", message);
     }
 
-    if (path.includes('client_secret')) {
-      if (errorCode === 'invalid_request' && message?.includes('missing')) {
-        return oauthError('invalid_request', message);
+    if (path.includes("client_secret")) {
+      if (errorCode === "invalid_request" && message?.includes("missing")) {
+        return oauthError("invalid_request", message);
       }
 
-      return oauthError('invalid_client', message);
+      return oauthError("invalid_client", message);
     }
 
-    if (path.includes('scope')) {
-      return oauthError('invalid_scope', message);
+    if (path.includes("scope")) {
+      return oauthError("invalid_scope", message);
     }
   }
 
-  return oauthError('invalid_request', 'Invalid request');
+  return oauthError("invalid_request", "Invalid request");
 }
 
 export function oauthRedirect(
@@ -109,9 +100,9 @@ export function errorRedirect(
     state,
     error,
     error_description:
-      !description || typeof description === 'string'
+      !description || typeof description === "string"
         ? description
-        : description.format()._errors.join(', '),
+        : description.format()._errors.join(", "),
     error_uri: error_uri?.toString(),
   });
 }
@@ -125,7 +116,7 @@ export function userFacingOauthError(
   const status = statusMap[title];
 
   for (const accepted of resolveAcceptedMediaTypes(request)) {
-    if (accepted.startsWith('text/html')) {
+    if (accepted.startsWith("text/html")) {
       return error(status, {
         title,
         message: formatErrorDescription(description) ?? title,

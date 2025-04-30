@@ -1,19 +1,16 @@
-import {
-  getAuthSessionIdFromCookie,
-  resolveUserId,
-} from '$lib/server/auth';
+import { getAuthSessionIdFromCookie, resolveUserId } from "$lib/server/auth";
 import {
   createChallenge,
   findUserByIdentifier,
   listAuthenticatorsForUser,
-} from '@colibri-hq/sdk';
+} from "@colibri-hq/sdk";
 import {
   generateAuthenticationOptions,
   type GenerateAuthenticationOptionsOpts,
-} from '@simplewebauthn/server';
-import { error, json, type RequestHandler } from '@sveltejs/kit';
+} from "@simplewebauthn/server";
+import { error, json, type RequestHandler } from "@sveltejs/kit";
 
-export const GET: RequestHandler = async function handler({
+export const GET = async function handler({
   url,
   cookies,
   locals: { database },
@@ -23,13 +20,13 @@ export const GET: RequestHandler = async function handler({
 
   if (!sessionId) {
     throw error(403, {
-      title: 'Not authorized',
-      message: 'Session ID cookie is missing or invalid',
+      title: "Not authorized",
+      message: "Session ID cookie is missing or invalid",
     });
   }
 
   const options: GenerateAuthenticationOptionsOpts = {
-    userVerification: 'required',
+    userVerification: "required",
     rpID: url.hostname,
     timeout: 60_000,
   };
@@ -56,4 +53,4 @@ export const GET: RequestHandler = async function handler({
   });
 
   return json(responseData);
-};
+} satisfies RequestHandler;

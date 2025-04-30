@@ -10,6 +10,7 @@ export default defineBuildConfig({
       globOptions: { ignore: ["**/*.test.ts", "**/*.spec.ts"] },
       outDir: "./dist",
       format: "esm",
+      ext: "js",
       srcDir: "src",
     },
   ],

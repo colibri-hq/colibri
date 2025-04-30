@@ -36,7 +36,7 @@
   type="button"
 >
   <strong
-    class="max-w-full overflow-hidden text-ellipsis whitespace-nowrap font-serif font-semibold"
+    class="max-w-full overflow-hidden font-serif font-semibold text-ellipsis whitespace-nowrap"
   >
     {entry.title}
   </strong>

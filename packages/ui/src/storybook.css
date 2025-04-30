@@ -1,109 +1,109 @@
-@import './style.css';
+@import "./style.css";
 
 .sbdocs.sbdocs-wrapper {
-    @apply bg-white dark:bg-gray-900 dark:text-gray-200;
+  @apply bg-white dark:bg-gray-900 dark:text-gray-200;
 
-    & .sbdocs-title {
-        @apply dark:text-gray-100;
+  & .sbdocs-title {
+    @apply dark:text-gray-100;
+  }
+
+  & .toc-list {
+    @apply dark:border-l-2! dark:border-gray-800!;
+
+    & .toc-list-item {
+      & > a {
+        @apply dark:text-gray-500;
+      }
+
+      &.is-active-li {
+        @apply dark:before:border-l-2 dark:before:border-blue-500;
+
+        & > a {
+          @apply dark:text-blue-500;
+        }
+      }
+    }
+  }
+
+  & .sbdocs.sbdocs-preview {
+    @apply dark:bg-gray-950 dark:text-gray-200 dark:shadow-none dark:border-gray-800;
+
+    & .sb-bar {
+      @apply dark:bg-gray-900 dark:text-gray-200;
+    }
+  }
+
+  & .css-11xgcgt {
+    @apply dark:bg-transparent dark:text-gray-200;
+
+    & .docblock-code-toggle {
+      @apply dark:bg-gray-900/75 dark:text-gray-200;
+    }
+  }
+
+  & .docblock-argstable {
+    & .docblock-argstable-body > tr.css-1oi7qoy > td {
+      @apply dark:bg-gray-950/25! dark:text-gray-200!;
     }
 
-    & .toc-list {
-        @apply dark:border-l-2! dark:border-gray-800!;
-
-        & .toc-list-item {
-            & > a {
-                @apply dark:text-gray-500;
-            }
-
-            &.is-active-li {
-                @apply dark:before:border-l-2 dark:before:border-blue-500;
-
-                & > a {
-                    @apply dark:text-blue-500;
-                }
-            }
-        }
+    & th {
+      @apply dark:text-gray-200;
     }
 
-    & .sbdocs.sbdocs-preview {
-        @apply dark:bg-gray-950 dark:text-gray-200 dark:shadow-none dark:border-gray-800;
-
-        & .sb-bar {
-            @apply dark:bg-gray-900 dark:text-gray-200;
-        }
+    & tbody > tr > * {
+      @apply dark:bg-gray-950 dark:text-gray-200;
     }
 
-    & .css-11xgcgt {
-        @apply dark:bg-transparent dark:text-gray-200;
-
-        & .docblock-code-toggle {
-            @apply dark:bg-gray-900/75 dark:text-gray-200;
-        }
+    & .css-o1d7ko {
+      @apply dark:bg-gray-900 dark:text-gray-200 dark:border-gray-800/50;
     }
 
-    & .docblock-argstable {
-        & .docblock-argstable-body > tr.css-1oi7qoy > td {
-            @apply dark:bg-gray-950/25! dark:text-gray-200!;
-        }
-
-        & th {
-            @apply dark:text-gray-200;
-        }
-
-        & tbody > tr > * {
-            @apply dark:bg-gray-950 dark:text-gray-200;
-        }
-
-        & .css-o1d7ko {
-            @apply dark:bg-gray-900 dark:text-gray-200 dark:border-gray-800/50;
-        }
-
-        & .css-1vgq5xr,
-        & .css-10lkeuu,
-        & .css-14o1cbe,
-        & .css-r7fl1p,
-        & .css-177r6r9,
-        & .css-7mc623 {
-            @apply dark:bg-gray-900 dark:text-gray-200 dark:ring dark:ring-gray-700/50 dark:focus-visible:ring-blue-500;
-        }
-
-        & .css-obbby0 {
-            @apply -mx-px p-px;
-        }
-
-        & .css-7mc623 {
-            @apply min-h-8;
-        }
-
-        & .css-177r6r9 {
-            @apply dark:bg-gray-950;
-
-            & span {
-                @apply dark:text-gray-200;
-            }
-
-            & input:checked ~ span:last-of-type,
-            & input:not(:checked) ~ span:first-of-type {
-                @apply dark:bg-gray-800 dark:border-gray-800;
-            }
-
-            & input {
-                @apply dark:focus:ring! dark:focus:ring-blue-500!;
-            }
-
-            @apply dark:text-gray-200;
-        }
-
-        & .css-18pz2h2 code {
-            @apply dark:bg-gray-900 dark:text-gray-200 dark:border-gray-800;
-        }
+    & .css-1vgq5xr,
+    & .css-10lkeuu,
+    & .css-14o1cbe,
+    & .css-r7fl1p,
+    & .css-177r6r9,
+    & .css-7mc623 {
+      @apply dark:bg-gray-900 dark:text-gray-200 dark:ring dark:ring-gray-700/50 dark:focus-visible:ring-blue-500;
     }
 
-    & .css-qa4clq :where(p:not(.sb-anchor, .sb-unstyled, .sb-unstyled p)) {
-        @apply dark:text-gray-400;
+    & .css-obbby0 {
+      @apply -mx-px p-px;
     }
 
-    & .css-qa4clq :where(h3:not(.sb-anchor, .sb-unstyled, .sb-unstyled h3)) {
+    & .css-7mc623 {
+      @apply min-h-8;
+    }
+
+    & .css-177r6r9 {
+      @apply dark:bg-gray-950;
+
+      & span {
         @apply dark:text-gray-200;
+      }
+
+      & input:checked ~ span:last-of-type,
+      & input:not(:checked) ~ span:first-of-type {
+        @apply dark:bg-gray-800 dark:border-gray-800;
+      }
+
+      & input {
+        @apply dark:focus:ring! dark:focus:ring-blue-500!;
+      }
+
+      @apply dark:text-gray-200;
     }
+
+    & .css-18pz2h2 code {
+      @apply dark:bg-gray-900 dark:text-gray-200 dark:border-gray-800;
+    }
+  }
+
+  & .css-qa4clq :where(p:not(.sb-anchor, .sb-unstyled, .sb-unstyled p)) {
+    @apply dark:text-gray-400;
+  }
+
+  & .css-qa4clq :where(h3:not(.sb-anchor, .sb-unstyled, .sb-unstyled h3)) {
+    @apply dark:text-gray-200;
+  }
 }

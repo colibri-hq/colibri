@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
 
   interface Props {
     items?: { link: string; title: string }[];
@@ -11,7 +11,7 @@
 <nav class="mt-1">
   {#if items.length > 1}
     <ul class="flex items-center">
-      {#each items as { link, title }, index}
+      {#each items as { link, title }, index (index)}
         {#if index > 0}
           <li class="group contents">
             <Icon name="chevron_right" class="leading-none text-gray-500" />

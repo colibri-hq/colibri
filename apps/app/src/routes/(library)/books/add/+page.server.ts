@@ -1,38 +1,38 @@
-import type { Actions } from '@sveltejs/kit';
-import { fail, redirect } from '@sveltejs/kit';
+import type { Actions } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 
 export const actions: Actions = {
   default: async ({ request, url, locals, platform }) => {
     const data = await request.formData();
-    const title = data.get('title') as string;
+    const title = data.get("title") as string;
 
     if (!title) {
       return fail(400, {
         title,
-        message: 'Missing book title',
+        message: "Missing book title",
       });
     }
 
-    const authorId = (data.get('author') || undefined) as string | undefined;
-    const authorName = data.get('authorName') as string | undefined;
+    const authorId = (data.get("author") || undefined) as string | undefined;
+    const authorName = data.get("authorName") as string | undefined;
 
-    const publisherId = (data.get('publisher') || undefined) as
+    const publisherId = (data.get("publisher") || undefined) as
       | string
       | undefined;
-    const publisherName = data.get('publisherName') as string | undefined;
+    const publisherName = data.get("publisherName") as string | undefined;
 
-    const publishingDate = data.get('publishingDate') as string | undefined;
-    const description = data.get('description') as string | undefined;
-    const language = data.get('language') as string | undefined;
-    const isbn = data.get('isbn') as string | undefined;
-    const uuid = data.get('uuid') as string | undefined;
-    const doi = data.get('doi') as string | undefined;
-    const jdcn = data.get('jdcn') as string | undefined;
-    const rights = data.get('rights') as string | undefined;
+    const publishingDate = data.get("publishingDate") as string | undefined;
+    const description = data.get("description") as string | undefined;
+    const language = data.get("language") as string | undefined;
+    const isbn = data.get("isbn") as string | undefined;
+    const uuid = data.get("uuid") as string | undefined;
+    const doi = data.get("doi") as string | undefined;
+    const jdcn = data.get("jdcn") as string | undefined;
+    const rights = data.get("rights") as string | undefined;
 
-    const file = data.get('file') as File;
-    const coverFile = data.get('cover') as File | undefined;
-    const coverHash = data.get('coverHash') as string | undefined;
+    const file = data.get("file") as File;
+    const coverFile = data.get("cover") as File | undefined;
+    const coverHash = data.get("coverHash") as string | undefined;
 
     const metadata = JSON.stringify(collectMetadata(data));
 
@@ -67,7 +67,7 @@ export const actions: Actions = {
             assets: {
               create: {
                 size: file.size,
-                mediaType: 'application/epub+zip',
+                mediaType: "application/epub+zip",
               },
             },
 
@@ -85,7 +85,7 @@ export const actions: Actions = {
                   },
                 },
                 where: {
-                  id: authorId || '__none__',
+                  id: authorId || "__none__",
                 },
               },
             },
@@ -101,7 +101,7 @@ export const actions: Actions = {
                   },
                 },
                 where: {
-                  id: publisherId || '__none__',
+                  id: publisherId || "__none__",
                 },
               },
             },
@@ -123,7 +123,7 @@ export const actions: Actions = {
 
         if (coverFile) {
           const type = await resolveFileType(coverFile);
-          const mimeType = type?.mime || 'image/jpeg';
+          const mimeType = type?.mime || "image/jpeg";
           const cover = await tx.cover.create({
             data: {
               size: coverFile.size,
@@ -166,14 +166,14 @@ export const actions: Actions = {
 
 function collectMetadata(
   data: FormData,
-  fieldName: string = 'metadata',
+  fieldName: string = "metadata",
 ): Record<string, string | null> {
   return Object.fromEntries(
     Array.from(data.entries())
       .filter(([key]) => key.startsWith(fieldName))
       .map(([key, value]) => [
-        key.replace(new RegExp(`^${fieldName}\\[(.+)]$`), '$1'),
-        typeof value === 'string' ? value : null,
+        key.replace(new RegExp(`^${fieldName}\\[(.+)]$`), "$1"),
+        typeof value === "string" ? value : null,
       ]),
   );
 }

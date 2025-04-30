@@ -1,28 +1,25 @@
-import {
-  S3_PROTOCOL_ACCESS_KEY_ID,
-  S3_PROTOCOL_ACCESS_KEY_SECRET,
-  S3_PROTOCOL_REGION,
-  STORAGE_S3_URL,
-} from '$env/static/private';
+import { env } from "$env/dynamic/private";
 import {
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
-} from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-export const client = new S3Client({
-  region: S3_PROTOCOL_REGION,
-  endpoint: STORAGE_S3_URL,
-  forcePathStyle: true,
-  credentials: {
-    accessKeyId: S3_PROTOCOL_ACCESS_KEY_ID,
-    secretAccessKey: S3_PROTOCOL_ACCESS_KEY_SECRET,
-  },
-});
+export function storage() {
+  return new S3Client({
+    region: env.S3_PROTOCOL_REGION,
+    endpoint: env.STORAGE_S3_URL,
+    forcePathStyle: true,
+    credentials: {
+      accessKeyId: env.S3_PROTOCOL_ACCESS_KEY_ID,
+      secretAccessKey: env.S3_PROTOCOL_ACCESS_KEY_SECRET,
+    },
+  });
+}
 
 export function downloadObject(bucket: string, filename: string) {
-  return client.send(
+  return storage().send(
     new GetObjectCommand({
       Bucket: bucket,
       Key: filename,
@@ -69,7 +66,7 @@ export async function generatePresignedDownloadUrl(
     Bucket: bucket,
     Key: filename,
   });
-  return await getSignedUrl(client, command, {
+  return await getSignedUrl(storage(), command, {
     expiresIn,
   });
 }
@@ -89,7 +86,7 @@ export async function generatePresignedUploadUrl(
     // Metadata: { ...metadata },
   });
 
-  return await getSignedUrl(client, command, {
+  return await getSignedUrl(storage(), command, {
     expiresIn,
   });
 }

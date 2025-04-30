@@ -1,25 +1,25 @@
-import { log } from '$lib/logging';
-import { Parser } from 'xml2js';
+import { log } from "$lib/logging";
+import { Parser } from "xml2js";
 
 export async function loadFeed(
   url: string | URL | AtomLink | OpdsLink,
   resolveRoot = true,
 ) {
-  const feedUrl = typeof url === 'string' ? url : url.href;
+  const feedUrl = typeof url === "string" ? url : url.href;
   let body: string;
 
   try {
-    log('odps', 'debug', 'Fetching feed', { url: feedUrl });
+    log("odps", "debug", "Fetching feed", { url: feedUrl });
     const response = await fetch(feedUrl, {
-      redirect: 'follow',
-      method: 'GET',
+      redirect: "follow",
+      method: "GET",
     });
     body = await response.text();
 
     if (!response.ok) {
       const { status, statusText } = response;
 
-      log('odps', 'error', 'Failed to fetch feed', {
+      log("odps", "error", "Failed to fetch feed", {
         url: feedUrl,
         status,
         statusText,
@@ -29,7 +29,7 @@ export async function loadFeed(
       throw new Error(`Server reported an error: ${status}—${statusText}`);
     }
   } catch (cause) {
-    log('odps', 'error', 'Failed to fetch feed', { url: feedUrl, cause });
+    log("odps", "error", "Failed to fetch feed", { url: feedUrl, cause });
 
     if (!(cause instanceof Error)) {
       throw new Error(`Failed to fetch feed: ${cause}`);
@@ -52,17 +52,17 @@ export async function loadFeed(
   }
 
   if (!isAtomFeedXmlDocument(parsedBody)) {
-    throw new Error('Failed to parse feed as XML: No feed data');
+    throw new Error("Failed to parse feed as XML: No feed data");
   }
 
   const { feed } = parsedBody;
 
   if (!isAtomFeed(feed)) {
-    throw new Error('Invalid feed format: Not an Atom feed');
+    throw new Error("Invalid feed format: Not an Atom feed");
   }
 
   if (!isOdpsFeed(feed)) {
-    throw new Error('Invalid OPDS feed: Not an OPDS feed');
+    throw new Error("Invalid OPDS feed: Not an OPDS feed");
   }
 
   if (!resolveRoot) {
@@ -70,11 +70,11 @@ export async function loadFeed(
   }
 
   const links = Array.isArray(feed.link) ? feed.link : [feed.link];
-  const catalogLink = links.find((link) => link.rel === 'start');
-  const selfLink = links.find((link) => link.rel === 'self');
+  const catalogLink = links.find((link) => link.rel === "start");
+  const selfLink = links.find((link) => link.rel === "self");
 
   if (!catalogLink) {
-    throw new Error('Invalid OPDS feed: No start link');
+    throw new Error("Invalid OPDS feed: No start link");
   }
 
   if (
@@ -82,9 +82,9 @@ export async function loadFeed(
     (selfLink && selfLink.href !== catalogLink.href)
   ) {
     log(
-      'odps',
-      'warn',
-      'OPDS feed contains different start link, parsing feed root',
+      "odps",
+      "warn",
+      "OPDS feed contains different start link, parsing feed root",
       {
         url: feedUrl,
         selfLink: selfLink?.href,
@@ -124,10 +124,10 @@ function createParser() {
        * @param name
        */
       function processAtomLinkType(value, name) {
-        if (name === 'type' && value.startsWith('application/atom+xml')) {
+        if (name === "type" && value.startsWith("application/atom+xml")) {
           return `mime=${value}`
-            .split(';')
-            .map((part) => part.split('='))
+            .split(";")
+            .map((part) => part.split("="))
             .reduce<Record<string, string>>((acc, [key, value]) => {
               acc[key] = value;
               return acc;
@@ -144,18 +144,18 @@ function isAtomFeedXmlDocument(
   xmlDocument: unknown,
 ): xmlDocument is { feed: object } {
   return (
-    typeof xmlDocument === 'object' &&
+    typeof xmlDocument === "object" &&
     xmlDocument !== null &&
-    'feed' in xmlDocument
+    "feed" in xmlDocument
   );
 }
 
 function isAtomFeed(feed: unknown): feed is AtomFeed | OpdsFeed {
   return (
-    typeof feed === 'object' &&
+    typeof feed === "object" &&
     feed !== null &&
-    'xmlns' in feed &&
-    feed.xmlns === 'http://www.w3.org/2005/Atom'
+    "xmlns" in feed &&
+    feed.xmlns === "http://www.w3.org/2005/Atom"
   );
 }
 
@@ -164,9 +164,9 @@ function isOdpsFeed(feed: AtomFeed | OpdsFeed): feed is OpdsFeed {
     (feed.link &&
       (Array.isArray(feed.link) ? feed.link : [feed.link]).some(
         (link) =>
-          typeof link.type === 'object' &&
-          'profile' in link.type &&
-          link.type.profile === 'opds-catalog',
+          typeof link.type === "object" &&
+          "profile" in link.type &&
+          link.type.profile === "opds-catalog",
       )) ??
     false
   );
@@ -174,10 +174,10 @@ function isOdpsFeed(feed: AtomFeed | OpdsFeed): feed is OpdsFeed {
 
 function isOpdsLink(link: AtomLink | OpdsLink): link is OpdsLink {
   return (
-    link.rel?.startsWith('http://opds-spec.org/') ||
-    (typeof link.type === 'object' &&
-      'profile' in link.type &&
-      link.type.profile === 'opds-catalog')
+    link.rel?.startsWith("http://opds-spec.org/") ||
+    (typeof link.type === "object" &&
+      "profile" in link.type &&
+      link.type.profile === "opds-catalog")
   );
 }
 
@@ -185,7 +185,7 @@ function isOpdsEntry(entry: AtomEntry | OpdsEntry): entry is OpdsEntry {
   return !!(
     entry.link &&
     (Array.isArray(entry.link) ? entry.link : [entry.link]).some(
-      (link) => isOpdsLink(link) || link.rel === 'alternate',
+      (link) => isOpdsLink(link) || link.rel === "alternate",
     )
   );
 }
@@ -247,16 +247,16 @@ export class Feed extends OpdsRecord<OpdsFeed> {
 
   public get links() {
     return super.links.filter(
-      (link) => link.rel !== 'self' && link.rel !== 'start',
+      (link) => link.rel !== "self" && link.rel !== "start",
     );
   }
 
   public get selfLink() {
-    return super.links.find(({ rel }) => rel === 'self')?.href;
+    return super.links.find(({ rel }) => rel === "self")?.href;
   }
 
   public get rootLink() {
-    return super.links.find(({ rel }) => rel === 'start')?.href;
+    return super.links.find(({ rel }) => rel === "start")?.href;
   }
 
   public get isRoot() {
@@ -285,7 +285,7 @@ export class Feed extends OpdsRecord<OpdsFeed> {
   public get imageUrl() {
     return this.unrelatedEntries
       .flatMap((entry) => extractLinks(entry))
-      .find((link) => link?.rel === 'http://opds-spec.org/image/thumbnail')
+      .find((link) => link?.rel === "http://opds-spec.org/image/thumbnail")
       ?.href;
   }
 
@@ -312,7 +312,7 @@ export class Feed extends OpdsRecord<OpdsFeed> {
   private get itemEntries() {
     return this.#entries.filter((entry) =>
       extractLinks(entry).some((link) =>
-        link.rel.startsWith('http://opds-spec.org/acquisition'),
+        link.rel.startsWith("http://opds-spec.org/acquisition"),
       ),
     );
   }
@@ -321,8 +321,8 @@ export class Feed extends OpdsRecord<OpdsFeed> {
     return this.#entries.filter((entry) =>
       extractLinks(entry).some(
         (link) =>
-          typeof link.type === 'object' &&
-          ['navigation', 'acquisition'].includes(link.type.kind),
+          typeof link.type === "object" &&
+          ["navigation", "acquisition"].includes(link.type.kind),
       ),
     );
   }
@@ -351,7 +351,7 @@ export class Feed extends OpdsRecord<OpdsFeed> {
 
 export class Entry extends OpdsRecord<OpdsEntry, Feed> {
   public get language() {
-    return this.record['dc:language']?._;
+    return this.record["dc:language"]?._;
   }
 
   public get authors() {
@@ -376,12 +376,12 @@ export class Entry extends OpdsRecord<OpdsEntry, Feed> {
 export class Category extends OpdsRecord<OpdsEntry, Feed> {
   public get subsections() {
     return this.links
-      .filter((link) => link.rel === 'subsection')
+      .filter((link) => link.rel === "subsection")
       .map(({ href }) => new URL(href, this.document!.rootLink));
   }
 
   public get link() {
-    return this.links.find((link) => link.rel === 'subsection')?.href ?? '/';
+    return this.links.find((link) => link.rel === "subsection")?.href ?? "/";
   }
 
   toJSON() {
@@ -421,63 +421,63 @@ function extractAuthors(feed: OpdsFeed | OpdsEntry) {
   }));
 }
 
-export interface OpdsFeed extends Omit<AtomFeed, 'link' | 'entry'> {
+export interface OpdsFeed extends Omit<AtomFeed, "link" | "entry"> {
   link: OpdsLink | AtomLink | (OpdsLink | AtomLink)[];
   entry: OpdsEntry | AtomEntry | (OpdsEntry | AtomEntry)[];
 }
 
-export interface OpdsLink extends Omit<AtomLink, 'rel'> {
+export interface OpdsLink extends Omit<AtomLink, "rel"> {
   rel: OpdsLinkRelType;
   href: `http://${string}` | `https://${string}` | string;
   type:
     | string
-    | { profile: 'opds-catalog'; kind: 'acquisition' | 'navigation' };
+    | { profile: "opds-catalog"; kind: "acquisition" | "navigation" };
 }
 
 type OpdsLinkRelType =
-  | 'self'
-  | 'start'
-  | 'search'
-  | 'subsection'
+  | "self"
+  | "start"
+  | "search"
+  | "subsection"
 
   // A graphical Resource associated to the OPDS Catalog Entry.
-  | 'http://opds-spec.org/image'
+  | "http://opds-spec.org/image"
 
   // A reduced-size version of a graphical Resource associated to the OPS Catalog Entry.
-  | 'http://opds-spec.org/image/thumbnail'
+  | "http://opds-spec.org/image/thumbnail"
 
   // A generic relation that indicates that the complete representation of the content Resource may
   // be retrieved.
-  | 'http://opds-spec.org/acquisition'
+  | "http://opds-spec.org/acquisition"
 
   // Indicates that the complete representation of the Resource can be retrieved without any
   // requirement, which includes payment and registration.
-  | 'http://opds-spec.org/acquisition/open-access'
+  | "http://opds-spec.org/acquisition/open-access"
 
   // Indicates that the complete representation of the content Resource may be retrieved as part of
   // a lending transaction.
-  | 'http://opds-spec.org/acquisition/borrow'
+  | "http://opds-spec.org/acquisition/borrow"
 
   // Indicates that the complete representation of the content Resource may be retrieved as part of
   // a purchase.
-  | 'http://opds-spec.org/acquisition/buy'
+  | "http://opds-spec.org/acquisition/buy"
 
   // Indicates that a subset of the content Resource may be retrieved.
-  | 'http://opds-spec.org/acquisition/samle'
-  | 'http://opds-spec.org/acquisition/preview'
+  | "http://opds-spec.org/acquisition/samle"
+  | "http://opds-spec.org/acquisition/preview"
 
   // Indicates that the complete representation of the content Resource may be retrieved as part of
   // a subscription.
-  | 'http://opds-spec.org/acquisition/subscribe'
+  | "http://opds-spec.org/acquisition/subscribe"
   | AtomLinkRelType;
 
-export interface OpdsEntry extends Omit<AtomEntry, 'link'> {
+export interface OpdsEntry extends Omit<AtomEntry, "link"> {
   link: OpdsLink | AtomLink | (OpdsLink | AtomLink)[];
 }
 
 /** A Feed consists of some metadata, followed by any number of entries.  */
 export interface AtomFeed {
-  xmlns?: 'http://www.w3.org/2005/Atom';
+  xmlns?: "http://www.w3.org/2005/Atom";
 
   /**
    * Identifies the feed using a universally unique and permanent URI. If you have a long-term,
@@ -634,9 +634,9 @@ export interface AtomEntry {
    *  */
   source?: AtomSource;
 
-  'dc:language'?: {
+  "dc:language"?: {
     _: string;
-    'xmlns:dc'?: string;
+    "xmlns:dc"?: string;
   };
 }
 
@@ -714,11 +714,11 @@ export interface AtomPerson {
 }
 
 export type AtomLinkRelType =
-  | 'alternate'
-  | 'enclosure'
-  | 'related'
-  | 'self'
-  | 'via';
+  | "alternate"
+  | "enclosure"
+  | "related"
+  | "self"
+  | "via";
 
 /** representation of &lt;author&gt; element */
 export interface AtomAuthor extends AtomPerson {}
@@ -734,7 +734,7 @@ export interface AtomContributor extends AtomPerson {}
  */
 export type AtomText = string;
 
-export type AtomTextType = 'text' | 'html' | 'xhtml';
+export type AtomTextType = "text" | "html" | "xhtml";
 
 /** representation of &lt;title&gt; element */
 export type AtomTitle = AtomText;

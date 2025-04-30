@@ -1,6 +1,6 @@
 <script lang="ts">
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
   import { fade } from 'svelte/transition';
 
   let paused = $state(false);
@@ -12,7 +12,7 @@
 
 <div
   aria-live="polite"
-  class="fixed bottom-0 right-0 p-8"
+  class="fixed right-0 bottom-0 p-8"
   role="status"
   transition:fade={{ duration: 150 }}
 >
@@ -25,8 +25,8 @@
         aria-controls="upload-operation-status"
         aria-pressed={paused}
         class="mt-0.5 leading-none opacity-0
-        outline-none transition
-        focus-visible:opacity-100 group-hover/spinner:opacity-100 group-hover:opacity-50 group-focus-visible:opacity-50 aria-pressed:opacity-100"
+        transition outline-none
+        group-hover:opacity-50 group-hover/spinner:opacity-100 group-focus-visible:opacity-50 focus-visible:opacity-100 aria-pressed:opacity-100"
         onclick={pause}
         type="button"
       >
@@ -34,12 +34,12 @@
       </button>
     </LoadingSpinner>
     <span
-      class="relative ml-3 mr-2 min-w-min select-none text-sm dark:text-gray-400"
+      class="relative mr-2 ml-3 min-w-min text-sm select-none dark:text-gray-400"
       id="upload-operation-status"
     >
       <span class={paused ? 'opacity-0' : 'opacity-100'}>Uploading Books…</span>
       <span
-        class="absolute left-0 top-0 {!paused ? 'opacity-0' : 'opacity-100'}"
+        class="absolute top-0 left-0 {!paused ? 'opacity-0' : 'opacity-100'}"
         >Upload paused…</span
       >
     </span>

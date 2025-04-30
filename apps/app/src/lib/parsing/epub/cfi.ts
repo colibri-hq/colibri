@@ -30,7 +30,7 @@ const isNumber = /\d/;
 export const isCFI = /^epubcfi\((.*)\)$/;
 
 function escapeCFI(value: string) {
-  return value.replace(/[\^[\](),;=]/g, '^$&');
+  return value.replace(/[\^[\](),;=]/g, "^$&");
 }
 
 function wrap(value: string) {
@@ -49,17 +49,17 @@ function lift(callback: (...values: string[]) => string) {
   };
 }
 
-export const joinIndirect = lift((...values: string[]) => values.join('!'));
+export const joinIndirect = lift((...values: string[]) => values.join("!"));
 
 function tokenize(input: string) {
   const tokens: (string | number)[][] = [];
   let state: string | null = null;
   let escape = false;
-  let value = '';
+  let value = "";
 
   function push(newTokens: (string | number)[]) {
     state = null;
-    value = '';
+    value = "";
 
     return tokens.push(newTokens);
   }
@@ -70,18 +70,18 @@ function tokenize(input: string) {
     return (value += token);
   }
 
-  for (const character of Array.from(input.trim()).concat('')) {
-    if (character === '^' && !escape) {
+  for (const character of Array.from(input.trim()).concat("")) {
+    if (character === "^" && !escape) {
       escape = true;
 
       continue;
     }
 
-    if (state === '!') {
-      push(['!']);
-    } else if (state === ',') {
-      push([',']);
-    } else if (state === '/' || state === ':') {
+    if (state === "!") {
+      push(["!"]);
+    } else if (state === ",") {
+      push([","]);
+    } else if (state === "/" || state === ":") {
       if (isNumber.test(character)) {
         cat(character);
 
@@ -89,38 +89,38 @@ function tokenize(input: string) {
       }
 
       push([state, parseInt(value)]);
-    } else if (state === '~') {
-      if (isNumber.test(character) || character === '.') {
+    } else if (state === "~") {
+      if (isNumber.test(character) || character === ".") {
         cat(character);
 
         continue;
       }
 
-      push(['~', parseFloat(value)]);
-    } else if (state === '@') {
-      if (character === ':') {
-        push(['@', parseFloat(value)]);
-        state = '@';
+      push(["~", parseFloat(value)]);
+    } else if (state === "@") {
+      if (character === ":") {
+        push(["@", parseFloat(value)]);
+        state = "@";
 
         continue;
       }
 
-      if (isNumber.test(character) || character === '.') {
+      if (isNumber.test(character) || character === ".") {
         cat(character);
 
         continue;
       }
 
-      push(['@', parseFloat(value)]);
-    } else if (state === '[') {
-      if (character === ';' && !escape) {
-        push(['[', value]);
-        state = ';';
-      } else if (character === ',' && !escape) {
-        push(['[', value]);
-        state = '[';
-      } else if (character === ']' && !escape) {
-        push(['[', value]);
+      push(["@", parseFloat(value)]);
+    } else if (state === "[") {
+      if (character === ";" && !escape) {
+        push(["[", value]);
+        state = ";";
+      } else if (character === "," && !escape) {
+        push(["[", value]);
+        state = "[";
+      } else if (character === "]" && !escape) {
+        push(["[", value]);
       } else {
         cat(character);
       }
@@ -128,14 +128,14 @@ function tokenize(input: string) {
       continue;
     }
 
-    if (state?.startsWith(';')) {
-      if (character === '=' && !escape) {
+    if (state?.startsWith(";")) {
+      if (character === "=" && !escape) {
         state = `;${value}`;
-        value = '';
-      } else if (character === ';' && !escape) {
+        value = "";
+      } else if (character === ";" && !escape) {
         push([state, value]);
-        state = ';';
-      } else if (character === ']' && !escape) {
+        state = ";";
+      } else if (character === "]" && !escape) {
         push([state, value]);
       } else {
         cat(character);
@@ -144,7 +144,7 @@ function tokenize(input: string) {
       continue;
     }
 
-    if ([',', '/', ':', '~', '@', '[', ';', ']', '!'].includes(character)) {
+    if ([",", "/", ":", "~", "@", "[", ";", "]", "!"].includes(character)) {
       state = character;
     }
   }
@@ -179,21 +179,21 @@ function parse(tokens: (string | number)[][]) {
   let state: string | undefined = undefined;
 
   for (const [type, val] of tokens) {
-    if (type === '/') {
+    if (type === "/") {
       parts.push({ index: Number(val) });
     } else {
       const last = parts[parts.length - 1];
 
-      if (type === ':') {
+      if (type === ":") {
         last.offset = Number(val);
-      } else if (type === '~') {
+      } else if (type === "~") {
         last.temporal = Number(val);
-      } else if (type === '@') {
+      } else if (type === "@") {
         last.spatial = (last.spatial ?? []).concat(Number(val));
-      } else if (type === ';s') {
+      } else if (type === ";s") {
         last.side = Number(val);
-      } else if (type === '[') {
-        if (state !== '/' || !val) {
+      } else if (type === "[") {
+        if (state !== "/" || !val) {
           last.text = (last.text ?? []).concat(val.toString());
 
           continue;
@@ -211,12 +211,12 @@ function parse(tokens: (string | number)[][]) {
 
 // split at step indirections, then parse each part
 function parseIndirect(tokens: (string | number)[][]) {
-  return splitAt(tokens, findTokens(tokens, '!'))?.map(parse) ?? [];
+  return splitAt(tokens, findTokens(tokens, "!"))?.map(parse) ?? [];
 }
 
 export function parseCfi(cfi: string): Cfi {
   const tokens = tokenize(unwrap(cfi));
-  const commas = findTokens(tokens, ',');
+  const commas = findTokens(tokens, ",");
 
   if (!commas.length) {
     return parseIndirect(tokens);
@@ -236,25 +236,25 @@ function partToString({
   text,
   side,
 }: Part) {
-  const param = side ? `;s=${side}` : '';
+  const param = side ? `;s=${side}` : "";
 
   return (
     `/${index}` +
-    (id ? `[${escapeCFI(id)}${param}]` : '') +
+    (id ? `[${escapeCFI(id)}${param}]` : "") +
     // "CFI expressions […] SHOULD include an explicit character offset"
-    (offset != null && index % 2 ? `:${offset}` : '') +
-    (temporal ? `~${temporal}` : '') +
-    (spatial ? `@${spatial.join(':')}` : '') +
+    (offset != null && index % 2 ? `:${offset}` : "") +
+    (temporal ? `~${temporal}` : "") +
+    (spatial ? `@${spatial.join(":")}` : "") +
     (text || (!id && side)
-      ? '[' + (text?.map(escapeCFI)?.join(',') ?? '') + param + ']'
-      : '')
+      ? "[" + (text?.map(escapeCFI)?.join(",") ?? "") + param + "]"
+      : "")
   );
 }
 
 function toInnerString(parsed: Cfi): string {
   return !Array.isArray(parsed)
-    ? [parsed.parent, parsed.start, parsed.end].map(toInnerString).join(',')
-    : parsed.map((parts: Part[]) => parts.map(partToString).join('')).join('!');
+    ? [parsed.parent, parsed.start, parsed.end].map(toInnerString).join(",")
+    : parsed.map((parts: Part[]) => parts.map(partToString).join("")).join("!");
 }
 
 function toString(parsed: Cfi) {
@@ -268,22 +268,22 @@ export function collapse(
   value: string | Cfi | Part[],
   toEnd?: boolean,
 ): RegularCfi | Part[] | string {
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return toString(collapse(parseCfi(value), toEnd));
   }
 
   return Array.isArray(value)
     ? value
-    : concatArrays(value.parent, value[toEnd ? 'end' : 'start']);
+    : concatArrays(value.parent, value[toEnd ? "end" : "start"]);
 }
 
 // create range CFI from two CFIs
 function buildRange(from: string | Cfi, to: string | Cfi) {
-  if (typeof from === 'string') {
+  if (typeof from === "string") {
     from = parseCfi(from);
   }
 
-  if (typeof to === 'string') {
+  if (typeof to === "string") {
     to = parseCfi(to);
   }
 
@@ -328,11 +328,11 @@ function buildRange(from: string | Cfi, to: string | Cfi) {
 }
 
 export function compare(a: string | Cfi, b: string | Cfi): -1 | 0 | 1 {
-  if (typeof a === 'string') {
+  if (typeof a === "string") {
     a = parseCfi(a);
   }
 
-  if (typeof b === 'string') {
+  if (typeof b === "string") {
     b = parseCfi(b);
   }
 
@@ -402,7 +402,7 @@ function getChildNodes(node: Node, filter?: NodeFilter): Node[] {
     ? nodes
         .map((node) => {
           const accept =
-            typeof filter === 'function'
+            typeof filter === "function"
               ? filter(node)
               : filter.acceptNode(node);
 
@@ -429,7 +429,7 @@ function getChildNodes(node: Node, filter?: NodeFilter): Node[] {
 // see "Step Reference to Child Element or Character Data (/)" in EPUB CFI spec
 function indexChildNodes(node: Node, filter?: NodeFilter) {
   const nodes = getChildNodes(node, filter).reduce<
-    (Node | Node[] | null | 'first' | 'last' | 'before' | 'after')[]
+    (Node | Node[] | null | "first" | "last" | "before" | "after")[]
   >((nodes, node) => {
     const last = nodes[nodes.length - 1];
 
@@ -441,14 +441,14 @@ function indexChildNodes(node: Node, filter?: NodeFilter) {
     else if (isTextNode(node)) {
       if (Array.isArray(last)) {
         last.push(node);
-      } else if (typeof last === 'object' && isTextNode(last)) {
+      } else if (typeof last === "object" && isTextNode(last)) {
         nodes[nodes.length - 1] = [last, node];
       } else {
         nodes.push(node);
       }
     } else {
       if (
-        typeof last === 'object' &&
+        typeof last === "object" &&
         !Array.isArray(last) &&
         isElementNode(last)
       ) {
@@ -465,29 +465,29 @@ function indexChildNodes(node: Node, filter?: NodeFilter) {
   const firstNode = nodes[0];
 
   if (
-    typeof firstNode === 'object' &&
+    typeof firstNode === "object" &&
     !Array.isArray(firstNode) &&
     firstNode !== null &&
     isElementNode(firstNode)
   ) {
-    nodes.unshift('first');
+    nodes.unshift("first");
   }
 
   // "the last chunk is located after the last child element"
   const lastNode = nodes[nodes.length - 1];
 
   if (
-    typeof lastNode === 'object' &&
+    typeof lastNode === "object" &&
     !Array.isArray(lastNode) &&
     lastNode !== null &&
     isElementNode(lastNode)
   ) {
-    nodes.push('last');
+    nodes.push("last");
   }
 
   // "'virtual' elements"
-  nodes.unshift('before'); // "0 is a valid index"
-  nodes.push('after'); // "n+2 is a valid index"
+  nodes.unshift("before"); // "0 is a valid index"
+  nodes.push("after"); // "n+2 is a valid index"
 
   return nodes;
 }
@@ -517,19 +517,19 @@ function partsToNode(
     const newNode = node ? indexChildNodes(node, filter)[index] : null;
 
     // handle non-existent nodes
-    if (newNode === 'first') {
+    if (newNode === "first") {
       return { node: node.firstChild ?? node };
     }
 
-    if (newNode === 'last') {
+    if (newNode === "last") {
       return { node: node.lastChild ?? node };
     }
 
-    if (newNode === 'before') {
+    if (newNode === "before") {
       return { node, before: true };
     }
 
-    if (newNode === 'after') {
+    if (newNode === "after") {
       return { node, after: true };
     }
 
@@ -707,7 +707,7 @@ export function fromCalibreHighlight({
   start_cfi: string;
   end_cfi: string;
 }) {
-  const pre = fake.fromIndex(spine_index) + '!';
+  const pre = fake.fromIndex(spine_index) + "!";
 
   return buildRange(pre + start_cfi.slice(2), pre + end_cfi.slice(2));
 }

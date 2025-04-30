@@ -13,7 +13,9 @@
 
   let { field = $bindable('updated_at'), onChange }: Props = $props();
 
-  function onSelect({ detail: { selected } }: CustomEvent<{ selected: string }>) {
+  function onSelect({
+    detail: { selected },
+  }: CustomEvent<{ selected: string }>) {
     const icon = selected.split(' ').shift();
     field = options.find((item) => item.icon === icon)!.field;
 
@@ -50,7 +52,7 @@
       {#if $menu.expanded}
         <div
           use:menu.items
-          class="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:divide-gray-800 dark:bg-black dark:ring-gray-700"
+          class="ring-opacity-5 absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black focus:outline-none dark:divide-gray-800 dark:bg-black dark:ring-gray-700"
         >
           {#each options as option, index (index)}
             <button

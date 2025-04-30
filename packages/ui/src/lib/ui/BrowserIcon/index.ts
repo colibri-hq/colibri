@@ -1,1 +1,1 @@
-export { default as BrowserIcon } from './BrowserIcon.svelte';
+export { default as BrowserIcon } from "./BrowserIcon.svelte";

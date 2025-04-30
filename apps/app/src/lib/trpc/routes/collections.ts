@@ -1,3 +1,4 @@
+import { procedure, t } from "$lib/trpc/t";
 import {
   addCollectionComment,
   loadCollectionBooks,
@@ -5,9 +6,8 @@ import {
   loadCollectionCommentsLegacy,
   loadCollectionForUser,
   loadCollectionsForUser,
-} from '@colibri-hq/sdk';
-import { procedure, t } from '$lib/trpc/t';
-import { z } from 'zod';
+} from "@colibri-hq/sdk";
+import { z } from "zod";
 
 export const collections = t.router({
   list: procedure()
@@ -76,7 +76,7 @@ export const collections = t.router({
           where: { id: collection },
           data: {
             books: {
-              [existsInCollection ? 'connect' : 'disconnect']: {
+              [existsInCollection ? "connect" : "disconnect"]: {
                 id: book,
               },
             },
@@ -104,7 +104,7 @@ export const collections = t.router({
         });
       } else {
         if (!rest.name) {
-          throw new Error('No collection name provided');
+          throw new Error("No collection name provided");
         }
 
         await prisma.collection.create({

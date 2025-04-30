@@ -1,0 +1,162 @@
+/**************************************
+ *
+ * Colibri Tailwind Theme
+ *
+ **************************************
+ *
+ * This file contains the custom theme for the Colibri application.
+ */
+
+@theme {
+  /* region Typography */
+  --font-sans:
+    "Titillium Web", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif:
+    "Neuton", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  /* endregion */
+  /* region Animations */
+  --animate-breathe: breathe 3s linear infinite;
+
+  @keyframes breathe {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.01);
+    }
+  }
+  /* endregion */
+  /* region Shadows */
+  --shadow-inner-sm:
+    inset 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+    inset 0 -2px 1px 0 rgba(255, 255, 255, 0.06);
+  /* endregion */
+  /* region Spacing */
+  --spacing-1\/6: calc(100% / 6);
+  /* TODO: Custom ring width 6? */
+  /* endregion */
+}
+
+@source "./lib/**/*";
+
+/* region Custom Variants */
+@custom-variant transparency-reduce {
+  @media (prefers-reduced-transparency) {
+    /*noinspection CssInvalidAtRule*/
+    @slot;
+  }
+
+  &:where([data-transparency="reduce"], [data-transparency="reduce"] *) {
+    /*noinspection CssInvalidAtRule*/
+    @slot;
+  }
+}
+
+@custom-variant dark {
+  @media (prefers-color-scheme: dark) {
+    /*noinspection CssInvalidAtRule*/
+    @slot;
+  }
+
+  &:where([data-color-scheme="dark"], [data-color-scheme="dark"] *) {
+    /*noinspection CssInvalidAtRule*/
+    @slot;
+  }
+}
+/* endregion */
+
+/* region ByteMD */
+div.bytemd {
+  @apply w-full rounded-md dark:border-gray-700 dark:bg-black dark:text-gray-200;
+
+  & .bytemd-toolbar {
+    @apply rounded-t-md dark:border-gray-700 dark:bg-gray-900;
+  }
+
+  & .bytemd-status {
+    @apply dark:border-gray-700 dark:bg-gray-900;
+  }
+
+  & .CodeMirror {
+    @apply dark:bg-black dark:text-gray-300;
+  }
+
+  & .bytemd-toolbar-tab-active {
+    @apply text-blue-500;
+  }
+}
+
+/* endregion */
+
+/* region Markdown */
+div.markdown-body {
+  @apply leading-relaxed text-gray-900 dark:text-gray-200;
+
+  & p {
+    @apply text-base;
+
+    & + p {
+      @apply mb-1 mt-2;
+    }
+  }
+
+  & h1,
+  & h2,
+  & h3,
+  & h4 {
+    @apply mb-1 mt-2 font-bold;
+  }
+
+  & h1 {
+    @apply text-2xl;
+  }
+
+  & h2 {
+    @apply text-xl;
+  }
+
+  & h3 {
+    @apply text-lg;
+  }
+
+  & h4 {
+    @apply text-base;
+  }
+
+  & h5 {
+    @apply text-sm;
+  }
+
+  & h6 {
+    @apply text-sm font-bold;
+  }
+
+  & blockquote {
+    @apply my-2 border-l-4 border-blue-50 bg-blue-50/50 px-4 py-2;
+
+    & small {
+      display: inline-block;
+      margin: 0.8em 0 0.8em 1.5em;
+      font-size: 0.9em;
+      opacity: 0.8;
+    }
+
+    /* Quotation marks */
+
+    & small:before {
+      content: "\2014 \00A0";
+    }
+
+    & cite {
+      font-weight: bold;
+    }
+
+    & cite a {
+      font-weight: normal;
+    }
+  }
+}
+
+/* endregion */

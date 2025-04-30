@@ -4,7 +4,7 @@
   import relativeTime from 'dayjs/plugin/relativeTime';
   import ReactionButton from '$lib/components/Comments/ReactionButton.svelte';
   import { Icon } from '@colibri-hq/ui';
-  import { EmojiPicker, { type EmojiPickerInputEvent } } from '@colibri-hq/ui';
+  import { EmojiPicker } from '@colibri-hq/ui';
   import { page } from '$app/state';
   import type { CommentWithUserAndReactions } from '@colibri-hq/sdk';
 
@@ -12,8 +12,11 @@
 
   interface Props {
     comment: CommentWithUserAndReactions;
-    onReaction?: (event: { commentId: string; emoji: string; }) => unknown;
-    onReactionRemoved?: (event: { commentId: string; emoji: string; }) => unknown;
+    onReaction?: (event: { commentId: string; emoji: string }) => unknown;
+    onReactionRemoved?: (event: {
+      commentId: string;
+      emoji: string;
+    }) => unknown;
   }
 
   let { comment, onReaction, onReactionRemoved }: Props = $props();
@@ -27,7 +30,8 @@
   );
 
   // Transform the reactions from a list to a dictionary, counting the numbers for each emoji
-  let reactions = $derived.by(() => comment.reactions.reduce<
+  let reactions = $derived.by(() =>
+    comment.reactions.reduce<
       Record<
         string,
         {
@@ -51,7 +55,7 @@
     }, {}),
   );
 
-  async function addReaction({ emoji }: EmojiPickerInputEvent) {
+  async function addReaction(emoji: string) {
     const commentId = comment.id;
 
     onReaction?.({ commentId, emoji });
@@ -80,7 +84,7 @@
   </aside>
 
   <header class="col-start-2 flex items-baseline">
-    <h3 class="font-serif font-medium leading-none">
+    <h3 class="font-serif leading-none font-medium">
       {comment.created_by?.name}
     </h3>
 
@@ -111,8 +115,8 @@
           {#snippet trigger()}
             <button
               class="flex cursor-pointer items-center rounded-full bg-gray-200 px-1
-              py-0.5 opacity-0 outline-none transition hover:ring
-              focus-visible:ring active:ring-blue-700 group-focus-within/picker:opacity-100 group-focus-within/picker:ring group-hover:opacity-100
+              py-0.5 opacity-0 transition outline-none group-focus-within/picker:opacity-100
+              group-focus-within/picker:ring group-hover:opacity-100 hover:ring focus-visible:ring active:ring-blue-700
               dark:bg-gray-800 dark:hover:bg-blue-950"
               aria-label="Add reaction"
               title="Add reaction"

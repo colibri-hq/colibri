@@ -15,6 +15,8 @@ export type ArrayTypeImpl<T> = T extends ColumnType<infer S, infer I, infer U>
 
 export type AuthenticationColorScheme = "dark" | "light" | "system";
 
+export type AuthenticationPkceChallengeMethod = "S256";
+
 export type AuthenticationUserRole = "admin" | "adult" | "child" | "guest";
 
 export type AuthenticationWebauthnTransport = "ble" | "cable" | "hybrid" | "internal" | "nfc" | "smart-card" | "usb";
@@ -94,6 +96,7 @@ export interface AuthenticationAuthorizationCode {
    * The PKCE code challenge associated with the authorization code.
    */
   challenge: string;
+  challenge_method: Generated<AuthenticationPkceChallengeMethod>;
   client_id: string;
   /**
    * Actual authorization code value.

@@ -7,7 +7,7 @@
   import { page } from '$app/stores';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import type { RouterOutputs } from '$lib/trpc/router';
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
 
   interface Props {
     open?: boolean;
@@ -102,8 +102,8 @@
   <p class="text-sm text-gray-600 dark:text-gray-400">
     Add a new OPDS catalog to Colibri. A catalog provides a way to browse and
     download books from a specific source, like a library or a bookstore. You
-    can add a catalog by providing its OPDS feed URL. Colibri will regularly fetch
-    the feed and display the books in the <em>Discover</em>
+    can add a catalog by providing its OPDS feed URL. Colibri will regularly
+    fetch the feed and display the books in the <em>Discover</em>
     section.<br />
     If you're not sure how this works, take a look at the&nbsp;<a
       class="underline"
@@ -158,7 +158,7 @@
 
   {#if error}
     <div
-      class="mt-2 rounded-lg bg-red-50 p-2 text-sm shadow-sm shadow-red-500/25 ring ring-red-200"
+      class="mt-2 rounded-lg bg-red-50 p-2 text-sm shadow-sm ring shadow-red-500/25 ring-red-200"
       transition:fade={{ delay: 50, duration: 100 }}
     >
       <strong class="text-red-700">⚠️ Could not fetch catalog</strong>

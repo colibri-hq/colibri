@@ -15,7 +15,7 @@
   </header>
 
   <ul class="grid grid-cols-3 gap-4">
-    {#each data.publishers as publisher}
+    {#each data.publishers as publisher, index (index)}
       <PublisherLink {publisher} />
     {/each}
   </ul>

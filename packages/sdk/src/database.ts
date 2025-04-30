@@ -1,18 +1,21 @@
-import { Kysely, PostgresDialect } from 'kysely';
-import { Buffer } from 'node:buffer';
-import pg from 'pg';
-import type { DB } from './schema';
-
-const { Pool } = pg;
+import { Kysely, PostgresDialect } from "kysely";
+import { Buffer } from "node:buffer";
+import { Pool } from "pg";
+import type { DB } from "./schema";
 
 export type Schema = DB;
 export type Database = Kysely<DB>;
 
 type ClientOptions = {
   certificate?: string;
-  debug?: boolean,
-  log?: (channel: string, level: string, message: string | Error, ...args: unknown[]) => unknown
-}
+  debug?: boolean;
+  log?: (
+    channel: string,
+    level: string,
+    message: string | Error,
+    ...args: unknown[]
+  ) => unknown;
+};
 
 export function initialize(
   connectionString: URL | string,
@@ -20,20 +23,21 @@ export function initialize(
 ): Database {
   const dialect = new PostgresDialect({
     pool: new Pool({
-      application_name: 'Colibri',
+      application_name: "Colibri",
       ssl: certificate
         ? {
-          rejectUnauthorized: false,
-          ca: Buffer.from(certificate, 'base64'),
-        }
+            rejectUnauthorized: false,
+            ca: Buffer.from(certificate, "base64"),
+          }
         : undefined,
       connectionString: connectionString.toString(),
-      log: debug && log
-        ? (message, error, ...args) =>
-          error instanceof Error
-            ? log('postgres', 'error', error, ...args)
-            : log('postgres', 'debug', message, ...args)
-        : undefined,
+      log:
+        debug && log
+          ? (message, error, ...args) =>
+              error instanceof Error
+                ? log("postgres", "error", error, ...args)
+                : log("postgres", "debug", message, ...args)
+          : undefined,
     }),
   });
 
@@ -41,7 +45,7 @@ export function initialize(
     log: (event) => {
       const { level } = event;
 
-      if (debug && level === 'query') {
+      if (debug && level === "query") {
         const {
           query: { sql, parameters },
           queryDurationMillis,
@@ -57,18 +61,22 @@ export function initialize(
           maximumFractionDigits: 2,
         });
 
-        log?.('kysely:query', 'debug', `${query} \x1b[2m(${duration}ms)\x1b[0m`);
+        log?.(
+          "kysely:query",
+          "debug",
+          `${query} \x1b[2m(${duration}ms)\x1b[0m`,
+        );
 
         return;
       }
 
-      if (level === 'error') {
+      if (level === "error") {
         const { error, queryDurationMillis, query } = event;
 
         log?.(
-          'kysely',
-          'error',
-          `${error}${error instanceof Error ? '\n' + error.stack : ''}`,
+          "kysely",
+          "error",
+          `${error}${error instanceof Error ? "\n" + error.stack : ""}`,
           {
             query,
             duration: queryDurationMillis,

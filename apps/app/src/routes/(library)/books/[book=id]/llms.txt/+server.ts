@@ -1,6 +1,6 @@
-import { LLMS_TXT_ENABLED } from '$env/static/private';
-import { loadBook, loadCreatorsForBook, NoResultError } from '@colibri-hq/sdk';
-import { error, type RequestHandler } from '@sveltejs/kit';
+import { env } from "$env/dynamic/private";
+import { loadBook, loadCreatorsForBook, NoResultError } from "@colibri-hq/sdk";
+import { error, type RequestHandler } from "@sveltejs/kit";
 
 /**
  * This endpoint serves the llms.txt file for a book.
@@ -8,9 +8,9 @@ import { error, type RequestHandler } from '@sveltejs/kit';
  * @see https://llmstxt.org
  */
 export const GET = async function ({ params, locals: { database } }) {
-  if (!LLMS_TXT_ENABLED) {
+  if (!env.LLMS_TXT_ENABLED) {
     throw error(404, {
-      message: 'The /llms.txt feature is not enabled on this Colibri instance.',
+      message: "The /llms.txt feature is not enabled on this Colibri instance.",
     });
   }
 
@@ -26,7 +26,7 @@ export const GET = async function ({ params, locals: { database } }) {
   } catch (cause) {
     if (cause instanceof NoResultError) {
       throw error(404, {
-        message: 'Book not found',
+        message: "Book not found",
       });
     }
 
@@ -36,7 +36,7 @@ export const GET = async function ({ params, locals: { database } }) {
   return new Response(
     `# title: ${book.title}
     
-    > Written by ${creators.map((creator) => creator.name).join(' & ')}
+    > Written by ${creators.map((creator) => creator.name).join(" & ")}
 
     ${book.synopsis}
     

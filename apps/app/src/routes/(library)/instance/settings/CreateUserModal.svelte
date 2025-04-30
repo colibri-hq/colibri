@@ -130,7 +130,7 @@
         role="alert"
         transition:fly={{ duration: 200, delay: 20, y: -16 }}
         class="mt-4 flex flex-col rounded-lg bg-red-100 px-4 py-2 text-sm text-red-900 shadow-md
-        shadow-red-500/10 ring-2 ring-red-200"
+        ring-2 shadow-red-500/10 ring-red-200"
       >
         <strong class="mb-1">Something unexpected happened</strong>
         <p>The user account could not be created: {error}</p>

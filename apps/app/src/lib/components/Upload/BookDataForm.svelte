@@ -8,10 +8,13 @@
   import { Field } from '@colibri-hq/ui';
   import ImageInput from '$lib/components/Form/ImageInput.svelte';
   import PublisherInput from '$lib/components/Form/PublisherInput.svelte';
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
   import { encodeImageToBlurHash } from '@colibri-hq/shared';
   import type { FileResponse } from '$lib/workers/epub.worker';
-  import type { BlurhashRequest, BlurhashResponse } from '$lib/workers/image.worker';
+  import type {
+    BlurhashRequest,
+    BlurhashResponse,
+  } from '$lib/workers/image.worker';
   import { workerOperation } from '$lib/workers/workers';
   import { Editor } from 'bytemd';
   import 'bytemd/dist/index.css';
@@ -304,7 +307,7 @@
   </div>
 
   <footer
-    class="sticky -bottom-4 mt-8 flex w-full items-center bg-white pb-8 pt-8 md:static md:bottom-0 md:pb-0 dark:bg-gray-900"
+    class="sticky -bottom-4 mt-8 flex w-full items-center bg-white pt-8 pb-8 md:static md:bottom-0 md:pb-0 dark:bg-gray-900"
   >
     <Button disabled={loading} label="Add to library" type="submit" />
     <Button

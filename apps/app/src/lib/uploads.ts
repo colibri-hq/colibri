@@ -1,41 +1,41 @@
-import { browser } from '$app/environment';
+import { browser } from "$app/environment";
 import type {
   CancelUploadRequest,
   ResumeRequest,
   UploadRequest,
   UploadResponse,
-} from '$lib/workers/upload.worker';
-import { loadWorker, type WebWorker } from '$lib/workers/workers';
-import { generateRandomUuid } from '@colibri-hq/shared';
-import { derived, get, writable } from 'svelte/store';
+} from "$lib/workers/upload.worker";
+import { loadWorker, type WebWorker } from "$lib/workers/workers";
+import { generateRandomUuid } from "@colibri-hq/shared";
+import { derived, get, writable } from "svelte/store";
 
 export const supportedUploadFormats = [
   {
-    description: 'EPUB eBook',
+    description: "EPUB eBook",
     accept: {
-      'application/epub+zip': '.epub',
+      "application/epub+zip": ".epub",
     },
   },
   {
-    description: 'PDF Document',
+    description: "PDF Document",
     accept: {
-      'application/pdf': '.pdf',
-      'application/x-pdf': '.pdf',
+      "application/pdf": ".pdf",
+      "application/x-pdf": ".pdf",
     },
   },
   {
-    description: 'Amazon eBook',
+    description: "Amazon eBook",
     accept: {
-      'application/azw3': '.azw3',
-      'application/x-mobi8-ebook': '.azw3',
-      'application/vnd.amazon.mobi8-ebook': '.azw3',
+      "application/azw3": ".azw3",
+      "application/x-mobi8-ebook": ".azw3",
+      "application/vnd.amazon.mobi8-ebook": ".azw3",
     },
   },
   {
-    description: 'Mobipocket eBook',
+    description: "Mobipocket eBook",
     accept: {
-      'application/x-mobipocket-ebook': ['.mobi', '.prc'],
-      'application/octet-stream': ['.mobi', '.prc'],
+      "application/x-mobipocket-ebook": [".mobi", ".prc"],
+      "application/octet-stream": [".mobi", ".prc"],
     },
   },
 ] satisfies FilePickerAcceptType[];
@@ -72,13 +72,13 @@ export async function upload(items: (File | FileSystemFileHandle)[]) {
   queue.update((queued) => [...queued, ...jobs]);
   // endregion
 
-  worker.addEventListener('message', ({ data: { type, payload } }) => {
+  worker.addEventListener("message", ({ data: { type, payload } }) => {
     // TODO: Show notification or something?
-    console.log('Got worker result [upload]', { type, payload });
+    console.log("Got worker result [upload]", { type, payload });
   });
 
-  worker.addEventListener('error', (event) => {
-    console.error('Worker failed', { event });
+  worker.addEventListener("error", (event) => {
+    console.error("Worker failed", { event });
 
     const jobIds = jobs.map(({ id }) => id);
     queue.update((queued) => queued.filter(({ id }) => !jobIds.includes(id)));
@@ -96,7 +96,7 @@ export async function upload(items: (File | FileSystemFileHandle)[]) {
   // will transfer ownership of the objects in the system memory to the web worker, which can take
   // care of handling the files.
   worker.postMessage(
-    { type: 'upload', payload: { files } },
+    { type: "upload", payload: { files } },
     files.map(({ buffer }) => buffer),
   );
 }
@@ -111,12 +111,12 @@ export async function resume() {
     return;
   }
 
-  worker.addEventListener('message', ({ data: { type, payload } }) => {
-    console.log('Got worker result', { type, payload });
+  worker.addEventListener("message", ({ data: { type, payload } }) => {
+    console.log("Got worker result", { type, payload });
   });
 
   worker.postMessage({
-    type: 'resume',
+    type: "resume",
     payload: { ids },
   });
 }
@@ -124,7 +124,7 @@ export async function resume() {
 export async function promptForFiles() {
   const files = await showOpenFilePicker({
     multiple: true,
-    startIn: 'documents',
+    startIn: "documents",
     types: supportedUploadFormats,
   });
 
@@ -133,7 +133,7 @@ export async function promptForFiles() {
 
 async function loadUploadsWorker() {
   if (worker === null) {
-    const workerModule = import('$lib/workers/upload.worker?worker');
+    const workerModule = import("$lib/workers/upload.worker?worker");
 
     worker = await loadWorker<
       UploadRequest | ResumeRequest | CancelUploadRequest,
@@ -141,7 +141,7 @@ async function loadUploadsWorker() {
     >(workerModule);
 
     worker.addEventListener(
-      'message',
+      "message",
       ({
         data: {
           payload: { id, failed },
@@ -161,9 +161,9 @@ async function loadUploadsWorker() {
   return worker;
 }
 
-const key = 'colibri.uploads.queue';
+const key = "colibri.uploads.queue";
 const initialValue = browser
-  ? deserialize(localStorage.getItem(key) || '[]')
+  ? deserialize(localStorage.getItem(key) || "[]")
   : [];
 
 const queue = writable(initialValue);
@@ -176,9 +176,9 @@ if (browser) {
 
   // By listening to the storage event, we can keep the store in sync with other tabs. This way,
   // the recent emojis are shared in real-time across all open tabs.
-  window.addEventListener('storage', (event) => {
+  window.addEventListener("storage", (event) => {
     if (event.key === key) {
-      queue.set(deserialize(event.newValue || ''));
+      queue.set(deserialize(event.newValue || ""));
     }
   });
 }

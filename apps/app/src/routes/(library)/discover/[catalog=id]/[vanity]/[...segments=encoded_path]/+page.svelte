@@ -15,7 +15,7 @@
   import { encodeBreadcrumbs } from './breadcrumbs';
   import Breadcrumbs from './Breadcrumbs.svelte';
   import EntryItem from './Entry.svelte';
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
 
   const transition = { duration: 100 };
 
@@ -56,7 +56,7 @@
     <div in:fade={{ delay: 10, ...transition }} out:fade={transition}>
       <nav>
         <ul class="grid grid-cols-2 gap-4">
-          {#each feed.categories as entry}
+          {#each feed.categories as entry, index (index)}
             <li>
               <CategoryItem {entry} on:navigate={showCategory} />
             </li>
@@ -66,7 +66,7 @@
 
       <section>
         <ul class="columns-2 gap-4">
-          {#each feed.entries as entry}
+          {#each feed.entries as entry, index (index)}
             <li class="py-2">
               <EntryItem {entry} />
             </li>
@@ -75,7 +75,7 @@
 
         {#if feed.entries.length + feed.categories.length === 0}
           <div
-            class="rounded-xl bg-blue-50 p-4 text-blue-950 shadow-lg shadow-blue-500/10 ring ring-blue-100"
+            class="rounded-xl bg-blue-50 p-4 text-blue-950 shadow-lg ring shadow-blue-500/10 ring-blue-100"
           >
             <strong class="inline-flex items-center text-lg font-semibold">
               <Icon name="info" class="mr-2 text-blue-500" weight={800} />
@@ -91,7 +91,7 @@
     </div>
   {:catch error}
     <div
-      class="rounded-xl bg-red-50 p-4 text-red-950 shadow-lg shadow-red-500/10 ring ring-red-200"
+      class="rounded-xl bg-red-50 p-4 text-red-950 shadow-lg ring shadow-red-500/10 ring-red-200"
     >
       <strong class="inline-flex items-center text-lg font-semibold">
         <Icon name="error" class="mr-2 text-red-500" weight={800} />

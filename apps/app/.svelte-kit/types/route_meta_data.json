@@ -17,8 +17,16 @@
 	"/.well-known/openid-configuration": [
 		"src/routes/.well-known/openid-configuration/+server.ts"
 	],
+	"/api": [
+		"src/routes/api/+page.server.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/api/+server.ts"
+	],
 	"/api/docs": [
 		"src/routes/+layout.server.ts"
+	],
+	"/api/health": [
+		"src/routes/api/health/+server.ts"
 	],
 	"/api/ingest": [
 		"src/routes/api/ingest/+server.ts"

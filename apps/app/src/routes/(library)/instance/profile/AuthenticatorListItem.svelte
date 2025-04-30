@@ -34,7 +34,6 @@
     nameInput?.focus({ preventScroll: true });
     nameInput?.select();
   }
-
 </script>
 
 <div
@@ -59,7 +58,7 @@
           {disabled}
           value={authenticator.handle}
           bind:this={nameInput}
-          class="-mx-0.5 w-full rounded border-none bg-transparent px-0.5 py-0 focus:outline-0 focus:ring-2"
+          class="-mx-0.5 w-full rounded border-none bg-transparent px-0.5 py-0 focus:ring-2 focus:outline-0"
         />
       {/if}
     </div>
@@ -80,7 +79,7 @@
     <Button
       variant="subtle"
       size="small"
-      class="ml-auto mt-1 leading-none lg:mt-0"
+      class="mt-1 ml-auto leading-none lg:mt-0"
       onClick={remove}
       {disabled}
     >

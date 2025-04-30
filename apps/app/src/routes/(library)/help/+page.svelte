@@ -3,17 +3,15 @@
 </script>
 
 <ContentSection padding>
-  <header class="flex flex-col gap-2 mb-8">
-    <h1 class="text-6xl font-serif font-bold">
-      Help Center
-    </h1>
+  <header class="mb-8 flex flex-col gap-2">
+    <h1 class="font-serif text-6xl font-bold">Help Center</h1>
 
-    <strong class="font-medium font-serif text-2xl">Learn how to use Colibri, and what it can do for you</strong>
+    <strong class="font-serif text-2xl font-medium"
+      >Learn how to use Colibri, and what it can do for you</strong
+    >
   </header>
 
-  <div class="leading-relaxed text-lg max-w-5xl flex flex-col gap-2">
-    <p>
-      TODO: Write a gentle introduction to Calibri.
-    </p>
+  <div class="flex max-w-5xl flex-col gap-2 text-lg leading-relaxed">
+    <p>TODO: Write a gentle introduction to Calibri.</p>
   </div>
 </ContentSection>

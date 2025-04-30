@@ -154,7 +154,7 @@
 <section {...$$restProps} class={className}>
   <div class="relative flex flex-col pb-6">
     <ol class="flex items-center justify-between space-x-2">
-      {#each digits as digit, index}
+      {#each digits as digit, index (index)}
         {#if separator && index === Math.floor(amount / 2)}
           <li class="contents select-none">
             <slot name="separator">
@@ -189,8 +189,8 @@
 
     {#if error}
       <span
-        class="absolute -bottom-0 left-0 w-full max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap
-        text-sm text-red-600"
+        class="absolute -bottom-0 left-0 w-full max-w-full overflow-hidden text-sm overflow-ellipsis
+        whitespace-nowrap text-red-600"
       >
         {error}
       </span>

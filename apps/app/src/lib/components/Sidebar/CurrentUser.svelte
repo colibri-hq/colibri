@@ -13,7 +13,12 @@
     [key: string]: unknown;
   }
 
-  let { email, name = $bindable(), class: className, ...rest }: Props = $props();
+  let {
+    email,
+    name = $bindable(),
+    class: className,
+    ...rest
+  }: Props = $props();
 
   async function logout() {
     await fetch('/auth/logout', {
@@ -34,16 +39,19 @@
 
 <div
   {...rest}
-  class="{className} flex w-full items-center justify-center sm:justify-start gap-2 select-none"
+  class="{className} flex w-full items-center justify-center gap-2 select-none sm:justify-start"
 >
   <a
     class="flex grow items-center justify-center gap-4
    rounded-md outline-0 focus-visible:ring-2 md:justify-start"
     href="/instance/profile"
   >
-    <Gravatar class="overflow-hidden rounded-full ring ring-gray-300 shadow-md" {email} />
+    <Gravatar
+      class="overflow-hidden rounded-full shadow-md ring ring-gray-300"
+      {email}
+    />
     <span
-      class="hidden max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap font-bold sm:inline"
+      class="hidden max-w-full overflow-hidden font-bold overflow-ellipsis whitespace-nowrap sm:inline"
     >
       {name}
     </span>

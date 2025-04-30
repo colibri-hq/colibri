@@ -1,18 +1,18 @@
-import { goto } from '$app/navigation';
+import { goto } from "$app/navigation";
 import {
   browserSupportsWebAuthnAutofill,
   startAuthentication,
-} from '@simplewebauthn/browser';
+} from "@simplewebauthn/browser";
 import type {
   AuthenticationResponseJSON,
   PublicKeyCredentialRequestOptionsJSON,
-} from '@simplewebauthn/types';
-import type { VerificationResponse } from '../assertion/verify/+server';
+} from "@simplewebauthn/types";
+import type { VerificationResponse } from "../assertion/verify/+server";
 
 export async function ceremony(fetch: Fetch) {
   if (!(await browserSupportsWebAuthnAutofill())) {
     throw new Error(
-      'Passkeys are not available in this browser. Please sign in using a one-time code instead.',
+      "Passkeys are not available in this browser. Please sign in using a one-time code instead.",
     );
   }
 
@@ -35,8 +35,8 @@ export async function ceremony(fetch: Fetch) {
     });
 
     throw new Error(
-      'Uh-oh, Something went wrong while signing you in. ' +
-        'Please try again or continue with your email address.',
+      "Uh-oh, Something went wrong while signing you in. " +
+        "Please try again or continue with your email address.",
       { cause },
     );
   }
@@ -57,8 +57,8 @@ export async function ceremony(fetch: Fetch) {
     });
 
     throw new Error(
-      'Uh-oh, Something went wrong while signing you in. ' +
-        'Please try again or continue with your email address.',
+      "Uh-oh, Something went wrong while signing you in. " +
+        "Please try again or continue with your email address.",
       { cause },
     );
   }
@@ -71,8 +71,8 @@ async function requestAssertion(fetch: Fetch) {
   let assertionOptions: PublicKeyCredentialRequestOptionsJSON;
 
   try {
-    assertionOptionsResponse = await fetch('/auth/assertion/generate', {
-      headers: { accept: 'application/json' },
+    assertionOptionsResponse = await fetch("/auth/assertion/generate", {
+      headers: { accept: "application/json" },
     });
 
     assertionOptions = await assertionOptionsResponse.json();
@@ -91,9 +91,9 @@ async function verifyAssertion(
   fetch: Fetch,
   assertion: AuthenticationResponseJSON,
 ) {
-  const verificationResponse = await fetch('/auth/assertion/verify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  const verificationResponse = await fetch("/auth/assertion/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(assertion),
   });
 
@@ -101,12 +101,12 @@ async function verifyAssertion(
 
   if (!data) {
     throw new Error(
-      'Verification failed: Unexpected payload: No verification data',
+      "Verification failed: Unexpected payload: No verification data",
     );
   }
 
   if (!data.verified) {
-    throw new Error('Verification failed: Unexpected state');
+    throw new Error("Verification failed: Unexpected state");
   }
 
   return data.destination;

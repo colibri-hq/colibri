@@ -24,7 +24,7 @@
     {@render children?.()}
 
     <ul class="mt-2 flex flex-col">
-      {#each scopes as scope}
+      {#each scopes as scope, index (index)}
         <li class="flex items-center justify-between">
           <strong class="text-sm">{scope.description ?? ''}</strong>
 
@@ -50,11 +50,7 @@
     </ul>
 
     <div class="mt-4 flex items-center justify-end">
-      <Button
-        class="order-2"
-        formaction="?/grantConsent"
-        type="submit"
-      >
+      <Button class="order-2" formaction="?/grantConsent" type="submit">
         Allow
       </Button>
       <Button

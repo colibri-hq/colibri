@@ -1,1 +1,1 @@
-export { default as QrCode } from './QrCode.svelte';
+export { default as QrCode } from "./QrCode.svelte";

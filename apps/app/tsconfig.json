@@ -1,26 +1,38 @@
 {
   "extends": "./.svelte-kit/tsconfig.json",
+  "buildOptions": {
+    "incremental": true
+  },
   "compilerOptions": {
-    "allowJs": true,
-    "checkJs": true,
+    "allowJs": false,
     "esModuleInterop": false,
+    "exactOptionalPropertyTypes": false,
     "forceConsistentCasingInFileNames": true,
-    "verbatimModuleSyntax": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "sourceMap": true,
     "strict": true,
-    "exactOptionalPropertyTypes": false,
-    "moduleResolution": "bundler",
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable"
-    ]
-  }
-  // Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
-  // except $lib which is handled by https://kit.svelte.dev/docs/configuration#files
-  //
-  // If you want to overwrite includes/excludes, make sure to copy over the relevant includes/excludes
-  // from the referenced tsconfig.json - TypeScript does not merge them in
+    "tsBuildInfoFile": ".cache/tsbuildinfo.json",
+    "verbatimModuleSyntax": true
+  },
+  "include": [
+    "ambient.d.ts",
+    "non-ambient.d.ts",
+    "./.svelte-kit/types/**/$types.d.ts",
+    "./vite.config.ts",
+    "./src/**/*.ts",
+    "./src/**/*.svelte",
+    "./tests/**/*.ts",
+    "./tests/**/*.svelte",
+
+    // This is a workaround since TypeScript does not pick up dot files by default
+    "./src/routes/.well-known/**/*.ts",
+    "./src/routes/.well-known/**/*.svelte"
+  ],
+  "exclude": [
+    "./node_modules/**",
+    "./src/service-worker.ts",
+    "./src/service-worker/**/*.ts",
+    "./src/service-worker.d.ts",
+    "./src/service-worker/**/*.d.ts"
+  ]
 }

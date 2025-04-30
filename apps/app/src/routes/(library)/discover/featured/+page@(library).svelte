@@ -34,7 +34,7 @@
         <p>Loading…</p>
       {:then books}
         <ul class="grid grid-cols-4 gap-4">
-          {#each books as book}
+          {#each books as book, index (index)}
             <li
               class="flex flex-col items-center justify-between rounded-lg bg-white p-4 shadow-md"
             >

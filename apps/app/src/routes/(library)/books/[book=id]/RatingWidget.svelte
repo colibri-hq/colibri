@@ -12,7 +12,7 @@
     onView?: () => unknown;
     onRating?: (rating: number) => unknown;
 
-    [key: string]: any;
+    [key: string]: unknown;
   }
 
   let {
@@ -65,7 +65,7 @@
 {:then { user, average }}
   <div
     class="group mt-2 flex max-w-max items-center
-    rounded-full py-1 pl-2 pr-1 transition focus-within:bg-gray-100 hover:bg-gray-100
+    rounded-full py-1 pr-1 pl-2 transition focus-within:bg-gray-100 hover:bg-gray-100
     dark:focus-within:bg-gray-900 dark:hover:bg-gray-900 {className}"
     {...rest}
   >
@@ -79,9 +79,9 @@
 
     <button
       class="ml-2 -translate-x-2 rounded-full bg-gray-200 px-3 py-0.5 text-gray-600
-      opacity-0 shadow-sm outline-none transition hover:bg-gray-300
-      focus-visible:bg-gray-300 focus-visible:ring focus-visible:ring-gray-500 group-focus-within:translate-x-0
-      group-focus-within:opacity-100 group-hover:translate-x-0 group-hover:opacity-100
+      opacity-0 shadow-sm transition outline-none group-focus-within:translate-x-0
+      group-focus-within:opacity-100 group-hover:translate-x-0 group-hover:opacity-100 hover:bg-gray-300
+      focus-visible:bg-gray-300 focus-visible:ring focus-visible:ring-gray-500
       dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/75 dark:hover:text-gray-300
       dark:focus-visible:bg-gray-700 dark:focus-visible:text-gray-300"
       onclick={viewAll}

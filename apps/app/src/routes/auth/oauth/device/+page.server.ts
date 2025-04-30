@@ -1,6 +1,6 @@
-import { APP_SECRET_KEY, OAUTH_CONSENT_TTL } from '$env/static/private';
-import { getJwtCookie, verifyToken } from '$lib/server/auth';
-import { storePreviousLocation } from '$lib/server/utilities';
+import { env } from "$env/dynamic/private";
+import { getJwtCookie, verifyToken } from "$lib/server/auth";
+import { storePreviousLocation } from "$lib/server/utilities";
 import {
   type Database,
   findUserByIdentifier,
@@ -9,22 +9,22 @@ import {
   loadClientWithScopes,
   loadDeviceChallengeByUserCode,
   loadUserConsent,
-} from '@colibri-hq/sdk';
-import { signPayload, verifySignedPayload } from '@colibri-hq/shared';
-import { type Cookies, error, fail, redirect } from '@sveltejs/kit';
-import { z } from 'zod';
-import type { Actions } from './$types';
+} from "@colibri-hq/sdk";
+import { signPayload, verifySignedPayload } from "@colibri-hq/shared";
+import { type Cookies, error, fail, redirect } from "@sveltejs/kit";
+import { z } from "zod";
+import type { Actions } from "./$types";
 
 function authenticate(database: Database, url: URL, cookies: Cookies) {
   try {
-    const token = getJwtCookie(cookies) || '';
+    const token = getJwtCookie(cookies) || "";
     const { sub } = verifyToken(token);
 
     return findUserByIdentifier(database, sub as string);
   } catch {
     storePreviousLocation(cookies, url);
     const target = new URL(url);
-    target.pathname = '/auth/login';
+    target.pathname = "/auth/login";
 
     throw redirect(303, target);
   }
@@ -51,14 +51,14 @@ export const actions = {
       .object({
         user_code: z
           .string({
-            required_error: 'Code is missing',
-            invalid_type_error: 'Code is invalid',
+            required_error: "Code is missing",
+            invalid_type_error: "Code is invalid",
           })
           .regex(/[A-Z0-9]{3}-?[A-Z0-9]{3}/, {
-            message: 'Code is invalid',
+            message: "Code is invalid",
           })
           .toLowerCase()
-          .transform((value) => value.replace('-', '')),
+          .transform((value) => value.replace("-", "")),
       })
       .safeParse(payload);
 
@@ -78,7 +78,7 @@ export const actions = {
     } catch {
       return fail(400, {
         errors: {
-          user_code: ['The device code is invalid or unknown.'],
+          user_code: ["The device code is invalid or unknown."],
         },
       });
     }
@@ -105,7 +105,7 @@ export const actions = {
       return fail(400, {
         errors: {
           consent: [
-            'The application is currently suspended and cannot be connected.',
+            "The application is currently suspended and cannot be connected.",
           ],
         },
       });
@@ -125,11 +125,11 @@ export const actions = {
         userCode,
         deviceChallenge: deviceChallenge.id,
       },
-      APP_SECRET_KEY,
+      env.APP_SECRET_KEY,
     );
-    cookies.set('device', `${nonce}.${signature}`, {
+    cookies.set("device", `${nonce}.${signature}`, {
       path: url.pathname,
-      sameSite: 'strict',
+      sameSite: "strict",
       httpOnly: true,
     });
 
@@ -162,18 +162,18 @@ export const actions = {
       });
     }
 
-    const device = cookies.get('device');
+    const device = cookies.get("device");
 
     if (!device) {
-      throw error(400, 'The device code is missing');
+      throw error(400, "The device code is missing");
     }
 
-    const [nonce, signature] = device.split('.');
+    const [nonce, signature] = device.split(".");
     const { userCode, deviceChallenge } = validated.data;
 
     await verifySignedPayload(
       { userCode, deviceChallenge, signature, nonce },
-      APP_SECRET_KEY,
+      env.APP_SECRET_KEY,
     );
     await database.transaction().execute(async (trx) => {
       const { client_id, scopes } = await invalidateDeviceChallenge(
@@ -187,7 +187,7 @@ export const actions = {
         client_id,
         user.id,
         scopes ?? [],
-        Number(OAUTH_CONSENT_TTL ?? 604_800),
+        Number(env.OAUTH_CONSENT_TTL ?? 604_800),
       );
     });
 
@@ -215,18 +215,18 @@ export const actions = {
       });
     }
 
-    const device = cookies.get('device');
+    const device = cookies.get("device");
 
     if (!device) {
-      throw error(400, 'The device code is missing.');
+      throw error(400, "The device code is missing.");
     }
 
-    const [nonce, signature] = device.split('.');
+    const [nonce, signature] = device.split(".");
     const { userCode, deviceChallenge } = validated.data;
 
     await verifySignedPayload(
       { userCode, deviceChallenge, signature, nonce },
-      APP_SECRET_KEY,
+      env.APP_SECRET_KEY,
     );
     await invalidateDeviceChallenge(database, deviceChallenge, false);
 

@@ -23,18 +23,19 @@
 
 <svelte:body use:theme />
 
-
-<div class="grid grid-cols-12 min-h-screen">
+<div class="grid min-h-screen grid-cols-12">
   <Sidebar
-    class="col-span-2 sm:col-span-4 lg:col-span-3 xl:col-span-2 h-full max-h-screen"
+    class="col-span-2 h-full max-h-screen sm:col-span-4 lg:col-span-3 xl:col-span-2"
     collections={data.collections}
-    onUpload={() => uploadModalOpen = true}
+    onUpload={() => (uploadModalOpen = true)}
     user={data.user}
   />
 
-  <div class="col-span-10 sm:col-span-8 lg:col-span-9 xl:col-span-10 h-full min-h-full max-h-screen ps-0 p-2">
+  <div
+    class="col-span-10 h-full max-h-screen min-h-full p-2 ps-0 sm:col-span-8 lg:col-span-9 xl:col-span-10"
+  >
     <div
-      class="min-h-full max-h-full overflow-auto grid border rounded border-gray-200 bg-white dark:border-gray-800
+      class="grid max-h-full min-h-full overflow-auto rounded border border-gray-200 bg-white dark:border-gray-800
       dark:bg-gray-950"
     >
       <main class="contents">

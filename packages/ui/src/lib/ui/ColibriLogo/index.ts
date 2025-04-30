@@ -1,1 +1,1 @@
-export { default as ColibriLogo } from './ColibriLogo.svelte';
+export { default as ColibriLogo } from "./ColibriLogo.svelte";

@@ -63,7 +63,7 @@
   </header>
 
   <Tabs>
-    {#each tabs as { title: titleText, slug, component }}
+    {#each tabs as { title: titleText, slug, component }, index (index)}
       <Tab onActivate={updateUrl(slug)} open={initialActive === slug}>
         {#snippet title()}
           <span>{titleText}</span>

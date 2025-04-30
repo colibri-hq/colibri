@@ -1,10 +1,10 @@
+import { paginatable, paginatedResults, procedure, t } from "$lib/trpc/t";
 import {
   loadContributionsForCreator,
   loadCreator,
   loadCreators,
-} from '@colibri-hq/sdk';
-import { paginatable, paginatedResults, procedure, t } from '$lib/trpc/t';
-import { z } from 'zod';
+} from "@colibri-hq/sdk";
+import { z } from "zod";
 
 export const creators = t.router({
   list: procedure()

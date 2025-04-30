@@ -1,9 +1,6 @@
-import { env } from '$env/dynamic/private';
-import {
-  getAuthSessionIdFromCookie,
-  setJwtCookie,
-} from '$lib/server/auth';
-import { resolvePreviousLocation } from '$lib/server/utilities';
+import { env } from "$env/dynamic/private";
+import { getAuthSessionIdFromCookie, setJwtCookie } from "$lib/server/auth";
+import { resolvePreviousLocation } from "$lib/server/utilities";
 import {
   type Authenticator,
   type Database,
@@ -12,15 +9,15 @@ import {
   NoResultError,
   resolveCurrentChallenge,
   updateAuthenticator,
-} from '@colibri-hq/sdk';
-import { decodeFromBase64 } from '@colibri-hq/shared';
+} from "@colibri-hq/sdk";
+import { decodeFromBase64 } from "@colibri-hq/shared";
 import {
   type VerifiedAuthenticationResponse,
   verifyAuthenticationResponse,
-} from '@simplewebauthn/server';
-import type { AuthenticationResponseJSON } from '@simplewebauthn/types';
-import { type Cookies, error, json, type RequestHandler } from '@sveltejs/kit';
-import jwt from 'jsonwebtoken';
+} from "@simplewebauthn/server";
+import type { AuthenticationResponseJSON } from "@simplewebauthn/types";
+import { type Cookies, error, json, type RequestHandler } from "@sveltejs/kit";
+import jwt from "jsonwebtoken";
 
 export const POST = async function handler({
   url,
@@ -32,7 +29,7 @@ export const POST = async function handler({
   const sessionId = getAuthSessionIdFromCookie(cookies);
 
   if (!sessionId) {
-    throw error(401, 'Not authenticated');
+    throw error(401, "Not authenticated");
   }
   // endregion
 
@@ -81,7 +78,7 @@ export const POST = async function handler({
     authenticator = await resolveAuthenticator(database, response, userId);
   } catch (reason) {
     const { message } =
-      reason instanceof Error ? reason : { message: 'Invalid authenticator' };
+      reason instanceof Error ? reason : { message: "Invalid authenticator" };
 
     await deleteChallenges(database, sessionId);
 
@@ -101,7 +98,7 @@ export const POST = async function handler({
     );
   } catch (cause) {
     const { message } =
-      cause instanceof Error ? cause : { message: 'Failed to verify response' };
+      cause instanceof Error ? cause : { message: "Failed to verify response" };
 
     await deleteChallenges(database, sessionId);
 
@@ -129,7 +126,7 @@ export const POST = async function handler({
   // endregion
 
   // region Resolve previous URL and generate response
-  const destination = resolvePreviousLocation(cookies, url, '/');
+  const destination = resolvePreviousLocation(cookies, url, "/");
 
   return json({ verified, destination });
   // endregion
@@ -156,7 +153,7 @@ async function resolveAuthenticator(
   }
 
   if (!authenticator || authenticator.user_id !== userId) {
-    throw new Error('Authenticator is not registered with this site');
+    throw new Error("Authenticator is not registered with this site");
   }
 
   return authenticator;
@@ -202,7 +199,7 @@ function issueAccessToken(
   cookies: Cookies,
   { id: authenticator, user_id }: Authenticator,
 ) {
-  console.error('Unexpected token issue', { authenticator, user_id });
+  console.error("Unexpected token issue", { authenticator, user_id });
   // Sign the user token: We have authenticated the user successfully using the passcode, so they
   // may use this JWT to create their pass *key*.
   const token = jwt.sign({ authenticator }, env.JWT_SECRET, {

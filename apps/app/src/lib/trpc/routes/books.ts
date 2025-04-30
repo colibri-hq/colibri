@@ -1,7 +1,7 @@
-import { S3_BUCKET_ASSETS } from '$env/static/private';
-import { relatorRoles } from '$lib/parsing/contributions';
-import { generatePresignedUploadUrl } from '$lib/server/storage';
-import { procedure, t, unguardedProcedure } from '$lib/trpc/t';
+import { env } from "$env/dynamic/private";
+import { relatorRoles } from "$lib/parsing/contributions";
+import { generatePresignedUploadUrl } from "$lib/server/storage";
+import { procedure, t, unguardedProcedure } from "$lib/trpc/t";
 import {
   createBook,
   createEdition,
@@ -13,9 +13,9 @@ import {
   loadRatings,
   loadReviews,
   updateRating,
-} from '@colibri-hq/sdk';
-import { decodeFromBase64 } from '@colibri-hq/shared';
-import { z } from 'zod';
+} from "@colibri-hq/sdk";
+import { decodeFromBase64 } from "@colibri-hq/shared";
+import { z } from "zod";
 
 export const books = t.router({
   list: unguardedProcedure()
@@ -72,7 +72,7 @@ export const books = t.router({
     )
     .mutation(async ({ input: { id, ...rest }, ctx: { userId, url } }) => {
       if (!id) {
-        throw new Error('Books must not be created via the JSON API');
+        throw new Error("Books must not be created via the JSON API");
       }
       //
       // const book = await prisma.book.update({
@@ -107,7 +107,7 @@ export const books = t.router({
           mimeType: z.string().regex(/^.+\/.+/),
           size: z.number().positive(),
         }),
-        title: z.string().optional().default('Untitled Book'),
+        title: z.string().optional().default("Untitled Book"),
         sortingKey: z.string().optional(),
         synopsis: z.string().optional(),
         rating: z.number({ coerce: true }).optional(),
@@ -126,7 +126,7 @@ export const books = t.router({
       }),
     )
     .mutation(async ({ input, ctx: { userId, database } }) => {
-      console.log('Creating book', { input });
+      console.log("Creating book", { input });
 
       const checksum = input.asset.checksum;
       const existingAsset = await findAssetByChecksum(database, checksum);
@@ -136,7 +136,7 @@ export const books = t.router({
       }
 
       const assetUrlTest = await generatePresignedUploadUrl(
-        S3_BUCKET_ASSETS,
+        env.S3_BUCKET_ASSETS,
         `42-42.epub`,
         3600,
         checksum,
@@ -186,7 +186,7 @@ export const books = t.router({
         });
 
       const assetUrl = await generatePresignedUploadUrl(
-        'books',
+        "books",
         `${bookId}-${editionId}.epub`,
         3600,
         checksum,

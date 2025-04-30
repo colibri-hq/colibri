@@ -8,13 +8,9 @@
     "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "paths": {
-      "$cli/*": [
-        "./src/*"
-      ]
+      "$cli/*": ["./src/*"]
     },
     "module": "ESNext",
     "moduleResolution": "bundler",
@@ -29,9 +25,7 @@
     "tsBuildInfoFile": "node_modules/.tsbuildinfo",
     "verbatimModuleSyntax": true
   },
-  "include": [
-    "src/**/*.ts"
-  ],
+  "include": ["src/**/*.ts", "./ambient.d.ts"],
   "ts-node": {
     "esm": true
   }

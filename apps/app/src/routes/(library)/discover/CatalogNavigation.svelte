@@ -14,11 +14,11 @@
     <span class="text-sm text-gray-500">Loading catalogs…</span>
   {:then catalogs}
     <ul class="flex flex-col space-y-1">
-      {#each catalogs as catalog}
+      {#each catalogs as catalog, index (index)}
         <li>
           <a
             href="/discover/{catalog.id}/{catalog.slug}"
-            class="block rounded px-2 py-1 text-sm text-gray-700 outline-none transition
+            class="block rounded px-2 py-1 text-sm text-gray-700 transition outline-none
             hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:ring"
           >
             <span>{catalog.title}</span>

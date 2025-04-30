@@ -1,7 +1,7 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
-import type { Database } from '@colibri-hq/sdk';
-import type { CompositionEventHandler } from 'svelte/elements';
+import type { Database } from "@colibri-hq/sdk";
+import type { CompositionEventHandler } from "svelte/elements";
 
 declare global {
   namespace App {
@@ -22,7 +22,7 @@ declare global {
 
   declare namespace svelteHTML {
     interface HTMLAttributes<T> {
-      'onClickOutside'?: CompositionEventHandler<T>;
+      onClickOutside?: CompositionEventHandler<T>;
     }
   }
 

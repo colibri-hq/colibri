@@ -35,9 +35,9 @@
 
 <div
   {...rest}
-  class="relative overflow-hidden rounded bg-blue-200 dark:bg-blue-800
-  after:absolute after:left-0 after:top-0 after:z-20 after:block after:h-full
-  after:w-full after:rounded after:content-[''] {className}"
+  class="relative overflow-hidden rounded bg-blue-200 after:absolute
+  after:top-0 after:left-0 after:z-20 after:block after:h-full after:w-full
+  after:rounded after:content-[''] dark:bg-blue-800 {className}"
 >
   <img
     {alt}
@@ -53,7 +53,7 @@
     {/if}
 
     <span
-      class="absolute left-2 top-6 block select-none px-4 text-center font-serif text-xs opacity-85"
+      class="absolute top-6 left-2 block px-4 text-center font-serif text-xs opacity-85 select-none"
     >
       {title}
     </span>
@@ -61,17 +61,17 @@
 </div>
 
 <style lang="postcss">
-    div::after {
-        background: linear-gradient(
-                to right,
-                rgba(60, 13, 20, 0.2) 0.75%,
-                rgba(255, 255, 255, 0.5) 1.25%,
-                rgba(255, 255, 255, 0.25) 1.75%,
-                rgba(255, 255, 255, 0.25) 2.5%,
-                rgba(0, 0, 0, 0.05) 3%,
-                transparent 4%,
-                rgba(255, 255, 255, 0.25) 4.25%,
-                transparent 5.5%
-        );
-    }
+  div::after {
+    background: linear-gradient(
+      to right,
+      rgba(60, 13, 20, 0.2) 0.75%,
+      rgba(255, 255, 255, 0.5) 1.25%,
+      rgba(255, 255, 255, 0.25) 1.75%,
+      rgba(255, 255, 255, 0.25) 2.5%,
+      rgba(0, 0, 0, 0.05) 3%,
+      transparent 4%,
+      rgba(255, 255, 255, 0.25) 4.25%,
+      transparent 5.5%
+    );
+  }
 </style>

@@ -1,15 +1,20 @@
-import { sveltekit } from '@sveltejs/kit/vite';
-import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'vite';
-import packageJson from './package.json' with { type: 'json' };
+import { sveltekit } from "@sveltejs/kit/vite";
+import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "vite";
+import packageJson from "./package.json" with { type: "json" };
 
 const { homepage, bugs, repository } = packageJson;
 
 export default defineConfig({
-  plugins: [sveltekit(), tailwindcss()],
+  plugins: [tailwindcss(), sveltekit()],
+  build: {
+    commonjsOptions: {
+      esmExternals: ["pg-cloudflare"],
+    },
+  },
   worker: {
     plugins: () => [sveltekit()],
-    format: 'es',
+    format: "es",
   },
   define: {
     PACKAGE_REPOSITORY_URL: `"${repository.url}"`,

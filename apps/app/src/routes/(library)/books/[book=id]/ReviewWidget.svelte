@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Icon } from '@colibri-hq/ui';
+  import { Icon } from '@colibri-hq/ui';
   import type { MaybePromise } from '@colibri-hq/shared';
   import type { Review } from './+page@(library).svelte';
   import Modal from '$lib/components/Modal.svelte';
@@ -33,7 +33,7 @@
 </script>
 
 <section
-  class="rounded-3xl bg-gray-50 px-4 pb-6 pt-4 shadow-inner-sm dark:bg-gray-900"
+  class="rounded-3xl bg-gray-50 px-4 pt-4 pb-6 shadow-inner-sm dark:bg-gray-900"
 >
   <header class="mb-2 px-3">
     <h3 class="font-serif text-xl font-bold dark:text-gray-200">Reviews</h3>
@@ -44,14 +44,14 @@
   {:then reviews}
     {#if reviews.length > 0}
       <ul class="flex flex-col gap-y-2">
-        {#each reviews as review}
+        {#each reviews as review, index (index)}
           <li class="flex items-center space-x-2">
             <button
               onclick={showReview(review)}
               type="button"
               tabindex="0"
               class="group flex flex-col rounded-xl px-3
-              py-1 outline-none transition hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:ring dark:hover:bg-gray-800 dark:focus-visible:bg-gray-800"
+              py-1 transition outline-none hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:ring dark:hover:bg-gray-800 dark:focus-visible:bg-gray-800"
               aria-labelledby="review-label-{review.id}"
             >
               <!-- region Reviewer and publication -->
@@ -82,7 +82,7 @@
 
               <!-- region "Read full" button -->
               <span
-                class="ml-auto mt-1 flex items-center text-sm text-gray-500 transition group-hover:text-gray-900
+                class="mt-1 ml-auto flex items-center text-sm text-gray-500 transition group-hover:text-gray-900
                 group-focus-visible:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-200
                 dark:group-focus-visible:text-gray-200"
               >
@@ -111,7 +111,7 @@
             <MarkdownContent source={activeReview.content} />
 
             <footer
-              class="mb-4 mt-8 flex items-center justify-between text-sm text-gray-500"
+              class="mt-8 mb-4 flex items-center justify-between text-sm text-gray-500"
             >
               {#if activeReview.url}
                 <span>

@@ -1,5 +1,5 @@
-import { resolveUserId } from '$lib/server/auth';
-import type { RequestEvent } from '@sveltejs/kit';
+import { resolveUserId } from "$lib/server/auth";
+import type { RequestEvent } from "@sveltejs/kit";
 
 export async function createContext({
   cookies,
@@ -7,7 +7,7 @@ export async function createContext({
   url,
   locals: { database },
 }: RequestEvent) {
-  const userId = resolveUserId(cookies) || '';
+  const userId = resolveUserId(cookies) || "";
 
   return { userId, url, platform, database };
 }
