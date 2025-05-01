@@ -47,21 +47,22 @@
     }
   },
   "scripts": {
-    "prepack": "oclif manifest && oclif readme",
     "build": "unbuild",
     "dev": "unbuild --watch",
     "postbuild": "pnpx tsc-alias",
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "pnpm run lint",
-    "test": "vitest --config ./tsconfig.test.json",
-    "test:coverage": "vitest run --config ./tsconfig.test.json --coverage",
-    "test:ui": "vitest --config ./tsconfig.test.json --ui",
+    "test": "vitest --config tsconfig.test.json",
+    "test:coverage": "vitest run --config tsconfig.test.json --coverage",
+    "test:ui": "vitest --config tsconfig.test.json --ui",
     "version": "oclif readme && git add README.md",
     "check": "tsc --noEmit",
     "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
     "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
     "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
-    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content ."
+    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content .",
+    "prepack": "pnpm run fmt && pnpm run check && pnpm run lint && pnpm run package",
+    "package": "pnpm run build && pnpm run oclif manifest && oclif readme"
   },
   "dependencies": {
     "@colibri-hq/oauth": "workspace:*",
