@@ -1,4 +1,4 @@
-import { readFile } from "$lib/server/storage";
+import { read } from "$lib/server/storage";
 import type { RequestHandler } from "@sveltejs/kit";
 import { error, redirect } from "@sveltejs/kit";
 
@@ -37,7 +37,7 @@ const handler: RequestHandler = async function ({
 
   const path = resolveAssetPath(book, asset);
 
-  return new Response(await readFile(platform, path), {
+  return new Response(await read(platform, path), {
     status: 200,
     headers: {
       "Content-Type": asset.mediaType as string,

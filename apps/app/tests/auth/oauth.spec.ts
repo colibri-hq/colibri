@@ -1,7 +1,4 @@
-import type {
-  AuthorizationCode,
-  OAuthErrorCode,
-} from "$lib/server/auth/oauth/types";
+import type { Entities, OAuthErrorCode } from "@colibri-hq/oauth";
 import type { Database } from "@colibri-hq/sdk";
 import { storeAuthorizationCode } from "@colibri-hq/sdk";
 import { type APIResponse, expect, type Page } from "@playwright/test";
@@ -747,7 +744,7 @@ async function testAuthorizationCodeExchange(
   requestOverrides?: OverrideOption<
     ApiRequestOptions<"post">,
     AuthorizationCodeExchangeConfigContext & {
-      authCode: AuthorizationCode;
+      authCode: Entities.AuthorizationCode;
     }
   >,
 ) {
@@ -787,7 +784,12 @@ async function testAuthorizationCodeExchange(
       },
     } satisfies ApiRequestOptions<"post">,
     requestOverrides,
-    { authCode, codeVerifier, codeChallenge, code },
+    {
+      authCode: authCode as Entities.AuthorizationCode,
+      codeVerifier,
+      codeChallenge,
+      code,
+    },
   );
   const response = await request.post("/auth/oauth/token", requestOptions);
   const responseBody = await response.json();
@@ -804,7 +806,9 @@ function testAuthorizationCodeExchangeSuccess(
   >,
   requestOverrides?: OverrideOption<
     ApiRequestOptions<"post">,
-    AuthorizationCodeExchangeConfigContext & { authCode: AuthorizationCode }
+    AuthorizationCodeExchangeConfigContext & {
+      authCode: Entities.AuthorizationCode;
+    }
   >,
 ) {
   return testAuthorizationCodeExchange(
@@ -827,7 +831,9 @@ function testAuthorizationCodeExchangeFailure(
   >,
   requestOverrides?: OverrideOption<
     ApiRequestOptions<"post">,
-    AuthorizationCodeExchangeConfigContext & { authCode: AuthorizationCode }
+    AuthorizationCodeExchangeConfigContext & {
+      authCode: Entities.AuthorizationCode;
+    }
   >,
 ) {
   return testAuthorizationCodeExchange(

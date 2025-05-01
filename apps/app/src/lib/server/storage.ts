@@ -1,92 +1,50 @@
 import { env } from "$env/dynamic/private";
 import {
-  GetObjectCommand,
-  PutObjectCommand,
-  S3Client,
-} from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+  client,
+  generatePresignedDownloadUrl,
+  generatePresignedUploadUrl,
+  readFile,
+  streamFile,
+} from "@colibri-hq/sdk/storage";
 
-export function storage() {
-  return new S3Client({
+export function storage(): ReturnType<typeof client> {
+  return client({
     region: env.S3_PROTOCOL_REGION,
     endpoint: env.STORAGE_S3_URL,
-    forcePathStyle: true,
-    credentials: {
-      accessKeyId: env.S3_PROTOCOL_ACCESS_KEY_ID,
-      secretAccessKey: env.S3_PROTOCOL_ACCESS_KEY_SECRET,
-    },
+    accessKeyId: env.S3_PROTOCOL_ACCESS_KEY_ID,
+    secretAccessKey: env.S3_PROTOCOL_ACCESS_KEY_SECRET,
   });
 }
 
-export function downloadObject(bucket: string, filename: string) {
-  return storage().send(
-    new GetObjectCommand({
-      Bucket: bucket,
-      Key: filename,
-    }),
-  );
+export async function read(bucket: string, filename: string) {
+  return readFile(storage(), bucket, filename);
 }
 
-export async function readFile(
-  platform: Readonly<App.Platform> | undefined,
-  bucket: string,
-  filename: string,
-) {
-  try {
-    const response = await downloadObject(bucket, filename);
-
-    return response.Body?.transformToByteArray() ?? new Uint8Array();
-  } catch (cause) {
-    console.error({ cause });
-    throw new Error(`Failed to read file ${filename}`, { cause });
-  }
+export async function stream(bucket: string, filename: string) {
+  return streamFile(storage(), bucket, filename);
 }
 
-export async function streamFile(
-  platform: Readonly<App.Platform> | undefined,
-  bucket: string,
-  filename: string,
-) {
-  try {
-    const response = await downloadObject(bucket, filename);
-
-    return response.Body?.transformToWebStream() ?? new ReadableStream();
-  } catch (cause) {
-    console.error({ cause });
-    throw new Error(`Failed to read file ${filename}`, { cause });
-  }
-}
-
-export async function generatePresignedDownloadUrl(
+export async function downloadUrl(
   bucket: string,
   filename: string,
   expiresIn: number = 3600,
 ) {
-  const command = new GetObjectCommand({
-    Bucket: bucket,
-    Key: filename,
-  });
-  return await getSignedUrl(storage(), command, {
-    expiresIn,
-  });
+  return generatePresignedDownloadUrl(storage(), bucket, filename, expiresIn);
 }
 
-export async function generatePresignedUploadUrl(
+export async function uploadUrl(
   bucket: string,
   filename: string,
   expiresIn: number = 3600,
-  checksum: Buffer | ArrayBufferLike,
+  checksum: Buffer | Uint8Array | ArrayBufferLike,
   metadata?: Record<string, string>,
 ) {
-  const command = new PutObjectCommand({
-    Bucket: bucket,
-    Key: filename,
-    Expires: new Date(Date.now() + expiresIn * 1_000),
-    // ChecksumSHA256: encodeToBase64(checksum),
-    // Metadata: { ...metadata },
-  });
-
-  return await getSignedUrl(storage(), command, {
+  return generatePresignedUploadUrl(
+    storage(),
+    bucket,
+    filename,
     expiresIn,
-  });
+    checksum,
+    metadata,
+  );
 }

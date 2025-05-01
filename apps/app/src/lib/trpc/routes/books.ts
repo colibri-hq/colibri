@@ -1,6 +1,6 @@
 import { env } from "$env/dynamic/private";
 import { relatorRoles } from "$lib/parsing/contributions";
-import { generatePresignedUploadUrl } from "$lib/server/storage";
+import { uploadUrl } from "$lib/server/storage";
 import { procedure, t, unguardedProcedure } from "$lib/trpc/t";
 import {
   createBook,
@@ -135,7 +135,7 @@ export const books = t.router({
         return null;
       }
 
-      const assetUrlTest = await generatePresignedUploadUrl(
+      const assetUrlTest = await uploadUrl(
         env.S3_BUCKET_ASSETS,
         `42-42.epub`,
         3600,
@@ -185,7 +185,7 @@ export const books = t.router({
           return { bookId, editionId };
         });
 
-      const assetUrl = await generatePresignedUploadUrl(
+      const assetUrl = await uploadUrl(
         "books",
         `${bookId}-${editionId}.epub`,
         3600,

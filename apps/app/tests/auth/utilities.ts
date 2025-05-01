@@ -1,5 +1,5 @@
 import { log } from "$lib/logging";
-import type { MaybePromise } from "@sveltejs/kit";
+import type { MaybePromise } from "@colibri-hq/shared";
 import { createHash } from "node:crypto";
 import { createServer, type IncomingMessage, type Server } from "node:http";
 import { Readable } from "node:stream";

@@ -139,7 +139,6 @@ export async function loadSharedWorker<
 >(module: Promise<SharedWorkerModule<I, O>>): Promise<SharedWebWorker<I, O>> {
   const Worker = await module;
 
-   
   console.debug(
     "Loading shared worker… To inspect the worker, open the developer tools from " +
       "chrome://inspect/#workers",

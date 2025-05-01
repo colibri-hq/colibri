@@ -1,5 +1,5 @@
 import { env } from "$env/dynamic/private";
-import { streamFile } from "$lib/server/storage";
+import { stream } from "$lib/server/storage";
 import { error, redirect, type RequestHandler } from "@sveltejs/kit";
 
 export const GET = async function ({
@@ -7,7 +7,6 @@ export const GET = async function ({
   request,
   url,
   locals: { database },
-  platform,
 }) {
   const edition = url.searchParams.get("edition");
   const id = params.book;
@@ -54,11 +53,7 @@ export const GET = async function ({
   }
 
   return new Response(
-    await streamFile(
-      platform,
-      env.S3_BUCKET_COVERS,
-      `${cover.id}/${cover.filename}`,
-    ),
+    await stream(env.S3_BUCKET_COVERS, `${cover.id}/${cover.filename}`),
     {
       status: 200,
       headers: {

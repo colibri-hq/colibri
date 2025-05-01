@@ -36,6 +36,9 @@
     "types": "kysely-codegen --dialect postgres --env-file ../../.env --url 'env(DB_URL)' --out-file ./src/schema.d.ts --type-only-imports --default-schema public --exclude-pattern \"auth.*\" --include-pattern \"(public|authentication).*\""
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.800.0",
+    "@aws-sdk/lib-storage": "^3.800.0",
+    "@aws-sdk/s3-request-presigner": "^3.800.0",
     "@colibri-hq/oauth": "workspace:*",
     "@colibri-hq/shared": "workspace:*",
     "jsonwebtoken": "catalog:",
@@ -69,6 +72,10 @@
     "./oauth": {
       "import": "./dist/oauth/index.js",
       "types": "./dist/oauth/index.d.ts"
+    },
+    "./storage": {
+      "import": "./dist/storage/index.js",
+      "types": "./dist/storage/index.d.ts"
     }
   },
   "sideEffects": false,
