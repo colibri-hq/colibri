@@ -1,12 +1,12 @@
 import js from '@eslint/js';
-import svelte from 'eslint-plugin-svelte';
 import type { Config as SvelteConfig } from '@sveltejs/kit';
+import svelte from 'eslint-plugin-svelte';
 import ts, { type ConfigArray } from 'typescript-eslint';
 // import tailwind from 'eslint-plugin-tailwindcss';
-import oxlint from 'eslint-plugin-oxlint';
-import prettier from 'eslint-config-prettier/flat';
-import globals from 'globals';
 import type { Linter } from 'eslint';
+import prettier from 'eslint-config-prettier/flat';
+import oxlint from 'eslint-plugin-oxlint';
+import globals from 'globals';
 
 export function config(
   {
@@ -15,7 +15,7 @@ export function config(
     ignores = [],
   }: {
     tsconfigRootDir?: string;
-    svelteConfig?: SvelteConfig;
+    svelteConfig?: Partial<SvelteConfig>;
     ignores?: string[];
   } = {},
   ...additionalConfigs: Linter.Config[]
@@ -177,7 +177,9 @@ export function config(
     // endregion
 
     ...additionalConfigs,
-    ...oxlint.buildFromOxlintConfigFile(`${import.meta.dirname}/.oxlintrc.json`),
+    ...oxlint.buildFromOxlintConfigFile(
+      `${import.meta.dirname}/.oxlintrc.json`,
+    ),
   ]);
 }
 

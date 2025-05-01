@@ -1,9 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "typescript",
-    "unicorn"
-  ],
+  "plugins": ["typescript", "unicorn"],
   "categories": {
     "correctness": "off"
   },
@@ -949,50 +946,34 @@
   },
   "overrides": [
     {
-      "files": [
-        "*.svelte",
-        "**/*.svelte"
-      ],
+      "files": ["*.svelte", "**/*.svelte"],
       "rules": {
         "no-inner-declarations": "off",
         "no-self-assign": "off"
       }
     },
     {
-      "files": [
-        "*.svelte",
-        "**/*.svelte"
-      ],
+      "files": ["*.svelte", "**/*.svelte"],
       "rules": {
         "no-inner-declarations": "off",
         "no-self-assign": "off"
       }
     },
     {
-      "files": [
-        "**/*.cjs"
-      ],
+      "files": ["**/*.cjs"],
       "rules": {
         "@typescript-eslint/no-require-imports": "off"
       }
     },
     {
-      "files": [
-        "tests/**/*.ts",
-        "src/**/*.test.ts",
-        "src/**/*.spec.ts"
-      ],
+      "files": ["tests/**/*.ts", "src/**/*.test.ts", "src/**/*.spec.ts"],
       "env": {
         "commonjs": true,
         "node": true
       }
     },
     {
-      "files": [
-        "src/**/*.ts",
-        "tests/**/*.ts",
-        "src/**/*.svelte"
-      ],
+      "files": ["src/**/*.ts", "tests/**/*.ts", "src/**/*.svelte"],
       "rules": {
         "no-unused-vars": [
           "warn",
@@ -1007,18 +988,13 @@
       }
     },
     {
-      "files": [
-        "src/**/*.ts"
-      ],
+      "files": ["src/**/*.ts"],
       "rules": {
         "no-console": "warn"
       }
     },
     {
-      "files": [
-        "src/lib/server/**/*.ts",
-        "**/*.server.ts"
-      ],
+      "files": ["src/lib/server/**/*.ts", "**/*.server.ts"],
       "rules": {
         "no-console": "off"
       },
@@ -1029,9 +1005,7 @@
       }
     },
     {
-      "files": [
-        "src/**/*.svelte"
-      ],
+      "files": ["src/**/*.svelte"],
       "env": {
         "browser": true
       }
