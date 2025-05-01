@@ -1,6 +1,6 @@
 import type { Linter } from "eslint";
 import oclif from "eslint-config-oclif";
-import prettier from "eslint-config-prettier";
+import prettier from "eslint-config-prettier/flat";
 
 export default [
   {

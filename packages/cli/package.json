@@ -57,6 +57,7 @@
     "test:coverage": "vitest run --config ./tsconfig.test.json --coverage",
     "test:ui": "vitest --config ./tsconfig.test.json --ui",
     "version": "oclif readme && git add README.md",
+    "check": "tsc --noEmit",
     "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
     "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
     "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",

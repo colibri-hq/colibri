@@ -37,7 +37,8 @@
     "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
     "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
     "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
-    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content ."
+    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content .",
+    "prepack": "pnpm run fmt && pnpm run check && pnpm run lint && pnpm run build"
   },
   "dependencies": {
     "blurhash": "^2.0.5"
@@ -54,10 +55,30 @@
     "eslint-plugin-svelte": "^3.5.1",
     "globals": "catalog:",
     "oxlint": "^0.16.8",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "prettier-plugin-svelte": "^3.3.3",
+    "prettier-plugin-tailwindcss": "^0.6.11",
     "rimraf": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@sveltejs/kit": "^2.20.8",
+    "eslint": "^9.25.1",
+    "prettier": "^3.5.3"
+  },
+  "peerDependenciesMeta": {
+    "@sveltejs/kit": {
+      "optional": true
+    },
+    "prettier": {
+      "optional": true
+    },
+    "eslint": {
+      "optional": true
+    }
   },
   "module": "dist/index.js",
   "exports": {
@@ -66,7 +87,8 @@
       "types": "./dist/index.d.ts"
     },
     "./prettier.config": {
-      "default": "./prettier.config.js",
+      "import": "./prettier.config.ts",
+      "default": "./prettier.config.ts",
       "types": "./config.d.ts"
     },
     "./eslint.config": {
