@@ -27,9 +27,9 @@
   },
   "packageManager": "pnpm@10.6.5",
   "scripts": {
-    "build": "unbuild",
-    "dev": "unbuild --watch",
-    "prepack": "unbuild",
+    "build": "rimraf dist; tsc",
+    "dev": "tsc --watch",
+    "check": "tsc --noEmit",
     "test": "vitest",
     "test:coverage": "vitest run --config ./tsconfig.test.json --coverage",
     "test:ui": "vitest --config ./tsconfig.test.json --ui",
@@ -56,9 +56,9 @@
     "fastify": "^5.3.2",
     "msw": "^2.7.5",
     "prettier": "catalog:",
+    "rimraf": "catalog:",
     "supertest": "^7.1.0",
     "typescript": "catalog:",
-    "unbuild": "catalog:",
     "vitest": "catalog:"
   },
   "module": "dist/index.js",

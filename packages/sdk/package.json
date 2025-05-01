@@ -27,7 +27,7 @@
   },
   "packageManager": "pnpm@10.6.5",
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf dist; tsc",
     "dev": "tsc --watch",
     "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
     "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
@@ -41,6 +41,7 @@
     "jsonwebtoken": "catalog:",
     "kysely": "^0.27.6",
     "pg": "^8.15.6",
+    "typescript": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -52,6 +53,8 @@
     "kanel-kysely": "^0.7.1",
     "kysely-codegen": "^0.18.3",
     "prettier": "catalog:"
+    "prettier": "catalog:",
+    "rimraf": "catalog:",
   },
   "module": "dist/index.js",
   "exports": {

@@ -28,9 +28,9 @@
   },
   "packageManager": "pnpm@10.6.5",
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf dist; tsc",
     "dev": "tsc --watch",
-    "prepack": "unbuild",
+    "check": "tsc --noEmit",
     "test": "vitest --config ./tsconfig.test.json",
     "test:coverage": "vitest run --config ./tsconfig.test.json --coverage",
     "test:ui": "vitest --config ./tsconfig.test.json --ui",
@@ -54,6 +54,8 @@
     "eslint-plugin-svelte": "^3.5.1",
     "globals": "catalog:",
     "oxlint": "^0.16.8",
+    "rimraf": "catalog:",
+    "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vitest": "catalog:"
   },
