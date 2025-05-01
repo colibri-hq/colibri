@@ -85,8 +85,8 @@ catalogs:
       specifier: ^3.1.0
       version: 3.1.0
     tailwindcss:
-      specifier: ^4.0.15
-      version: 4.0.17
+      specifier: ^4.1.5
+      version: 4.1.5
     typescript:
       specifier: ^5.8.3
       version: 5.8.3
@@ -296,7 +296,7 @@ importers:
         version: 4.1.5(picomatch@4.0.2)(svelte@5.28.2)(typescript@5.8.3)
       tailwindcss:
         specifier: 'catalog:'
-        version: 4.0.17
+        version: 4.1.5
       tslib:
         specifier: ^2.8.1
         version: 2.8.1
@@ -691,7 +691,7 @@ importers:
         version: 3.1.0
       tailwindcss:
         specifier: 'catalog:'
-        version: 4.0.17
+        version: 4.1.5
       typescript:
         specifier: 'catalog:'
         version: 5.8.3
@@ -6687,11 +6687,11 @@ packages:
   tailwind-merge@3.1.0:
     resolution: {integrity: sha512-aV27Oj8B7U/tAOMhJsSGdWqelfmudnGMdXIlMnk1JfsjwSjts6o8HyfN7SFH3EztzH4YH8kk6GbLTHzITJO39Q==}
 
-  tailwindcss@4.0.17:
-    resolution: {integrity: sha512-OErSiGzRa6rLiOvaipsDZvLMSpsBZ4ysB4f0VKGXUrjw2jfkJRd6kjRKV2+ZmTCNvwtvgdDam5D7w6WXsdLJZw==}
-
   tailwindcss@4.1.1:
     resolution: {integrity: sha512-QNbdmeS979Efzim2g/bEvfuh+fTcIdp1y7gA+sb6OYSW74rt7Cr7M78AKdf6HqWT3d5AiTb7SwTT3sLQxr4/qw==}
+
+  tailwindcss@4.1.5:
+    resolution: {integrity: sha512-nYtSPfWGDiWgCkwQG/m+aX83XCwf62sBgg3bIlNiiOcggnS1x3uVRDAuyelBFL+vJdOPPCGElxv9DjHJjRHiVA==}
 
   tapable@2.2.1:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==}
@@ -14412,9 +14412,9 @@ snapshots:
 
   tailwind-merge@3.1.0: {}
 
-  tailwindcss@4.0.17: {}
-
   tailwindcss@4.1.1: {}
+
+  tailwindcss@4.1.5: {}
 
   tapable@2.2.1: {}
 
