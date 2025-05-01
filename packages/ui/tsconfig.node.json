@@ -1,18 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "./tsconfig.base.json",
+  "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
     "composite": true,
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "tsBuildInfoFile": ".cache/tsbuildinfo.node.json",
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
-  "include": [
-    "*.config.ts",
-    "*.config.js"
-  ]
+  "include": ["*.config.ts", "*.config.js"]
 }

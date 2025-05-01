@@ -1,8 +1,23 @@
 {
-  "extends": "./tsconfig.json",
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true,
-    "types": ["vitest/globals", "node"]
+    "composite": true,
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "tsBuildInfoFile": ".cache/tsbuildinfo.test.json",
+    "types": [
+      "vitest/globals",
+      "node"
+    ]
   },
-  "include": ["test/**/*.ts", "src/**/*.ts"]
+  "include": [
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "test/**/*.ts"
+  ],
+  "exclude": []
 }

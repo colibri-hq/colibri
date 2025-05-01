@@ -1,10 +1,12 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "./.svelte-kit/tsconfig.json",
   "buildOptions": {
     "incremental": true
   },
   "compilerOptions": {
-    "allowJs": false,
+    "allowJs": true,
+    "checkJs": true,
     "esModuleInterop": false,
     "exactOptionalPropertyTypes": false,
     "forceConsistentCasingInFileNames": true,
@@ -15,8 +17,8 @@
     "verbatimModuleSyntax": true
   },
   "include": [
-    "ambient.d.ts",
-    "non-ambient.d.ts",
+    "./.svelte-kit/ambient.d.ts",
+    "./.svelte-kit/non-ambient.d.ts",
     "./.svelte-kit/types/**/$types.d.ts",
     "./vite.config.ts",
     "./src/**/*.ts",

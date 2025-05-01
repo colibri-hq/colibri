@@ -1,18 +1,20 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist",
     "lib": [
       "DOM",
+      "DOM.Iterable",
       "ESNext"
-    ]
+    ],
+    "tsBuildInfoFile": ".cache/tsbuildinfo.json"
   },
-  "include": [
-    "src/**/*.ts"
-  ],
   "exclude": [
     "src/**/*.test.ts",
     "src/**/*.spec.ts"
+  ],
+  "include": [
+    "src/**/*.ts"
   ],
   "references": [
     {

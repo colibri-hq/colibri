@@ -1,32 +1,28 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "allowJs": true,
-    "checkJs": true,
-    "declaration": true,
-    "declarationMap": true,
-    "esModuleInterop": true,
-    "exactOptionalPropertyTypes": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "lib": ["ESNext"],
-    "paths": {
-      "$cli/*": ["./src/*"]
-    },
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "noEmit": true,
-    "outDir": "./dist",
-    "resolveJsonModule": true,
-    "rootDir": "src",
-    "skipLibCheck": true,
-    "sourceMap": true,
-    "strict": true,
-    "target": "ESNext",
-    "tsBuildInfoFile": "node_modules/.tsbuildinfo",
-    "verbatimModuleSyntax": true
+    "composite": true,
+    "lib": [
+      "ESNext"
+    ],
+    "tsBuildInfoFile": ".cache/tsbuildinfo.json"
   },
-  "include": ["src/**/*.ts", "./ambient.d.ts"],
-  "ts-node": {
-    "esm": true
-  }
+  "exclude": [
+    "test/**/*",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts"
+  ],
+  "include": [
+    "src/**/*.ts",
+    "./ambient.d.ts"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.test.json"
+    }
+  ]
 }

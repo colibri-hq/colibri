@@ -6,16 +6,17 @@
     "lib": [
       "ESNext"
     ],
-    "tsBuildInfoFile": ".cache/tsbuildinfo.test.json",
+    "tsBuildInfoFile": ".cache/tsbuildinfo.node.json",
     "types": [
-      "vitest/globals",
       "node"
     ]
   },
   "include": [
-    "src/**/*.test.ts",
-    "src/**/*.spec.ts",
-    "tests/**/*.ts"
+    "*.config.ts",
+    "*.config.js",
+    "./ambient.d.ts"
   ],
-  "exclude": []
+  "ts-node": {
+    "esm": true
+  }
 }

@@ -2,8 +2,10 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
-    "allowJs": false,
-    "checkJs": false,
+    "composite": true,
+    "tsBuildInfoFile": ".cache/tsbuildinfo.json",
+    "allowJs": true,
+    "checkJs": true,
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
@@ -11,9 +13,6 @@
     "importsNotUsedAsValues": "error",
     "inlineSourceMap": true,
     "inlineSources": true,
-    "isolatedModules": true,
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
     "noUncheckedIndexedAccess": true,
     "preserveValueImports": false,
     "removeComments": false,
@@ -21,7 +20,25 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "stripInternal": true,
-    "verbatimModuleSyntax": true
-  }
+    "stripInternal": true
+  },
+  "include": [
+    "./.svelte-kit/ambient.d.ts",
+    "./.svelte-kit/non-ambient.d.ts",
+    "./.svelte-kit/types/**/$types.d.ts",
+    "./*.config.ts",
+    "./src/**/*.ts",
+    "./src/**/*.svelte",
+    "./tests/**/*.ts",
+    "./tests/**/*.svelte"
+  ],
+  "exclude": ["../node_modules/**", "src/**/*.stories.svelte"],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.storybook.json"
+    }
+  ]
 }
