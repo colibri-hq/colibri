@@ -77,7 +77,12 @@
   "sideEffects": false,
   "types": "./dist/index.d.ts",
   "files": [
-  ]
     "dist",
     "theme.css",
+    "prettier.config.ts",
+    "eslint.config.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }
