@@ -56,11 +56,10 @@
     "@browser-logos/webkit": "^1.0.10",
     "@browser-logos/yandex": "^1.0.8",
     "@colibri-hq/sdk": "workspace:*",
-    "@colibri-hq/tailwind": "workspace:*",
     "@fontsource-variable/material-symbols-outlined": "catalog:",
     "@fontsource/neuton": "catalog:",
     "@fontsource/titillium-web": "catalog:",
-    "bits-ui": "^1.4.2",
+    "bits-ui": "^1.4.3",
     "blurhash": "^2.0.5",
     "esm-env": "^1.2.2",
     "qrcode": "^1.5.4"
@@ -70,7 +69,7 @@
     "@playwright/test": "^1.52.0",
     "@storybook/addon-essentials": "^8.6.12",
     "@storybook/addon-interactions": "^8.6.12",
-    "@storybook/addon-svelte-csf": "5.0.0-next.28",
+    "@storybook/addon-svelte-csf": "5.0.0-next.29",
     "@storybook/blocks": "^8.6.12",
     "@storybook/svelte": "^8.6.12",
     "@storybook/sveltekit": "^8.6.12",
@@ -85,7 +84,7 @@
     "@testing-library/svelte": "^5.2.7",
     "@types/qrcode": "^1.5.5",
     "eslint": "catalog:",
-    "eslint-plugin-storybook": "^0.11.6",
+    "eslint-plugin-storybook": "^0.12.0",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-svelte": "catalog:",
@@ -102,8 +101,8 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "@sveltejs/kit": "^2.20.3",
-    "svelte": "^5.25.6"
+    "@sveltejs/kit": "^2.20.8",
+    "svelte": "^5.28.2"
   },
   "module": "dist/index.js",
   "exports": {
