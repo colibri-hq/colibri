@@ -5,12 +5,143 @@ services:
       args:
         PORT: 3000
     environment:
-      DB_URL: "postgres://postgres:password@db:5432/colibri"
+      DB_URL: "postgres://colibri:colibri@postgres:5432/colibri"
+      DATABASE_CERTIFICATE: ""
+      STORAGE_S3_URL: "http://minio:9000"
+    networks:
+      colibri:
     ports:
       - published: 3000
         target: 3000
         protocol: tcp
         app_protocol: http
-        name: web
+        name: colibri
         mode: ingress
         host_ip: "127.0.0.1"
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: colibri
+      POSTGRES_PASSWORD: colibri
+      POSTGRES_DB: colibri
+    configs:
+      - source: postgres-init-roles
+        target: /docker-entrypoint-initdb.d/0_roles.sql
+      - source: postgres-init-schema
+        target: /docker-entrypoint-initdb.d/0_init.sh
+        mode: 700
+    volumes:
+      - source: postgres
+        target: /var/lib/postgresql/data
+        consistency: delegated
+        type: volume
+      - source: ./supabase
+        target: /colibri
+        consistency: cached
+        read_only: true
+        type: bind
+    networks:
+      colibri:
+    expose:
+      - 5432
+    ports:
+      - published: 5432
+        target: 5432
+        protocol: tcp
+        app_protocol: postgresql
+        name: postgres
+        mode: ingress
+        host_ip: "127.0.0.1"
+
+  minio:
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: colibri
+      MINIO_ROOT_PASSWORD: password
+    # language=bash
+    command: >
+      server --console-address ":9001" /data
+    volumes:
+      - source: minio
+        target: /data
+        consistency: delegated
+        type: volume
+    healthcheck:
+      # language=bash
+      test: >
+        timeout 5s
+        bash -c ':> /dev/tcp/127.0.0.1/9000' 
+          || exit 1
+      interval: 5s
+      timeout: 20s
+      retries: 10
+    networks:
+      colibri:
+    expose:
+      - 9000
+      - 9001
+    ports:
+      - published: 9000
+        target: 9000
+        protocol: tcp
+        app_protocol: http
+        name: minio
+        mode: ingress
+        host_ip: "127.0.0.1"
+      - published: 9001
+        target: 9001
+        protocol: tcp
+        app_protocol: http
+        name: minio-console
+        mode: ingress
+        host_ip: "127.0.0.1"
+  minio_setup:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    # language=bash
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set colibri-minio http://minio:9000 colibri password;
+      /usr/bin/mc mb colibri-minio/colibri-bucket;
+      exit 0;
+      "
+    networks:
+      colibri:
+
+networks:
+  colibri:
+    name: colibri
+
+volumes:
+  postgres:
+    name: colibri_postgres
+  minio:
+    name: colibri_minio
+
+configs:
+  # region Postgres
+  postgres-init-roles:
+    # language=postgresql
+    content: |
+      create role anon;
+      create role authenticated;
+      create role service_role bypassrls;
+  postgres-init-schema:
+    # language=bash
+    content: |
+      #!/usr/bin/env bash
+      set -eux
+      cat /colibri/schema/*.sql > /docker-entrypoint-initdb.d/1_init.sql
+      
+      if [ -n "$(find /colibri/migrations -maxdepth 0 -not -empty)" ]; then
+        cat /colibri/migrations/*.sql > /docker-entrypoint-initdb.d/2_migrations.sql
+      fi
+      
+      if [ -n "$(find /colibri/seeds -maxdepth 0 -not -empty)" ]; then
+        cat /colibri/seeds/*.sql > /docker-entrypoint-initdb.d/3_seeds.sql
+      fi
+
+  # endregion
