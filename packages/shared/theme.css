@@ -10,10 +10,10 @@
 @theme {
   /* region Typography */
   --font-sans:
-    "Titillium Web", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    'Titillium Web', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --font-serif:
-    "Neuton", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    'Neuton', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   /* endregion */
   /* region Animations */
   --animate-breathe: breathe 3s linear infinite;
@@ -48,7 +48,7 @@
     @slot;
   }
 
-  &:where([data-transparency="reduce"], [data-transparency="reduce"] *) {
+  &:where([data-transparency='reduce'], [data-transparency='reduce'] *) {
     /*noinspection CssInvalidAtRule*/
     @slot;
   }
@@ -60,7 +60,7 @@
     @slot;
   }
 
-  &:where([data-color-scheme="dark"], [data-color-scheme="dark"] *) {
+  &:where([data-color-scheme='dark'], [data-color-scheme='dark'] *) {
     /*noinspection CssInvalidAtRule*/
     @slot;
   }
@@ -146,7 +146,7 @@ div.markdown-body {
     /* Quotation marks */
 
     & small:before {
-      content: "\2014 \00A0";
+      content: '\2014 \00A0';
     }
 
     & cite {

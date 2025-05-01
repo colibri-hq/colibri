@@ -71,11 +71,13 @@
       "import": "./eslint.config.ts",
       "default": "./eslint.config.ts",
       "types": "./config.d.ts"
-    }
+    },
+    "./theme.css": "./theme.css"
   },
   "sideEffects": false,
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
   ]
+    "dist",
+    "theme.css",
 }
