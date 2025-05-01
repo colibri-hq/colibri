@@ -1,10 +1,10 @@
-Colibri OAuth
-=============
+# Colibri OAuth
+
 > Colibri OAuth is a framework-agnostic OAuth 2.1 server, built with a focus on spec-compliance, extensibility, and
 > security.
 
-Overview
---------
+## Overview
+
 Colibri OAuth provides a robust implementation of the OAuth 2.1 and OpenID Connect protocols, striving for full
 implementation of all published specifications. It's designed to be framework-agnostic, allowing seamless integration
 with any web framework that supports standard Web API interfaces.
@@ -14,13 +14,13 @@ with any web framework that supports standard Web API interfaces.
 - [x] Full OAuth 2.1 and OpenID Connect 1.0 compliance
 - [x] Comprehensive test coverage
 - [x] Support for all standard OAuth 2.1 grant types:
-    - [x] Authorization Code ([RFC 6749](https://datatracker.ietf.org/doc/html/rfc6749#section-1.3.1),
-      [OAuth 2.1](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-12#section-1.3.1))
-    - [x] Client Credentials ([RFC 6749](https://datatracker.ietf.org/doc/html/rfc6749#section-1.3.4),
-      [OAuth 2.1](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-12#section-1.3.4))
-    - [x] Refresh Token ([RFC 6749](https://datatracker.ietf.org/doc/html/rfc6749#section-1.5),
-      [OAuth 2.1](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-12#section-1.3.2))
-    - [x] Device Authorization ([RFC 8628](https://datatracker.ietf.org/doc/html/rfc8628#section-1))
+  - [x] Authorization Code ([RFC 6749](https://datatracker.ietf.org/doc/html/rfc6749#section-1.3.1),
+        [OAuth 2.1](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-12#section-1.3.1))
+  - [x] Client Credentials ([RFC 6749](https://datatracker.ietf.org/doc/html/rfc6749#section-1.3.4),
+        [OAuth 2.1](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-12#section-1.3.4))
+  - [x] Refresh Token ([RFC 6749](https://datatracker.ietf.org/doc/html/rfc6749#section-1.5),
+        [OAuth 2.1](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-12#section-1.3.2))
+  - [x] Device Authorization ([RFC 8628](https://datatracker.ietf.org/doc/html/rfc8628#section-1))
 - [x] Support for defining custom grant types
 - [x] PKCE: Proof Key for Code Exchange ([RFC 7636](https://datatracker.ietf.org/doc/html/rfc7636#section-1))
 - [x] Token revocation ([RFC 7009](https://datatracker.ietf.org/doc/html/rfc7009#section-1))
@@ -48,14 +48,12 @@ npm install @colibri-hq/oauth
 To create a new authorization server instance, use the `createAuthorizationServer` function:
 
 ```typescript
-import { createAuthorizationServer } from '@colibri-hq/oauth';
+import { createAuthorizationServer } from "@colibri-hq/oauth";
 
 const server = createAuthorizationServer({
   issuer: process.env.OAUTH_ISSUER_URL,
   jwtSecret: process.env.OAUTH_JWT_SECRET,
-  persistence: {
-    // Methods to read and write data to your data store
-  },
+  /* Options omitted for brevity */
 });
 ```
 
@@ -110,28 +108,27 @@ To add a custom grant type:
 
 1. Create a new class extending `GrantType`:
 
-```typescript
-import { GrantType } from '@colibri-hq/oauth';
+   ```typescript
+   import { GrantType } from "@colibri-hq/oauth";
 
-class CustomGrantType extends GrantType {
-  async validateRequest(request: Request): Promise<void> {
-    // Implement validation logic
-  }
+   class CustomGrantType extends GrantType {
+     async validateRequest(request: Request): Promise<void> {
+       // Implement validation logic
+     }
 
-  async handleRequest(request: Request): Promise<Response> {
-    // Implement request handling
-  }
-}
-```
+     async handleRequest(request: Request): Promise<Response> {
+       // Implement request handling
+     }
+   }
+   ```
 
 2. Register the grant type with the server:
-
-```typescript
-const server = createAuthorizationServer(options);
-server.enableGrantType(CustomGrantType, {
-  // Grant type specific options
-});
-```
+   ```typescript
+   const server = createAuthorizationServer(options);
+   server.enableGrantType(CustomGrantType, {
+     // Grant type specific options
+   });
+   ```
 
 ## Contributing
 
@@ -141,13 +138,13 @@ We welcome contributions to the Colibri OAuth module! Here's how you can help:
 
 1. Clone the repository
 2. Install dependencies:
-    ```bash
-    pnpm install
-    ```
+   ```bash
+   pnpm install
+   ```
 3. Run tests:
-    ```bash
-    pnpm test
-    ```
+   ```bash
+   pnpm test
+   ```
 
 ### Guidelines
 
