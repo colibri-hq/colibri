@@ -1,2 +1,7 @@
-declare module '@colibri-hq/shared/prettier.config';
-declare module '@colibri-hq/shared/eslint.config';
+declare module '@colibri-hq/shared/prettier.config' {
+  import { Config } from 'prettier';
+
+  export const config: Config;
+
+  export default config;
+}
