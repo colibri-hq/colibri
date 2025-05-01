@@ -1,6 +1,6 @@
 -- region Slugify Function
 create extension unaccent schema public;
-drop function public.slugify(value text);
+drop function if exists public.slugify(value text);
 create function public.slugify(value text) returns text
     language plpgsql
     immutable strict set search_path to '' as
