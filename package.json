@@ -37,11 +37,9 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild",
-      "msw",
-      "svelte-preprocess"
+      "msw"
     ],
     "ignoredBuiltDependencies": [
-      "svelte-preprocess",
       "unrs-resolver",
       "yarn"
     ]
