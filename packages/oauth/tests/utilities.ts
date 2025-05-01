@@ -10,7 +10,6 @@ import { vi } from "vitest";
 import {
   type AuthorizationServerOptions,
   createAuthorizationServer,
-  type PersistenceAdapter,
 } from "../src";
 import type { Server as HttpServer } from "node:http";
 import type { Server as HttpsServer } from "node:https";
@@ -72,7 +71,7 @@ export function createMockPersistence() {
     validateScope: vi.fn(),
     loadScopes: vi.fn(),
     loadTokenInfo: vi.fn(),
-  } satisfies PersistenceAdapter<any, any, any, any, any>;
+  };
 }
 
 // region Request & Response Bridge
@@ -80,11 +79,11 @@ export function createRequest<Server extends AnyHttpServer>(
   request: FastifyRequest<RouteGenericInterface, Server>,
   reply: FastifyReply<RouteGenericInterface, Server>,
 ): Request {
-  let url = getUrl(request);
+  const url = getUrl(request);
 
   let controller: AbortController | null = new AbortController();
 
-  let init: RequestInit = {
+  const init: RequestInit = {
     method: request.method,
     headers: createHeaders(request.headers),
     signal: controller.signal,
@@ -113,12 +112,12 @@ export async function sendResponse<Server extends AnyHttpServer>(
 ) {
   reply.status(response.status);
 
-  for (let [key, values] of response.headers.entries()) {
+  for (const [key, values] of response.headers.entries()) {
     reply.headers({ [key]: values });
   }
 
   if (response.body) {
-    let stream = responseToReadable(response.clone());
+    const stream = responseToReadable(response.clone());
     return reply.send(stream);
   }
 
@@ -130,11 +129,11 @@ function responseToReadable(response: Response) {
     return null;
   }
 
-  let reader = response.body.getReader();
-  let readable = new Readable();
+  const reader = response.body.getReader();
+  const readable = new Readable();
   readable._read = async () => {
     try {
-      let result = await reader.read();
+      const result = await reader.read();
       if (!result.done) {
         readable.push(Buffer.from(result.value));
       } else {
@@ -150,12 +149,12 @@ function responseToReadable(response: Response) {
 }
 
 function createHeaders(requestHeaders: FastifyRequest["headers"]) {
-  let headers = new Headers();
+  const headers = new Headers();
 
-  for (let [key, values] of Object.entries(requestHeaders)) {
+  for (const [key, values] of Object.entries(requestHeaders)) {
     if (values) {
       if (Array.isArray(values)) {
-        for (let value of values) {
+        for (const value of values) {
           headers.append(key, value);
         }
       } else {
@@ -170,7 +169,7 @@ function createHeaders(requestHeaders: FastifyRequest["headers"]) {
 function getUrl<Server extends AnyHttpServer>(
   request: FastifyRequest<RouteGenericInterface, Server>,
 ) {
-  let origin = `${request.protocol}://${request.host}`;
+  const origin = `${request.protocol}://${request.host}`;
 
   return `${origin}${request.originalUrl}`;
 }
@@ -178,7 +177,7 @@ function getUrl<Server extends AnyHttpServer>(
 const createReadableStreamFromReadable = (
   source: Readable & { readableHighWaterMark?: number },
 ) => {
-  let pump = new StreamPump(source);
+  const pump = new StreamPump(source);
 
   return new ReadableStream(pump, pump);
 };
@@ -248,9 +247,9 @@ class StreamPump {
 
     try {
       // noinspection SuspiciousTypeOfGuard
-      let bytes = chunk instanceof Uint8Array ? chunk : Buffer.from(chunk);
+      const bytes = chunk instanceof Uint8Array ? chunk : Buffer.from(chunk);
 
-      let available = (this._controller.desiredSize || 0) - bytes.byteLength;
+      const available = (this._controller.desiredSize || 0) - bytes.byteLength;
       this._controller.enqueue(bytes);
 
       if (available <= 0) {

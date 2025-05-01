@@ -7,8 +7,8 @@ export type AsyncReturnType<TFunction extends (...args: unknown[]) => unknown> =
 export type MaybePromise<T> = T | Promise<T>;
 
 export type DeepRequired<T> = Required<{
-  [K in keyof T]: T[K] extends Required<T[K]> ? T[K] : DeepRequired<T[K]>
-}>
+  [K in keyof T]: T[K] extends Required<T[K]> ? T[K] : DeepRequired<T[K]>;
+}>;
 
 export type Optional<T, K extends keyof T = keyof T> = Pick<Partial<T>, K> &
   Omit<T, K>;

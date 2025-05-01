@@ -3,16 +3,9 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "tsBuildInfoFile": ".cache/tsbuildinfo.node.json",
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
-  "include": [
-    "*.config.ts",
-    "*.config.js"
-  ]
+  "include": ["*.config.ts", "*.config.js"]
 }

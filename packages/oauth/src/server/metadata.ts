@@ -1,4 +1,7 @@
-import type { AuthorizationServerMetadata, AuthorizationServerOptions } from "../types";
+import type {
+  AuthorizationServerMetadata,
+  AuthorizationServerOptions,
+} from "../types";
 import { createAuthorizationServer } from "../server";
 import { jsonResponse } from "../utilities";
 import { OAuthError } from "../errors";

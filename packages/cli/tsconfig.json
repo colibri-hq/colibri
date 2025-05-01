@@ -3,20 +3,11 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "tsBuildInfoFile": ".cache/tsbuildinfo.json"
   },
-  "exclude": [
-    "test/**/*",
-    "src/**/*.test.ts",
-    "src/**/*.spec.ts"
-  ],
-  "include": [
-    "src/**/*.ts",
-    "./ambient.d.ts"
-  ],
+  "exclude": ["test/**/*", "src/**/*.test.ts", "src/**/*.spec.ts"],
+  "include": ["src/**/*.ts", "./ambient.d.ts"],
   "references": [
     {
       "path": "./tsconfig.node.json"

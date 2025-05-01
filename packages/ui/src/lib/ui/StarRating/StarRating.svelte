@@ -45,16 +45,12 @@
         event.preventDefault();
         projected = Math.max(index - 1, 1);
 
-        if (buttonElements[index - 1]) {
-          buttonElements[index - 1].focus();
-        }
+        buttonElements[index - 1]?.focus();
       } else if (['Right', 'ArrowRight', 'Up', 'ArrowUp'].includes(event.key)) {
         event.preventDefault();
         projected = Math.min(index + 1, Number(max));
 
-        if (buttonElements[index + 1]) {
-          buttonElements[index + 1].focus();
-        }
+        buttonElements[index + 1]?.focus();
       } else if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
         update(index)();

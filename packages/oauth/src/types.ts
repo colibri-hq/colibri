@@ -115,7 +115,7 @@ export interface AuthorizationServerMetadata {
   /**
    * **OPTIONAL.** JSON array containing a list of the OAuth 2.0 `response_mode` values that this
    * authorization server supports, as specified
-   * in OAuth 2.0 Multiple  Response Type Encoding Practices
+   * in OAuth 2.0 Multiple Response Type Encoding Practices
    * ([RFC 8414](https://datatracker.ietf.org/doc/html/rfc8414#ref-OAuth.Responses)).
    * If omitted, the default is `["query", "fragment"]`. The response mode value `form_post` is also
    * defined in OAuth 2.0 Form Post Response Mode
@@ -395,7 +395,7 @@ export type JwtSigningAlgorithm = "HS256" | "RS256" | "ES256" | "none";
 export type PkceCodeChallengeMethod = "plain" | "S256";
 
 export type OAuthErrorCode =
-  // The request is missing a parameter so the server can’t proceed with the request. This may also
+  // The request is missing a parameter, so the server can’t proceed with the request. This may also
   // be returned if the request includes an unsupported parameter or repeats a parameter.
   | "invalid_request"
 
@@ -438,7 +438,7 @@ export type OAuthErrorCode =
 /**
  * **Successful Token Response**
  *
- * The authorization server issues an access token and optional refresh token, and constructs the
+ * The authorization server issues an access token and optional refresh token and constructs the
  * response by adding the following parameters to the entity-body of the HTTP response with a
  * `200 (OK)` status code.
  *
@@ -477,7 +477,7 @@ export interface TokenPayload {
   /**
    * **OPTIONAL.** ID Token value associated with the authenticated session.
    *
-   * This is only included if the `openid` scope is requested, and will only be included for clients
+   * This is only included if the `openid` scope is requested and will only be included for clients
    * using the authorization code grant type.
    *
    * @see https://openid.net/specs/openid-connect-core-1_0.html#TokenResponse OpenID Connect Core 1.0
@@ -513,7 +513,7 @@ export interface TokenPayload {
  * ========
  * The `Entities` namespace holds all data models used by the Colibri OAuth server.
  *
- * These models are used to store and retrieve data from the persistence layer, and can be used as
+ * These models are used to store and retrieve data from the persistence layer and can be used as
  * a reference for all required fields.
  */
 export namespace Entities {
@@ -567,7 +567,7 @@ export namespace Entities {
     identifier: string;
     client_id: string;
     code_challenge: string;
-    code_challenge_method: string;
+    code_challenge_method: PkceCodeChallengeMethod;
     created_at: Date;
     expires_at: Date;
     redirect_uri: string;
@@ -860,7 +860,7 @@ type TokenRevocationOptions = {
   authSigningAlgValuesSupported?: JwtSigningAlgorithm[];
 };
 
-type TokenIntrospectionOptions<T extends Entities.AccessToken> = {
+type TokenIntrospectionOptions<_T extends Entities.AccessToken> = {
   endpoint?: string | URL;
   authMethodsSupported?: TokenEndpointAuthenticationMethod[];
   authSigningAlgValuesSupported?: JwtSigningAlgorithm[];
@@ -878,38 +878,4 @@ type ClientRegistrationOptions = {
   endpoint?: string | URL;
 };
 type ClientManagementOptions = {};
-
-export type PersistenceAdapter<C extends Entities.Client> = {
-  /**
-   * Retrieves a client by its identifier as retrieved from the `client_id` request parameter
-   *
-   * @param identifier The client identifier
-   * @deprecated
-   */
-  loadClient: (identifier: string) => MaybePromise<C | undefined>;
-
-  /**
-   * Retrieves all scopes supported by the server
-   * @deprecated
-   */
-  loadScopes: () => MaybePromise<string[]>;
-
-  /**
-   * Checks if a given scope is valid and supported by the server
-   *
-   * @param scope The scope to validate
-   * @deprecated
-   */
-  validateScope: (scope: string, clientId?: string) => MaybePromise<boolean>;
-
-  /**
-   * Issues tokens for a client
-   *
-   * This method is called by the grant types to issue tokens. To ensure all persistence operations
-   * can be carried out in a single atomic transaction, it receives all parameters needed to issue
-   * an access token, a refresh token, and an ID token, at once.
-   * @deprecated
-   */
-  issueTokens: IssueTokensFn;
-};
 // endregion

@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   arrayBufferToHex,
-  hexToArrayBuffer,
-  createStreamFromArrayBuffer,
   createArrayBufferFromStream,
-} from './buffer';
+  createStreamFromArrayBuffer,
+  hexToArrayBuffer,
+} from './buffer.js';
 
 describe('buffer', () => {
   describe('arrayBufferToHex', () => {
@@ -45,7 +45,9 @@ describe('buffer', () => {
         chunks.push(value);
       }
 
-      const result = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
+      const result = new Uint8Array(
+        chunks.reduce((acc, chunk) => acc + chunk.length, 0),
+      );
       let offset = 0;
       for (const chunk of chunks) {
         result.set(chunk, offset);
@@ -68,7 +70,7 @@ describe('buffer', () => {
       }
 
       expect(chunks.length).toBeGreaterThan(1);
-      chunks.forEach(chunk => expect(chunk.length).toBeLessThanOrEqual(2));
+      chunks.forEach((chunk) => expect(chunk.length).toBeLessThanOrEqual(2));
     });
   });
 
@@ -77,9 +79,9 @@ describe('buffer', () => {
       const input = new TextEncoder().encode('Hello').buffer;
       const stream = createStreamFromArrayBuffer(input);
       const result = await createArrayBufferFromStream(stream);
-      
+
       expect(result).toBeInstanceOf(ArrayBuffer);
       expect(new TextDecoder().decode(result)).toBe('Hello');
     });
   });
-}); 
+});

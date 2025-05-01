@@ -15,9 +15,7 @@
     "resolveJsonModule": true,
     "rootDir": "./src",
     "paths": {
-      "$cli/*": [
-        "./src/*"
-      ]
+      "$cli/*": ["./src/*"]
     },
     "skipLibCheck": true,
     "sourceMap": true,

@@ -42,7 +42,7 @@ export async function decodeBlurHashToImage(
 
 export async function getImageDimensions(image: string | ArrayBuffer): Promise<{
   width: number;
-  height: number
+  height: number;
 }> {
   if (typeof image === 'string') {
     return new Promise<{ width: number; height: number }>((resolve, reject) => {

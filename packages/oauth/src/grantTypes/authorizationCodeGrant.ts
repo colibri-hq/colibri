@@ -510,7 +510,7 @@ export async function handleAuthorizationRequest<
     options: T;
     userIdentifier: string;
   },
-) {
+): Promise<Response> {
   const url = new URL(request.url);
   const queryParams = Object.fromEntries(url.searchParams.entries());
   let params: Awaited<ReturnType<typeof authorize<T>>>;
@@ -762,7 +762,7 @@ export async function handleAuthorizationRequest<
 export async function handlePushedAuthorizationRequest<
   T extends Entities.Client = Entities.Client,
   O extends AuthorizationServerOptions<T> = AuthorizationServerOptions<T>,
->(request: Request, options: O) {
+>(request: Request, options: O): Promise<Response> {
   // region Validate the authorization request
   if (!options.pushedAuthorizationRequests) {
     throw new OAuthError(
@@ -943,8 +943,8 @@ async function authorize<T extends AuthorizationServerOptions>(
         scopes: scopes ?? [],
         state: state ?? undefined,
       };
-    } catch (error) {
-      throw new OAuthError("server_error");
+    } catch (cause) {
+      throw new OAuthError("server_error", undefined, undefined, { cause });
     }
   }
   // endregion

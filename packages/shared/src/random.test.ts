@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  generateRandomString,
   generateRandomBytes,
   generateRandomDigits,
+  generateRandomString,
   generateRandomUuid,
 } from './random';
 
@@ -41,8 +41,8 @@ describe('random', () => {
     it('should generate a valid UUID', () => {
       const result = generateRandomUuid();
       expect(result).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
       );
     });
   });
-}); 
+});

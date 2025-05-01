@@ -1,12 +1,15 @@
 import { arrayBufferToHex } from './buffer';
 
-export function generateRandomString(length: number, alphabet?: string): string {
+export function generateRandomString(
+  length: number,
+  alphabet?: string,
+): string {
   // noinspection SpellCheckingInspection
   const characters =
     alphabet ??
     'ABCDEFGHIJKLMNOPQRSTUVWXYZqeytrpolkadjsghfgmnbzxcvnQPOWEYRKASJHDGFMNBCV' +
-    'Xjsfhrlg124903564576986483658fgh4sdfh687e4h897WETHJ68F7G468847' +
-    '1877GFHJFFGJ87469857468746hfghwrtiyj4598yhdjkhgnk';
+      'Xjsfhrlg124903564576986483658fgh4sdfh687e4h897WETHJ68F7G468847' +
+      '1877GFHJFFGJ87469857468746hfghwrtiyj4598yhdjkhgnk';
 
   return Array(length)
     .fill(undefined)
@@ -17,7 +20,6 @@ export function generateRandomString(length: number, alphabet?: string): string 
       '',
     );
 }
-
 
 export function generateRandomBytes(amount: number): string {
   return arrayBufferToHex(crypto.getRandomValues(new Uint8Array(amount)));

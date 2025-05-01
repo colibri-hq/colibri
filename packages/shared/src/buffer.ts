@@ -1,4 +1,6 @@
-export function arrayBufferToHex(buffer: ArrayBufferLike | Uint8Array<ArrayBuffer>) {
+export function arrayBufferToHex(
+  buffer: ArrayBufferLike | Uint8Array<ArrayBuffer>,
+) {
   // @ts-expect-error -- Buffer conversion works as intended
   return Array.from(new Uint8Array(buffer)).reduce(
     (acc, byte) => acc + byte.toString(16).padStart(2, '0'),
@@ -14,15 +16,14 @@ export function hexToArrayBuffer(hex: string): ArrayBuffer {
   return buffer;
 }
 
-export function createStreamFromArrayBuffer(
-  buffer: ArrayBuffer,
-  chunkSize = 64 * 1024,
-): ReadableStream<Uint8Array<ArrayBuffer>> {
+export function createStreamFromArrayBuffer<
+  T extends ArrayBuffer | ArrayBufferLike,
+>(buffer: T, chunkSize = 64 * 1024): ReadableStream<Uint8Array<T>> {
   return new ReadableStream({
     start(controller) {
       const bytes = new Uint8Array(buffer);
 
-      for (let readIndex = 0; readIndex < bytes.byteLength;) {
+      for (let readIndex = 0; readIndex < bytes.byteLength; ) {
         controller.enqueue(bytes.subarray(readIndex, (readIndex += chunkSize)));
       }
 

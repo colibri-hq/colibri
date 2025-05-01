@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  sleep,
-  uniqueBy,
-  wrapArray,
-  slugify,
   humanReadableFileSize,
   inferNameFromEmailAddress,
+  sleep,
+  slugify,
+  uniqueBy,
+  wrapArray,
 } from './utilities';
 
 describe('utilities', () => {
@@ -27,7 +27,7 @@ describe('utilities', () => {
       ];
       const result = uniqueBy(input, 'id');
       expect(result).toHaveLength(2);
-      expect(result.map(item => item.id)).toEqual([1, 2]);
+      expect(result.map((item) => item.id)).toEqual([1, 2]);
     });
 
     it('should remove duplicates based on function', () => {
@@ -36,9 +36,9 @@ describe('utilities', () => {
         { id: 1, name: 'John' },
         { id: 2, name: 'Jane' },
       ];
-      const result = uniqueBy(input, item => item.name);
+      const result = uniqueBy(input, (item) => item.name);
       expect(result).toHaveLength(2);
-      expect(result.map(item => item.name)).toEqual(['John', 'Jane']);
+      expect(result.map((item) => item.name)).toEqual(['John', 'Jane']);
     });
   });
 
@@ -100,33 +100,51 @@ describe('utilities', () => {
 
   describe('inferNameFromEmailAddress', () => {
     it('should convert email to proper name format', () => {
-      expect(inferNameFromEmailAddress('john.doe@example.com')).toBe('John Doe');
+      expect(inferNameFromEmailAddress('john.doe@example.com')).toBe(
+        'John Doe',
+      );
     });
 
     it('should handle plus addressing', () => {
-      expect(inferNameFromEmailAddress('john.doe+test@example.com')).toBe('John Doe');
+      expect(inferNameFromEmailAddress('john.doe+test@example.com')).toBe(
+        'John Doe',
+      );
     });
 
     it('should handle generational suffixes', () => {
-      expect(inferNameFromEmailAddress('john.smith.iii@example.com')).toBe('John Smith III');
+      expect(inferNameFromEmailAddress('john.smith.iii@example.com')).toBe(
+        'John Smith III',
+      );
     });
 
     it('should handle jr/sr suffixes', () => {
-      expect(inferNameFromEmailAddress('john.smith.jr@example.com')).toBe('John Smith, Jr.');
+      expect(inferNameFromEmailAddress('john.smith.jr@example.com')).toBe(
+        'John Smith, Jr.',
+      );
     });
 
     it('should handle title prefixes', () => {
-      expect(inferNameFromEmailAddress('dr.john.smith@example.com')).toBe('Dr. John Smith');
+      expect(inferNameFromEmailAddress('dr.john.smith@example.com')).toBe(
+        'Dr. John Smith',
+      );
     });
 
     it('should handle special name patterns', () => {
-      expect(inferNameFromEmailAddress('claire.smith@example.com')).toBe('Claire Smith');
-      expect(inferNameFromEmailAddress('van.der.sar@example.com')).toBe('van der Sar');
-      expect(inferNameFromEmailAddress("o'connor@example.com")).toBe('O\'Connor');
+      expect(inferNameFromEmailAddress('claire.smith@example.com')).toBe(
+        'Claire Smith',
+      );
+      expect(inferNameFromEmailAddress('van.der.sar@example.com')).toBe(
+        'van der Sar',
+      );
+      expect(inferNameFromEmailAddress("o'connor@example.com")).toBe(
+        "O'Connor",
+      );
     });
 
     it('should handle Mc names', () => {
-      expect(inferNameFromEmailAddress('marty.mcfly@example.com')).toBe('Marty McFly');
+      expect(inferNameFromEmailAddress('marty.mcfly@example.com')).toBe(
+        'Marty McFly',
+      );
     });
   });
-}); 
+});

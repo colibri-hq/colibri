@@ -6,7 +6,7 @@ import type {
   Entities,
   OAuthGrantType,
   PersistedTokensInfo,
-  TokenPayload
+  TokenPayload,
 } from "../types";
 import { GrantType } from "../grantTypes/grantType";
 

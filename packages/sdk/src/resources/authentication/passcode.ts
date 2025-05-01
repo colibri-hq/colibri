@@ -1,8 +1,8 @@
-import type { User } from './user';
-import type { Database } from '../../database';
-import { generateRandomDigits } from '@colibri-hq/shared';
+import type { User } from "./user";
+import type { Database } from "../../database";
+import { generateRandomDigits } from "@colibri-hq/shared";
 
-const table = 'authentication.passcode' as const;
+const table = "authentication.passcode" as const;
 
 export async function verifyPasscode(
   client: Database,
@@ -12,10 +12,10 @@ export async function verifyPasscode(
   const result = await client
     .deleteFrom(table)
     .where((expression) =>
-      expression.and({ email, code }).and('expires_at', '>', new Date()),
+      expression.and({ email, code }).and("expires_at", ">", new Date()),
     )
-    .using('authentication.user')
-    .returning('user_id')
+    .using("authentication.user")
+    .returning("user_id")
     .executeTakeFirstOrThrow();
 
   return Number(result.user_id);
@@ -23,8 +23,11 @@ export async function verifyPasscode(
 
 export function createPasscode(
   client: Database,
-  user: User | User['id'],
-  { ttl: ttl$1 = 300, length = 6 }: { ttl?: number; length?: number } = { ttl: 300, length: 6 },
+  user: User | User["id"],
+  { ttl: ttl$1 = 300, length = 6 }: { ttl?: number; length?: number } = {
+    ttl: 300,
+    length: 6,
+  },
 ) {
   const code = generateRandomDigits(length);
   const ttl = ttl$1 * 1_000;
@@ -32,16 +35,16 @@ export function createPasscode(
   return client
     .insertInto(table)
     .values({
-      user_id: typeof user === 'string' ? user : user.id,
+      user_id: typeof user === "string" ? user : user.id,
       expires_at: new Date(Date.now() + ttl),
       code,
     })
     .onConflict((conflict) =>
-      conflict.column('user_id').doUpdateSet({
+      conflict.column("user_id").doUpdateSet({
         expires_at: new Date(Date.now() + ttl),
         code,
       }),
     )
-    .returning('code')
+    .returning("code")
     .executeTakeFirstOrThrow();
 }

@@ -941,9 +941,7 @@ function deobfuscators(): Record<string, Algorithm> {
     "http://www.idpf.org/2008/embedding": {
       key: (opf) =>
         sha1Hash(
-          getIdentifier(opf)
-             
-            .replaceAll(/[\u0020\u0009\u000d\u000a]/g, ""),
+          getIdentifier(opf).replaceAll(/[\u0020\u0009\u000d\u000a]/g, ""),
         ),
       decode: (key, blob) => deobfuscate(key, 1040, blob),
     },

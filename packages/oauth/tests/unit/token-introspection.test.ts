@@ -11,12 +11,9 @@ describe("Token Introspection Unit Tests", () => {
   let persistence: ReturnType<typeof createMockPersistence>;
 
   beforeEach(() => {
-    persistence = createMockPersistence();
-
     options = {
       issuer: "http://localhost:3000",
       jwtSecret: "test-secret",
-      persistence,
     };
   });
 
@@ -117,4 +114,4 @@ describe("Token Introspection Unit Tests", () => {
       });
     });
   });
-}); 
+});

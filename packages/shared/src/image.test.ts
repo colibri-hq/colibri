@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  encodeImageToBlurHash,
   decodeBlurHashToImage,
+  encodeImageToBlurHash,
   getImageDimensions,
 } from './image';
 
@@ -108,13 +108,17 @@ describe('image', () => {
 
     it('should handle image load errors', async () => {
       const mockImage = new Image();
-      mockImage.addEventListener = vi.fn().mockImplementation((event, callback) => {
-        if (event === 'error') {
-          callback(new Error('Failed to load image'));
-        }
-      });
+      mockImage.addEventListener = vi
+        .fn()
+        .mockImplementation((event, callback) => {
+          if (event === 'error') {
+            callback(new Error('Failed to load image'));
+          }
+        });
 
-      await expect(getImageDimensions('invalid-url.jpg')).rejects.toThrow('Failed to load image');
+      await expect(getImageDimensions('invalid-url.jpg')).rejects.toThrow(
+        'Failed to load image',
+      );
     });
   });
-}); 
+});

@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { encodeToBase64, decodeFromBase64 } from './base64';
+import { describe, expect, it } from 'vitest';
+import { decodeFromBase64, encodeToBase64 } from './base64.js';
 
 describe('base64', () => {
   describe('encodeToBase64', () => {
@@ -16,7 +16,9 @@ describe('base64', () => {
     });
 
     it('should encode TypedArray input to base64', () => {
-      const input = new Uint8Array([72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33]);
+      const input = new Uint8Array([
+        72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33,
+      ]);
       const result = encodeToBase64(input);
       expect(result).toBe('SGVsbG8sIFdvcmxkIQ==');
     });
@@ -59,4 +61,4 @@ describe('base64', () => {
       expect(() => decodeFromBase64(input)).toThrow('Not a valid base64 input');
     });
   });
-}); 
+});

@@ -1,8 +1,8 @@
-import type { Insertable, Updateable } from 'kysely';
-import type { Database, Schema } from '../database';
-import { paginate } from '../utilities';
+import type { Insertable, Updateable } from "kysely";
+import type { Database, Schema } from "../database";
+import { paginate } from "../utilities";
 
-const table = 'catalog' as const;
+const table = "catalog" as const;
 
 export async function loadCatalogs(
   database: Database,
@@ -11,19 +11,19 @@ export async function loadCatalogs(
   perPage = 10,
 ) {
   return paginate(database, table, page, perPage)
-    .orderBy('updated_at desc')
+    .orderBy("updated_at desc")
     .selectAll(table)
     .select(({ fn, val }) =>
-      fn('slugify', [
+      fn("slugify", [
         fn.coalesce(
-          'title',
-          fn('regexp_replace', [
-            'feed_url',
-            val('^(https?://)?(www\\.)?'),
-            val(''),
+          "title",
+          fn("regexp_replace", [
+            "feed_url",
+            val("^(https?://)?(www\\.)?"),
+            val(""),
           ]),
         ),
-      ]).as('slug'),
+      ]).as("slug"),
     )
     .execute();
 }
@@ -31,19 +31,19 @@ export async function loadCatalogs(
 export async function loadCatalog(database: Database, id: string) {
   return database
     .selectFrom(table)
-    .where('id', '=', id)
+    .where("id", "=", id)
     .selectAll()
     .select(({ fn, val }) =>
-      fn('slugify', [
+      fn("slugify", [
         fn.coalesce(
-          'title',
-          fn('regexp_replace', [
-            'feed_url',
-            val('^(https?://)?(www\\.)?'),
-            val(''),
+          "title",
+          fn("regexp_replace", [
+            "feed_url",
+            val("^(https?://)?(www\\.)?"),
+            val(""),
           ]),
         ),
-      ]).as('slug'),
+      ]).as("slug"),
     )
     .executeTakeFirstOrThrow();
 }
@@ -53,10 +53,13 @@ export async function updateCatalog(
   id: string,
   data: Updateable<Table>,
 ) {
-  await database.updateTable(table).set(data).where('id', '=', id).execute();
+  await database.updateTable(table).set(data).where("id", "=", id).execute();
 }
 
-export async function createCatalog(database: Database, data: Insertable<Table>) {
+export async function createCatalog(
+  database: Database,
+  data: Insertable<Table>,
+) {
   await database.insertInto(table).values(data).execute();
 }
 

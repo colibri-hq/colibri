@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { createMockPersistence, createTestServer } from "../utilities";
-import { AuthorizationCodeGrant, type Entities } from "../../src";
+import { type Entities } from "../../src/index.js";
 import type { FastifyInstance } from "fastify";
 import crypto from "crypto";
 

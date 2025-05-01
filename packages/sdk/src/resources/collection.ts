@@ -1,20 +1,28 @@
-import { type InsertObject, type Selectable, type SelectQueryBuilder, sql } from 'kysely';
-import type { User } from './authentication';
-import type { Database, Schema } from '../database';
-import type { DB } from '../schema';
-import type { Comment } from './comment';
+import {
+  type InsertObject,
+  type Selectable,
+  type SelectQueryBuilder,
+  sql,
+} from "kysely";
+import type { User } from "./authentication";
+import type { Database, Schema } from "../database";
+import type { DB } from "../schema";
+import type { Comment } from "./comment";
 
-const table = 'collection' as const;
+const table = "collection" as const;
 
 export function loadAllCollections(database: Database) {
   return database.selectFrom(table).selectAll().execute();
 }
 
-export function loadCollection(database: Database, collection: string | number) {
+export function loadCollection(
+  database: Database,
+  collection: string | number,
+) {
   return database
     .selectFrom(table)
     .selectAll()
-    .where('id', '=', collection.toString())
+    .where("id", "=", collection.toString())
     .execute();
 }
 
@@ -23,26 +31,26 @@ export function loadCollectionsForUser(
   user: User | string | number,
 ) {
   const userId =
-    typeof user === 'number' || typeof user === 'string'
+    typeof user === "number" || typeof user === "string"
       ? user.toString()
       : user.id;
 
   return applyAccessControls(database.selectFrom(table), userId)
     .leftJoin(
-      'collection_entry',
-      'collection_entry.collection_id',
-      'collection.id',
+      "collection_entry",
+      "collection_entry.collection_id",
+      "collection.id",
     )
     .select((eb) =>
       eb
-        .selectFrom('collection_entry')
+        .selectFrom("collection_entry")
         .select(({ fn }) =>
-          fn.count('collection_entry.book_id').as('entry_count'),
+          fn.count("collection_entry.book_id").as("entry_count"),
         )
-        .whereRef('collection_entry.collection_id', '=', 'collection.id')
-        .as('entry_count'),
+        .whereRef("collection_entry.collection_id", "=", "collection.id")
+        .as("entry_count"),
     )
-    .selectAll('collection')
+    .selectAll("collection")
     .execute();
 }
 
@@ -52,13 +60,13 @@ export function loadCollectionForUser(
   user: User | string | number,
 ) {
   const userId =
-    typeof user === 'number' || typeof user === 'string'
+    typeof user === "number" || typeof user === "string"
       ? user.toString()
       : user.id;
 
   return applyAccessControls(database.selectFrom(table), userId)
-    .selectAll('collection')
-    .where('collection.id', '=', collection.toString())
+    .selectAll("collection")
+    .where("collection.id", "=", collection.toString())
     .executeTakeFirstOrThrow();
 }
 
@@ -69,79 +77,82 @@ export function loadCollectionCommentsLegacy(
   return database
     .selectFrom(table)
     .innerJoin(
-      'collection_comment',
-      'collection_comment.collection_id',
-      'collection.id',
+      "collection_comment",
+      "collection_comment.collection_id",
+      "collection.id",
     )
-    .innerJoin('comment', 'collection_comment.comment_id', 'comment.id')
-    .leftJoin('authentication.user as u', 'u.id', 'comment.created_by')
+    .innerJoin("comment", "collection_comment.comment_id", "comment.id")
+    .leftJoin("authentication.user as u", "u.id", "comment.created_by")
     .leftJoinLateral(
       (eb) =>
         eb
           .selectFrom((eb) =>
             eb
-              .selectFrom('comment_reaction')
-              .select('emoji')
-              .select(({ fn }) => fn.count('emoji').as('count'))
-              .whereRef('comment_id', '=', 'comment.id')
-              .groupBy('emoji')
-              .as('reaction'),
+              .selectFrom("comment_reaction")
+              .select("emoji")
+              .select(({ fn }) => fn.count("emoji").as("count"))
+              .whereRef("comment_id", "=", "comment.id")
+              .groupBy("emoji")
+              .as("reaction"),
           )
           .select(({ fn, ref }) =>
-            fn('jsonb_object_agg', [
-              ref('reaction.emoji'),
-              ref('reaction.count'),
-            ]).as('reactions'),
+            fn("jsonb_object_agg", [
+              ref("reaction.emoji"),
+              ref("reaction.count"),
+            ]).as("reactions"),
           )
-          .as('result'),
+          .as("result"),
       (join) => join.onTrue(),
     )
-    .selectAll('comment')
-    .select(({ fn }) => fn.toJson('u').as('created_by'))
+    .selectAll("comment")
+    .select(({ fn }) => fn.toJson("u").as("created_by"))
     .select(({ fn, ref, val }) =>
-      fn.coalesce(ref('result.reactions'), val('{}')).as('reactions'),
+      fn.coalesce(ref("result.reactions"), val("{}")).as("reactions"),
     )
-    .where('collection.id', '=', id.toString())
-    .groupBy('comment.id')
-    .groupBy('result.reactions')
-    .groupBy('u.id')
+    .where("collection.id", "=", id.toString())
+    .groupBy("comment.id")
+    .groupBy("result.reactions")
+    .groupBy("u.id")
     .execute();
 }
 
-export function loadCollectionComments(database: Database, id: number | string): Promise<Comment[]> {
+export function loadCollectionComments(
+  database: Database,
+  id: number | string,
+): Promise<Comment[]> {
   return database
     .selectFrom(table)
     .innerJoin(
-      'collection_comment',
-      'collection_comment.collection_id',
-      'collection.id',
+      "collection_comment",
+      "collection_comment.collection_id",
+      "collection.id",
     )
-    .innerJoin('comment', 'collection_comment.comment_id', 'comment.id')
-    .leftJoin('authentication.user as u', 'u.id', 'comment.created_by')
+    .innerJoin("comment", "collection_comment.comment_id", "comment.id")
+    .leftJoin("authentication.user as u", "u.id", "comment.created_by")
     .leftJoinLateral(
       (eb) =>
         eb
-          .selectFrom('comment_reaction')
-          .select(['emoji', 'user_id', 'created_at'])
-          .whereRef('comment_id', '=', 'comment.id')
-          .as('reactions'),
+          .selectFrom("comment_reaction")
+          .select(["emoji", "user_id", "created_at"])
+          .whereRef("comment_id", "=", "comment.id")
+          .as("reactions"),
       (join) => join.onTrue(),
     )
-    .selectAll('comment')
+    .selectAll("comment")
     .select(({ fn, val }) =>
       fn
         .coalesce(
           fn
-            .jsonAgg('reactions')
-            .filterWhere('reactions.emoji', 'is not', null),
-          val('[]'),
+            .jsonAgg("reactions")
+            .filterWhere("reactions.emoji", "is not", null),
+          val("[]"),
         )
-        .as('reactions'),
+        .as("reactions"),
     )
-    .select(({ fn }) => fn.toJson('u').as('created_by'))
-    .where('collection.id', '=', id.toString())
-    .groupBy('comment.id')
-    .groupBy('u.id')
+    .select(({ fn }) => fn.toJson("u").as("created_by"))
+    .where("collection.id", "=", id.toString())
+    .groupBy("comment.id")
+    .groupBy("u.id")
     .execute();
 }
 
@@ -149,36 +160,36 @@ export function loadCollectionBooks(database: Database, id: number | string) {
   return database
     .selectFrom(table)
     .innerJoin(
-      'collection_entry',
-      'collection_entry.collection_id',
-      'collection.id',
+      "collection_entry",
+      "collection_entry.collection_id",
+      "collection.id",
     )
-    .innerJoin('book', 'collection_entry.book_id', 'book.id')
-    .leftJoin('edition', 'book.main_edition_id', 'edition.id')
-    .leftJoin('cover', 'edition.cover_id', 'cover.id')
-    .selectAll('book')
-    .select('edition.id as edition_id')
-    .select('cover.blurhash as cover_blurhash')
-    .where('collection.id', '=', id.toString())
+    .innerJoin("book", "collection_entry.book_id", "book.id")
+    .leftJoin("edition", "book.main_edition_id", "edition.id")
+    .leftJoin("cover", "edition.cover_id", "cover.id")
+    .selectAll("book")
+    .select("edition.id as edition_id")
+    .select("cover.blurhash as cover_blurhash")
+    .where("collection.id", "=", id.toString())
     .execute();
 }
 
 export async function addCollectionComment(
   database: Database,
   collection: number | string,
-  comment: InsertObject<DB, 'comment'>,
+  comment: InsertObject<DB, "comment">,
 ) {
   const collectionId = collection.toString();
 
   await database.transaction().execute(async (transaction) => {
     const { id } = await transaction
-      .insertInto('comment')
+      .insertInto("comment")
       .values(comment)
-      .returning('id')
+      .returning("id")
       .executeTakeFirstOrThrow();
 
     await transaction
-      .insertInto('collection_comment')
+      .insertInto("collection_comment")
       .values({
         collection_id: collectionId,
         comment_id: id,
@@ -194,23 +205,23 @@ function applyAccessControls(
   userId: string,
 ) {
   return query
-    .leftJoin('authentication.user', (join) =>
-      join.on('authentication.user.id', '=', userId),
+    .leftJoin("authentication.user", (join) =>
+      join.on("authentication.user.id", "=", userId),
     )
     .where((builder) =>
       builder.and([
         // region Shared/private collections
         builder.or([
           // Collection is shared with all users
-          builder.eb('collection.shared', '=', true),
+          builder.eb("collection.shared", "=", true),
 
           // Collection is private, but belongs to the user
           builder.and([
-            builder.eb('collection.shared', '=', false),
+            builder.eb("collection.shared", "=", false),
             builder.eb(
-              'collection.created_by',
-              '=',
-              builder.ref('authentication.user.id'),
+              "collection.created_by",
+              "=",
+              builder.ref("authentication.user.id"),
             ),
           ]),
         ]),
@@ -219,22 +230,22 @@ function applyAccessControls(
         // region Age requirements
         builder.or([
           // User is not a child
-          builder.eb('authentication.user.role', '<>', 'child'),
+          builder.eb("authentication.user.role", "<>", "child"),
 
           // User is a child, but has no birthdate configured, and the collection has an age
           // requirement of less than 18 years (anything 18 and above is considered adult-only, and
           // a user with the child role but no birthdate has probably just not been configured yet)
           builder.and([
-            builder.eb('authentication.user.birthdate', 'is', null),
-            builder.eb('collection.age_requirement', '<', 18),
+            builder.eb("authentication.user.birthdate", "is", null),
+            builder.eb("collection.age_requirement", "<", 18),
           ]),
 
           // User is a child, but is older than the collection's age limit
           builder.eb(
-            'collection.age_requirement',
-            '<=',
+            "collection.age_requirement",
+            "<=",
             sql<number>`extract
-                (year from age(now(), ${sql.ref('authentication.user.birthdate')}))`,
+                (year from age(now(), ${sql.ref("authentication.user.birthdate")}))`,
           ),
         ]),
         // endregion

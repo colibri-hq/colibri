@@ -1,5 +1,5 @@
-import type { Database } from '../database';
-import { createAuthorizationServer } from '@colibri-hq/oauth';
+import type { Database } from "../database";
+import { createAuthorizationServer, type Entities } from "@colibri-hq/oauth";
 import {
   createAccessToken,
   createAuthorizationCode,
@@ -17,21 +17,24 @@ import {
   revokeRefreshToken,
   scopeValidationRegex,
   storeAuthorizationRequest,
-} from '../resources';
-import jwt from 'jsonwebtoken';
-import { z } from 'zod';
+} from "../resources";
+import jwt from "jsonwebtoken";
+import { z } from "zod";
 
-export function server(database: Database, {
-  issuer = 'https://colibri.dev',
-  jwtSecret,
-  accessTokenTtl = 3600,
-  refreshTokenTtl = 3600,
-}: {
-  issuer: string;
-  jwtSecret: string;
-  accessTokenTtl?: number;
-  refreshTokenTtl?: number;
-}) {
+export function server(
+  database: Database,
+  {
+    issuer = "https://colibri.dev",
+    jwtSecret,
+    accessTokenTtl = 3600,
+    refreshTokenTtl = 3600,
+  }: {
+    issuer: string;
+    jwtSecret: string;
+    accessTokenTtl?: number;
+    refreshTokenTtl?: number;
+  },
+) {
   function createIdToken(
     clientId: string,
     userIdentifier: string,
@@ -51,28 +54,26 @@ export function server(database: Database, {
     accessTokenTtl,
     refreshTokenTtl,
     issuer,
-    baseUri: '/auth/oauth/',
+    baseUri: "/auth/oauth/",
     jwtSecret,
     token: {
-      endpoint: './token',
+      endpoint: "./token",
     },
     authorizationCode: {
-      endpoint: './authorize',
+      endpoint: "./authorize",
       ttl: 300,
       loadAuthorizationCode(code) {
         return loadAuthorizationCode(database, code);
       },
-      storeAuthorizationCode(
-        {
-          clientId,
-          challenge,
-          challengeMethod,
-          redirectUri,
-          scopes,
-          ttl,
-          userIdentifier,
-        },
-      ) {
+      storeAuthorizationCode({
+        clientId,
+        challenge,
+        challengeMethod,
+        redirectUri,
+        scopes,
+        ttl,
+        userIdentifier,
+      }) {
         return createAuthorizationCode(
           database,
           userIdentifier,
@@ -94,7 +95,7 @@ export function server(database: Database, {
       },
     },
     deviceCode: {
-      endpoint: './device',
+      endpoint: "./device",
       pollDeviceChallenge(clientId, code) {
         return pollDeviceChallenge(database, clientId, code);
       },
@@ -106,23 +107,24 @@ export function server(database: Database, {
       },
     },
     pushedAuthorizationRequests: {
-      endpoint: './par',
+      endpoint: "./par",
       ttl: 60,
       loadAuthorizationRequest(requestUri) {
-        return loadAuthorizationRequest(database, requestUri);
+        return loadAuthorizationRequest(
+          database,
+          requestUri,
+        ) as Promise<Entities.AuthorizationRequest>;
       },
-      storeAuthorizationRequest(
-        {
-          clientId,
-          ttl,
-          challenge,
-          challengeMethod = 'S256',
-          redirectUri,
-          responseType,
-          state,
-          scopes,
-        },
-      ) {
+      storeAuthorizationRequest({
+        clientId,
+        ttl,
+        challenge,
+        challengeMethod = "S256",
+        redirectUri,
+        responseType,
+        state,
+        scopes,
+      }) {
         return storeAuthorizationRequest(database, {
           client_id: clientId,
           code_challenge: challenge,
@@ -132,11 +134,11 @@ export function server(database: Database, {
           response_type: responseType,
           scopes: scopes ?? null,
           state: state ?? null,
-        });
+        }) as Promise<Entities.AuthorizationRequest>;
       },
     },
     tokenRevocation: {
-      endpoint: './token/revoke',
+      endpoint: "./token/revoke",
       revokeAccessToken(clientId, token) {
         return revokeAccessToken(database, clientId, token);
       },
@@ -145,25 +147,23 @@ export function server(database: Database, {
       },
     },
     tokenIntrospection: {
-      endpoint: './tokeninfo',
+      endpoint: "./tokeninfo",
     },
     serverMetadata: {},
     userInfo: {
-      endpoint: './userinfo',
+      endpoint: "./userinfo",
     },
     clientRegistration: {
-      endpoint: './register',
+      endpoint: "./register",
     },
-    async issueTokens(
-      {
-        accessToken,
-        refreshToken,
-        idToken,
-        clientId,
-        scopes,
-        userIdentifier,
-      },
-    ) {
+    async issueTokens({
+      accessToken,
+      refreshToken,
+      idToken,
+      clientId,
+      scopes,
+      userIdentifier,
+    }) {
       return await database.transaction().execute(async (trx) => {
         const [
           {
@@ -175,37 +175,32 @@ export function server(database: Database, {
         ] = await Promise.all([
           accessToken
             ? createAccessToken(
-              trx,
-              clientId,
-              userIdentifier ?? null,
-              accessToken.scopes ?? scopes,
-              accessToken.ttl ?? accessTokenTtl,
-            )
+                trx,
+                clientId,
+                userIdentifier ?? null,
+                accessToken.scopes ?? scopes,
+                accessToken.ttl ?? accessTokenTtl,
+              )
             : {
-              token: undefined,
-              scopes: [],
-              expires_at: new Date(0),
-            },
+                token: undefined,
+                scopes: [],
+                expires_at: new Date(0),
+              },
 
           refreshToken
             ? createRefreshToken(
-              trx,
-              clientId,
-              userIdentifier ?? null,
-              scopes,
-              refreshTokenTtl,
-            )
+                trx,
+                clientId,
+                userIdentifier ?? null,
+                scopes,
+                refreshTokenTtl,
+              )
             : { token: undefined },
         ]);
 
         const pendingIdToken =
           userIdentifier && idToken
-            ? createIdToken(
-              clientId,
-              userIdentifier,
-              scopes,
-              accessTokenTtl,
-            )
+            ? createIdToken(clientId, userIdentifier, scopes, accessTokenTtl)
             : undefined;
 
         if (accessToken?.exchange) {

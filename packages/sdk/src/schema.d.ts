@@ -5,13 +5,13 @@
 
 import type { ColumnType } from "kysely";
 
-export type ArrayType<T> = ArrayTypeImpl<T> extends (infer U)[]
-  ? U[]
-  : ArrayTypeImpl<T>;
+export type ArrayType<T> =
+  ArrayTypeImpl<T> extends (infer U)[] ? U[] : ArrayTypeImpl<T>;
 
-export type ArrayTypeImpl<T> = T extends ColumnType<infer S, infer I, infer U>
-  ? ColumnType<S[], I[], U[]>
-  : T[];
+export type ArrayTypeImpl<T> =
+  T extends ColumnType<infer S, infer I, infer U>
+    ? ColumnType<S[], I[], U[]>
+    : T[];
 
 export type AuthenticationColorScheme = "dark" | "light" | "system";
 
@@ -19,13 +19,25 @@ export type AuthenticationPkceChallengeMethod = "S256";
 
 export type AuthenticationUserRole = "admin" | "adult" | "child" | "guest";
 
-export type AuthenticationWebauthnTransport = "ble" | "cable" | "hybrid" | "internal" | "nfc" | "smart-card" | "usb";
+export type AuthenticationWebauthnTransport =
+  | "ble"
+  | "cable"
+  | "hybrid"
+  | "internal"
+  | "nfc"
+  | "smart-card"
+  | "usb";
 
-export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
-  ? ColumnType<S, I | undefined, U>
-  : ColumnType<T, T | undefined, T>;
+export type Generated<T> =
+  T extends ColumnType<infer S, infer I, infer U>
+    ? ColumnType<S, I | undefined, U>
+    : ColumnType<T, T | undefined, T>;
 
-export type Int8 = ColumnType<string, bigint | number | string, bigint | number | string>;
+export type Int8 = ColumnType<
+  string,
+  bigint | number | string,
+  bigint | number | string
+>;
 
 export type Json = JsonValue;
 
@@ -39,7 +51,12 @@ export type JsonPrimitive = boolean | number | string | null;
 
 export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 
-export type LanguageType = "constructed" | "extinct" | "historical" | "living" | "special";
+export type LanguageType =
+  | "constructed"
+  | "extinct"
+  | "historical"
+  | "living"
+  | "special";
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
@@ -224,7 +241,7 @@ export interface AuthenticationDeviceChallenge {
    */
   scopes: string[] | null;
   /**
-   * Timestamp when the device code has been used to issue an access token, and thus cannot be used anymore. 
+   * Timestamp when the device code has been used to issue an access token, and thus cannot be used anymore.
    */
   used_at: Timestamp | null;
   /**

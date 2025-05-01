@@ -1,9 +1,9 @@
 import { Parser } from "@oclif/core";
-import { expect, test } from "vitest";
+import { describe, expect, it } from "vitest";
 import { filterFactory } from "./filter.js";
 
 describe("filter flag", () => {
-  test("parses string filters", async () => {
+  it("should parses string filters", async () => {
     const {
       flags: { filter: result },
     } = await Parser.parse(["--filter", "name=John"], {
@@ -83,7 +83,7 @@ describe("filter flag", () => {
     });
   });
 
-  test("parses number filters", async () => {
+  it("should parses number filters", async () => {
     const {
       flags: { filter: result },
     } = await Parser.parse(["--filter", "age=25"], {
@@ -163,7 +163,7 @@ describe("filter flag", () => {
     });
   });
 
-  test("parses date filters", async () => {
+  it("should parses date filters", async () => {
     const {
       flags: { filter: result },
     } = await Parser.parse(["--filter", "created_at=2024-03-20"], {
@@ -243,7 +243,7 @@ describe("filter flag", () => {
     });
   });
 
-  test("parses boolean filters", async () => {
+  it("should parses boolean filters", async () => {
     const {
       flags: { filter: result },
     } = await Parser.parse(["--filter", "is_active=true"], {
@@ -297,7 +297,7 @@ describe("filter flag", () => {
     });
   });
 
-  test("parses null filters", async () => {
+  it("should parses null filters", async () => {
     const {
       flags: { filter: result },
     } = await Parser.parse(["--filter", "deleted_at=null"], {
@@ -325,7 +325,7 @@ describe("filter flag", () => {
     });
   });
 
-  test("parses list filters", async () => {
+  it("should parses list filters", async () => {
     const {
       flags: { filter: result },
     } = await Parser.parse(["--filter", "status=in(active,pending)"], {
@@ -353,7 +353,7 @@ describe("filter flag", () => {
     });
   });
 
-  test("handles quoted string values", async () => {
+  it("should handles quoted string values", async () => {
     const {
       flags: { filter: result },
     } = await Parser.parse(["--filter", 'name="John Doe"'], {
@@ -368,7 +368,7 @@ describe("filter flag", () => {
     });
   });
 
-  test("handles alternative operator syntaxes", async () => {
+  it("should handles alternative operator syntaxes", async () => {
     const {
       flags: { filter: result },
     } = await Parser.parse(["--filter", "age=eq25"], {

@@ -36,14 +36,15 @@ export function humanReadableFileSize(size: number): string {
 }
 
 export function inferNameFromEmailAddress(email: string): string {
-  const mailbox = email
+  const mailbox =
+    email
 
-    // Pick anything before the last @ character ("foo\@bar@test.com" -> "foo\@bar")
-    .slice(0, email.lastIndexOf('@'))
+      // Pick anything before the last @ character ("foo\@bar@test.com" -> "foo\@bar")
+      .slice(0, email.lastIndexOf('@'))
 
-    // Remove any + modifiers
-    .split('+', 1)
-    .shift() ?? '';
+      // Remove any + modifiers
+      .split('+', 1)
+      .shift() ?? '';
 
   let name = mailbox
 

@@ -18,7 +18,7 @@ export function redirectResponse(
   uri: string | URL,
   searchParams?: URLSearchParams | Record<string, string | undefined | null>,
   status = 302,
-) {
+): Response {
   const url = new URL(uri);
 
   if (searchParams instanceof URLSearchParams) {
@@ -62,10 +62,10 @@ export function redirectResponse(
  * @param payload The payload to include in the JSON response.
  * @param init Optional response initialization options. Passed to the Response constructor verbatim
  */
-export function jsonResponse(payload: any, init?: ResponseInit) {
-  // Indenting the JSON response isn't very common, but it makes it easier to read the response body
-  // when debugging an already annoying issue, so let's grant this curtesy to the developer dealing
-  // with our library here, at the cost of a few bytes in the response body.
+export function jsonResponse(payload: any, init?: ResponseInit): Response {
+  // Indenting the JSON response isn't very common. However, it makes it easier to read the response
+  // body when debugging an already annoying issue, so let's grant this curtesy to the developer
+  // dealing with our library here, at the cost of a few bytes in the response body.
   const body = JSON.stringify(payload, null, 2);
 
   return new Response(body, {

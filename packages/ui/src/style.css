@@ -2,7 +2,7 @@
 @import "@colibri-hq/shared/theme.css";
 
 @layer base {
-    html {
-        @apply dark:bg-gray-900;
-    }
+  html {
+    @apply dark:bg-gray-900;
+  }
 }

@@ -54,7 +54,8 @@ describe("Device Authorization Grant Unit Tests", () => {
         device_code: mockChallenge.device_code,
         user_code: mockChallenge.user_code,
         verification_uri: "http://localhost:3000/device",
-        verification_uri_complete: "http://localhost:3000/device?user_code=test-user-code",
+        verification_uri_complete:
+          "http://localhost:3000/device?user_code=test-user-code",
         expires_in: 600,
         interval: 5,
       });
@@ -156,4 +157,4 @@ describe("Device Authorization Grant Unit Tests", () => {
       expect(result).toBe(false);
     });
   });
-}); 
+});

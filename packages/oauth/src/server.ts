@@ -252,22 +252,28 @@ class AuthorizationServer<
   }
 
   // region OAuth 2.0 endpoints
-  public async handleTokenRequest(request: Request) {
+  public async handleTokenRequest(request: Request): Promise<Response> {
     return handleTokenRequest(request, {
       grantTypes: this.#grantTypes,
       options: this.#options,
     });
   }
 
-  public async handleTokenRevocationRequest(request: Request) {
+  public async handleTokenRevocationRequest(
+    request: Request,
+  ): Promise<Response> {
     return handleTokenRevocation(request, this.#options);
   }
 
-  public async handleTokenIntrospectionRequest(request: Request) {
+  public async handleTokenIntrospectionRequest(
+    request: Request,
+  ): Promise<Response> {
     return handleTokenIntrospection(request, this.#options);
   }
 
-  public async handleServerMetadataRequest(request: Request) {
+  public async handleServerMetadataRequest(
+    request: Request,
+  ): Promise<Response> {
     return handleServerMetadataRequest(request, {
       configuration: this.configuration,
       options: this.#options,
@@ -277,7 +283,7 @@ class AuthorizationServer<
   public async handleAuthorizationRequest(
     request: Request,
     userIdentifier: string,
-  ) {
+  ): Promise<Response> {
     if (!this.#options.authorizationCode) {
       throw new OAuthError(
         "unauthorized_client",
@@ -292,7 +298,9 @@ class AuthorizationServer<
     });
   }
 
-  public async handleDeviceAuthorizationRequest(request: Request) {
+  public async handleDeviceAuthorizationRequest(
+    request: Request,
+  ): Promise<Response> {
     if (!this.#options.deviceCode) {
       throw new OAuthError(
         "unauthorized_client",
@@ -306,7 +314,9 @@ class AuthorizationServer<
     });
   }
 
-  public async handlePushedAuthorizationRequest(request: Request) {
+  public async handlePushedAuthorizationRequest(
+    request: Request,
+  ): Promise<Response> {
     if (!this.#options.authorizationCode) {
       throw new OAuthError(
         "unauthorized_client",
@@ -319,7 +329,7 @@ class AuthorizationServer<
 
   // endregion
 
-  public checkAuthorization(request: Request) {
+  public checkAuthorization(request: Request): Promise<A> {
     return assertAuthorization(request, this.#options);
   }
 }

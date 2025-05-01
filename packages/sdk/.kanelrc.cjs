@@ -1,9 +1,9 @@
-const { makeKyselyHook } = require('kanel-kysely');
+const { makeKyselyHook } = require("kanel-kysely");
 
 const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
-  throw new Error('DATABASE_URL environment variable must be set');
+  throw new Error("DATABASE_URL environment variable must be set");
 }
 
 /** @type {import('kanel').Config} */
@@ -11,18 +11,18 @@ module.exports = {
   connection: {
     connectionString,
   },
-  schemas: ['public', 'authentication', 'auth'],
+  schemas: ["public", "authentication", "auth"],
 
   preDeleteOutputFolder: true,
-  outputPath: './src/schema',
+  outputPath: "./src/schema",
 
   customTypeMap: {
-    'pg_catalog.tsvector': 'string',
-    'pg_catalog.bpchar': 'string',
-    'pg_catalog.float8': 'number',
+    "pg_catalog.tsvector": "string",
+    "pg_catalog.bpchar": "string",
+    "pg_catalog.float8": "number",
   },
 
-  enumStyle: 'type',
+  enumStyle: "type",
 
   preRenderHooks: [makeKyselyHook()],
 };

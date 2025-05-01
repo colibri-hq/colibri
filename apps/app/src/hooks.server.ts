@@ -12,7 +12,6 @@ import { createTRPCHandle } from "trpc-sveltekit";
 const handlers = [
   // region Database Connection in context
   async function handle({ event, resolve }) {
-
     // TODO: Accessing the environment variables dynamically here breaks prerendering
     //       currently; but reading them from the static env means we'd need to build
     //       the app against a specific database URL. This may not be what we want;

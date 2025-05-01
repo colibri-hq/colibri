@@ -50,7 +50,7 @@ export class OAuthError extends Error {
     return this.#description.format()._errors.join(", ");
   }
 
-  get response() {
+  get response(): Response {
     return jsonResponse(
       {
         error: this.code,
@@ -123,7 +123,7 @@ export class OAuthAuthorizationError extends OAuthError {
     this.name = "OAuthAuthorizationError";
   }
 
-  get response() {
+  get response(): Response {
     return redirectResponse(this.redirectUri, {
       error: this.code,
       error_description: this.description,

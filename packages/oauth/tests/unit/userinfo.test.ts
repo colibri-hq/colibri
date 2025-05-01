@@ -142,4 +142,4 @@ describe("User Info Endpoint Unit Tests", () => {
       await expect(server.handleUserInfoRequest(request)).rejects.toThrow();
     });
   });
-}); 
+});

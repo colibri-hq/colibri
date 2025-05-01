@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   type AuthorizationServerOptions,
   type Entities,
-  createAuthorizationServer, AuthorizationCodeGrant
+  createAuthorizationServer,
+  AuthorizationCodeGrant,
 } from "../../src";
 import type { createMockPersistence } from "../utilities";
 

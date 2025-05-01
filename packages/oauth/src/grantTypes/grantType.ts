@@ -1,7 +1,6 @@
 import { z, type ZodType } from "zod";
-import { OAuthError } from "../errors";
 import type { MaybePromise } from "@colibri-hq/shared";
-import type { Entities, OAuthGrantType, RequestedToken, TokenPayload } from "../types";
+import type { Entities, OAuthGrantType, RequestedToken } from "../types";
 
 /**
  * Define a new grant type handler
