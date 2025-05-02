@@ -9,7 +9,7 @@
 </script>
 
 <Button
-  class="mt-auto justify-center bg-black py-4 text-white"
+  class="w-full justify-center bg-black py-4 text-white"
   onclick={onClick}
   type="button"
   variant="primary"

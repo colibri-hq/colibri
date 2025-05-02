@@ -1,10 +1,5 @@
 <script lang="ts">
-  import {
-    Field,
-    NavigationKnob,
-    NavigationLink,
-    NavigationSection,
-  } from '@colibri-hq/ui';
+  import { Field, NavigationKnob, NavigationLink, NavigationMenu, NavigationSection } from '@colibri-hq/ui';
   import AccountPromotionBanner from '$lib/components/Sidebar/AccountPromotionBanner.svelte';
   import AddBookButton from '$lib/components/Sidebar/AddBookButton.svelte';
   import CollectionsList from '$lib/components/Sidebar/CollectionsList.svelte';
@@ -45,7 +40,7 @@
     />
   </div>
 
-  <div
+  <NavigationMenu
     class="flex h-full max-h-full flex-col overflow-y-auto px-4 py-1 md:gap-y-4"
   >
     <!-- region Search Bar -->
@@ -87,14 +82,17 @@
     {/if}
     <!-- endregion -->
 
-    <!-- region Navigation Actions Area -->
+  </NavigationMenu>
+
+  <!-- region Navigation Actions Area -->
+  <div class="px-4 flex justify-stretch">
     {#if user}
       <AddBookButton onClick={onUpload} />
     {:else}
       <AccountPromotionBanner />
     {/if}
-    <!-- endregion -->
   </div>
+  <!-- endregion -->
 
   <!-- region User Account Area -->
   {#if user}

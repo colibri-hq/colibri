@@ -39,6 +39,7 @@
   /* endregion */
 }
 
+@source "../../packages/ui/src/**/*.{js,ts,svelte}";
 @source "./lib/**/*";
 
 /* region Custom Variants */
@@ -160,3 +161,9 @@ div.markdown-body {
 }
 
 /* endregion */
+
+/* https://tailwindcss.com/docs/upgrade-guide#buttons-use-the-default-cursor */
+button:not(:disabled),
+[role='button']:not(:disabled) {
+  cursor: pointer;
+}

@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import Icon from '../Icon/Icon.svelte';
   import type { Snippet } from 'svelte';
-  import { Button } from 'bits-ui';
+  import { Button, NavigationMenu } from 'bits-ui';
 
   interface Props {
     /**
@@ -46,6 +46,10 @@
 
   const { title, to, icon, emoji, onClick, children, ...rest }: Props = $props();
 
+  const ButtonRoot = Button.Root;
+  const NavigationMenuItem = NavigationMenu.Item;
+  const NavigationMenuLink = NavigationMenu.Link;
+
   const onclick = (event: MouseEvent) => {
     if (!to) {
       event.preventDefault();
@@ -54,37 +58,41 @@
     onClick?.(event);
   };
 
-  const ButtonRoot = Button.Root;
   const active = $derived.by(() => page.url.pathname === to);
 </script>
 
-<li class="contents">
-  <ButtonRoot
-    {...rest}
-    aria-current={active ? 'page' : 'false'}
-    class="group/link flex items-center justify-center gap-2 rounded-md p-2 text-gray-500 outline-none
-    transition hover:bg-gray-200 dark:hover:bg-gray-900 hover:text-gray-700 active:bg-gray-300
-    focus-visible:bg-gray-200 dark:focus-visible:bg-gray-900 dark:focus-visible:ring-gray-800
-    focus-visible:text-gray-700 focus-visible:ring sm:justify-start sm:py-1 sm:px-2 select-none
-    {active ? 'bg-gray-200 dark:bg-gray-700' : undefined}
-    dark:text-gray-400 dark:hover:text-gray-300 dark:active:bg-gray-600 dark:focus-visible:text-gray-300"
-    href={to}
-    {onclick}
-  >
-    {#if typeof icon === 'string'}
-      <Icon class="mt-[1.5px] text-3xl sm:text-xl" name={icon} />
-    {:else if emoji}
-      <span class="text-3xl sm:text-xl">{emoji}</span>
-    {:else}
-      {@render icon?.()}
-    {/if}
+<NavigationMenuItem class="contents">
+  <NavigationMenuLink>
+    {#snippet child({ props })}
+      <ButtonRoot
+        {...props}
+        class="group/link flex items-center justify-center gap-2 rounded-md p-2 text-gray-500 outline-none
+        transition hover:bg-gray-200 dark:hover:bg-gray-900 hover:text-gray-700 active:bg-gray-300
+        focus-visible:bg-gray-200 dark:focus-visible:bg-gray-900 dark:focus-visible:ring-gray-800
+        focus-visible:text-gray-700 focus-visible:ring sm:justify-start sm:py-1 sm:px-2 select-none
+        {active ? 'bg-gray-200 dark:bg-gray-700' : undefined}
+        dark:text-gray-400 dark:hover:text-gray-300 dark:active:bg-gray-600 dark:focus-visible:text-gray-300"
+        {...rest}
+        {onclick}
+        href={to}
+        aria-current={active ? 'page' : 'false'}
+      >
+        {#if typeof icon === 'string'}
+          <Icon class="mt-[1.5px] text-3xl sm:text-xl" name={icon} />
+        {:else if emoji}
+          <span class="text-3xl sm:text-xl">{emoji}</span>
+        {:else}
+          {@render icon?.()}
+        {/if}
 
-    <div class="hidden sm:contents">
-      {#if children}
-        {@render children()}
-      {:else}
-        <span>{title}</span>
-      {/if}
-    </div>
-  </ButtonRoot>
-</li>
+        <span class="hidden sm:contents">
+          {#if children}
+            {@render children()}
+          {:else}
+            <span>{title}</span>
+          {/if}
+        </span>
+      </ButtonRoot>
+    {/snippet}
+  </NavigationMenuLink>
+</NavigationMenuItem>

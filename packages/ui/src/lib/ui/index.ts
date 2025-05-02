@@ -10,6 +10,7 @@ export { Icon } from "./Icon/index.js";
 export { LoadingIndicator } from "./LoadingIndicator/index.js";
 export { NavigationKnob } from "./NavigationKnob/index.js";
 export { NavigationLink } from "./NavigationLink/index.js";
+export { NavigationMenu } from "./NavigationMenu/index.js";
 export { NavigationSection } from "./NavigationSection/index.js";
 export { QrCode } from "./QrCode/index.js";
 export { StarRating } from "./StarRating/index.js";
