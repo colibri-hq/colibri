@@ -27,10 +27,11 @@ services:
       POSTGRES_DB: colibri
     configs:
       - source: postgres-init-roles
-        target: /docker-entrypoint-initdb.d/0_roles.sql
+        target: /bootstrap/0_roles.sql
+        mode: 0777
       - source: postgres-init-schema
         target: /docker-entrypoint-initdb.d/0_init.sh
-        mode: 700
+        mode: 0777
     volumes:
       - source: postgres
         target: /var/lib/postgresql/data
@@ -129,19 +130,66 @@ configs:
       create role anon;
       create role authenticated;
       create role service_role bypassrls;
+      create role postgres bypassrls;
   postgres-init-schema:
     # language=bash
     content: |
       #!/usr/bin/env bash
-      set -eux
-      cat /colibri/schema/*.sql > /docker-entrypoint-initdb.d/1_init.sql
+      set -euo pipefail
+
+      function apply_schema() {
+        local file="$${1}"
+        echo "Applying schema changes from '$${file}'…"
+        psql \
+          --set ON_ERROR_STOP=ON \
+          --single-transaction \
+          --dbname colibri \
+          --user=colibri \
+          --echo-errors \
+          --quiet \
+          --file "$${file}"
+      }
       
-      if [ -n "$(find /colibri/migrations -maxdepth 0 -not -empty)" ]; then
-        cat /colibri/migrations/*.sql > /docker-entrypoint-initdb.d/2_migrations.sql
-      fi
-      
-      if [ -n "$(find /colibri/seeds -maxdepth 0 -not -empty)" ]; then
-        cat /colibri/seeds/*.sql > /docker-entrypoint-initdb.d/3_seeds.sql
+      function apply_files() {
+        local files=("$${@}")
+        for file in "$${files[@]}"; do
+          if [ -f "$${file}" ]; then
+            apply_schema "$${file}"
+          else
+            echo "Warning: File '$${file}' not found. Skipping."
+          fi
+        done
+      }
+
+      schema_files=(
+        /bootstrap/*.sql
+        /colibri/schema/*.sql
+      )
+
+      if [ "$${#schema_files[@]}" -eq 0 ]; then
+        echo "No schema files found in /bootstrap or /colibri/schema. Aborting."
+        exit 1
       fi
 
+      apply_files "$${schema_files[@]}"
+
+      if [ -n "$$(find /colibri/migrations -maxdepth 0 -not -empty)" ]; then
+        migration_files=(
+          /colibri/migrations/*.sql
+        )
+
+        apply_files "$${migration_files[@]}"
+      else
+        echo "No pending migrations found."
+      fi
+      
+      if [ -n "$$(find /colibri/seeds -maxdepth 0 -not -empty)" ]; then
+        seed_files=(
+          /colibri/seeds/*.sql
+        )
+        
+        apply_files "$${seed_files[@]}"
+      else
+        echo "No pending seeds found."
+      fi
   # endregion

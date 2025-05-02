@@ -97,11 +97,9 @@ grant all on function authentication.validate_authenticator(authenticator_id cha
 grant all on table authentication.authenticator to anon;
 grant all on table authentication.authenticator to authenticated;
 grant all on table authentication.authenticator to service_role;
-grant all on table authentication.authenticator to supabase_admin;
 grant all on sequence authentication.authenticator_id_seq to anon;
 grant all on sequence authentication.authenticator_id_seq to authenticated;
 grant all on sequence authentication.authenticator_id_seq to service_role;
-grant all on sequence authentication.authenticator_id_seq to supabase_admin;
 
 alter table authentication.authenticator
     enable row level security;
@@ -226,11 +224,9 @@ alter table authentication.challenge
 grant all on table authentication.challenge to anon;
 grant all on table authentication.challenge to authenticated;
 grant all on table authentication.challenge to service_role;
-grant all on table authentication.challenge to supabase_admin;
 grant all on sequence authentication.challenge_id_seq to anon;
 grant all on sequence authentication.challenge_id_seq to authenticated;
 grant all on sequence authentication.challenge_id_seq to service_role;
-grant all on sequence authentication.challenge_id_seq to supabase_admin;
 
 alter table authentication.challenge
     enable row level security;
