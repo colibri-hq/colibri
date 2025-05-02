@@ -1,5 +1,7 @@
 services:
   colibri:
+    profiles:
+      - preview
     build:
       context: .
       args:
