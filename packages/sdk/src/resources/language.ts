@@ -1,4 +1,4 @@
-import type { Database } from "../database";
+import type { Database } from "../database.js";
 
 export function loadLanguages(database: Database) {
   return database.selectFrom("language").execute();

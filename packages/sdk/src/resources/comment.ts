@@ -1,6 +1,6 @@
 import type { Selectable } from "kysely";
-import type { User } from "./authentication";
-import type { Database, Schema } from "../database";
+import type { User } from "./authentication/user.js";
+import type { Database, Schema } from "../database.js";
 
 const table = "comment" as const;
 

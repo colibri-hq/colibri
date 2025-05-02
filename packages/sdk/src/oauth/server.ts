@@ -1,5 +1,4 @@
-import type { Database } from "../database";
-import { createAuthorizationServer, type Entities } from "@colibri-hq/oauth";
+import type { Database } from "../database.js";
 import {
   createAccessToken,
   createAuthorizationCode,
@@ -17,7 +16,8 @@ import {
   revokeRefreshToken,
   scopeValidationRegex,
   storeAuthorizationRequest,
-} from "../resources";
+} from "../resources/authentication/oauth.js";
+import { createAuthorizationServer, type Entities } from "@colibri-hq/oauth";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
 

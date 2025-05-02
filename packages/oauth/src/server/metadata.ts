@@ -1,10 +1,10 @@
 import type {
   AuthorizationServerMetadata,
   AuthorizationServerOptions,
-} from "../types";
-import { createAuthorizationServer } from "../server";
-import { jsonResponse } from "../utilities";
-import { OAuthError } from "../errors";
+} from "../types.js";
+import { createAuthorizationServer } from "../server.js";
+import { jsonResponse } from "../utilities.js";
+import { OAuthError } from "../errors.js";
 
 /**
  * Authorization Server Metadata Endpoint

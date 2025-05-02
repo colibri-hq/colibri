@@ -1,6 +1,6 @@
 import type { OAuthErrorCode } from "./types.js";
 import { type ZodCustomIssue, ZodError, type ZodIssue } from "zod";
-import { jsonResponse, redirectResponse } from "./utilities";
+import { jsonResponse, redirectResponse } from "./utilities.js";
 
 export const statusMap: Record<OAuthErrorCode, number> = {
   invalid_request: 400,

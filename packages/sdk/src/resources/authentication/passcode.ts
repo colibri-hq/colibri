@@ -1,5 +1,5 @@
-import type { User } from "./user";
-import type { Database } from "../../database";
+import type { User } from "./user.js";
+import type { Database } from "../../database.js";
 import { generateRandomDigits } from "@colibri-hq/shared";
 
 const table = "authentication.passcode" as const;

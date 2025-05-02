@@ -1,4 +1,4 @@
-import type { Database, Schema } from "../../database";
+import type { Database, Schema } from "../../database.js";
 import type { Insertable, Selectable } from "kysely";
 
 const table = "authentication.challenge" as const;

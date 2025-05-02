@@ -1,7 +1,7 @@
 import { Kysely, PostgresDialect } from "kysely";
 import { Buffer } from "node:buffer";
 import { Pool } from "pg";
-import type { DB } from "./schema";
+import type { DB } from "./schema.js";
 
 export type Schema = DB;
 export type Database = Kysely<DB>;

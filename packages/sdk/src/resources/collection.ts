@@ -4,10 +4,10 @@ import {
   type SelectQueryBuilder,
   sql,
 } from "kysely";
-import type { User } from "./authentication";
-import type { Database, Schema } from "../database";
-import type { DB } from "../schema";
-import type { Comment } from "./comment";
+import type { User } from "./authentication/index.js";
+import type { Database, Schema } from "../database.js";
+import type { DB } from "../schema.js";
+import type { Comment } from "./comment.js";
 
 const table = "collection" as const;
 
@@ -240,12 +240,12 @@ function applyAccessControls(
             builder.eb("collection.age_requirement", "<", 18),
           ]),
 
-          // User is a child, but is older than the collection's age limit
+          // User is a child but is older than the collection's age limit
           builder.eb(
             "collection.age_requirement",
             "<=",
             sql<number>`extract
-                (year from age(now(), ${sql.ref("authentication.user.birthdate")}))`,
+              (year from age(now(), ${sql.ref("authentication.user.birthdate")}))`,
           ),
         ]),
         // endregion

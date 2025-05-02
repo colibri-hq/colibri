@@ -1,6 +1,6 @@
 import type { Insertable, Selectable, SelectQueryBuilder } from "kysely";
-import type { Database, Schema } from "../database";
-import type { Creator } from "../schema";
+import type { Database, Schema } from "../database.js";
+import type { Creator } from "../schema.js";
 
 const table = "book" as const;
 

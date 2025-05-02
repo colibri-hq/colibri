@@ -1,5 +1,5 @@
-import { createAuthorizationServer } from "./server";
-import { AuthorizationCodeGrant } from "./grantTypes/authorizationCodeGrant";
+import { createAuthorizationServer } from "./server.js";
+import { AuthorizationCodeGrant } from "./grantTypes/authorizationCodeGrant.js";
 
 const server = createAuthorizationServer({
   issuer: "https://example.com",

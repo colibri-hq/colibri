@@ -1,6 +1,6 @@
 import type { Insertable, Updateable } from "kysely";
-import type { Database, Schema } from "../database";
-import { paginate } from "../utilities";
+import type { Database, Schema } from "../database.js";
+import { paginate } from "../utilities.js";
 
 const table = "catalog" as const;
 

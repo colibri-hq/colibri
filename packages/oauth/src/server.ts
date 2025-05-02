@@ -1,26 +1,26 @@
-import { OAuthError } from "./errors";
-import type { AuthorizationServerOptions, Entities } from "./types";
+import { OAuthError } from "./errors.js";
+import type { AuthorizationServerOptions, Entities } from "./types.js";
 import {
   GrantType,
   type GrantTypeFactory,
   type GrantTypeOptions,
-} from "./grantTypes/grantType";
-import { handleTokenIntrospection } from "./server/introspection";
-import { handleServerMetadataRequest } from "./server/metadata";
-import { handleTokenRevocation } from "./server/revocation";
-import { handleTokenRequest } from "./server/token";
-import { assertAuthorization } from "./server/assert";
+} from "./grantTypes/grantType.js";
+import { handleTokenIntrospection } from "./server/introspection.js";
+import { handleServerMetadataRequest } from "./server/metadata.js";
+import { handleTokenRevocation } from "./server/revocation.js";
+import { handleTokenRequest } from "./server/token.js";
+import { assertAuthorization } from "./server/assert.js";
 import {
   AuthorizationCodeGrant,
   handleAuthorizationRequest,
   handlePushedAuthorizationRequest,
-} from "./grantTypes/authorizationCodeGrant";
+} from "./grantTypes/authorizationCodeGrant.js";
 import {
   DeviceCodeGrant,
   handleDeviceAuthorizationRequest,
-} from "./grantTypes/deviceCodeGrant";
-import { ClientCredentialsGrant } from "./grantTypes/clientCredentialsGrant";
-import { RefreshTokenGrant } from "./grantTypes/refreshTokenGrant";
+} from "./grantTypes/deviceCodeGrant.js";
+import { ClientCredentialsGrant } from "./grantTypes/clientCredentialsGrant.js";
+import { RefreshTokenGrant } from "./grantTypes/refreshTokenGrant.js";
 import { z } from "zod";
 
 export function createAuthorizationServer<

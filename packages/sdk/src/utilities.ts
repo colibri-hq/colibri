@@ -1,7 +1,7 @@
-import type { DB } from "./schema";
+import type { DB } from "./schema.js";
 import { jsonBuildObject } from "kysely/helpers/postgres";
 import { type SelectQueryBuilder, sql } from "kysely";
-import type { Database } from "./database";
+import type { Database } from "./database.js";
 
 type ExtractTableAlias<DB, TE> = TE extends `${string} as ${infer TA}`
   ? TA extends keyof DB

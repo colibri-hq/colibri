@@ -1,8 +1,8 @@
-import { parseRequestBody } from "../utilities";
+import { parseRequestBody } from "../utilities.js";
 import { z } from "zod";
-import { OAuthError } from "../errors";
-import { type AuthorizationServerOptions } from "../types";
-import { assertAuthorization } from "./assert";
+import { OAuthError } from "../errors.js";
+import { type AuthorizationServerOptions } from "../types.js";
+import { assertAuthorization } from "./assert.js";
 
 /**
  * Token Revocation Endpoint

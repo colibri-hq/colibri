@@ -1,13 +1,13 @@
 import { OAuthError } from "../errors.js";
 import type { AuthorizationServerOptions, Entities } from "../types.js";
 import { z } from "zod";
-import { defineGrantType, type GrantTypeOptions } from "./grantType";
+import { defineGrantType, type GrantTypeOptions } from "./grantType.js";
 import {
   jsonResponse,
   parseRequestBody,
   resolveClient,
   timeOffset,
-} from "../utilities";
+} from "../utilities.js";
 import type { MaybePromise } from "@colibri-hq/shared";
 
 export interface DeviceCodeGrantOptions<

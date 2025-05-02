@@ -1,8 +1,8 @@
 import type { MaybePromise } from "@colibri-hq/shared";
-import type { ClientCredentialsGrantOptions } from "./grantTypes/clientCredentialsGrant";
-import type { RefreshTokenGrantOptions } from "./grantTypes/refreshTokenGrant";
-import type { AuthorizationCodeGrantOptions } from "./grantTypes/authorizationCodeGrant";
-import type { DeviceCodeGrantOptions } from "./grantTypes/deviceCodeGrant";
+import type { ClientCredentialsGrantOptions } from "./grantTypes/clientCredentialsGrant.js";
+import type { RefreshTokenGrantOptions } from "./grantTypes/refreshTokenGrant.js";
+import type { AuthorizationCodeGrantOptions } from "./grantTypes/authorizationCodeGrant.js";
+import type { DeviceCodeGrantOptions } from "./grantTypes/deviceCodeGrant.js";
 import { z } from "zod";
 
 // region Specification

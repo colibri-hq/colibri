@@ -1,7 +1,7 @@
 import { OAuthError } from "../errors.js";
 import { encodeToBase64, hash, timingSafeEqual } from "@colibri-hq/shared";
 import { z } from "zod";
-import { defineGrantType, type GrantTypeOptions } from "./grantType";
+import { defineGrantType, type GrantTypeOptions } from "./grantType.js";
 
 export interface ClientCredentialsGrantOptions extends GrantTypeOptions {
   /**

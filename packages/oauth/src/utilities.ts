@@ -1,5 +1,5 @@
-import type { AuthorizationServerOptions, Entities } from "./types";
-import { OAuthError } from "./errors";
+import type { AuthorizationServerOptions, Entities } from "./types.js";
+import { OAuthError } from "./errors.js";
 
 // region Response Generation
 

@@ -1,4 +1,4 @@
-import type { AuthorizationServerOptions, Entities } from "../types";
+import type { AuthorizationServerOptions, Entities } from "../types.js";
 
 export async function assertAuthorization<
   T extends Entities.AccessToken,

@@ -1,5 +1,5 @@
-import type { User } from "./user";
-import type { Database, Schema } from "../../database";
+import type { User } from "./user.js";
+import type { Database, Schema } from "../../database.js";
 import { type Insertable, type Selectable, type Updateable } from "kysely";
 
 const table = "authentication.authenticator" as const;

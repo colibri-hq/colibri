@@ -1,6 +1,6 @@
 import type { Selectable } from "kysely";
-import type { Database, Schema } from "../database";
-import { paginate } from "../utilities";
+import type { Database, Schema } from "../database.js";
+import { paginate } from "../utilities.js";
 
 const table = "creator" as const;
 

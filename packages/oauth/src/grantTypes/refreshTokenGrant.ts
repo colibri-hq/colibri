@@ -1,7 +1,7 @@
 import { OAuthError } from "../errors.js";
 import type { Entities } from "../types.js";
 import { z } from "zod";
-import { defineGrantType, type GrantTypeOptions } from "./grantType";
+import { defineGrantType, type GrantTypeOptions } from "./grantType.js";
 
 export interface RefreshTokenGrantOptions<
   T extends Entities.RefreshToken = Entities.RefreshToken,

@@ -1,3 +1,3 @@
-export * from "./resources/index";
-export * from "./database";
+export * from "./resources/index.js";
+export * from "./database.js";
 export { NoResultError } from "kysely";

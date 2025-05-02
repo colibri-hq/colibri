@@ -10,9 +10,8 @@
     "lib": [
       "ESNext"
     ],
-    "module": "ESNext",
-    "moduleDetection": "auto",
-    "moduleResolution": "bundler",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "noEmit": true,
     "noImplicitAny": true,
     "pretty": true,

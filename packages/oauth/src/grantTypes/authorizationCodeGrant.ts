@@ -1,13 +1,16 @@
 import { z } from "zod";
-import { defineGrantType, type GrantTypeOptions } from "./grantType";
-import { OAuthAuthorizationError, OAuthError } from "../errors";
+import {
+  defineGrantType,
+  type GrantTypeOptions,
+} from "./grantType.js";
+import { OAuthAuthorizationError, OAuthError } from "../errors.js";
 import {
   type AuthorizationServerOptions,
   type Entities,
   type PkceCodeChallengeMethod,
   type ResponseMode,
   type ResponseType,
-} from "../types";
+} from "../types.js";
 import {
   jsonResponse,
   parseRequestBody,
@@ -15,7 +18,7 @@ import {
   resolveClient,
   resolveScopes,
   timeOffset,
-} from "../utilities";
+} from "../utilities.js";
 import type { MaybePromise } from "@colibri-hq/shared";
 
 export interface AuthorizationCodeGrantOptions<

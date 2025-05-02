@@ -1,6 +1,6 @@
 import type { Selectable } from "kysely";
-import { withCover } from "./book";
-import type { Database, Schema } from "../database";
+import { withCover } from "./book.js";
+import type { Database, Schema } from "../database.js";
 
 const table = "publisher" as const;
 

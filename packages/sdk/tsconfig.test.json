@@ -3,7 +3,6 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
-    "lib": ["ESNext"],
     "tsBuildInfoFile": ".cache/tsbuildinfo.test.json",
     "types": ["vitest/globals", "node"]
   },

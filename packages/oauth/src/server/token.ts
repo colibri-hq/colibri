@@ -1,14 +1,14 @@
-import { jsonResponse, parseRequestBody, timeOffset } from "../utilities";
+import { jsonResponse, parseRequestBody, timeOffset } from "../utilities.js";
 import { z, ZodError } from "zod";
-import { OAuthError } from "../errors";
+import { OAuthError } from "../errors.js";
 import type {
   AuthorizationServerOptions,
   Entities,
   OAuthGrantType,
   PersistedTokensInfo,
   TokenPayload,
-} from "../types";
-import { GrantType } from "../grantTypes/grantType";
+} from "../types.js";
+import { GrantType } from "../grantTypes/grantType.js";
 
 /**
  * Token Endpoint

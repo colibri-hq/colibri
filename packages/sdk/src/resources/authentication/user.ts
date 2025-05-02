@@ -1,6 +1,6 @@
-import type { Database, Schema } from "../../database";
+import type { Database, Schema } from "../../database.js";
 import type { Insertable, Selectable, Updateable } from "kysely";
-import { paginate } from "../../utilities";
+import { paginate } from "../../utilities.js";
 
 const table = "authentication.user" as const;
 
