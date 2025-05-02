@@ -1,4 +1,4 @@
-import { arrayBufferToHex } from './buffer';
+import { arrayBufferToHex } from './buffer.js';
 
 export function generateRandomString(
   length: number,

@@ -9,7 +9,7 @@
     "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "module": "ESNext",
+    "module": "NodeNext",
     "moduleResolution": "nodenext",
     "outDir": "./dist",
     "resolveJsonModule": true,

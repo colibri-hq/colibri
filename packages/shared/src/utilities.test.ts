@@ -6,7 +6,7 @@ import {
   slugify,
   uniqueBy,
   wrapArray,
-} from './utilities';
+} from './utilities.js';
 
 describe('utilities', () => {
   describe('sleep', () => {

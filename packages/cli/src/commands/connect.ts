@@ -36,12 +36,11 @@ export default class Connect extends BaseCommand<typeof Connect> {
   ];
 
   async run() {
-    const { args, flags } = await this.parse(Connect);
-    const instanceUri = flags.instance ?? (await this.promptForInstance());
+    const instanceUri = this.flags.instance ?? (await this.promptForInstance());
 
     try {
       // Try to connect to the database
-      initialize(args.dsn);
+      initialize(this.args.dsn);
 
       // If we get here, the connection was successful
       this.logToStderr("Successfully connected to the database");
@@ -51,7 +50,7 @@ export default class Connect extends BaseCommand<typeof Connect> {
 
       // Store the connection string in the config
       const instanceKey = instanceUri.toString();
-      config.instances[instanceKey] = { databaseUri: args.dsn.toString() };
+      config.instances[instanceKey] = { databaseUri: this.args.dsn.toString() };
 
       // If this is the first instance, set it as default
       if (Object.keys(config.instances).length === 1) {
