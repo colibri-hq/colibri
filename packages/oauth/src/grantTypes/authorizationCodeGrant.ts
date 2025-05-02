@@ -1,8 +1,5 @@
 import { z } from "zod";
-import {
-  defineGrantType,
-  type GrantTypeOptions,
-} from "./grantType.js";
+import { defineGrantType, type GrantTypeOptions } from "./grantType.js";
 import { OAuthAuthorizationError, OAuthError } from "../errors.js";
 import {
   type AuthorizationServerOptions,
