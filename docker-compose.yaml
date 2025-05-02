@@ -1,5 +1,6 @@
 services:
   colibri:
+    container_name: colibri-web
     profiles:
       - preview
     build:
