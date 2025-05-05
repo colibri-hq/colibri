@@ -70,7 +70,7 @@
     "@colibri-hq/shared": "workspace:*",
     "@inquirer/prompts": "^7.5.0",
     "@oclif/core": "^4.3.0",
-    "@oclif/plugin-help": "^6.2.27",
+    "@oclif/plugin-help": "^6.2.28",
     "@oclif/plugin-not-found": "^3.2.50",
     "@oclif/plugin-plugins": "^5.4.36",
     "ansis": "^3.17.0",
