@@ -60,7 +60,7 @@
     "@fontsource-variable/material-symbols-outlined": "catalog:",
     "@fontsource/neuton": "catalog:",
     "@fontsource/titillium-web": "catalog:",
-    "bits-ui": "^1.4.3",
+    "bits-ui": "^1.4.6",
     "blurhash": "^2.0.5",
     "esm-env": "^1.2.2",
     "qrcode": "^1.5.4"
