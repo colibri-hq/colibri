@@ -54,7 +54,7 @@
     "eslint-plugin-oxlint": "^0.16.8",
     "eslint-plugin-svelte": "^3.5.1",
     "globals": "catalog:",
-    "oxlint": "^0.16.8",
+    "oxlint": "^0.16.10",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-svelte": "^3.3.3",
