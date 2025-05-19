@@ -67,7 +67,7 @@
       <ButtonRoot
         {...props}
         class="group/link flex items-center justify-center gap-2 rounded-md p-2 text-gray-500 outline-none
-        transition hover:bg-gray-200 dark:hover:bg-gray-900 hover:text-gray-700 active:bg-gray-300
+        transition hover:bg-gray-200/50 dark:hover:bg-gray-900 hover:text-gray-700 active:bg-gray-300
         focus-visible:bg-gray-200 dark:focus-visible:bg-gray-900 dark:focus-visible:ring-gray-800
         focus-visible:text-gray-700 focus-visible:ring sm:justify-start sm:py-1 sm:px-2 select-none
         {active ? 'bg-gray-200 dark:bg-gray-700' : undefined}

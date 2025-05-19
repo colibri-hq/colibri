@@ -21,9 +21,9 @@
 </script>
 
 <NavigationMenuRoot {...rest} class={className} {orientation}>
-  <NavigationMenuList>
+  <NavigationMenuList class="contents">
     {#snippet child({ props })}
-      <ul {...props}>
+      <ul class="contents" {...props}>
         {@render children()}
       </ul>
     {/snippet}

@@ -43,7 +43,7 @@
     {#snippet child({ props })}
       <details
         {...props}
-        class={twMerge('flex flex-col gap-4', className, 'group')}
+        class={twMerge('flex flex-col', className, 'group')}
         {open}
       >
         <CollapsibleTrigger>

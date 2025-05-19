@@ -26,7 +26,7 @@
   let searchTerm = $state('');
 </script>
 
-<nav class={twMerge(className, 'flex flex-col gap-2 py-2')}>
+<div class={twMerge(className, 'flex flex-col gap-2 py-2')}>
   <div
     class="flex items-center justify-center px-4 pt-2 sm:justify-between sm:pt-0"
   >
@@ -96,7 +96,7 @@
 
   <!-- region User Account Area -->
   {#if user}
-    <CurrentUser class="ps-4 pe-4" email={user.email} name={user.name} />
+    <CurrentUser class="px-4" email={user.email} name={user.name} />
   {/if}
   <!-- endregion -->
-</nav>
+</div>

@@ -42,12 +42,11 @@
   class="{className} flex w-full items-center justify-center gap-2 select-none sm:justify-start"
 >
   <a
-    class="flex grow items-center justify-center gap-4
-   rounded-md outline-0 focus-visible:ring-2 md:justify-start"
+    class="flex grow items-center justify-center gap-4 rounded-md outline-0 focus-visible:ring-2 md:justify-start"
     href="/instance/profile"
   >
     <Gravatar
-      class="overflow-hidden rounded-full shadow-md ring ring-gray-300"
+      class="overflow-hidden rounded-full shadow-md ring ring-gray-300 size-10"
       {email}
     />
     <span
