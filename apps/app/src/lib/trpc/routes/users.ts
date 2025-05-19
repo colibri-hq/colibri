@@ -16,10 +16,8 @@ import { z } from "zod";
 export const users = t.router({
   list: procedure()
     .input(paginatable({}))
-    .query(async ({ input: { page, perPage }, ctx: { database } }) =>
-      paginatedResults<Awaited<ReturnType<typeof listUsers>>[number]>(
-        listUsers(database, page, perPage),
-      ),
+    .query(({ input: { page, perPage }, ctx: { database } }) =>
+      paginatedResults(listUsers(database, page, perPage)),
     ),
 
   /**

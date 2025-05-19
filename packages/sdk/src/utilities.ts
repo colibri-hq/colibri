@@ -11,34 +11,30 @@ type ExtractTableAlias<DB, TE> = TE extends `${string} as ${infer TA}`
     ? TE
     : never;
 
-type PaginatedSelectQueryBuilder<DB, T extends keyof DB> = SelectQueryBuilder<
-  DB,
-  T,
-  readonly (
-    | "_pagination"
-    | (ExtractTableAlias<
-        DB & {
-          _pagination: {
-            _pagination: {
-              last_page: number;
-              per_page: number;
-              page: number;
-              total: string | number | bigint;
-            };
-          };
-        },
-        T
-      > &
-        string)
-  )[]
->;
+type PaginationData = {
+  _pagination: {
+    last_page: number;
+    page: number;
+    per_page: number;
+    total: string | number | bigint;
+  };
+};
+type PaginationSchema = {
+  _pagination: PaginationData;
+};
 
-export function paginate<T extends keyof DB>(
+export type Paginated<T> = Omit<T, "_pagination"> & PaginationData;
+
+export function paginate<T extends keyof DB, O>(
   database: Database,
   table: T,
   page: number = 1,
   perPage = 10,
-): PaginatedSelectQueryBuilder<DB, T> {
+): SelectQueryBuilder<
+  DB & PaginationSchema,
+  ExtractTableAlias<DB, T> | "_pagination",
+  O
+> {
   const limit = Math.max(1, Math.min(100, perPage));
   const offset = limit * Math.max(0, page - 1);
 
