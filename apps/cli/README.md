@@ -7,14 +7,16 @@ The command-line interface for Colibri, an ebook management app
 [![Downloads/week](https://img.shields.io/npm/dw/@colibri-hq/cli.svg)](https://npmjs.org/package/@colibri-hq/cli)
 
 <!-- toc -->
-* [@colibri-hq/cli](#colibri-hqcli)
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [@colibri-hq/cli](#colibri-hqcli)
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
+
 ```sh-session
 $ npm install -g @colibri-hq/cli
 $ colibri COMMAND
@@ -26,52 +28,54 @@ USAGE
   $ colibri COMMAND
 ...
 ```
+
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
-* [`colibri connect DSN`](#colibri-connect-dsn)
-* [`colibri help [COMMAND]`](#colibri-help-command)
-* [`colibri login`](#colibri-login)
-* [`colibri oauth`](#colibri-oauth)
-* [`colibri oauth clients`](#colibri-oauth-clients)
-* [`colibri oauth clients add ID`](#colibri-oauth-clients-add-id)
-* [`colibri oauth clients remove ID`](#colibri-oauth-clients-remove-id)
-* [`colibri oauth clients update ID`](#colibri-oauth-clients-update-id)
-* [`colibri plugins`](#colibri-plugins)
-* [`colibri plugins add PLUGIN`](#colibri-plugins-add-plugin)
-* [`colibri plugins:inspect PLUGIN...`](#colibri-pluginsinspect-plugin)
-* [`colibri plugins install PLUGIN`](#colibri-plugins-install-plugin)
-* [`colibri plugins link PATH`](#colibri-plugins-link-path)
-* [`colibri plugins remove [PLUGIN]`](#colibri-plugins-remove-plugin)
-* [`colibri plugins reset`](#colibri-plugins-reset)
-* [`colibri plugins uninstall [PLUGIN]`](#colibri-plugins-uninstall-plugin)
-* [`colibri plugins unlink [PLUGIN]`](#colibri-plugins-unlink-plugin)
-* [`colibri plugins update`](#colibri-plugins-update)
-* [`colibri settings`](#colibri-settings)
-* [`colibri settings get`](#colibri-settings-get)
-* [`colibri settings set KEY VALUE`](#colibri-settings-set-key-value)
-* [`colibri settings version`](#colibri-settings-version)
-* [`colibri storage config`](#colibri-storage-config)
-* [`colibri storage config get`](#colibri-storage-config-get)
-* [`colibri storage config set`](#colibri-storage-config-set)
-* [`colibri storage copy SOURCE DESTINATION`](#colibri-storage-copy-source-destination)
-* [`colibri storage cp SOURCE DESTINATION`](#colibri-storage-cp-source-destination)
-* [`colibri storage list [BUCKET]`](#colibri-storage-list-bucket)
-* [`colibri storage ls [BUCKET]`](#colibri-storage-ls-bucket)
-* [`colibri storage make-bucket BUCKET`](#colibri-storage-make-bucket-bucket)
-* [`colibri storage mb BUCKET`](#colibri-storage-mb-bucket)
-* [`colibri storage move BUCKET DESTINATION SOURCE`](#colibri-storage-move-bucket-destination-source)
-* [`colibri storage mv BUCKET DESTINATION SOURCE`](#colibri-storage-mv-bucket-destination-source)
-* [`colibri storage rb BUCKET`](#colibri-storage-rb-bucket)
-* [`colibri storage remove KEYS`](#colibri-storage-remove-keys)
-* [`colibri storage remove-bucket BUCKET`](#colibri-storage-remove-bucket-bucket)
-* [`colibri storage rm KEYS`](#colibri-storage-rm-keys)
-* [`colibri users`](#colibri-users)
-* [`colibri users add EMAIL`](#colibri-users-add-email)
-* [`colibri users remove USER`](#colibri-users-remove-user)
-* [`colibri users update USER`](#colibri-users-update-user)
+
+- [`colibri connect DSN`](#colibri-connect-dsn)
+- [`colibri help [COMMAND]`](#colibri-help-command)
+- [`colibri login`](#colibri-login)
+- [`colibri oauth`](#colibri-oauth)
+- [`colibri oauth clients`](#colibri-oauth-clients)
+- [`colibri oauth clients add ID`](#colibri-oauth-clients-add-id)
+- [`colibri oauth clients remove ID`](#colibri-oauth-clients-remove-id)
+- [`colibri oauth clients update ID`](#colibri-oauth-clients-update-id)
+- [`colibri plugins`](#colibri-plugins)
+- [`colibri plugins add PLUGIN`](#colibri-plugins-add-plugin)
+- [`colibri plugins:inspect PLUGIN...`](#colibri-pluginsinspect-plugin)
+- [`colibri plugins install PLUGIN`](#colibri-plugins-install-plugin)
+- [`colibri plugins link PATH`](#colibri-plugins-link-path)
+- [`colibri plugins remove [PLUGIN]`](#colibri-plugins-remove-plugin)
+- [`colibri plugins reset`](#colibri-plugins-reset)
+- [`colibri plugins uninstall [PLUGIN]`](#colibri-plugins-uninstall-plugin)
+- [`colibri plugins unlink [PLUGIN]`](#colibri-plugins-unlink-plugin)
+- [`colibri plugins update`](#colibri-plugins-update)
+- [`colibri settings`](#colibri-settings)
+- [`colibri settings get`](#colibri-settings-get)
+- [`colibri settings set KEY VALUE`](#colibri-settings-set-key-value)
+- [`colibri settings version`](#colibri-settings-version)
+- [`colibri storage config`](#colibri-storage-config)
+- [`colibri storage config get`](#colibri-storage-config-get)
+- [`colibri storage config set`](#colibri-storage-config-set)
+- [`colibri storage copy SOURCE DESTINATION`](#colibri-storage-copy-source-destination)
+- [`colibri storage cp SOURCE DESTINATION`](#colibri-storage-cp-source-destination)
+- [`colibri storage list [BUCKET]`](#colibri-storage-list-bucket)
+- [`colibri storage ls [BUCKET]`](#colibri-storage-ls-bucket)
+- [`colibri storage make-bucket BUCKET`](#colibri-storage-make-bucket-bucket)
+- [`colibri storage mb BUCKET`](#colibri-storage-mb-bucket)
+- [`colibri storage move BUCKET DESTINATION SOURCE`](#colibri-storage-move-bucket-destination-source)
+- [`colibri storage mv BUCKET DESTINATION SOURCE`](#colibri-storage-mv-bucket-destination-source)
+- [`colibri storage rb BUCKET`](#colibri-storage-rb-bucket)
+- [`colibri storage remove KEYS`](#colibri-storage-remove-keys)
+- [`colibri storage remove-bucket BUCKET`](#colibri-storage-remove-bucket-bucket)
+- [`colibri storage rm KEYS`](#colibri-storage-rm-keys)
+- [`colibri users`](#colibri-users)
+- [`colibri users add EMAIL`](#colibri-users-add-email)
+- [`colibri users remove USER`](#colibri-users-remove-user)
+- [`colibri users update USER`](#colibri-users-update-user)
 
 ## `colibri connect DSN`
 
@@ -1310,4 +1314,5 @@ EXAMPLES
 ```
 
 _See code: [src/commands/users/update.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/users/update.ts)_
+
 <!-- commandsstop -->
