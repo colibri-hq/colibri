@@ -14,3 +14,4 @@ export { NavigationMenu } from "./NavigationMenu/index.js";
 export { NavigationSection } from "./NavigationSection/index.js";
 export { QrCode } from "./QrCode/index.js";
 export { StarRating } from "./StarRating/index.js";
+export { Tabs, TabContent } from "./Tabs/index.js";

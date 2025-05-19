@@ -5,72 +5,80 @@
 </script>
 
 <script lang="ts">
-  import Tabs from '$lib/components/Tabs.svelte';
-  import Tab from '$lib/components/Tab.svelte';
-  import InstanceSettings from './InstanceSettings.svelte';
-  import PersonalSettings from './PersonalSettings.svelte';
   import CatalogSettings from './CatalogSettings.svelte';
-  import { page } from '$app/state';
+  import InstanceSettings from './InstanceSettings.svelte';
+  import MemberSettings from './MemberSettings.svelte';
+  import PersonalSettings from './PersonalSettings.svelte';
   import SharingSettings from './SharingSettings.svelte';
+  import { page } from '$app/state';
   import { goto } from '$app/navigation';
   import { removePaginationParametersFromUrl } from '$lib/trpc/client';
+  import { Tabs } from '@colibri-hq/ui';
 
-  type Slug = (typeof tabs)[number]['slug'];
+  const tabs = {
+    personal: 'Personal',
+    instance: 'Instance',
+    members: 'Members',
+    catalogs: 'Catalogs',
+    sharing: 'Sharing',
+  };
+  type Slug = keyof typeof tabs;
+
   const queryParamName = 'tab';
-  const tabs = [
-    {
-      title: 'Personal',
-      slug: 'personal',
-      component: PersonalSettings,
-    },
-    {
-      title: 'Instance',
-      slug: 'instance',
-      component: InstanceSettings,
-    },
-    {
-      title: 'Catalogs',
-      slug: 'catalogs',
-      component: CatalogSettings,
-    },
-    {
-      title: 'Sharing',
-      slug: 'sharing',
-      component: SharingSettings,
-    },
-  ];
+  let initialActive = $derived.by<Slug>(() => {
+    const tab = page.url.searchParams.get(queryParamName);
 
-  let initialActive: Slug = $derived(
-    (page.url.searchParams.get(queryParamName) as Slug) ?? 'personal',
-  );
+    return isValidTab(tab) ? tab : 'personal';
+  });
 
-  function updateUrl(tab: string) {
-    return () => {
-      const newUrl = new URL(page.url);
+  function isValidTab(tab: string | null): tab is Slug {
+    return Boolean(tab && Object.keys(tabs).includes(tab));
+  }
 
-      // Remove the pagination query parameters once the user navigates away from the tab—we don't
-      // want to mess up another page's pagination.
-      removePaginationParametersFromUrl(newUrl);
-      newUrl?.searchParams?.set(queryParamName, tab);
-      goto(newUrl);
-    };
+  function updateUrl(tab: Slug) {
+    const newUrl = new URL(page.url);
+
+    // Remove the pagination query parameters once the user navigates away
+    // from the tab—we don't want to mess up another page's pagination.
+    removePaginationParametersFromUrl(newUrl);
+    newUrl?.searchParams?.set(queryParamName, tab);
+
+    return goto(newUrl);
   }
 </script>
 
+<svelte:head>
+  <title>Settings</title>
+</svelte:head>
+
 <article>
   <header class="mb-8">
-    <h1 class="text-4xl font-bold">Settings</h1>
+    <h1 class="text-5xl font-bold font-serif">Settings</h1>
   </header>
 
-  <Tabs>
-    {#each tabs as { title: titleText, slug, component }, index (index)}
-      <Tab onActivate={updateUrl(slug)} open={initialActive === slug}>
-        {#snippet title()}
-          <span>{titleText}</span>
-        {/snippet}
-        {@const SvelteComponent = component}
-        <SvelteComponent />
-      </Tab>
-    {/each}
+  <Tabs
+    {tabs}
+    initialValue={initialActive}
+    onChange={updateUrl}
+  >
+    {#snippet personalContent()}
+      <PersonalSettings></PersonalSettings>
+    {/snippet}
+
+    {#snippet instanceContent()}
+      <InstanceSettings></InstanceSettings>
+    {/snippet}
+
+    {#snippet membersContent()}
+      <MemberSettings></MemberSettings>
+    {/snippet}
+
+    {#snippet catalogsContent()}
+      <CatalogSettings></CatalogSettings>
+    {/snippet}
+
+    {#snippet sharingContent()}
+      <SharingSettings></SharingSettings>
+    {/snippet}
   </Tabs>
 </article>

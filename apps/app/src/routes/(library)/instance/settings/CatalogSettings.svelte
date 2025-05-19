@@ -5,11 +5,9 @@
   import AddCatalogModal from './AddCatalogModal.svelte';
   import { type PaginationData, trpc } from '$lib/trpc/client';
   import { page } from '$app/stores';
-  import CatalogListItem, {
-    type DisableCatalogEvent,
-    type EnableCatalogEvent,
-  } from './CatalogListItem.svelte';
+  import CatalogListItem, { type DisableCatalogEvent, type EnableCatalogEvent } from './CatalogListItem.svelte';
   import PaginatedList from '$lib/components/Pagination/PaginatedList.svelte';
+  import SettingsPane from './SettingsPane.svelte';
 
   let data: MaybePromise<[Catalog[], PaginationData]> = $derived(
     $page.data.catalogs,
@@ -51,21 +49,12 @@
   }
 </script>
 
-<section>
-  <header
-    class="mb-8 flex flex-col items-center justify-between md:mb-4 md:flex-row"
-  >
-    <div>
-      <h3 class="mb-2 font-serif text-3xl font-bold">Catalogs</h3>
-      <p class="text-gray-700 dark:text-gray-400">
-        Here you can find all the catalogs that are available in the system.
-      </p>
-    </div>
-
-    <Button class="mt-4 mr-auto md:mt-0 md:mr-0" onClick={showCatalogModal}>
+<SettingsPane description="Here you can find all the catalogs that are available in the system.">
+  {#snippet actions()}
+    <Button onClick={showCatalogModal}>
       Add new catalog
     </Button>
-  </header>
+  {/snippet}
 
   <PaginatedList {data}>
     {#snippet children({ items })}
@@ -81,6 +70,6 @@
       </ul>
     {/snippet}
   </PaginatedList>
-</section>
+</SettingsPane>
 
 <AddCatalogModal bind:open={catalogModalOpen} />
