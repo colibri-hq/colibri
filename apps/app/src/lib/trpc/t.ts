@@ -5,6 +5,7 @@ import { auth } from "$lib/trpc/middleware/auth";
 import { logger } from "$lib/trpc/middleware/logger";
 import { initTRPC } from "@trpc/server";
 import { z, type ZodRawShape } from "zod";
+import type { MaybePromise } from "@colibri-hq/shared";
 
 export const t = initTRPC.context<Context>().create({
   isServer: !browser,
@@ -39,11 +40,9 @@ export function paginatable<T extends ZodRawShape>(shape: T) {
   });
 }
 
-export async function paginatedResults<
-  T extends Record<string, unknown> & { _pagination: PaginationData },
->(
-  maybeResults: T[] | Promise<T[]>,
-): Promise<[Omit<T, "_pagination">[], PaginationData]> {
+export async function paginatedResults<T>(
+  maybeResults: MaybePromise<Array<T & { _pagination?: PaginationData }>>,
+): Promise<[Array<Omit<T, "_pagination">>, PaginationData]> {
   const results = await maybeResults;
   const pagination = results.at(0)?._pagination || {
     page: 1,
@@ -51,11 +50,11 @@ export async function paginatedResults<
     per_page: 10,
     total: 0,
   };
-  const items = results.map((result: Omit<T, "_pagination">) => {
+  const items = results.map((result) => {
     delete result._pagination;
 
     return result;
   });
 
-  return [items, pagination];
+  return [items, pagination] as const;
 }
