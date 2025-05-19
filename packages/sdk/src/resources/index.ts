@@ -6,3 +6,4 @@ export * from "./comment.js";
 export * from "./creator.js";
 export * from "./language.js";
 export * from "./publisher.js";
+export * from "./settings.js";

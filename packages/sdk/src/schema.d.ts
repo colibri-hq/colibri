@@ -713,6 +713,22 @@ export interface SeriesTag {
   tag_id: Int8;
 }
 
+export interface Settings {
+  created_at: Timestamp | null;
+  data: Json | null;
+  updated_at: Timestamp | null;
+  updated_by: Int8 | null;
+  version: number | null;
+}
+
+export interface SettingsRevision {
+  created_at: Generated<Timestamp>;
+  data: Json;
+  updated_at: Generated<Timestamp>;
+  updated_by: Int8 | null;
+  version: number;
+}
+
 export interface Tag {
   color: string | null;
   created_at: Generated<Timestamp>;
@@ -772,6 +788,8 @@ export interface DB {
   series_comment: SeriesComment;
   series_entry: SeriesEntry;
   series_tag: SeriesTag;
+  settings: Settings;
+  settings_revision: SettingsRevision;
   tag: Tag;
   user_collection_favorite: UserCollectionFavorite;
   user_creator_favorite: UserCreatorFavorite;
