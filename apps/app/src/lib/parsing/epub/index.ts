@@ -1505,11 +1505,14 @@ class Loader {
   }
 }
 
-function getHTMLFragment(document_: Document, id: string) {
-  return (
-    document_.getElementById(id) ??
-    document_.querySelector(`[name="${CSS.escape(id)}"]`)
-  );
+function getHTMLFragment(document: Document, id: string) {
+  const element = document.getElementById(id);
+
+  if (element) {
+    return element;
+  }
+
+  return document.querySelector(`[name="${CSS.escape(id)}"]`);
 }
 
 function getPageSpread(properties: string[]) {
@@ -1535,13 +1538,19 @@ function getDisplayOptions(document: Document | undefined) {
     return undefined;
   }
 
+  const options = Array.from(document.getElementsByTagName("option"));
+  const fixedLayout =
+    options
+      .find((option) => option.getAttribute("name") === "fixed-layout")
+      ?.getAttribute("value") ?? undefined;
+  const openToSpread =
+    options
+      .find((option) => option.getAttribute("name") === "open-to-spread")
+      ?.getAttribute("value") ?? undefined;
+
   return {
-    fixedLayout: getElementText(
-      document.querySelector('option[name="fixed-layout"]')!,
-    ),
-    openToSpread: getElementText(
-      document.querySelector('option[name="open-to-spread"]')!,
-    ),
+    fixedLayout,
+    openToSpread,
   };
 }
 

@@ -25,7 +25,6 @@ self.addEventListener("message", handleMessage);
 async function handleMessage({
   data: { type, payload },
 }: MessageEvent<UploadRequest | ResumeRequest | CancelUploadRequest>) {
-  console.log("Handling messsage", { type, payload });
   switch (type) {
     case "cancel":
       return payload.id
@@ -33,7 +32,6 @@ async function handleMessage({
         : await handleCancelAllUploads(payload);
 
     case "upload":
-      console.log("upload worker", { payload });
       return await handleUpload(payload);
 
     case "resume":
@@ -63,7 +61,7 @@ async function handleUpload({ files }: UploadPayload) {
 
     try {
       handle = await writeFile(new File([buffer], name), container);
-    } catch (cause) {
+    } catch {
       return self.postMessage({
         type: "upload",
         payload: {
@@ -75,12 +73,18 @@ async function handleUpload({ files }: UploadPayload) {
     }
 
     const asset = await handle.getFile();
-    const result = await processFile(id, asset, container, signal);
 
-    // TODO: Write the metadata into a file in the OPFS, then return the data.
-    //       If the operation is aborted mid-flight, we'll be able to resume the
-    //       operation by reading the metadata file and resuming the upload.c
+    // Extract details and metadata from the file
+    const result = await processFile(id, asset, container, signal);
     const checksum = await crypto.subtle.digest("SHA-256", buffer);
+
+    console.log("Got metadata", {
+      id,
+      asset,
+      result,
+      checksum: encodeToBase64(checksum),
+    });
+    // Persist the new book in the database
     const reply = await trpc.books.create.mutate({
       asset: {
         checksum: encodeToBase64(checksum),
@@ -110,7 +114,6 @@ async function handleUpload({ files }: UploadPayload) {
     });
 
     await uploadAsset(assetUrl, asset, signal);
-
     await finalizeUpload(id);
 
     self.postMessage({
@@ -126,9 +129,12 @@ async function handleUpload({ files }: UploadPayload) {
 
     console.log("Got local copies of all files!", { files });
   } catch (cause) {
-    throw new Error(`Failed to upload files: ${(cause as Error).message}`, {
-      cause,
-    });
+    throw new Error(
+      `Failed to upload files: ${(cause as Error).message}: ${(cause as Error).stack}`,
+      {
+        cause,
+      },
+    );
   }
 }
 
@@ -235,6 +241,17 @@ async function handleCancelAllUploads(_payload: CancelPayload) {
   }
 }
 
+/**
+ * Process a file and extract metadata from it.
+ *
+ * If the file is an EPUB or PDF, we will extract the metadata and cover image.
+ * If the file is a MOBI, we will just return the file as is.
+ *
+ * @param id
+ * @param file
+ * @param container
+ * @param signal
+ */
 async function processFile(
   id: string,
   file: File,
@@ -242,8 +259,8 @@ async function processFile(
   signal?: AbortSignal,
 ) {
   log("worker:upload", "info", `Processing uploaded file`, { id, file });
-  let metadata: Metadata;
   let cover: Blob | undefined = undefined;
+  let metadata: Metadata;
 
   try {
     metadata = await readMetadataFile(container);

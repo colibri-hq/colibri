@@ -176,7 +176,10 @@ export function createEdition(
     .executeTakeFirstOrThrow();
 }
 
-export function findAssetByChecksum(database: Database, checksum: ArrayBuffer) {
+export function findAssetByChecksum(
+  database: Database,
+  checksum: Uint8Array<ArrayBufferLike>,
+) {
   return database
     .selectFrom("asset")
     .where("checksum", "=", Buffer.from(checksum))

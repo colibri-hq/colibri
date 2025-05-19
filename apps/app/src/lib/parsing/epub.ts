@@ -57,7 +57,6 @@ async function load(file: File, signal?: AbortSignal) {
 
   async function readFile<T>(href: string, sink: Writer<T>) {
     const file = resolveFile(href);
-    console.log(`Reading file at ${href}`, { file });
 
     if (!file || !file.getData) {
       throw new Error(`File not found: ${href}`);

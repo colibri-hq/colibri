@@ -17,6 +17,14 @@ type ClientOptions = {
   ) => unknown;
 };
 
+/**
+ * Initialize a new Kysely instance with a Postgres dialect.
+ *
+ * @param {URL|string} connectionString The connection string to the database.
+ * @param {string|undefined} [certificate]
+ * @param {boolean|undefined} [debug]
+ * @param {(channel: string, level: string, message: string|Error) => any|undefined} [log]
+ */
 export function initialize(
   connectionString: URL | string,
   { certificate, debug, log }: ClientOptions = {},

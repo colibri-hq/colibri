@@ -1,4 +1,3 @@
-import { env } from "$env/dynamic/private";
 import { relatorRoles } from "$lib/parsing/contributions";
 import { uploadUrl } from "$lib/server/storage";
 import { procedure, t, unguardedProcedure } from "$lib/trpc/t";
@@ -9,6 +8,7 @@ import {
   loadBook,
   loadBooks,
   loadCreators,
+  loadLanguage,
   loadPublisher,
   loadRatings,
   loadReviews,
@@ -125,76 +125,74 @@ export const books = t.router({
           .optional(),
       }),
     )
-    .mutation(async ({ input, ctx: { userId, database } }) => {
-      console.log("Creating book", { input });
-
-      const checksum = input.asset.checksum;
-      const existingAsset = await findAssetByChecksum(database, checksum);
-
-      if (existingAsset) {
-        return null;
-      }
-
-      const assetUrlTest = await uploadUrl(
-        env.S3_BUCKET_ASSETS,
-        `42-42.epub`,
-        3600,
-        checksum,
-        {
-          title: input.title,
+    .mutation(
+      async ({
+        input: {
+          numberOfPages,
+          legalInformation,
+          sortingKey,
+          rating,
+          title,
+          language: languageCode,
+          synopsis,
+          asset,
         },
-      );
+        ctx: { userId, database },
+      }) => {
+        const checksum = asset.checksum;
+        const existingAsset = await findAssetByChecksum(database, checksum);
 
-      if (assetUrlTest.length > 0) {
-        return { assetUrl: assetUrlTest };
-      }
+        if (existingAsset) {
+          return null;
+        }
 
-      const { bookId, editionId } = await database
-        .transaction()
-        .execute(async (trx) => {
-          // TODO: Check if contributors exist
-          // TODO: Create contributors, one by one
+        const language = languageCode
+          ? await loadLanguage(database, languageCode)
+          : undefined;
 
-          // TODO: Check if book exists
-          // TODO: Create book
-          const { id: bookId } = await createBook(trx, userId);
+        const { bookId, editionId } = await database
+          .transaction()
+          .execute(async (trx) => {
+            // TODO: Check if contributors exist
+            // TODO: Create contributors, one by one
 
-          // TODO: Check if edition exists, by comparing unique identifiers like
-          //       the ISBN. If we don't have an ISBN, we will import the book as
-          //       a duplicate and rely on the suggestion queue to merge them.
-          // TODO: Create edition
-          const { id: editionId } = await createEdition(trx, {
-            book_id: bookId,
-            title: input.title,
-            synopsis: input.synopsis ?? null,
-            language: input.language ?? null,
-            legal_information: input.legalInformation ?? null,
-            pages: input.numberOfPages ?? null,
-            sorting_key: input.sortingKey ?? input.title,
+            // TODO: Check if book exists
+            const { id: bookId } = await createBook(trx, userId);
+
+            // TODO: Check if edition exists, by comparing unique identifiers like
+            //       the ISBN. If we don't have an ISBN, we will import the book as
+            //       a duplicate and rely on the suggestion queue to merge them.
+            const { id: editionId } = await createEdition(trx, {
+              book_id: bookId,
+              title,
+              synopsis: synopsis ?? null,
+              language: language?.iso_639_3 ?? null,
+              legal_information: legalInformation ?? null,
+              pages: numberOfPages ?? null,
+              sorting_key: sortingKey ?? title,
+            });
+
+            // TODO: Update main edition for book
+            // TODO: Create rating
+
+            // TODO: Create publisher
+
+            if (rating) {
+              await updateRating(trx, bookId, userId, rating);
+            }
+
+            return { bookId, editionId };
           });
 
-          // TODO: Update main edition for book
-          // TODO: Create rating
+        const assetUrl = await uploadUrl(
+          "books",
+          `${bookId}-${editionId}.epub`,
+          3600,
+          checksum,
+          { title },
+        );
 
-          // TODO: Create publisher
-
-          if (input.rating) {
-            await updateRating(trx, bookId, userId, input.rating);
-          }
-
-          return { bookId, editionId };
-        });
-
-      const assetUrl = await uploadUrl(
-        "books",
-        `${bookId}-${editionId}.epub`,
-        3600,
-        checksum,
-        {
-          title: input.title,
-        },
-      );
-
-      return { assetUrl };
-    }),
+        return { assetUrl };
+      },
+    ),
 });
