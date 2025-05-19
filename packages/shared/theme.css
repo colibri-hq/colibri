@@ -42,6 +42,14 @@
 @source "../../packages/ui/src/**/*.{js,ts,svelte}";
 @source "./lib/**/*";
 
+@layer base {
+  /* https://tailwindcss.com/docs/upgrade-guide#buttons-use-the-default-cursor */
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 /* region Custom Variants */
 @custom-variant transparency-reduce {
   @media (prefers-reduced-transparency) {
@@ -161,9 +169,3 @@ div.markdown-body {
 }
 
 /* endregion */
-
-/* https://tailwindcss.com/docs/upgrade-guide#buttons-use-the-default-cursor */
-button:not(:disabled),
-[role='button']:not(:disabled) {
-  cursor: pointer;
-}
