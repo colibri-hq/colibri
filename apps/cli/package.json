@@ -1,0 +1,136 @@
+{
+  "name": "@colibri-hq/cli",
+  "version": "0.0.1",
+  "type": "module",
+  "license": "MIT",
+  "description": "The command-line interface for Colibri, an ebook management app",
+  "keywords": [
+    "colibri",
+    "server",
+    "ebooks",
+    "ebook-management",
+    "epub",
+    "opds",
+    "oclif"
+  ],
+  "homepage": "https://github.com/colibri-hq/colibri",
+  "author": {
+    "name": "Moritz Mazetti",
+    "email": "m@9dev.de",
+    "url": "https://mazetti.me"
+  },
+  "repository": {
+    "url": "git+https://github.com/colibri-hq/colibri.git",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "oclif": {
+    "bin": "colibri",
+    "dirname": "colibri",
+    "commands": "./dist/commands",
+    "plugins": [
+      "@oclif/plugin-help",
+      "@oclif/plugin-plugins",
+      "@oclif/plugin-not-found"
+    ],
+    "topicSeparator": " ",
+    "topics": {
+      "storage": {
+        "description": "Manage persistent storage."
+      },
+      "storage config": {
+        "description": "Manage persistent storage provider configuration."
+      },
+      "settings": {
+        "description": "Manage instance settings."
+      },
+      "users": {
+        "description": "Manage Colibri user accounts."
+      },
+      "oauth": {
+        "description": "Manage OAuth integrations."
+      }
+    }
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc && oclif manifest",
+    "dev": "tsc --watch",
+    "postbuild": "pnpm tsc-alias",
+    "postpack": "rm -f oclif.manifest.json",
+    "posttest": "pnpm run lint",
+    "test": "vitest --config tsconfig.test.json",
+    "test:coverage": "vitest run --config tsconfig.test.json --coverage",
+    "test:ui": "vitest --config tsconfig.test.json --ui",
+    "version": "oclif readme && git add README.md",
+    "check": "tsc --noEmit",
+    "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
+    "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
+    "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
+    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content .",
+    "prepack": "pnpm run fmt && pnpm run check && pnpm run lint && pnpm run package",
+    "package": "pnpm run build && oclif readme --tsconfig-path=tsconfig.base.json"
+  },
+  "dependencies": {
+    "@colibri-hq/oauth": "workspace:*",
+    "@colibri-hq/sdk": "workspace:*",
+    "@colibri-hq/shared": "workspace:*",
+    "@inquirer/prompts": "^7.5.1",
+    "@oclif/core": "^4.3.0",
+    "@oclif/plugin-help": "^6.2.28",
+    "@oclif/plugin-not-found": "^3.2.52",
+    "@oclif/plugin-plugins": "^5.4.38",
+    "ansis": "^4.0.0",
+    "open": "^10.1.2",
+    "ora": "^8.2.0",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@eslint/js": "catalog:",
+    "@oclif/test": "^4.1.13",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-import-resolver-typescript": "^4.3.5",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-n": "^17.18.0",
+    "eslint-plugin-perfectionist": "^4.13.0",
+    "eslint-plugin-unicorn": "^59.0.1",
+    "globals": "catalog:",
+    "jiti": "^2.4.2",
+    "msw": "^2.8.4",
+    "oclif": "^4.17.46",
+    "prettier": "catalog:",
+    "rimraf": "catalog:",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:",
+    "unbuild": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "dist/index.js",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "files": [
+    "bin",
+    "dist",
+    "oclif.manifest.json"
+  ],
+  "bin": {
+    "colibri": "./bin/run.js"
+  }
+}
