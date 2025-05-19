@@ -78,7 +78,6 @@ export async function loadConfig(configFile?: string) {
 async function findConfigFile() {
   for (const file of configFileVariants) {
     try {
-       
       await stat(file);
 
       return file;

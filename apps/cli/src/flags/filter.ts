@@ -69,10 +69,10 @@ export const filterFactory = <T extends string = string>() =>
     name: "filter",
     async parse(input) {
       const [key, operator, value] = input
-      .split(
-        /([=<>!~^$]+|is(?: not)?|(?:not )?in|n?eq|ne|gte?|lte?|(?:not )?like)/,
-      )
-      .map((v) => v.trim());
+        .split(
+          /([=<>!~^$]+|is(?: not)?|(?:not )?in|n?eq|ne|gte?|lte?|(?:not )?like)/,
+        )
+        .map((v) => v.trim());
 
       return parseFilter(key as T, operator, value);
     },
@@ -282,64 +282,63 @@ function parseValue(value: string | undefined): FilterValue {
   return value;
 }
 
- 
 function resolveOperator(operator: string | undefined) {
   switch (operator) {
-  case "":
-  case undefined: {
-    return;
-  }
+    case "":
+    case undefined: {
+      return;
+    }
 
-  case "!=":
-  case "!~":
-  case "<":
-  case "<=":
-  case "=":
-  case ">":
-  case ">=":
-  case "in":
-  case "is":
-  case "is not":
-  case "not in":
-  case "~": {
-    return operator;
-  }
+    case "!=":
+    case "!~":
+    case "<":
+    case "<=":
+    case "=":
+    case ">":
+    case ">=":
+    case "in":
+    case "is":
+    case "is not":
+    case "not in":
+    case "~": {
+      return operator;
+    }
 
-  case "eq": {
-    return "=";
-  }
+    case "eq": {
+      return "=";
+    }
 
-  case "gt": {
-    return ">";
-  }
+    case "gt": {
+      return ">";
+    }
 
-  case "gte": {
-    return ">=";
-  }
+    case "gte": {
+      return ">=";
+    }
 
-  case "like": {
-    return "~";
-  }
+    case "like": {
+      return "~";
+    }
 
-  case "lt": {
-    return "<";
-  }
+    case "lt": {
+      return "<";
+    }
 
-  case "lte": {
-    return "<=";
-  }
+    case "lte": {
+      return "<=";
+    }
 
-  case "ne":
-  case "neq": {
-    return "!=";
-  }
+    case "ne":
+    case "neq": {
+      return "!=";
+    }
 
-  case "not like": {
-    return "!~";
-  }
+    case "not like": {
+      return "!~";
+    }
 
-  default: {
-    throw new Error(`Unknown comparison operator: ${operator}`);
-  }
+    default: {
+      throw new Error(`Unknown comparison operator: ${operator}`);
+    }
   }
 }

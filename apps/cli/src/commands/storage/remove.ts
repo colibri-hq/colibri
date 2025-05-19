@@ -45,10 +45,10 @@ export class Remove extends StorageBaseCommand<typeof Remove> {
 
         await Promise.all(
           keysByBucket
-          .entries()
-          .map(async ([bucket, keys]) =>
-            removeObjects(this.storage, bucket, [...keys]),
-          ),
+            .entries()
+            .map(async ([bucket, keys]) =>
+              removeObjects(this.storage, bucket, [...keys]),
+            ),
         );
       },
       `Are you sure you want to remove the object(s) "${objects.join('", "')}"? This action cannot be undone!`,
@@ -58,9 +58,7 @@ export class Remove extends StorageBaseCommand<typeof Remove> {
     await operation();
 
     if (this.flags.verbose) {
-      this.logToStderr(
-        `Removed ${objects.length} object(s) successfully.`,
-      );
+      this.logToStderr(`Removed ${objects.length} object(s) successfully.`);
     }
   }
 }

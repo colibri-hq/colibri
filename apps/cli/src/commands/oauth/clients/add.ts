@@ -13,15 +13,18 @@ export default class Add extends BaseCommand<typeof Add> {
   static description = "Add a new OAuth client.";
   static examples = [
     {
-      command: "<%= config.bin %> <%= command.id %> myapp --name \"My Application\" --description \"My awesome application\"",
+      command:
+        '<%= config.bin %> <%= command.id %> myapp --name "My Application" --description "My awesome application"',
       description: "Add a new OAuth client with name and description:",
     },
     {
-      command: "<%= config.bin %> <%= command.id %> myapp --personal --redirect-uris \"https://example.com/callback\"",
+      command:
+        '<%= config.bin %> <%= command.id %> myapp --personal --redirect-uris "https://example.com/callback"',
       description: "Add a personal OAuth client with redirect URIs:",
     },
     {
-      command: "<%= config.bin %> <%= command.id %> myapp --instance https://colibri.example.com --scopes \"read:books\" \"write:books\"",
+      command:
+        '<%= config.bin %> <%= command.id %> myapp --instance https://colibri.example.com --scopes "read:books" "write:books"',
       description: "Add an OAuth client with specific scopes:",
     },
   ];

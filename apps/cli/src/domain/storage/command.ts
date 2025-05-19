@@ -47,8 +47,7 @@ export abstract class StorageBaseCommand<
                 );
               }
             },
-            trace() {
-            },
+            trace() {},
             warn: (...args) => {
               if (this.flags.verbose) {
                 this.logToStderr(

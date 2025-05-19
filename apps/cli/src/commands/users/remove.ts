@@ -29,7 +29,8 @@ export class Remove extends BaseCommand<typeof Remove> {
       description: "Remove a user by ID:",
     },
     {
-      command: "<%= config.bin %> <%= command.id %> 42 --instance https://colibri.example.com",
+      command:
+        "<%= config.bin %> <%= command.id %> 42 --instance https://colibri.example.com",
       description: "Remove a user by ID from a specific Colibri instance:",
     },
   ];

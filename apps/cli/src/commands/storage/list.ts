@@ -34,7 +34,7 @@ export class List extends StorageBaseCommand<typeof List> {
   }
 
   async #listBuckets(storage: Client) {
-    console.log({listBuckets});
+    console.log({ listBuckets });
     const buckets = await listBuckets(storage);
 
     if (buckets.length === 0) {

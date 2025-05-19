@@ -51,21 +51,21 @@ export async function withConfirmation<
     const confirmation =
       typeof defaultValue === "string"
         ? await input({
-          default: defaultValue,
-          message: prompt,
-          required: true,
-          validate(input) {
-            if (input === defaultValue) {
-              return true;
-            }
+            default: defaultValue,
+            message: prompt,
+            required: true,
+            validate(input) {
+              if (input === defaultValue) {
+                return true;
+              }
 
-            return `Please type "${defaultValue}" to confirm.`;
-          },
-        })
+              return `Please type "${defaultValue}" to confirm.`;
+            },
+          })
         : await confirm({
-          default: defaultValue,
-          message: prompt,
-        });
+            default: defaultValue,
+            message: prompt,
+          });
 
     if (!confirmation) {
       throw new Error(abortMessage, {

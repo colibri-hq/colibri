@@ -23,7 +23,8 @@ export default class Remove extends BaseCommand<typeof Remove> {
       description: "Force remove an OAuth client without confirmation:",
     },
     {
-      command: "<%= config.bin %> <%= command.id %> myapp --instance https://colibri.example.com",
+      command:
+        "<%= config.bin %> <%= command.id %> myapp --instance https://colibri.example.com",
       description: "Remove an OAuth client from a specific Colibri instance:",
     },
   ];

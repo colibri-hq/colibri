@@ -1,4 +1,4 @@
-import ansis, {inverse} from "ansis";
+import ansis, { inverse } from "ansis";
 
 /**
  * Plain Theme
@@ -113,7 +113,6 @@ export const ansiTheme = {
 } satisfies BoxTheme;
 
 type BoxOptions = {
-
   /**
    * Footer label text to display at the bottom of the box.
    *
@@ -216,12 +215,12 @@ export function box(content: string, options?: Partial<BoxOptions>) {
     ...renderContent(content, boxWidth, mergedOptions),
     renderBottomBorder(boxWidth, mergedOptions),
   ]
-  .map((line) =>
-    line
-    .padStart(line.length + Math.ceil(mergedOptions.margin / 2))
-    .padEnd(line.length + Math.floor(mergedOptions.margin / 2)),
-  )
-  .join("\n");
+    .map((line) =>
+      line
+        .padStart(line.length + Math.ceil(mergedOptions.margin / 2))
+        .padEnd(line.length + Math.floor(mergedOptions.margin / 2)),
+    )
+    .join("\n");
 }
 
 function renderContent(content: string, width: number, options: BoxOptions) {
@@ -230,42 +229,42 @@ function renderContent(content: string, width: number, options: BoxOptions) {
   }
 
   return content
-  .split("\n")
-  .flatMap((line) => {
-    if (!exceedsLength(line)) {
-      return [line];
-    }
-
-    const words = line.split(/\s+/);
-    const lines: string[] = [];
-    let currentLine = "";
-
-    while (words.length > 0) {
-      const word = words.shift()!;
-
-      if (exceedsLength(`${currentLine} ${word}`)) {
-        lines.push(currentLine);
-        currentLine = "";
+    .split("\n")
+    .flatMap((line) => {
+      if (!exceedsLength(line)) {
+        return [line];
       }
 
-      // If the word is too long, we need to split it
-      if (exceedsLength(word)) {
-        if (currentLine) {
+      const words = line.split(/\s+/);
+      const lines: string[] = [];
+      let currentLine = "";
+
+      while (words.length > 0) {
+        const word = words.shift()!;
+
+        if (exceedsLength(`${currentLine} ${word}`)) {
           lines.push(currentLine);
+          currentLine = "";
         }
 
-        currentLine = word.slice(0, width - 4);
-        words.unshift(word.slice(width - 4));
-      } else {
-        currentLine += (currentLine ? " " : "") + word;
+        // If the word is too long, we need to split it
+        if (exceedsLength(word)) {
+          if (currentLine) {
+            lines.push(currentLine);
+          }
+
+          currentLine = word.slice(0, width - 4);
+          words.unshift(word.slice(width - 4));
+        } else {
+          currentLine += (currentLine ? " " : "") + word;
+        }
       }
-    }
 
-    lines.push(currentLine);
+      lines.push(currentLine);
 
-    return lines;
-  })
-  .map((line) => renderLine(line, width, options));
+      return lines;
+    })
+    .map((line) => renderLine(line, width, options));
 }
 
 function renderLine(

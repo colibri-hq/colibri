@@ -13,7 +13,8 @@ export default class Update extends BaseCommand<typeof Update> {
   static description = "Update an OAuth client.";
   static examples = [
     {
-      command: "<%= config.bin %> <%= command.id %> myapp --name \"Updated App Name\"",
+      command:
+        '<%= config.bin %> <%= command.id %> myapp --name "Updated App Name"',
       description: "Update an OAuth client name:",
     },
     {
@@ -21,7 +22,8 @@ export default class Update extends BaseCommand<typeof Update> {
       description: "Deactivate an OAuth client:",
     },
     {
-      command: "<%= config.bin %> <%= command.id %> myapp --instance https://colibri.example.com --redirect-uris \"https://new-example.com/callback\"",
+      command:
+        '<%= config.bin %> <%= command.id %> myapp --instance https://colibri.example.com --redirect-uris "https://new-example.com/callback"',
       description: "Update redirect URIs for an OAuth client:",
     },
   ];

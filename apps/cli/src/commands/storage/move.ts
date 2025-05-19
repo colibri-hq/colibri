@@ -24,7 +24,8 @@ export class MoveCommand extends StorageBaseCommand<typeof MoveCommand> {
   static description = "Move a file or folder in storage.";
   static examples = [
     {
-      command: "<%= config.bin %> <%= command.id %> assets/old-folder assets/new-folder",
+      command:
+        "<%= config.bin %> <%= command.id %> assets/old-folder assets/new-folder",
       description: "Move 'old-folder' to 'new-folder'",
     },
   ];

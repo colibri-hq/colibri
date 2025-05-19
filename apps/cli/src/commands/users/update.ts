@@ -37,7 +37,8 @@ export default class Update extends BaseCommand<typeof Update> {
   static description = "Update a user's information.";
   static examples = [
     {
-      command: "<%= config.bin %> <%= command.id %> jane@doe.com --name \"Jane Doe\"",
+      command:
+        '<%= config.bin %> <%= command.id %> jane@doe.com --name "Jane Doe"',
       description: "Update a user's name by email address:",
     },
     {
@@ -45,7 +46,8 @@ export default class Update extends BaseCommand<typeof Update> {
       description: "Update a user's role by ID:",
     },
     {
-      command: "<%= config.bin %> <%= command.id %> 42 --instance https://colibri.example.com --color-scheme dark",
+      command:
+        "<%= config.bin %> <%= command.id %> 42 --instance https://colibri.example.com --color-scheme dark",
       description:
         "Update a user's color scheme by ID from a specific Colibri instance:",
     },
