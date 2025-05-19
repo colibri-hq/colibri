@@ -25,7 +25,6 @@
   "bugs": {
     "url": "https://github.com/colibri-hq/colibri/issues"
   },
-  "packageManager": "pnpm@10.6.5",
   "dependencies": {
     "@colibri-hq/oauth": "workspace:*",
     "@colibri-hq/sdk": "workspace:*",
@@ -38,12 +37,12 @@
     "@simplewebauthn/server": "^13.1.1",
     "@trpc/client": "catalog:",
     "@trpc/server": "catalog:",
-    "@zip.js/zip.js": "^2.7.60",
+    "@zip.js/zip.js": "^2.7.61",
     "bytemd": "^1.22.0",
     "dayjs": "^1.11.13",
     "debounce": "^2.2.0",
     "jsonwebtoken": "catalog:",
-    "mdsvex": "^0.12.5",
+    "mdsvex": "^0.12.6",
     "pdfjs-dist": "^5.2.133",
     "pg-cloudflare": "^1.2.5",
     "playwright": "^1.52.0",

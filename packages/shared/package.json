@@ -26,7 +26,6 @@
   "bugs": {
     "url": "https://github.com/colibri-hq/colibri/issues"
   },
-  "packageManager": "pnpm@10.6.5",
   "scripts": {
     "build": "rimraf dist; tsc",
     "dev": "tsc --watch",
@@ -50,14 +49,14 @@
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
     "eslint": "catalog:",
-    "eslint-config-prettier": "^10.1.2",
-    "eslint-plugin-oxlint": "^0.16.8",
-    "eslint-plugin-svelte": "^3.5.1",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-oxlint": "^0.16.11",
+    "eslint-plugin-svelte": "^3.8.1",
     "globals": "catalog:",
-    "oxlint": "^0.16.10",
+    "oxlint": "^0.16.11",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "^4.1.0",
-    "prettier-plugin-svelte": "^3.3.3",
+    "prettier-plugin-svelte": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "rimraf": "catalog:",
     "typescript": "catalog:",

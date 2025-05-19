@@ -24,6 +24,5 @@
   },
   "bugs": {
     "url": "https://github.com/colibri-hq/colibri/issues"
-  },
-  "packageManager": "pnpm@10.6.5"
+  }
 }

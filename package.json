@@ -30,8 +30,10 @@
     "preinstall": "npx only-allow pnpm",
     "fmt": "turbo fmt",
     "lint": "turbo lint",
-    "dev": "turbo dev",
+    "dev": "turbo dev --filter=@colibri-hq/app...",
     "build": "turbo build",
+    "build:app": "turbo build --filter=@colibri-hq/app...",
+    "build:cli": "turbo build --filter=@colibri-hq/cli...",
     "storybook": "pnpm --filter=@colibri-hq/ui run storybook"
   },
   "pnpm": {
@@ -44,8 +46,8 @@
       "yarn"
     ]
   },
-  "packageManager": "pnpm@10.9.0+sha512.0486e394640d3c1fb3c9d43d49cf92879ff74f8516959c235308f5a8f62e2e19528a65cdc2a3058f587cde71eba3d5b56327c8c33a97e4c4051ca48a10ca2d5f",
+  "packageManager": "pnpm@10.11.0",
   "devDependencies": {
-    "turbo": "^2.5.2"
+    "turbo": "^2.5.3"
   }
 }
