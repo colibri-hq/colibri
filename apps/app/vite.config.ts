@@ -1,7 +1,8 @@
 import { sveltekit } from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
-import { defineConfig } from "vite";
+import { defineConfig, searchForWorkspaceRoot } from "vite";
 import packageJson from "./package.json" with { type: "json" };
+import { cwd } from "node:process";
 
 const { homepage, bugs, repository } = packageJson;
 
@@ -26,6 +27,9 @@ export default defineConfig({
     strictPort: true,
     hmr: {
       overlay: false,
+    },
+    fs: {
+      allow: [searchForWorkspaceRoot(cwd())],
     },
   },
 });
