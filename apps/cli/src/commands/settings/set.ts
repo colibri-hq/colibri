@@ -20,6 +20,12 @@ export class Set extends BaseCommand<typeof Set> {
     const { key, value } = this.args;
     const { data } = await loadSettings(this.instance.database);
 
+    if (!data || !(typeof data === "object") || Array.isArray(data)) {
+      this.logToStderr("Settings data is corrupted.");
+
+      this.exit(1);
+    }
+
     try {
       await updateSettings(this.instance.database, {
         data: {

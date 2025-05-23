@@ -14,8 +14,9 @@ import type { Client, StoredObject } from "./index.js";
 import { fileURLToPath } from "node:url";
 import { Readable } from "node:stream";
 import { buffer as streamToBuffer } from "node:stream/consumers";
-import { readFile, stat, writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { File } from "node:buffer";
+import { ReadableStream } from "node:stream/web";
 
 export async function listObjects(
   storage: Client,
@@ -185,9 +186,7 @@ export async function copyObject(
       );
     }
 
-    const stream = Readable.fromWeb(body);
-
-    return await uploadObject(storage, stream, bucketName, key);
+    return await uploadObject(storage, body as ReadableStream, bucketName, key);
   }
   // endregion
 
@@ -246,13 +245,20 @@ export async function downloadObject(
 
 export async function uploadObject(
   storage: Client,
-  file: File | Uint8Array | Buffer | Readable,
+  file:
+    | File
+    | Uint8Array
+    | Buffer
+    | Readable
+    | ReadableStream<Uint8Array<ArrayBufferLike>>,
   bucketName: string,
   key: string,
   { acl = "authenticated-read" }: { acl?: ObjectCannedACL } = {},
 ) {
   if (file instanceof Readable) {
     file = await streamToBuffer(file);
+  } else if (file instanceof ReadableStream) {
+    file = await streamToBuffer(Readable.fromWeb(file));
   }
 
   return await storage.send(

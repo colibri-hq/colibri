@@ -2,7 +2,7 @@ import { loadSettings } from "@colibri-hq/sdk";
 import { BaseCommand } from "../../command.ts";
 
 export class Version extends BaseCommand<typeof Version> {
-  static description = "Show settings version information.";
+  static override description = "Show settings version information.";
 
   async run() {
     const {
