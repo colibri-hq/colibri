@@ -1,4 +1,4 @@
-import { relatorRoles } from "$lib/parsing/contributions";
+import { relatorRoles } from "@colibri-hq/sdk/ebooks";
 import { uploadUrl } from "$lib/server/storage";
 import { procedure, t, unguardedProcedure } from "$lib/trpc/t";
 import {

@@ -37,6 +37,9 @@
     ],
     "topicSeparator": " ",
     "topics": {
+      "books": {
+        "description": "Manage books and editions."
+      },
       "storage": {
         "description": "Manage persistent storage."
       },

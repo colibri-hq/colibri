@@ -89,6 +89,11 @@
     "./storage": {
       "import": "./dist/storage/index.js",
       "types": "./dist/storage/index.d.ts"
+    },
+    "./ebooks": {
+      "import": "./dist/ebooks/index.js",
+      "browser": "./dist/ebooks/index.js",
+      "types": "./dist/ebooks/index.d.ts"
     }
   },
   "sideEffects": false,

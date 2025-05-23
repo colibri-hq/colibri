@@ -1,10 +1,8 @@
 import { log } from "$lib/logging";
-import { detectType, type Metadata } from "$lib/parsing";
-import { getMetadata as getEpubMetadata } from "$lib/parsing/epub";
-import { getMetadata as getPdfMetadata } from "$lib/parsing/pdf";
 import { trpc as t } from "$lib/trpc/client";
 import type { WorkerMessage } from "$lib/workers/workers";
 import { encodeToBase64 } from "@colibri-hq/shared";
+import { loadMetadata, type Metadata } from "@colibri-hq/sdk/ebooks";
 
 const trpc = t({
   fetch,
@@ -78,12 +76,6 @@ async function handleUpload({ files }: UploadPayload) {
     const result = await processFile(id, asset, container, signal);
     const checksum = await crypto.subtle.digest("SHA-256", buffer);
 
-    console.log("Got metadata", {
-      id,
-      asset,
-      result,
-      checksum: encodeToBase64(checksum),
-    });
     // Persist the new book in the database
     const reply = await trpc.books.create.mutate({
       asset: {
@@ -125,9 +117,7 @@ async function handleUpload({ files }: UploadPayload) {
   });
 
   try {
-    const files = await Promise.all(operations);
-
-    console.log("Got local copies of all files!", { files });
+    await Promise.all(operations);
   } catch (cause) {
     throw new Error(
       `Failed to upload files: ${(cause as Error).message}: ${(cause as Error).stack}`,
@@ -271,7 +261,7 @@ async function processFile(
       // No cover found, ignore
     }
   } catch {
-    metadata = await resolveMetadata(file, signal);
+    metadata = await loadMetadata(file, signal);
 
     if (metadata.cover) {
       cover = metadata.cover;
@@ -357,25 +347,6 @@ async function writeFile(
   }
 
   return handle;
-}
-
-async function resolveMetadata(file: File, signal?: AbortSignal) {
-  const type = await detectType(file);
-
-  switch (type) {
-    case "pdf":
-      return getPdfMetadata(file);
-
-    case "mobi":
-      // TODO: Add mobi support
-      return { title: "Untitled mobi file" } as Metadata;
-
-    case "epub":
-      return getEpubMetadata(file, signal);
-
-    default:
-      throw new Error(`Unsupported file type: ${type}`);
-  }
 }
 
 async function getFilesystemRoot() {

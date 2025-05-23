@@ -1,4 +1,5 @@
-import { type Relator, relatorRoles } from "$lib/parsing/contributions";
+/// <reference lib="dom" />
+import { type Relator, relatorRoles } from "../contributions.js";
 import { wrapArray } from "@colibri-hq/shared";
 import { DOMParser } from "xmldom";
 import {
@@ -7,7 +8,7 @@ import {
   parseCfi,
   parseCfiFromElements,
   type RegularCfi,
-} from "./cfi";
+} from "./cfi.js";
 
 const NS = {
   CONTAINER: "urn:oasis:names:tc:opendocument:xmlns:container",
@@ -852,7 +853,9 @@ class MediaOverlay extends EventTarget {
 }
 
 function getUuid(opf: Document) {
-  for (const element of opf.getElementsByTagNameNS(NS.DC, "identifier")) {
+  const elements = Array.from(opf.getElementsByTagNameNS(NS.DC, "identifier"));
+
+  for (const element of elements) {
     const [id] = getElementText(element).split(":").slice(-1);
 
     if (
@@ -1348,7 +1351,11 @@ class Loader {
         ),
       ]);
 
-      for (const element of document.querySelectorAll("[*|href]:not([href])")) {
+      const links = Array.from(
+        document.querySelectorAll("[*|href]:not([href])"),
+      );
+
+      for (const element of links) {
         const link = element.getAttributeNS(NS.XLINK, "href") ?? "";
         const namespace = (await this.loadHref(link, href, parents)) ?? "";
 

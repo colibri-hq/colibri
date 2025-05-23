@@ -1,5 +1,5 @@
-import { Epub } from "$lib/parsing/epub/index";
-import type { Metadata } from "$lib/parsing/index";
+import { Epub } from "./epub/index.js";
+import type { Metadata } from "./metadata.js";
 import { wrapArray } from "@colibri-hq/shared";
 import {
   BlobReader,
@@ -9,7 +9,7 @@ import {
   ZipReader,
 } from "@zip.js/zip.js";
 
-export async function isZipFile(file: File) {
+export async function isZipFile(file: File): Promise<boolean> {
   const slices = new Uint8Array(await file.slice(0, 4).arrayBuffer());
 
   return (
@@ -20,13 +20,16 @@ export async function isZipFile(file: File) {
   );
 }
 
-export async function getMetadata(file: File, signal?: AbortSignal) {
-  const book = await load(file, signal);
+export async function loadEpubMetadata(
+  file: File,
+  signal?: AbortSignal,
+): Promise<Metadata> {
+  const book = await loadEpub(file, signal);
   await book.initialize();
   const metadata = await book.metadata;
   const cover = await book.getCover();
 
-  const title = wrapArray(metadata.title).shift() ?? "Untitled Book";
+  const title = wrapArray(metadata.title).shift();
   const contributors = (metadata.contributors ?? []).map(
     ({ name, roles, sortAs }) => ({
       name,
@@ -35,18 +38,22 @@ export async function getMetadata(file: File, signal?: AbortSignal) {
     }),
   );
   const rights = metadata.rights ?? "";
+  const language = wrapArray(metadata.language).shift();
 
   return {
     title,
     contributors,
     legalInformation: rights,
-    language: wrapArray(metadata.language).shift(),
+    language,
     ...metadata,
     cover,
   } as Metadata;
 }
 
-async function load(file: File, signal?: AbortSignal) {
+export async function loadEpub(
+  file: File,
+  signal?: AbortSignal,
+): Promise<Epub> {
   const options = signal ? { signal } : {};
   const reader = new ZipReader(new BlobReader(file), options);
   const entries = await reader.getEntries();
