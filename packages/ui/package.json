@@ -60,9 +60,9 @@
     "@fontsource-variable/material-symbols-outlined": "catalog:",
     "@fontsource/neuton": "catalog:",
     "@fontsource/titillium-web": "catalog:",
-    "bits-ui": "^1.5.2",
+    "bits-ui": "^1.5.3",
     "blurhash": "^2.0.5",
-    "esm-env": "^1.2.2",
+    "esm-env": "catalog:",
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
@@ -82,7 +82,7 @@
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/svelte": "^5.2.7",
+    "@testing-library/svelte": "^5.2.8",
     "@types/qrcode": "^1.5.5",
     "eslint": "catalog:",
     "eslint-plugin-storybook": "^0.12.0",

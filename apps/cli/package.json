@@ -100,16 +100,13 @@
     "eslint-plugin-perfectionist": "^4.13.0",
     "eslint-plugin-unicorn": "^59.0.1",
     "globals": "catalog:",
-    "jiti": "^2.4.2",
     "msw": "^2.8.4",
     "oclif": "^4.17.46",
     "prettier": "catalog:",
     "rimraf": "catalog:",
-    "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.16",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
-    "unbuild": "catalog:",
     "vitest": "catalog:"
   },
   "engines": {
