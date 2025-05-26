@@ -28,17 +28,22 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
+    "postinstall": "lefthook install",
     "fmt": "turbo fmt",
     "lint": "turbo lint",
-    "dev": "turbo dev --filter=@colibri-hq/app...",
+    "dev": "turbo dev",
+    "dev:app": "turbo dev --filter=@colibri-hq/app...",
+    "dev:cli": "turbo dev --filter=@colibri-hq/cli...",
     "build": "turbo build",
     "build:app": "turbo build --filter=@colibri-hq/app...",
     "build:cli": "turbo build --filter=@colibri-hq/cli...",
+    "test": "turbo test",
     "storybook": "pnpm --filter=@colibri-hq/ui run storybook"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild",
+      "lefthook",
       "msw"
     ],
     "ignoredBuiltDependencies": [
@@ -48,6 +53,7 @@
   },
   "packageManager": "pnpm@10.11.0",
   "devDependencies": {
+    "lefthook": "^1.11.13",
     "turbo": "^2.5.3"
   }
 }

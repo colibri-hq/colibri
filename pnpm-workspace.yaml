@@ -37,3 +37,4 @@ catalog:
 
 strictPeerDependencies: false
 updateNotifier: false
+sideEffectsCache: false

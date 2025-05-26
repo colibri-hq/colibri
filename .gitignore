@@ -18,3 +18,9 @@ packages/*/dist
 /playwright/.cache/
 
 *storybook.log
+
+# Lefthook
+# See also: https://lefthook.dev/examples/lefthook-local.html
+lefthook-local.yml
+lefthook-local.yaml
+lefthook-local.toml

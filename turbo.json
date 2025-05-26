@@ -30,6 +30,15 @@
         "^lint"
       ]
     },
+    "test": {
+      "dependsOn": [
+        "^test"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*"
+      ]
+    },
     "check-types": {
       "dependsOn": [
         "^check-types"

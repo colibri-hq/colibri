@@ -1,0 +1,28 @@
+pre-commit:
+  commands:
+    fmt:
+      run: pnpm run fmt -- {staged_files}
+      stage_fixed: true
+      glob: "*.{ts,js,svelte,css,html,md}"
+      skip:
+        - merge
+        - rebase
+    lint:
+      run: pnpm run lint -- {staged_files}
+      stage_fixed: true
+      glob: "*.{ts,js,svelte,css,html,md}"
+    check:
+      run: pnpm run check -- {staged_files}
+      stage_fixed: true
+      glob:
+        - "*.{ts,js,svelte}"
+        - "tsconfig*.json"
+    test:
+      run: pnpm run test
+      glob:
+        - "*.{ts,js,svelte}"
+
+pre-push:
+  commands:
+    test:
+      run: pnpm test
