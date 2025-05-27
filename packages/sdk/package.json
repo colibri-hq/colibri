@@ -51,7 +51,7 @@
     "@zip.js/zip.js": "^2.7.62",
     "esm-env": "catalog:",
     "jsonwebtoken": "catalog:",
-    "kysely": "^0.27.6",
+    "kysely": "^0.28.2",
     "pg": "^8.16.0",
     "typescript": "catalog:",
     "xmldom": "^0.6.0",
