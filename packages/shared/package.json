@@ -50,7 +50,7 @@
     "@vitest/ui": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-oxlint": "^0.16.11",
+    "eslint-plugin-oxlint": "^0.16.12",
     "eslint-plugin-svelte": "^3.9.0",
     "globals": "catalog:",
     "oxlint": "^0.16.11",
