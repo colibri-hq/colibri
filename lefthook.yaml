@@ -1,18 +1,18 @@
 pre-commit:
   commands:
     fmt:
-      run: pnpm run fmt -- {staged_files}
+      run: pnpm run fmt -- '{staged_files}'
       stage_fixed: true
       glob: "*.{ts,js,svelte,css,html,md}"
       skip:
         - merge
         - rebase
     lint:
-      run: pnpm run lint -- {staged_files}
+      run: pnpm run lint -- --filter=$(dirname) '{staged_files}'
       stage_fixed: true
       glob: "*.{ts,js,svelte,css,html,md}"
     check:
-      run: pnpm run check -- {staged_files}
+      run: pnpm run check -- '{staged_files}'
       stage_fixed: true
       glob:
         - "*.{ts,js,svelte}"
