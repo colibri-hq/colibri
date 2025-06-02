@@ -82,7 +82,7 @@
     "@inquirer/prompts": "^7.5.1",
     "@oclif/core": "^4.3.0",
     "@oclif/plugin-help": "^6.2.28",
-    "@oclif/plugin-not-found": "^3.2.52",
+    "@oclif/plugin-not-found": "^3.2.55",
     "@oclif/plugin-plugins": "^5.4.38",
     "ansis": "^4.0.0",
     "open": "^10.1.2",
