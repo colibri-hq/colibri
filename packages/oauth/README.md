@@ -53,7 +53,7 @@ import { createAuthorizationServer } from "@colibri-hq/oauth";
 const server = createAuthorizationServer({
   issuer: process.env.OAUTH_ISSUER_URL,
   jwtSecret: process.env.OAUTH_JWT_SECRET,
-  /* Options omitted for brevity */
+  /* Other options omitted for brevity */
 });
 ```
 
@@ -77,7 +77,7 @@ The module follows a clean, modular architecture:
 
 ## Supported Claims
 
-The module supports standard OAuth and OpenID Connect claims:
+The module supports standard OAuth 2.1, and OpenID Connect claims:
 
 ### Standard Claims
 
@@ -106,21 +106,39 @@ The module supports standard OAuth and OpenID Connect claims:
 
 To add a custom grant type:
 
-1. Create a new class extending `GrantType`:
+1. Define the grant type using `defineGrantType`:
 
    ```typescript
-   import { GrantType } from "@colibri-hq/oauth";
+   import { defineGrantType } from "@colibri-hq/oauth/grantType";
 
-   class CustomGrantType extends GrantType {
-     async validateRequest(request: Request): Promise<void> {
-       // Implement validation logic
+   const CustomGrantType = defineGrantType({
+     // Define the grant type name to be used in requests
+     type: "urn:custom_grant_type",
+
+     // Zod Schema to validate requests against
+     schema: z.object({
+       client_id: z.string(),
+       custom_param: z.string(),
+     }),
+
+     configure(options: MyCustomGrantTypeOptions) {
+       // Set default options if necessary. This allows type inference
+       return options;
+     },
+
+     async validate(params) {
+       // Implement validation logic, return modified params or throw an error
+       return params;
      }
 
-     async handleRequest(request: Request): Promise<Response> {
-       // Implement request handling
+     async handle(params) {
+       // Implement request handling, return response data
      }
-   }
+   });
    ```
+
+   Review the `defineGrantType` implementation and the existing grant types for more details on how
+   to structure your custom grant type.
 
 2. Register the grant type with the server:
    ```typescript
