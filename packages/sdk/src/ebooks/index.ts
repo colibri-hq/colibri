@@ -2,6 +2,7 @@ import { isZipFile, loadEpubMetadata } from "./epub.js";
 import { isMobiFile, loadMobiMetadata } from "./mobi.js";
 import { isPdfFile, loadPdfMetadata } from "./pdf.js";
 import type { Metadata } from "./metadata.js";
+import TurndownService from "turndown";
 
 export async function detectType(file: File) {
   if (await isPdfFile(file)) {
@@ -19,31 +20,53 @@ export async function detectType(file: File) {
   throw new Error("Unsupported file format");
 }
 
+const metadataLoaders = {
+  epub: loadEpubMetadata,
+  mobi: loadMobiMetadata,
+  pdf: loadPdfMetadata,
+};
+
 export async function loadMetadata(
   file: File,
   signal?: AbortSignal,
 ): Promise<Metadata> {
   const type = await detectType(file);
+  const loader = metadataLoaders[type];
 
-  switch (type) {
-    case "epub": {
-      return loadEpubMetadata(file, signal);
-    }
-
-    case "mobi": {
-      return loadMobiMetadata(file, signal);
-    }
-
-    case "pdf": {
-      return loadPdfMetadata(file, signal);
-    }
-
-    // TODO: Add additional formats support
-
-    default: {
-      throw new Error(`Unsupported file type: ${type}`);
-    }
+  if (!loader) {
+    throw new Error(`Unsupported format: "${type}"`);
   }
+
+  const metadata = await loader(file, signal);
+
+  return {
+    ...metadata,
+    get synopsis() {
+      const synopsis = metadata?.synopsis;
+
+      if (!synopsis) {
+        return undefined;
+      }
+
+      return parseHtml(synopsis);
+    },
+  };
+}
+
+function parseHtml(html: string) {
+  const turndownService = new TurndownService({
+    bulletListMarker: "-",
+    codeBlockStyle: "fenced",
+    emDelimiter: "_",
+    fence: "```",
+    headingStyle: "atx",
+    hr: "---",
+    linkStyle: "inlined",
+    preformattedCode: true,
+    strongDelimiter: "**",
+  });
+
+  return turndownService.turndown(html);
 }
 
 export { loadEpubMetadata, loadEpub, isZipFile } from "./epub.js";

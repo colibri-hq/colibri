@@ -15,6 +15,17 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     "config-file": config({
       helpGroup: "GLOBAL",
     }),
+    displayLocale: Flags.string({
+      async default() {
+        return (process.env.LC_TIME ?? process.env.LC_ALL ?? process.env.TZ)
+          ?.replace("_", "-")
+          .split(".", 1)
+          .shift();
+      },
+      description: "The locale to use for displaying messages.",
+      env: "COLIBRI_DISPLAY_LOCALE",
+      hidden: true,
+    }),
     instance: Flags.string({
       char: "i",
       description: "The URL of your Colibri instance.",
@@ -59,6 +70,23 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     return this.#instance;
   }
 
+  public async init() {
+    await super.init();
+
+    const { args, argv, flags } = await this.parse({
+      args: this.ctor.args,
+      baseFlags: (super.ctor as typeof BaseCommand).baseFlags,
+      enableJsonFlag: this.ctor.enableJsonFlag,
+      flags: this.ctor.flags,
+      strict: this.ctor.strict,
+    });
+
+    this.flags = flags as Flags<T, typeof BaseCommand>;
+    this.args = args as Args<T>;
+    this.rawArgs = argv.map((arg) => String(arg).trim());
+    this.colibriConfig = await flags["config-file"].load();
+  }
+
   protected async catch(err: Error & { exitCode?: number }) {
     if (err.cause === Aborted) {
       this.logToStderr("Aborted.");
@@ -76,22 +104,5 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     }
 
     return super.finally(error);
-  }
-
-  public async init() {
-    await super.init();
-
-    const { args, argv, flags } = await this.parse({
-      args: this.ctor.args,
-      baseFlags: (super.ctor as typeof BaseCommand).baseFlags,
-      enableJsonFlag: this.ctor.enableJsonFlag,
-      flags: this.ctor.flags,
-      strict: this.ctor.strict,
-    });
-
-    this.flags = flags as Flags<T, typeof BaseCommand>;
-    this.args = args as Args<T>;
-    this.rawArgs = argv.map((arg) => String(arg).trim());
-    this.colibriConfig = await flags["config-file"].load();
   }
 }

@@ -1,5 +1,5 @@
-import { Epub } from "./epub/index.js";
-import type { Metadata } from "./metadata.js";
+import { Epub } from "./epub/legacy.js";
+import type { Identifier, Metadata } from "./metadata.js";
 import { wrapArray } from "@colibri-hq/shared";
 import {
   BlobReader,
@@ -25,29 +25,78 @@ export async function loadEpubMetadata(
   signal?: AbortSignal,
 ): Promise<Metadata> {
   const book = await loadEpub(file, signal);
-  await book.initialize();
-  const metadata = await book.metadata;
+  await book.load();
   const cover = await book.getCover();
 
-  const title = wrapArray(metadata.title).shift();
-  const contributors = (metadata.contributors ?? []).map(
-    ({ name, roles, sortAs }) => ({
-      name,
-      roles,
-      sortingKey: sortAs,
-    }),
-  );
-  const rights = metadata.rights ?? "";
-  const language = wrapArray(metadata.language).shift();
+  const {
+    contributors,
+    description: synopsis,
+    identifier,
+    language,
+    modified: dateModified,
+    published: datePublished,
+    rights,
+    sortAs,
+    subject = [],
+    title,
+    publisher,
+    ...properties
+  } = await book.metadata;
 
   return {
-    title,
-    contributors,
-    legalInformation: rights,
-    language,
-    ...metadata,
+    title: wrapArray(title).shift(),
+    dateModified,
+    synopsis,
+    identifiers: loadIdentifiers({ identifier }),
+    contributors: loadContributors({ contributors, publisher }),
+    legalInformation: rights ?? undefined,
+    tags: subject.map(({ name, term }) => term ?? name),
+    language: wrapArray(language).shift(),
+    properties,
+    datePublished,
     cover,
   } as Metadata;
+}
+
+function loadIdentifiers({
+  identifier = [],
+}: Pick<Awaited<Epub["metadata"]>, "identifier">) {
+  return wrapArray(identifier)
+    .filter((value) => !!value)
+    .map((value) => {
+      if (!value.includes(":")) {
+        return {
+          type: "other" as const,
+          value,
+        };
+      }
+
+      if (value.startsWith("urn:")) {
+        value = value.slice(4);
+      }
+
+      const [type, ...rest] = value.split(":");
+      const identifier = rest.join(":");
+
+      return {
+        type: type.toLowerCase() as Identifier["type"],
+        value: identifier,
+      };
+    });
+}
+
+function loadContributors({
+  contributors = [],
+  publisher,
+}: Pick<Awaited<Epub["metadata"]>, "contributors" | "publisher">) {
+  return [...contributors, publisher]
+    .filter((contributor) => contributor !== undefined)
+    .filter(({ name }) => !name.endsWith("[https://calibre-ebook.com]"))
+    .map(({ name, roles, sortAs }) => ({
+      name,
+      roles: wrapArray(roles),
+      sortingKey: sortAs,
+    }));
 }
 
 export async function loadEpub(
