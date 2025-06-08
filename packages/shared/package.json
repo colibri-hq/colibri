@@ -50,10 +50,10 @@
     "@vitest/ui": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-oxlint": "^0.17.0",
+    "eslint-plugin-oxlint": "^0.18.0",
     "eslint-plugin-svelte": "^3.9.1",
     "globals": "catalog:",
-    "oxlint": "^0.17.0",
+    "oxlint": "^0.18.0",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-svelte": "^3.4.0",
@@ -64,8 +64,8 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "@sveltejs/kit": "^2.20.8",
-    "eslint": "^9.25.1",
+    "@sveltejs/kit": "^2.21.2",
+    "eslint": "^9.28.0",
     "prettier": "^3.5.3"
   },
   "peerDependenciesMeta": {
