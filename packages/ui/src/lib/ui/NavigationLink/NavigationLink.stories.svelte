@@ -1,8 +1,8 @@
 <script module lang="ts">
   import { defineMeta } from '@storybook/addon-svelte-csf';
+  import { fn } from '@storybook/test';
   import NavigationLink from './NavigationLink.svelte';
   import Icon from '../Icon/Icon.svelte';
-  import { fn } from '@storybook/test';
 
   /**
    * The NavigationLink component is used to create a link with an icon and

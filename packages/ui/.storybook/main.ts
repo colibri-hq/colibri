@@ -1,4 +1,8 @@
+import { createRequire } from "node:module";
+import { dirname, join } from "node:path";
 import type { StorybookConfig } from "@storybook/sveltekit";
+
+const require = createRequire(import.meta.url);
 
 const config = {
   core: {
@@ -8,12 +12,11 @@ const config = {
   },
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|ts|svelte)"],
   addons: [
-    "@storybook/addon-svelte-csf",
-    "@storybook/addon-essentials",
-    "@storybook/addon-interactions",
+    getAbsolutePath("@storybook/addon-svelte-csf"),
+    getAbsolutePath("@storybook/addon-docs"),
   ],
   framework: {
-    name: "@storybook/sveltekit",
+    name: getAbsolutePath("@storybook/sveltekit"),
     options: {},
   },
   docs: {
@@ -22,3 +25,7 @@ const config = {
 } satisfies StorybookConfig;
 
 export default config;
+
+function getAbsolutePath(value: string): any {
+  return dirname(require.resolve(join(value, "package.json")));
+}
