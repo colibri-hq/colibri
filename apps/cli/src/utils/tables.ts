@@ -1,4 +1,5 @@
 import ansis, { bold, gray, green, red } from "ansis";
+import wrapAnsi from "wrap-ansi";
 
 /**
  * Divider
@@ -10,91 +11,72 @@ export const divider = Symbol.for("divider");
 /**
  * Renders a table with the given rows and columns.
  *
- * @param rows Data to be displayed in the table, as an array of objects.
+ * @param data Data to be displayed in the table, as an array of objects.
  * @param columns Array of objects describing the columns to be displayed.
  * @param options Optional configuration object for table formatting.
  */
 export function table<T extends Row>(
-  rows: (T | typeof divider)[],
+  data: (T | typeof divider)[],
   columns: Column<T>[],
   options?: TableOptions<T>,
 ): string {
-  const defaultOptions = {
-    format: {
-      format: String,
-      formatBoolean: (value: boolean) => (value ? green("✓") : red("✗")),
-      formatDate: (value: Date) => value.toLocaleDateString(),
-      formatNull: () => gray("—"),
-      formatNumber: (value: number) => value.toLocaleString(),
-      formatString: (value: string) => value.toLocaleString(),
-    } satisfies TableFormatOptions<T>,
-    interiorBorders: false,
-    theme: plainTheme,
-    width: "auto" as const,
-  };
-  const { format, interiorBorders, theme } = {
-    ...defaultOptions,
-    ...options,
-    format: {
-      ...defaultOptions.format,
-      ...(typeof options?.format === "function"
-        ? { format: options.format }
-        : {}),
-    },
-    theme: {
-      ...defaultOptions.theme,
-      ...options?.theme,
-    },
-  } satisfies Required<TableOptions<T>>;
-  const header = columns.map(({ name }) => bold(name));
-  const renderedRows = rows.map((row) =>
+  const { displayHeader, format, interiorBorders, theme, width } =
+    mergeOptions(options);
+
+  // Format all header cells first, so we can determine the column widths
+  const headerRow = columns.map(({ name }) => bold(name));
+
+  // Format all rows and their cells; again so we can determine the column widths
+  const rows = data.map((row) =>
     row === divider
       ? divider
       : columns.map((column) => formatValue(row, column, format)),
   );
-  const columnWidths = columns.map((_column, index) =>
-    Math.max(
-      ansis.strip(header[index]).length,
-      ...renderedRows
-        .filter((row) => row !== divider)
-        .map((row) => ansis.strip(row[index]).length),
-    ),
+
+  // Create a memoized text wrapping function to avoid recalculating it for each cell
+  const wrapText = textWrapping();
+
+  const layout = generateLayout(
+    columns,
+    headerRow,
+    rows,
+    { theme, width },
+    wrapText,
+  );
+
+  const header = renderHeader(headerRow, columns, layout, {
+    displayHeader,
+    theme,
+  });
+  const body = renderBody(
+    rows,
+    columns,
+    layout,
+    { interiorBorders, theme },
+    wrapText,
   );
 
   return [
-    renderSeparator(columnWidths, theme, "top"),
-    renderRow(
-      header.map((cell, index) =>
-        align(cell, columnWidths[index], columns[index], theme),
-      ),
-      theme,
-    ),
-    renderSeparator(columnWidths, theme, "head"),
-    ...renderedRows
-      .map((row) =>
-        row === divider
-          ? divider
-          : row.map((cell, index) =>
-              align(cell, columnWidths[index], columns[index], theme),
-            ),
-      )
-      .flatMap((cells, index) =>
-        [
-          cells === divider || (index > 0 && interiorBorders)
-            ? renderSeparator(columnWidths, theme, "mid")
-            : undefined,
-          cells === divider ? undefined : renderRow(cells, theme),
-        ].filter((line): line is string => line !== undefined),
-      ),
-    renderSeparator(columnWidths, theme, "bottom"),
+    renderSeparator(layout, theme, "top"),
+    ...header,
+    ...body,
+    renderSeparator(layout, theme, "bottom"),
   ].join("\n");
 }
+
+// region Themes
 
 /**
  * Plain Theme
  *
- * Renders a table like this:
+ * A basic theme that uses simple box-drawing characters to render the table.
+ * This is the default theme used by the `table` function if no theme is
+ * specified explicitly.
+ * Note that this theme requires a terminal that supports Unicode box-drawing
+ * characters to render correctly. If that is not the case, consider using
+ * the {@link asciiTheme `asciiTheme`} instead.
  *
+ * @example Renders a table like this:
  * ```
  * ┌─────────────┬─────────────┬─────────────┐
  * │ Column 1    │ Column 2    │ Column 3    │
@@ -129,8 +111,10 @@ export const plainTheme = {
 /**
  * Rounded Theme
  *
- * Renders a table like this:
+ * A theme based on the default plain theme that uses rounded corners for the
+ * table, providing for a more visually appealing appearance.
  *
+ * @example Renders a table like this:
  * ```
  * ╭─────────────┬─────────────┬─────────────╮
  * │ Column 1    │ Column 2    │ Column 3    │
@@ -153,8 +137,10 @@ export const roundedTheme = {
 /**
  * Bold Theme
  *
- * Renders a table like this:
+ * A theme that uses bold characters to render the outer borders and crossings
+ * of the table, providing a more pronounced appearance.
  *
+ * @example Renders a table like this:
  * ```
  * ┏━━━━━━━━━━━━━┯━━━━━━━━━━━━━┯━━━━━━━━━━━━━┓
  * ┃ Column 1    │ Column 2    │ Column 3    ┃
@@ -189,8 +175,10 @@ export const boldTheme = {
 /**
  * Double Box Drawing Theme
  *
- * Renders a table like this:
+ * A theme that uses double box-drawing characters to render the outer borders
+ * of the table, providing a more pronounced and visually appealing appearance.
  *
+ * @example Renders a table like this:
  * ```
  * ╔═════════════╤═════════════╤═════════════╗
  * ║ Column 1    │ Column 2    │ Column 3    ║
@@ -223,10 +211,12 @@ export const doubleBoxTheme = {
 } satisfies TableTheme;
 
 /**
- * ANSI Theme
+ * ASCII Theme
  *
- * Renders a table like this:
+ * A theme that uses only ASCII characters to render the table, making it suitable
+ * for environments that do not support Unicode characters.
  *
+ * @example Renders a table like this:
  * ```
  * +-------------+-------------+-------------+
  * | Column 1    | Column 2    | Column 3    |
@@ -238,7 +228,7 @@ export const doubleBoxTheme = {
  * +-------------+-------------+-------------+
  * ```
  */
-export const ansiTheme = {
+export const asciiTheme = {
   crossing: "+",
   crossingBottomEnd: "+",
   crossingBottomMid: "+",
@@ -257,6 +247,242 @@ export const ansiTheme = {
   verticalInsideBorder: "|",
   verticalOutsideBorder: "|",
 } satisfies TableTheme;
+
+/**
+ * Invisible Theme
+ *
+ * A theme that renders a table without any visible borders or separators.
+ * This can be useful for displaying data in a compact format. Note that
+ * horizontal borders are still present and will render as empty lines, so any
+ * sections in the table will still be visually separated.
+ *
+ * @example Renders a table like this:
+ * ```
+ *
+ *  Column 1     Column 2     Column 3
+ *
+ *  Row 1        Row 1        Row 1
+ *
+ *  Row 2        Row 2        Row 2
+ *  Row 3        Row 3        Row 3
+ *
+ * ```
+ */
+export const invisibleTheme = {
+  crossing: "",
+  crossingBottomEnd: "",
+  crossingBottomMid: "",
+  crossingBottomStart: "",
+  crossingHeadEndBottom: "",
+  crossingHeadMidBottom: "",
+  crossingHeadStartBottom: "",
+  crossingMidEnd: "",
+  crossingMidStart: "",
+  crossingTopEnd: "",
+  crossingTopMid: "",
+  crossingTopStart: "",
+  horizontalInsideBorder: "",
+  horizontalOutsideBorder: "",
+  padding: " ",
+  verticalInsideBorder: "",
+  verticalOutsideBorder: "",
+} satisfies TableTheme;
+
+// endregion
+
+// region Rendering Utilities
+
+function mergeOptions<T extends Row>(options: TableOptions<T> | undefined) {
+  const defaultOptions = {
+    displayHeader: true,
+    format: {
+      format: String,
+      formatBoolean: (value: boolean) => (value ? green("✓") : red("✗")),
+      formatDate: (value: Date) => value.toLocaleDateString(),
+      formatNull: () => gray("—"),
+      formatNumber: (value: number) => value.toLocaleString(),
+      formatString: (value: string) => value.toLocaleString(),
+    } satisfies TableFormatOptions<T>,
+    interiorBorders: false,
+    theme: plainTheme,
+    width: "auto" as const,
+  };
+
+  return {
+    ...defaultOptions,
+    ...options,
+    format: {
+      ...defaultOptions.format,
+      ...(typeof options?.format === "function"
+        ? { format: options.format }
+        : {}),
+    },
+    theme: {
+      ...defaultOptions.theme,
+      ...options?.theme,
+    },
+  } satisfies Required<TableOptions<T>>;
+}
+
+function generateLayout<T extends Row>(
+  columns: Column<T>[],
+  header: string[],
+  rows: (string[] | typeof divider)[],
+  {
+    theme: { padding, verticalInsideBorder, verticalOutsideBorder },
+    width: widthOption,
+  }: Required<Pick<TableOptions<T>, "theme" | "width">> & { theme: TableTheme },
+  wrapText: TextWrapper,
+) {
+  // Compute the natural width for each column based on the cell content
+  const naturalWidths = columns.map((_column, index) =>
+    Math.max(
+      ansis.strip(header[index]).length,
+      ...rows
+        .filter((row) => row !== divider)
+        .map((row) => ansis.strip(row[index]).length),
+    ),
+  );
+
+  // Determine max allowed width
+  const maxWidth = Math.max(
+    // Minimum width of 5 characters for the table to avoid strange rendering edge cases
+    5,
+
+    // Use an explicitly defined width if defined; otherwise, default to the terminal width if
+    // available, or 80 characters as a fallback. This way, the table should not grow larger than
+    // the terminal width.
+    // Finally, subtract the decorations to avoid pushing content to the next line.
+    (!widthOption || widthOption === "auto"
+      ? (process.stdout.columns ?? 80)
+      : widthOption) -
+      padding.length * 2 -
+      verticalOutsideBorder.length * 2,
+  );
+
+  // Calculate the spacing needed for the table, based on the theme
+  const totalSpacing =
+    (padding.length * 2 + verticalInsideBorder.length) * columns.length;
+
+  const columnWidths = naturalWidths.map((width) =>
+    Math.min(width, maxWidth - totalSpacing),
+  );
+
+  function tableWidth(widths: number[]) {
+    return widths.reduce((a, b) => a + b, 0) + totalSpacing;
+  }
+
+  // If the table width exceeds the maximum allowed width, we need to reduce the column widths
+  // to fit within the maximum width. We do this by reducing the column widths until the table fits
+  // within the maximum width, while trying to keep the columns as wide as possible.
+  if (tableWidth(naturalWidths) > maxWidth) {
+    // Set a minimum column width to avoid making columns too narrow. Five is a sensible value here
+    const minColumnWidth = 5;
+
+    const candidates = columns
+      .filter(
+        (column, index) =>
+          column.wrap !== false && columnWidths[index] > minColumnWidth,
+      )
+      .map((column) => columns.indexOf(column));
+
+    while (tableWidth(columnWidths) > maxWidth) {
+      let minHeight = Infinity;
+
+      let candidate: null | number = null;
+
+      for (const index of candidates) {
+        const width = columnWidths[index];
+        const height = rows
+          .filter((row) => row !== divider)
+          .reduce(
+            (sum, row) => sum + wrapText(row[index], width - 2).length,
+            0,
+          );
+
+        if (height < minHeight) {
+          minHeight = height;
+          candidate = index;
+        }
+      }
+
+      if (candidate === null) {
+        break;
+      }
+
+      columnWidths[candidate] = columnWidths[candidate] - 2;
+    }
+  }
+
+  return columnWidths;
+}
+
+function renderHeader<T extends Row>(
+  header: string[],
+  columns: Column<T>[],
+  widths: number[],
+  {
+    displayHeader,
+    theme,
+  }: Required<
+    Pick<TableOptions<Row>, "displayHeader" | "theme"> & { theme: TableTheme }
+  >,
+) {
+  if (!displayHeader) {
+    return [];
+  }
+
+  return [
+    renderRow(
+      header.map((cell, index) =>
+        justify(cell, widths[index], columns[index], theme),
+      ),
+      theme,
+    ),
+    renderSeparator(widths, theme, "head"),
+  ];
+}
+
+function renderBody<T extends Row>(
+  rows: (string[] | typeof divider)[],
+  columns: Column<T>[],
+  widths: number[],
+  {
+    interiorBorders,
+    theme,
+  }: Required<Pick<TableOptions<T>, "interiorBorders" | "theme">> & {
+    theme: TableTheme;
+  },
+  wrapText: TextWrapper,
+) {
+  return rows.flatMap((row, rowIndex) => {
+    if (row === divider) {
+      return [renderSeparator(widths, theme, "mid")];
+    }
+
+    const wrappedColumns = row.map((cell, index) =>
+      wrapText(cell, widths[index]),
+    );
+    const maxLines = Math.max(...wrappedColumns.map(({ length }) => length));
+
+    const aligned = wrappedColumns.map((lines, index) =>
+      align(lines, maxLines, columns[index].align ?? "top").map((line) =>
+        justify(line, widths[index], columns[index], theme),
+      ),
+    );
+
+    const lines = Array.from({ length: maxLines }, (_, index) =>
+      renderRow(
+        aligned.map((column) => column[index]),
+        theme,
+      ),
+    );
+
+    return interiorBorders && rowIndex > 0
+      ? [renderSeparator(widths, theme, "mid"), ...lines]
+      : lines;
+  });
+}
 
 /**
  * Renders a row of the table with the given cells.
@@ -379,26 +605,27 @@ function formatValue<T extends Row>(
  *
  * @param value The string value to align.
  * @param width The width to align the value to.
- * @param alignment The alignment of the value ('start', 'center', or 'end').
+ * @param justification The justification of the value (`start`, `center`, or
+ *                      `end`).
  * @param fillString The string used for padding.
  *
- * @returns The aligned string value.
+ * @returns The justified string value.
  */
-function align<T extends Row>(
+function justify<T extends Row>(
   value: string,
   width: number,
-  { align: alignment }: Column<T>,
+  { justify: justification }: Column<T>,
   { padding: fillString }: TableTheme,
 ) {
   const plainValue = ansis.strip(value);
   const pad = (amount: number = plainValue.length) =>
-    fillString.repeat(width - amount + fillString.length);
+    fillString.repeat(Math.max(0, width - amount + fillString.length));
 
-  if (alignment === "start") {
+  if (justification === "start") {
     return fillString + value + pad();
   }
 
-  if (alignment === "end") {
+  if (justification === "end") {
     return pad() + value + fillString;
   }
 
@@ -407,19 +634,82 @@ function align<T extends Row>(
   return pad(width - padding) + value + pad(plainValue.length + padding);
 }
 
+function align(
+  lines: string[],
+  maxLines: number,
+  align: "bottom" | "center" | "top",
+): string[] {
+  const padCount = maxLines - lines.length;
+
+  if (padCount <= 0) {
+    return lines;
+  }
+
+  // Content at top, blanks at bottom
+  if (align === "top") {
+    return [
+      ...lines,
+      ...(Array.from({ length: padCount }).fill("") as string[]),
+    ];
+  }
+
+  // Blanks at top, content at bottom
+  if (align === "bottom") {
+    return [
+      ...(Array.from({ length: padCount }).fill("") as string[]),
+      ...lines,
+    ];
+  }
+
+  const topPad = Math.floor(padCount / 2);
+  const bottomPad = padCount - topPad;
+
+  return [
+    ...(Array.from({ length: topPad }).fill("") as string[]),
+    ...lines,
+    ...(Array.from({ length: bottomPad }).fill("") as string[]),
+  ];
+}
+
+function textWrapping() {
+  const wrapCache = new Map<string, string[]>();
+
+  return function wrap(content: string, width: number) {
+    const key = `${width}${content}`;
+    let wrapped = wrapCache.get(key);
+
+    if (!wrapped) {
+      wrapped = wrapAnsi(content, width, {
+        hard: true,
+        trim: true,
+        wordWrap: true,
+      }).split("\n");
+      wrapCache.set(key, wrapped);
+    }
+
+    return wrapped;
+  } satisfies TextWrapper;
+}
+
+type TextWrapper = (content: string, width: number) => string[];
+
+// endregion
+
+// region Types
+
 type Row = object;
 
 /**
  * Column
  *
- * A column definition for the table, providing control over the column's
- * data accessor and display rendering.
+ * A column definition for the table, providing control over the column's data
+ * accessor and display rendering.
  */
 type Column<T extends Row, K extends keyof T = keyof T> = {
   /**
-   * A function that returns the value to be displayed in the column.
-   * If not provided, the column will use the value of the property
-   * with the same name as the column.
+   * A function that returns the value to be displayed in the column. If not
+   * provided, the column will use the value of the property with the same name
+   * as the column.
    *
    * Note that the result of this function is passed to the format function.
    */
@@ -428,23 +718,34 @@ type Column<T extends Row, K extends keyof T = keyof T> = {
     | K;
 
   /**
-   * The alignment of the column's content. This can be 'start', 'center',
-   * or 'end'. The default is 'center'.
+   * The alignment of the column's header and content.
    */
-  align?: "center" | "end" | "start";
+  align?: "bottom" | "center" | "top";
 
   /**
    * A function that formats the value for display in the table. If no formatter
-   * is provided, the default formatter for the data type returned by the accessor,
-   * or of the property in the row, will be used.
+   * is provided, the default formatter for the data type returned by the
+   * accessor, or of the property in the row, will be used.
    */
   format?: TableFormatter<T, T[K]>;
 
   /**
-   * The name of the column, which will be displayed in the header. If no accessor
-   * is provided, this will be used as the default accessor.
+   * The justification of the column's content. This can be 'start', 'center',
+   * or 'end'. The default is 'center'.
+   */
+  justify?: "center" | "end" | "start";
+
+  /**
+   * The name of the column, which will be displayed in the header. If no
+   * accessor is provided, this will be used as the default accessor.
    */
   name: string;
+
+  /**
+   * Whether to wrap the content of the column. If set to false, the content
+   * will not be wrapped and will be truncated if it exceeds the column width.
+   */
+  wrap?: boolean;
 };
 
 /**
@@ -581,6 +882,11 @@ type TableFormatOptions<T extends Row> = {
  */
 type TableOptions<T extends Row> = {
   /**
+   * Whether to display the header row with column names.
+   */
+  displayHeader?: boolean;
+
+  /**
    * Either a function that formats the value for display in the table,
    * or an object with functions for formatting different types of values.
    */
@@ -607,3 +913,5 @@ type TableOptions<T extends Row> = {
    */
   width?: "auto" | number;
 };
+
+// endregion
