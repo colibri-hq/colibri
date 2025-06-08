@@ -39,7 +39,7 @@
   "dependencies": {
     "@colibri-hq/shared": "workspace:*",
     "esm-env": "catalog:",
-    "pdfjs-dist": "^5.2.133"
+    "pdfjs-dist": "^5.3.31"
   },
   "devDependencies": {
     "eslint": "catalog:",

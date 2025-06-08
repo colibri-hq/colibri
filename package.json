@@ -54,6 +54,6 @@
   "packageManager": "pnpm@10.11.0",
   "devDependencies": {
     "lefthook": "^1.11.13",
-    "turbo": "^2.5.3"
+    "turbo": "^2.5.4"
   }
 }

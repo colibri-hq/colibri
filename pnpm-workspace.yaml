@@ -3,37 +3,39 @@ packages:
   - packages/*
 
 catalog:
-  '@eslint/js': ^9.27.0
-  '@fontsource-variable/material-symbols-outlined': ^5.2.10
+  '@eslint/js': ^9.28.0
+  '@fontsource-variable/material-symbols-outlined': ^5.2.11
   '@fontsource/neuton': ^5.2.5
   '@fontsource/titillium-web': ^5.2.5
   '@sveltejs/adapter-auto': ^6.0.1
-  '@sveltejs/kit': ^2.21.1
-  '@sveltejs/vite-plugin-svelte': ^5.0.3
-  '@tailwindcss/vite': ^4.1.7
+  '@sveltejs/kit': ^2.21.2
+  '@sveltejs/vite-plugin-svelte': ^5.1.0
+  '@tailwindcss/vite': ^4.1.8
   '@trpc/client': ^10.45.2
   '@trpc/server': ^10.45.2
   '@types/jsonwebtoken': ^9.0.2
-  '@types/node': ^22.15.21
+  '@types/node': ^22.15.23
+  '@types/turndown': ^5.0.5
   '@typescript-eslint/eslint-plugin': ^8.32.0
   '@typescript-eslint/parser': ^8.32.0
-  '@vitest/coverage-v8': ^3.1.4
-  '@vitest/ui': ^3.1.4
+  '@vitest/coverage-v8': ^3.2.1
+  '@vitest/ui': ^3.2.1
   jsonwebtoken: ^9.0.2
-  eslint: ^9.27.0
+  eslint: ^9.28.0
   esm-env: ^1.2.2
-  globals: ^16.1.0
+  globals: ^16.2.0
   prettier: ^3.5.3
   rimraf: ^6.0.1
-  svelte: ~5.30.2
+  svelte: ^5.33.14
   svelte-check: ^4.2.1
-  tailwindcss: ^4.1.7
+  tailwindcss: ^4.1.8
   tailwind-merge: ^3.2.0
+  turndown: ^7.2.0
   typescript: ^5.8.3
-  typescript-eslint: ^8.32.0
+  typescript-eslint: ^8.33.1
   vite: ^6.2.5
-  vitest: ^3.1.4
-  zod: ^3.25.20
+  vitest: ^3.2.1
+  zod: ^3.25.51
 
 strictPeerDependencies: false
 updateNotifier: false

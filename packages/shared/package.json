@@ -50,14 +50,14 @@
     "@vitest/ui": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-oxlint": "^0.16.12",
-    "eslint-plugin-svelte": "^3.9.0",
+    "eslint-plugin-oxlint": "^0.17.0",
+    "eslint-plugin-svelte": "^3.9.1",
     "globals": "catalog:",
-    "oxlint": "^0.16.11",
+    "oxlint": "^0.17.0",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-svelte": "^3.4.0",
-    "prettier-plugin-tailwindcss": "^0.6.11",
+    "prettier-plugin-tailwindcss": "^0.6.12",
     "rimraf": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
@@ -87,13 +87,13 @@
     },
     "./prettier.config": {
       "import": "./prettier.config.ts",
-      "default": "./prettier.config.ts",
-      "types": "./config.d.ts"
+      "types": "./config.d.ts",
+      "default": "./prettier.config.ts"
     },
     "./eslint.config": {
       "import": "./eslint.config.ts",
-      "default": "./eslint.config.ts",
-      "types": "./config.d.ts"
+      "types": "./config.d.ts",
+      "default": "./eslint.config.ts"
     },
     "./theme.css": "./theme.css"
   },
