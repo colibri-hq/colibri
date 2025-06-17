@@ -32,7 +32,7 @@ catalog:
   tailwind-merge: ^3.2.0
   turndown: ^7.2.0
   typescript: ^5.8.3
-  typescript-eslint: ^8.33.1
+  typescript-eslint: ^8.34.0
   vite: ^6.2.5
   vitest: ^3.2.1
   zod: ^3.25.51
