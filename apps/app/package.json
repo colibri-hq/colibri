@@ -43,7 +43,7 @@
     "jsonwebtoken": "catalog:",
     "mdsvex": "^0.12.6",
     "pg-cloudflare": "^1.2.5",
-    "playwright": "^1.52.0",
+    "playwright": "^1.53.1",
     "svelte": "catalog:",
     "svelte-file-dropzone": "^2.0.9",
     "svelte-gravatar": "^1.0.3",
