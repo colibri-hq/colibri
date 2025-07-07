@@ -65,6 +65,13 @@ function loadIdentifiers({
     .filter((value) => !!value)
     .map((value) => {
       if (!value.includes(":")) {
+        if (value.length === 10 || value.length === 13) {
+          return {
+            type: "isbn" as const,
+            value,
+          };
+        }
+
         return {
           type: "other" as const,
           value,
