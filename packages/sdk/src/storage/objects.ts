@@ -10,25 +10,24 @@ import {
   type ObjectCannedACL,
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
-import type { Client, StoredObject } from "./index.js";
+import type { Storage, StoredObject } from "./index.js";
 import { fileURLToPath } from "node:url";
 import { Readable } from "node:stream";
 import { buffer as streamToBuffer } from "node:stream/consumers";
 import { readFile, writeFile } from "node:fs/promises";
-import { File } from "node:buffer";
 import { ReadableStream } from "node:stream/web";
 
 export async function listObjects(
-  storage: Client,
-  bucketName: string,
+  { client, defaultBucket }: Storage,
   prefix: string,
   delimiter: string,
+  bucketName: string = defaultBucket,
 ): Promise<StoredObject[]> {
   let response;
   const objects: Array<_Object> = [];
 
   do {
-    response = await storage.send(
+    response = await client.send(
       new ListObjectsV2Command({
         Bucket: bucketName,
         Prefix: prefix,
@@ -43,10 +42,10 @@ export async function listObjects(
 }
 
 export async function removeObjects(
-  storage: Client,
-  bucket: string,
+  { client, defaultBucket }: Storage,
   keys: string | string[],
   abortSignal?: AbortSignal,
+  bucket: string = defaultBucket,
 ): Promise<void> {
   keys = Array.isArray(keys) ? keys : [keys];
 
@@ -58,7 +57,7 @@ export async function removeObjects(
     const [key] = keys;
 
     try {
-      await storage.send(
+      await client.send(
         new DeleteObjectCommand({
           Bucket: bucket,
           Key: key,
@@ -73,7 +72,7 @@ export async function removeObjects(
   }
 
   try {
-    await storage.send(
+    await client.send(
       new DeleteObjectsCommand({
         Bucket: bucket,
         Delete: { Objects: keys.map((Key) => ({ Key })) },
@@ -88,20 +87,23 @@ export async function removeObjects(
 }
 
 export async function moveObject(
-  storage: Client,
+  storage: Storage,
   source: string | URL,
   destination: string | URL,
 ) {
-  const { hostname: sourceBucket, pathname: sourceKey } = resolvePath(source);
-  const { hostname: destinationBucket, pathname: destinationKey } =
-    resolvePath(destination);
+  const { bucketName: sourceBucket, key: sourceKey } = new ObjectReference(
+    source,
+    storage.defaultBucket,
+  );
+  const { bucketName: destinationBucket, key: destinationKey } =
+    new ObjectReference(destination, storage.defaultBucket);
 
   let destinationExists = false;
 
   const { ETag: DestinationETag } =
-    (await statObject(storage, destinationBucket, destinationKey)) ?? {};
+    (await statObject(storage, destinationKey, destinationBucket)) ?? {};
   const { ETag: SourceETag } =
-    (await statObject(storage, sourceBucket, sourceKey)) ?? {};
+    (await statObject(storage, sourceKey, sourceBucket)) ?? {};
 
   if (!SourceETag) {
     throw new Error(`Source object "${source}" does not exist`);
@@ -117,16 +119,16 @@ export async function moveObject(
     await copyObject(storage, source, destination);
   }
 
-  await removeObjects(storage, sourceBucket, sourceKey);
+  await removeObjects(storage, sourceKey, undefined, sourceBucket);
 }
 
 export async function statObject(
-  storage: Client,
-  bucketName: string,
+  { client, defaultBucket }: Storage,
   key: string,
+  bucketName: string = defaultBucket,
 ): Promise<HeadObjectCommandOutput | undefined> {
   try {
-    return await storage.send(
+    return await client.send(
       new HeadObjectCommand({
         Bucket: bucketName,
         Key: key,
@@ -149,7 +151,7 @@ export async function statObject(
 }
 
 export async function copyObject(
-  storage: Client,
+  storage: Storage,
   source: string | URL,
   destination: string | URL,
 ) {
@@ -161,7 +163,7 @@ export async function copyObject(
     const { bucketName, key } = destinationRef;
     const file = await readFile(sourceRef.localPath);
 
-    return await uploadObject(storage, file, bucketName, key);
+    return await uploadObject(storage, file, key, {}, bucketName);
   }
   // endregion
 
@@ -186,7 +188,13 @@ export async function copyObject(
       );
     }
 
-    return await uploadObject(storage, body as ReadableStream, bucketName, key);
+    return await uploadObject(
+      storage,
+      body as ReadableStream,
+      key,
+      {},
+      bucketName,
+    );
   }
   // endregion
 
@@ -195,7 +203,7 @@ export async function copyObject(
     const path = destinationRef.localPath;
 
     const { bucketName, key } = sourceRef;
-    const stream = await downloadObject(storage, bucketName, key);
+    const stream = await downloadObject(storage, key, bucketName);
 
     return await writeFile(path, stream);
   }
@@ -203,7 +211,7 @@ export async function copyObject(
 
   // region From S3 to S3
   if (sourceRef.isS3 && destinationRef.isS3) {
-    const { CopyObjectResult } = await storage.send(
+    const { CopyObjectResult } = await storage.client.send(
       new CopyObjectCommand({
         Bucket: destinationRef.bucketName,
         CopySource: sourceRef.s3Path,
@@ -223,11 +231,11 @@ export async function copyObject(
 }
 
 export async function downloadObject(
-  storage: Client,
-  bucketName: string,
+  { client, defaultBucket }: Storage,
   key: string,
+  bucketName: string = defaultBucket,
 ) {
-  const response = await storage.send(
+  const response = await client.send(
     new GetObjectCommand({
       Bucket: bucketName,
       Key: key,
@@ -243,17 +251,22 @@ export async function downloadObject(
   return response.Body.transformToByteArray();
 }
 
+type UploadObjectAcceptableFile =
+  | File
+  | Uint8Array
+  | Buffer
+  | Readable
+  | ReadableStream<Uint8Array<ArrayBufferLike>>;
+type UploadObjectOptions = {
+  acl?: ObjectCannedACL | undefined;
+  metadata?: Record<string, string> | undefined;
+};
 export async function uploadObject(
-  storage: Client,
-  file:
-    | File
-    | Uint8Array
-    | Buffer
-    | Readable
-    | ReadableStream<Uint8Array<ArrayBufferLike>>,
-  bucketName: string,
+  { client, defaultBucket }: Storage,
+  file: UploadObjectAcceptableFile,
   key: string,
-  { acl = "authenticated-read" }: { acl?: ObjectCannedACL } = {},
+  { acl = "authenticated-read", metadata }: UploadObjectOptions = {},
+  bucketName: string = defaultBucket,
 ) {
   if (file instanceof Readable) {
     file = await streamToBuffer(file);
@@ -261,54 +274,25 @@ export async function uploadObject(
     file = await streamToBuffer(Readable.fromWeb(file));
   }
 
-  return await storage.send(
+  return await client.send(
     new PutObjectCommand({
       Bucket: bucketName,
       Key: key,
-      Body: file,
+      Body: file instanceof Blob ? await file.bytes() : file,
       ACL: acl,
       ContentLength: ArrayBuffer.isView(file) ? file.byteLength : file.size,
+      Metadata: metadata,
     }),
   );
-}
-
-function resolvePath(path: URL | string) {
-  if (path instanceof URL) {
-    if (path.protocol === "file:") {
-      return path;
-    }
-
-    if (path.protocol !== "s3:") {
-      throw new Error(
-        `Invalid object reference "${path}": Must be an s3:// URL ` +
-          `or a relative path as a string.`,
-      );
-    }
-  }
-
-  path = path.toString();
-
-  if (path.startsWith("s3://")) {
-    const url = new URL(path);
-
-    if (!url.hostname || !url.pathname) {
-      throw new Error(`Invalid S3 URL: ${path}`);
-    }
-  }
-
-  const [bucket, ...keyParts] = path.trim().split("/");
-
-  if (!bucket || keyParts.length === 0) {
-    throw new Error(`Invalid S3 path: ${path}`);
-  }
-
-  return new URL(keyParts.join("/"), `s3://${bucket}/`);
 }
 
 class ObjectReference {
   #normalizedPath: URL | undefined;
 
-  constructor(public readonly sourcePath: string | URL) {}
+  constructor(
+    public readonly sourcePath: string | URL,
+    public readonly defaultBucket?: string,
+  ) {}
 
   public get url() {
     if (!this.#normalizedPath) {
@@ -326,13 +310,15 @@ class ObjectReference {
         return this.#normalizedPath;
       }
 
-      const [bucket, ...keyParts] = this.sourcePath.trim().split("/");
+      const [bucketName, ...keyParts] = this.defaultBucket
+        ? [this.defaultBucket, this.sourcePath.trim()]
+        : this.sourcePath.trim().split("/");
 
-      if (!bucket || keyParts.length === 0) {
+      if (!bucketName || keyParts.length === 0) {
         throw new Error(`Invalid S3 path: ${this.sourcePath}`);
       }
 
-      this.#normalizedPath = new URL(keyParts.join("/"), `s3://${bucket}/`);
+      this.#normalizedPath = new URL(keyParts.join("/"), `s3://${bucketName}/`);
     }
 
     return this.#normalizedPath;

@@ -2,9 +2,9 @@ import { copyObject } from "@colibri-hq/sdk/storage";
 import { Args } from "@oclif/core";
 import { access, constants } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { StorageBaseCommand } from "../../domain/storage/command.ts";
+import { BaseCommand } from "../../command.ts";
 
-export class CopyCommand extends StorageBaseCommand<typeof CopyCommand> {
+export class CopyCommand extends BaseCommand<typeof CopyCommand> {
   static aliases = ["storage cp"];
   static args = {
     source: Args.string({
@@ -63,7 +63,7 @@ export class CopyCommand extends StorageBaseCommand<typeof CopyCommand> {
           );
         }
 
-        await copyObject(this.storage, source, destination);
+        await copyObject(await this.storage, source, destination);
 
         if (this.flags.verbose) {
           this.logToStderr(

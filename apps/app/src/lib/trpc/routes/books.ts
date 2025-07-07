@@ -137,7 +137,7 @@ export const books = t.router({
           synopsis,
           asset,
         },
-        ctx: { userId, database },
+        ctx: { userId, database, storage },
       }) => {
         const checksum = asset.checksum;
         const existingAsset = await findAssetByChecksum(database, checksum);
@@ -185,8 +185,8 @@ export const books = t.router({
           });
 
         const assetUrl = await uploadUrl(
-          "books",
-          `${bookId}-${editionId}.epub`,
+          await storage,
+          `${workId}-${editionId}.epub`,
           3600,
           checksum,
           { title },

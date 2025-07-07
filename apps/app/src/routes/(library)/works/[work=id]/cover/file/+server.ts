@@ -1,4 +1,3 @@
-import { env } from "$env/dynamic/private";
 import { stream } from "$lib/server/storage";
 import { error, redirect, type RequestHandler } from "@sveltejs/kit";
 
@@ -6,7 +5,7 @@ export const GET = async function ({
   params,
   request,
   url,
-  locals: { database },
+  locals: { database, storage },
 }) {
   const edition = url.searchParams.get("edition");
   const id = params.book;
@@ -52,15 +51,14 @@ export const GET = async function ({
     }
   }
 
-  return new Response(
-    await stream(env.S3_BUCKET_COVERS, `${cover.id}/${cover.filename}`),
-    {
-      status: 200,
-      headers: {
-        "Content-Type": cover.media_type,
-        "Last-Modified": coverTimestamp.toUTCString(),
-        ETag: `"${hash}"`,
-      },
+  const body = await stream(await storage, cover.storage_reference);
+
+  return new Response(body, {
+    status: 200,
+    headers: {
+      "Content-Type": cover.media_type,
+      "Last-Modified": coverTimestamp.toUTCString(),
+      ETag: `"${hash}"`,
     },
-  );
+  });
 } satisfies RequestHandler;

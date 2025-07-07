@@ -1,6 +1,7 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 import type { Database } from "@colibri-hq/sdk";
+import type { Storage } from "@colibri-hq/sdk/storage";
 import type { CompositionEventHandler } from "svelte/elements";
 
 declare global {
@@ -13,6 +14,7 @@ declare global {
 
     interface Locals {
       database: Database;
+      storage: Promise<Storage>;
     }
 
     // interface PageData {}

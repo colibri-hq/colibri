@@ -5,11 +5,11 @@ export async function createContext({
   cookies,
   platform,
   url,
-  locals: { database },
+  locals: { database, storage },
 }: RequestEvent) {
   const userId = resolveUserId(cookies) || "";
 
-  return { userId, url, platform, database };
+  return { userId, url, platform, database, storage };
 }
 
 export type Context = Awaited<ReturnType<typeof createContext>>;

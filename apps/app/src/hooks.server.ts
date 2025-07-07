@@ -3,7 +3,8 @@ import { env } from "$env/dynamic/private";
 import { log } from "$lib/logging";
 import { createContext } from "$lib/trpc/context";
 import { router } from "$lib/trpc/router";
-import { initialize } from "@colibri-hq/sdk";
+import { initialize as database } from "@colibri-hq/sdk";
+import { storage } from "@colibri-hq/sdk/storage";
 import type { Handle } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { hrtime } from "node:process";
@@ -12,13 +13,22 @@ import { createTRPCHandle } from "trpc-sveltekit";
 const handlers = [
   // region Database Connection in context
   async function handle({ event, resolve }) {
-    // TODO: Accessing the environment variables dynamically here breaks prerendering
-    //       currently; but reading them from the static env means we'd need to build
-    //       the app against a specific database URL. This may not be what we want;
-    //       investigation pending.
-    event.locals.database = initialize(env.DB_URL, {
-      certificate: env.DATABASE_CERTIFICATE,
-      debug: dev,
+    // TODO: Accessing the environment variables dynamically here breaks
+    //       prerendering currently; but reading them from the static env means
+    //       we'd need to build the app against a specific database URL.
+    //       This may not be what we want; investigation pending.
+    Object.defineProperty(event.locals, "database", {
+      get() {
+        return database(env.DB_URL, {
+          certificate: env.DATABASE_CERTIFICATE,
+          debug: dev,
+        });
+      },
+    });
+    Object.defineProperty(event.locals, "storage", {
+      get() {
+        return storage(event.locals.database);
+      },
     });
 
     return resolve(event);

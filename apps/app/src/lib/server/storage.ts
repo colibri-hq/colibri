@@ -1,50 +1,50 @@
-import { env } from "$env/dynamic/private";
 import {
-  client,
   generatePresignedDownloadUrl,
   generatePresignedUploadUrl,
   readFile,
+  type Storage,
   streamFile,
 } from "@colibri-hq/sdk/storage";
 
-export function storage(): ReturnType<typeof client> {
-  return client({
-    region: env.S3_PROTOCOL_REGION,
-    endpoint: env.STORAGE_S3_URL,
-    accessKeyId: env.S3_PROTOCOL_ACCESS_KEY_ID,
-    secretAccessKey: env.S3_PROTOCOL_ACCESS_KEY_SECRET,
-  });
+export async function read(
+  storage: Storage,
+  filename: string,
+  bucket?: string,
+) {
+  return readFile(storage, filename, bucket);
 }
 
-export async function read(bucket: string, filename: string) {
-  return readFile(storage(), bucket, filename);
-}
-
-export async function stream(bucket: string, filename: string) {
-  return streamFile(storage(), bucket, filename);
+export async function stream(
+  storage: Storage,
+  filename: string,
+  bucket?: string,
+) {
+  return streamFile(storage, filename, bucket);
 }
 
 export async function downloadUrl(
-  bucket: string,
+  storage: Storage,
   filename: string,
   expiresIn: number = 3600,
+  bucket?: string,
 ) {
-  return generatePresignedDownloadUrl(storage(), bucket, filename, expiresIn);
+  return generatePresignedDownloadUrl(storage, filename, expiresIn, bucket);
 }
 
 export async function uploadUrl(
-  bucket: string,
+  storage: Storage,
   filename: string,
   expiresIn: number = 3600,
   checksum: Buffer | Uint8Array | ArrayBufferLike,
   metadata?: Record<string, string>,
+  bucket?: string,
 ) {
   return generatePresignedUploadUrl(
-    storage(),
-    bucket,
+    storage,
     filename,
     expiresIn,
     checksum,
     metadata,
+    bucket,
   );
 }

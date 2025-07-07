@@ -6,7 +6,7 @@ const handler: RequestHandler = async function ({
   params,
   request,
   url,
-  platform,
+  locals: { database, storage },
 }): Promise<Response> {
   const book = await prisma.book.findFirstOrThrow({
     where: { id: params.book },
@@ -35,9 +35,7 @@ const handler: RequestHandler = async function ({
     }
   }
 
-  const path = resolveAssetPath(book, asset);
-
-  return new Response(await read(platform, path), {
+  return new Response(await read(await storage, asset.storage_reference), {
     status: 200,
     headers: {
       "Content-Type": asset.mediaType as string,

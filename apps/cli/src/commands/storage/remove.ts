@@ -1,10 +1,11 @@
 import { removeObjects } from "@colibri-hq/sdk/storage";
 import { Args } from "@oclif/core";
-import { StorageBaseCommand } from "../../domain/storage/command.ts";
+import { dim } from "ansis";
+import { BaseCommand } from "../../command.ts";
 import { force } from "../../flags/force.ts";
 import { withConfirmation } from "../../utils/interactive.ts";
 
-export class Remove extends StorageBaseCommand<typeof Remove> {
+export class Remove extends BaseCommand<typeof Remove> {
   static aliases = ["storage rm"];
   static args = {
     keys: Args.string({
@@ -28,13 +29,14 @@ export class Remove extends StorageBaseCommand<typeof Remove> {
   async run() {
     const objects = this.rawArgs.filter(Boolean);
 
+    const storage = await this.storage;
     const operation = await withConfirmation(
       async () => {
         const keysByBucket = new Map<string, Set<string>>();
 
         for (let ref of objects) {
           if (!ref.includes("://")) {
-            ref = `s3://${ref}`;
+            ref = `s3://${storage.defaultBucket}/${ref}`;
           }
 
           const { hostname: bucket, pathname: key } = new URL(ref);
@@ -47,7 +49,7 @@ export class Remove extends StorageBaseCommand<typeof Remove> {
           keysByBucket
             .entries()
             .map(async ([bucket, keys]) =>
-              removeObjects(this.storage, bucket, [...keys]),
+              removeObjects(storage, [...keys], undefined, bucket),
             ),
         );
       },
@@ -58,7 +60,9 @@ export class Remove extends StorageBaseCommand<typeof Remove> {
     await operation();
 
     if (this.flags.verbose) {
-      this.logToStderr(`Removed ${objects.length} object(s) successfully.`);
+      this.logToStderr(
+        dim(`Removed ${objects.length} object(s) successfully.`),
+      );
     }
   }
 }

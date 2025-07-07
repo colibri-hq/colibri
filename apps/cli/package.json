@@ -43,9 +43,6 @@
       "storage": {
         "description": "Manage persistent storage."
       },
-      "storage config": {
-        "description": "Manage persistent storage provider configuration."
-      },
       "settings": {
         "description": "Manage instance settings."
       },

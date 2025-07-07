@@ -1,6 +1,9 @@
+import { storage, type Storage } from "@colibri-hq/sdk/storage";
 import { Command, Flags, Interfaces } from "@oclif/core";
+import { inspect } from "node:util";
 import type { Config } from "./utils/config.ts";
 import { config } from "./flags/config.ts";
+import { box } from "./utils/box.ts";
 import { configureInstance } from "./utils/instance.ts";
 import { Aborted } from "./utils/interactive.ts";
 
@@ -51,7 +54,10 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
   protected colibriConfig!: Config;
   protected flags!: Flags<T, typeof BaseCommand>;
   protected rawArgs!: string[];
+
   #instance: ReturnType<typeof configureInstance> | undefined;
+
+  #storage: Promise<Storage> | undefined;
 
   protected get instance() {
     if (!this.#instance) {
@@ -68,6 +74,40 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     }
 
     return this.#instance;
+  }
+
+  protected get storage() {
+    if (!this.#storage) {
+      this.#storage = storage(this.instance.database, {
+        logger: {
+          debug: (...args) => {
+            if (this.flags.verbose) {
+              this.logToStderr(
+                box(args.join(" "), { title: "Storage: Debug" }),
+              );
+            }
+          },
+          error: (...args) => {
+            this.logToStderr(box(inspect(args), { title: "Storage: Error" }));
+          },
+          info: (...args) => {
+            if (this.flags.verbose) {
+              this.logToStderr(box(args.join(" "), { title: "Storage: Info" }));
+            }
+          },
+          trace() {},
+          warn: (...args) => {
+            if (this.flags.verbose) {
+              this.logToStderr(
+                box(args.join(" "), { title: "Storage: Warning" }),
+              );
+            }
+          },
+        },
+      });
+    }
+
+    return this.#storage;
   }
 
   public async init() {

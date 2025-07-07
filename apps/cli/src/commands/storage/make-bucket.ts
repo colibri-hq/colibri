@@ -1,8 +1,8 @@
 import { createBucket } from "@colibri-hq/sdk/storage";
 import { Args } from "@oclif/core";
-import { StorageBaseCommand } from "../../domain/storage/command.ts";
+import { BaseCommand } from "../../command.ts";
 
-export class MakeBucket extends StorageBaseCommand<typeof MakeBucket> {
+export class MakeBucket extends BaseCommand<typeof MakeBucket> {
   static aliases = ["storage mb"];
   static args = {
     bucket: Args.string({
@@ -22,7 +22,7 @@ export class MakeBucket extends StorageBaseCommand<typeof MakeBucket> {
   async run() {
     const { bucket } = this.args;
 
-    await createBucket(this.storage, bucket);
+    await createBucket(await this.storage, bucket);
 
     if (this.flags.verbose) {
       this.logToStderr(`Bucket "${bucket}" created successfully.`);

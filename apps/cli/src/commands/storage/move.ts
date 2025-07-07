@@ -1,8 +1,8 @@
 import { moveObject } from "@colibri-hq/sdk/storage";
 import { Args } from "@oclif/core";
-import { StorageBaseCommand } from "../../domain/storage/command.ts";
+import { BaseCommand } from "../../command.ts";
 
-export class MoveCommand extends StorageBaseCommand<typeof MoveCommand> {
+export class MoveCommand extends BaseCommand<typeof MoveCommand> {
   static aliases = ["storage mv"];
   static args = {
     bucket: Args.string({
@@ -33,7 +33,7 @@ export class MoveCommand extends StorageBaseCommand<typeof MoveCommand> {
   async run() {
     const { destination, source } = this.args;
 
-    await moveObject(this.storage, source, destination);
+    await moveObject(await this.storage, source, destination);
 
     if (this.flags.verbose) {
       this.logToStderr(
