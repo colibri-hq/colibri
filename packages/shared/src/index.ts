@@ -3,7 +3,7 @@ import packageJson from '../package.json' with { type: 'json' };
 export * from './base64.js';
 export * from './buffer.js';
 export * from './crypto.js';
-export * from './image.js';
+export * from './images/index.js';
 export * from './mediaType.js';
 export * from './random.js';
 export * from './types.js';
