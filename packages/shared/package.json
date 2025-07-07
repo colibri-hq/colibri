@@ -40,7 +40,10 @@
     "prepack": "pnpm run fmt && pnpm run check && pnpm run lint && pnpm run build"
   },
   "dependencies": {
-    "blurhash": "^2.0.5"
+    "blurhash": "^2.0.5",
+    "canvas": "^3.1.2",
+    "exif-reader": "^2.0.2",
+    "fast-xml-parser": "^5.2.5"
   },
   "devDependencies": {
     "@eslint/js": "catalog:",
@@ -50,21 +53,21 @@
     "@vitest/ui": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-oxlint": "^0.18.0",
-    "eslint-plugin-svelte": "^3.9.1",
+    "eslint-plugin-oxlint": "^1.6.0",
+    "eslint-plugin-svelte": "^3.10.1",
     "globals": "catalog:",
-    "oxlint": "^0.18.0",
+    "oxlint": "^1.6.0",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-svelte": "^3.4.0",
-    "prettier-plugin-tailwindcss": "^0.6.12",
+    "prettier-plugin-tailwindcss": "^0.6.13",
     "rimraf": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "@sveltejs/kit": "^2.21.2",
+    "@sveltejs/kit": "^2.21.4",
     "eslint": "^9.28.0",
     "prettier": "^3.5.3"
   },
