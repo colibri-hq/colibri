@@ -72,5 +72,9 @@ function parseHtml(html: string) {
 export { loadEpubMetadata, loadEpub, isZipFile } from "./epub.js";
 export { loadPdfMetadata, loadPdf, isPdfFile } from "./pdf.js";
 export { loadMobiMetadata, loadMobi, isMobiFile } from "./mobi.js";
-export type { Metadata } from "./metadata.js";
+export type {
+  Metadata,
+  Contributor,
+  Identifier as IdentifierType,
+} from "./metadata.js";
 export * from "./contributions.js";
