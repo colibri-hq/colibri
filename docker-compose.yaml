@@ -23,11 +23,14 @@ services:
         host_ip: "127.0.0.1"
 
   postgres:
-    image: postgres:17-alpine
+    image: ghcr.io/colibri-hq/postgres:latest
     environment:
       POSTGRES_USER: colibri
       POSTGRES_PASSWORD: colibri
       POSTGRES_DB: colibri
+    secrets:
+      - source: pgsodium_key
+        target: /run/secrets/pgsodium_key
     configs:
       - source: postgres-init-roles
         target: /bootstrap/0_roles.sql
@@ -190,9 +193,13 @@ configs:
         seed_files=(
           /colibri/seeds/*.sql
         )
-        
+      
         apply_files "$${seed_files[@]}"
       else
         echo "No pending seeds found."
       fi
   # endregion
+
+secrets:
+  pgsodium_key:
+    environment: COLIBRI_ENCRYPTION_KEY

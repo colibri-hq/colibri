@@ -11,7 +11,7 @@ module.exports = {
   connection: {
     connectionString,
   },
-  schemas: ["public", "authentication", "auth"],
+  schemas: ["public", "authentication", "auth", "vault"],
 
   preDeleteOutputFolder: true,
   outputPath: "./src/schema",

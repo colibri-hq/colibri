@@ -1,5 +1,5 @@
 -- region Slugify Function
-create extension unaccent schema public;
+create extension if not exists unaccent schema public;
 create function public.slugify(value text) returns text
     language plpgsql
     immutable strict set search_path to '' as
@@ -48,5 +48,10 @@ comment on domain public.url is 'Valid URLs';
 
 -- region Extensions
 create schema if not exists extensions;
+
+-- Enable the `isn` extension for International Standard Number (ISN) support
 create extension if not exists "isn" schema extensions;
+
+-- Enable the `supabase_vault` extension for secure storage of sensitive data
+create extension if not exists supabase_vault cascade;
 -- endregion

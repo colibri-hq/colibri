@@ -793,4 +793,10 @@ export interface DB {
   tag: Tag;
   user_collection_favorite: UserCollectionFavorite;
   user_creator_favorite: UserCreatorFavorite;
+  "vault.decrypted_secrets": VaultDecryptedSecrets;
+  "vault.secrets": VaultSecrets;
+  work: Work;
+  work_comment: WorkComment;
+  work_rating: WorkRating;
+  work_tag: WorkTag;
 }
