@@ -7,6 +7,7 @@ import type { Linter } from 'eslint';
 import prettier from 'eslint-config-prettier/flat';
 import oxlint from 'eslint-plugin-oxlint';
 import globals from 'globals';
+import { resolve } from 'node:path';
 
 export function config(
   {
@@ -86,7 +87,9 @@ export function config(
           ecmaVersion: 'latest',
           sourceType: 'module',
           tsconfigRootDir,
-          projectService: true,
+          projectService: {
+            defaultProject: resolve(tsconfigRootDir, 'tsconfig.test.json'),
+          },
         },
       },
     },

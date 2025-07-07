@@ -11,6 +11,8 @@ export default defineConfig({
       exclude: [
         'node_modules/**',
         'dist/**',
+        '.turbo/**',
+        '.cache/**',
         '**/*.d.ts',
         '**/*.test.ts',
         '**/*.config.ts',

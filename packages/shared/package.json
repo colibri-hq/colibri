@@ -98,6 +98,11 @@
       "types": "./config.d.ts",
       "default": "./eslint.config.ts"
     },
+    "./vitest.config": {
+      "import": "./vitest.config.ts",
+      "types": "./config.d.ts",
+      "default": "./vitest.config.ts"
+    },
     "./theme.css": "./theme.css"
   },
   "sideEffects": false,
