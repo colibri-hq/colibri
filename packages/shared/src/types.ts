@@ -12,3 +12,7 @@ export type DeepRequired<T> = Required<{
 
 export type Optional<T, K extends keyof T = keyof T> = Pick<Partial<T>, K> &
   Omit<T, K>;
+
+export type LoosePartial<T> = {
+  [P in keyof T]?: T[P] | undefined;
+};
