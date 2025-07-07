@@ -17,6 +17,7 @@ export async function loadMobiMetadata(
   const metadata = await parse(file);
   const {
     title,
+    titleFileAs,
     synopsis,
     publishingDate: datePublished,
     pdbHeader: { creationTime: dateCreated, modificationTime: dateModified },
@@ -43,6 +44,7 @@ export async function loadMobiMetadata(
       pdbHeader: metadata.pdbHeader,
       ...properties,
     },
+    sortingKey: titleFileAs ?? title,
     synopsis,
     tags: loadTags(metadata),
     title,
@@ -126,11 +128,12 @@ function loadTags(
 
 function loadIdentifiers({
   asin,
+  uuid,
   isbn,
   source,
 }: Pick<
   Awaited<ReturnType<typeof parse>>,
-  "asin" | "isbn" | "source"
+  "asin" | "uuid" | "isbn" | "source"
 >): Metadata["identifiers"] {
   const identifiers: Metadata["identifiers"] = [];
 
@@ -140,6 +143,10 @@ function loadIdentifiers({
 
   if (asin) {
     identifiers.push({ type: "asin", value: asin });
+  }
+
+  if (uuid) {
+    identifiers.push({ type: "uuid", value: uuid });
   }
 
   if (source) {

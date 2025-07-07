@@ -47,6 +47,7 @@ export type Metadata = {
   properties?: {
     [key: string]: unknown;
   };
+  sortingKey?: string | undefined;
   synopsis?: string | undefined;
   tags?: string[] | undefined;
 };
