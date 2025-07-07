@@ -1,0 +1,61 @@
+{
+  "name": "@colibri-hq/open-library-client",
+  "version": "0.0.1",
+  "type": "module",
+  "license": "MIT",
+  "description": "Client for the Open Library API",
+  "keywords": [
+    "colibri",
+    "open-library",
+    "api-client"
+  ],
+  "homepage": "https://github.com/colibri-hq/colibri",
+  "author": {
+    "name": "Moritz Mazetti",
+    "email": "m@9dev.de",
+    "url": "https://mazetti.me"
+  },
+  "repository": {
+    "url": "git+https://github.com/colibri-hq/colibri.git",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "scripts": {
+    "build": "rimraf dist; tsc",
+    "dev": "tsc --watch",
+    "check": "tsc --noEmit --project tsconfig.lib.json && tsc --noEmit --project tsconfig.node.json",
+    "coverage": "npx make-coverage-badge --output-path ./badges/coverage.svg",
+    "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
+    "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
+    "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
+    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content .",
+    "test": "vitest",
+    "prepack": "pnpm run fmt && pnpm run check && pnpm run lint && pnpm run build"
+  },
+  "dependencies": {
+    "@colibri-hq/shared": "workspace:*",
+    "vitest": "catalog:"
+  },
+  "devDependencies": {
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "rimraf": "catalog:",
+    "typescript": "catalog:"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "esnext": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ]
+}
