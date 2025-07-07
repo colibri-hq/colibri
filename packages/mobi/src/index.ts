@@ -63,9 +63,12 @@ function parseMetadata(
     metadata.language = mobiHeader.inputLanguage.tag;
   }
 
-  delete metadata.coverOffset;
-  delete metadata.thumbnailOffset;
-  delete metadata.kf8BoundaryOffset;
+  // If the metadata contains a UUID in the ASIN field, convert it to UUID format
+  // and remove the ASIN field.
+  if (metadata.asin && metadata.asin.length === 36) {
+    metadata.uuid = metadata.asin;
+    delete metadata.asin;
+  }
 
   return metadata;
 }

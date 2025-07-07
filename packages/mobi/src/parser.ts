@@ -771,6 +771,7 @@ const exthRecordParser = Parser.start()
 
 export type ExtendedHeader = {
   asin?: string;
+  uuid?: string;
   bookType?: string;
   clippingLimit?: number;
   contributor?: string;
