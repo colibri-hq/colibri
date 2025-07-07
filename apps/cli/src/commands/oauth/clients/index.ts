@@ -47,12 +47,12 @@ export default class Index extends BaseCommand<typeof Index> {
         table(scopes, [
           {
             accessor: "id",
-            align: "start",
+            justify: "start",
             name: "ID",
           },
           {
             accessor: "description",
-            align: "start",
+            justify: "start",
             name: "Description",
           },
         ]),

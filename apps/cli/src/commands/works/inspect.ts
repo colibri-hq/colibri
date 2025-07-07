@@ -30,7 +30,6 @@ export default class Inspect extends BaseCommand<typeof Inspect> {
     const metadata = await loadMetadata(file);
     const checksum = await subtle.digest("SHA-256", buffer);
 
-    const start = process.hrtime.bigint();
     if (!this.flags.json) {
       this.log(
         table(
@@ -104,7 +103,7 @@ export default class Inspect extends BaseCommand<typeof Inspect> {
                 .toString("hex")
                 .split(/(.{1,6})/)
                 .filter(Boolean)
-                .join(" "),
+                .join("·"),
             },
             ...(this.flags.verbose
               ? ([
@@ -137,8 +136,6 @@ export default class Inspect extends BaseCommand<typeof Inspect> {
         ),
       );
     }
-    const end = process.hrtime.bigint();
-    console.log(`Rendered table in ${Number(end - start) / 1_000_000} ms`);
 
     return metadata;
   }

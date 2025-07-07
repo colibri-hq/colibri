@@ -1,17 +1,17 @@
-import { loadBooks } from "@colibri-hq/sdk";
+import { loadWorks } from "@colibri-hq/sdk";
 import { BaseCommand } from "../../command.ts";
 import { table } from "../../utils/tables.ts";
 
 export default class List extends BaseCommand<typeof List> {
-  static override aliases = ["books", "books ls"];
-  static override description = "List all books in the database";
+  static override aliases = ["works", "works ls"];
+  static override description = "List all works in the database";
   static override examples = ["<%= config.bin %> <%= command.id %>"];
 
   public async run() {
-    const books = await loadBooks(this.instance.database);
+    const works = await loadWorks(this.instance.database);
 
     this.log(
-      table(books, [
+      table(works, [
         { accessor: "id", name: "ID" },
         { accessor: "title", name: "Title" },
         { accessor: "created_at", name: "Created At" },
@@ -20,6 +20,6 @@ export default class List extends BaseCommand<typeof List> {
       ]),
     );
 
-    return books;
+    return works;
   }
 }

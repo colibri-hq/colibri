@@ -37,8 +37,14 @@
     ],
     "topicSeparator": " ",
     "topics": {
-      "books": {
-        "description": "Manage books and editions."
+      "works": {
+        "description": "Manage works and editions."
+      },
+      "creators": {
+        "description": "Manage creators and their works."
+      },
+      "publishers": {
+        "description": "Manage publishers and their works."
       },
       "storage": {
         "description": "Manage persistent storage."
@@ -84,6 +90,7 @@
     "ansis": "^4.1.0",
     "open": "^10.1.2",
     "ora": "^8.2.0",
+    "sharp": "^0.34.2",
     "wrap-ansi": "^9.0.0",
     "zod": "catalog:"
   },

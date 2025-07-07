@@ -570,11 +570,12 @@ function formatValue<T extends Row>(
 ) {
   const value =
     typeof column.accessor === "function"
-      ? column.accessor(row)
+      ? (column.accessor as AccessorFn<T, T[keyof T]>)(row)
       : row[column.accessor ?? (column.name as keyof T)];
 
   if (column.format) {
-    return column.format(value as T[keyof T], row, column);
+    // @ts-expect-error -- The column format function can accept any value type
+    return column.format(value, row, column);
   }
 
   if (value === null || value === undefined) {
@@ -698,6 +699,7 @@ type TextWrapper = (content: string, width: number) => string[];
 // region Types
 
 type Row = object;
+type AccessorFn<T extends Row, R = unknown> = (row: T) => R;
 
 /**
  * Column
@@ -705,7 +707,20 @@ type Row = object;
  * A column definition for the table, providing control over the column's data
  * accessor and display rendering.
  */
-type Column<T extends Row, K extends keyof T = keyof T> = {
+type Column<
+  T extends Row,
+  K extends keyof T = keyof T,
+  TAccessor extends AccessorFn<T, T[K]> | K = K,
+  TFormatted extends TAccessor extends AccessorFn<T, infer R>
+    ? R
+    : TAccessor extends K
+      ? T[K]
+      : never = TAccessor extends AccessorFn<T, infer R>
+    ? R
+    : TAccessor extends K
+      ? T[K]
+      : never,
+> = {
   /**
    * A function that returns the value to be displayed in the column. If not
    * provided, the column will use the value of the property with the same name
@@ -713,9 +728,7 @@ type Column<T extends Row, K extends keyof T = keyof T> = {
    *
    * Note that the result of this function is passed to the format function.
    */
-  accessor?:
-    | ((row: T) => boolean | Date | null | number | string | undefined)
-    | K;
+  accessor?: TAccessor;
 
   /**
    * The alignment of the column's header and content.
@@ -727,7 +740,7 @@ type Column<T extends Row, K extends keyof T = keyof T> = {
    * is provided, the default formatter for the data type returned by the
    * accessor, or of the property in the row, will be used.
    */
-  format?: TableFormatter<T, T[K]>;
+  format?: TableFormatter<T, TFormatted>;
 
   /**
    * The justification of the column's content. This can be 'start', 'center',

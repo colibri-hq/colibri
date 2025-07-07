@@ -24,7 +24,6 @@ export default class List extends BaseCommand<typeof List> {
   };
 
   async run() {
-    console.log("Running list users command");
     //const filters = this.flags.filter ?? [];
     const spinner = ora({
       stream: process.stderr,
@@ -50,12 +49,12 @@ export default class List extends BaseCommand<typeof List> {
         table(users, [
           {
             accessor: "id",
-            align: "end",
+            justify: "end",
             name: "ID",
           },
           {
             accessor: "email",
-            align: "start",
+            justify: "start",
             name: "Email Address",
           },
           {
@@ -64,7 +63,7 @@ export default class List extends BaseCommand<typeof List> {
           },
           {
             accessor: "name",
-            align: "start",
+            justify: "start",
             name: "Name",
           },
           {
