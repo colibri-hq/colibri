@@ -45,7 +45,7 @@ export function loadCollectionsForUser(
       eb
         .selectFrom("collection_entry")
         .select(({ fn }) =>
-          fn.count("collection_entry.book_id").as("entry_count"),
+          fn.count("collection_entry.work_id").as("entry_count"),
         )
         .whereRef("collection_entry.collection_id", "=", "collection.id")
         .as("entry_count"),
@@ -156,7 +156,7 @@ export function loadCollectionComments(
     .execute();
 }
 
-export function loadCollectionBooks(database: Database, id: number | string) {
+export function loadCollectionWorks(database: Database, id: number | string) {
   return database
     .selectFrom(table)
     .innerJoin(
@@ -164,12 +164,12 @@ export function loadCollectionBooks(database: Database, id: number | string) {
       "collection_entry.collection_id",
       "collection.id",
     )
-    .innerJoin("book", "collection_entry.book_id", "book.id")
-    .leftJoin("edition", "book.main_edition_id", "edition.id")
-    .leftJoin("cover", "edition.cover_id", "cover.id")
-    .selectAll("book")
+    .innerJoin("work", "collection_entry.work_id", "work.id")
+    .leftJoin("edition", "work.main_edition_id", "edition.id")
+    .leftJoin("image", "edition.cover_image_id", "image.id")
+    .selectAll("work")
     .select("edition.id as edition_id")
-    .select("cover.blurhash as cover_blurhash")
+    .select("image.blurhash as cover_blurhash")
     .where("collection.id", "=", id.toString())
     .execute();
 }
@@ -215,7 +215,7 @@ function applyAccessControls(
           // Collection is shared with all users
           builder.eb("collection.shared", "=", true),
 
-          // Collection is private, but belongs to the user
+          // Collection is private but belongs to the user
           builder.and([
             builder.eb("collection.shared", "=", false),
             builder.eb(
@@ -232,7 +232,7 @@ function applyAccessControls(
           // User is not a child
           builder.eb("authentication.user.role", "<>", "child"),
 
-          // User is a child, but has no birthdate configured, and the collection has an age
+          // User is a child but has no birthdate configured, and the collection has an age
           // requirement of less than 18 years (anything 18 and above is considered adult-only, and
           // a user with the child role but no birthdate has probably just not been configured yet)
           builder.and([

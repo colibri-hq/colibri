@@ -12,6 +12,7 @@ export function loadLanguages(database: Database) {
  */
 export function loadLanguage(database: Database, code: string) {
   const query = database.selectFrom("language").selectAll();
+  code = code.toLowerCase().split(/[-_]/, 1)?.shift() ?? code;
 
   return (
     code.length === 2

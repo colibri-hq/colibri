@@ -2,16 +2,16 @@ import { relatorRoles } from "@colibri-hq/sdk/ebooks";
 import { uploadUrl } from "$lib/server/storage";
 import { procedure, t, unguardedProcedure } from "$lib/trpc/t";
 import {
-  createBook,
   createEdition,
+  createWork,
   findAssetByChecksum,
-  loadBook,
-  loadBooks,
-  loadCreators,
+  loadCreatorsForWork,
   loadLanguage,
-  loadPublisher,
+  loadPublisherForWork,
   loadRatings,
   loadReviews,
+  loadWork,
+  loadWorks,
   updateRating,
 } from "@colibri-hq/sdk";
 import { decodeFromBase64 } from "@colibri-hq/shared";
@@ -24,41 +24,41 @@ export const books = t.router({
         query: z.string().optional(),
       }),
     )
-    .query(({ input, ctx: { database } }) => loadBooks(database, input.query)),
+    .query(({ input, ctx: { database } }) => loadWorks(database, input.query)),
 
   load: procedure()
     .input(z.string())
-    .query(({ input, ctx: { database } }) => loadBook(database, input)),
+    .query(({ input, ctx: { database } }) => loadWork(database, input)),
 
   loadCreators: procedure()
-    .input(z.object({ bookId: z.string(), editionId: z.string().optional() }))
-    .query(({ input: { bookId, editionId }, ctx: { database } }) =>
-      loadCreators(database, bookId, editionId),
+    .input(z.object({ workId: z.string(), editionId: z.string().optional() }))
+    .query(({ input: { workId, editionId }, ctx: { database } }) =>
+      loadCreatorsForWork(database, workId, editionId),
     ),
 
   loadPublisher: procedure()
-    .input(z.object({ bookId: z.string(), editionId: z.string().optional() }))
-    .query(({ input: { bookId, editionId }, ctx: { database } }) =>
-      loadPublisher(database, bookId, editionId),
+    .input(z.object({ workId: z.string(), editionId: z.string().optional() }))
+    .query(({ input: { workId, editionId }, ctx: { database } }) =>
+      loadPublisherForWork(database, workId, editionId),
     ),
 
   loadRatings: procedure()
-    .input(z.object({ bookId: z.string() }))
-    .query(async ({ input: { bookId }, ctx: { database } }) =>
-      loadRatings(database, bookId),
+    .input(z.object({ workId: z.string() }))
+    .query(async ({ input: { workId }, ctx: { database } }) =>
+      loadRatings(database, workId),
     ),
 
   updateRating: procedure()
-    .input(z.object({ bookId: z.string(), rating: z.number() }))
+    .input(z.object({ workId: z.string(), rating: z.number() }))
     .mutation(
-      async ({ input: { bookId, rating }, ctx: { database, userId } }) =>
-        updateRating(database, bookId, userId, rating),
+      async ({ input: { workId, rating }, ctx: { database, userId } }) =>
+        updateRating(database, workId, userId, rating),
     ),
 
   loadReviews: procedure()
-    .input(z.object({ bookId: z.string(), editionId: z.string().optional() }))
-    .query(({ input: { bookId, editionId }, ctx: { database } }) =>
-      loadReviews(database, bookId, editionId),
+    .input(z.object({ workId: z.string(), editionId: z.string().optional() }))
+    .query(({ input: { workId, editionId }, ctx: { database } }) =>
+      loadReviews(database, workId, editionId),
     ),
 
   save: procedure()
@@ -150,26 +150,25 @@ export const books = t.router({
           ? await loadLanguage(database, languageCode)
           : undefined;
 
-        const { bookId, editionId } = await database
+        const { workId, editionId } = await database
           .transaction()
           .execute(async (trx) => {
             // TODO: Check if contributors exist
             // TODO: Create contributors, one by one
 
             // TODO: Check if book exists
-            const { id: bookId } = await createBook(trx, userId);
+            const { id: workId } = await createWork(trx, userId);
 
             // TODO: Check if edition exists, by comparing unique identifiers like
             //       the ISBN. If we don't have an ISBN, we will import the book as
             //       a duplicate and rely on the suggestion queue to merge them.
-            const { id: editionId } = await createEdition(trx, {
-              book_id: bookId,
+            const { id: editionId } = await createEdition(trx, workId, {
               title,
-              synopsis: synopsis ?? null,
-              language: language?.iso_639_3 ?? null,
-              legal_information: legalInformation ?? null,
-              pages: numberOfPages ?? null,
-              sorting_key: sortingKey ?? title,
+              synopsis: synopsis,
+              language: language?.iso_639_3,
+              legalInformation,
+              pages: numberOfPages,
+              sortingKey: sortingKey ?? title,
             });
 
             // TODO: Update main edition for book
@@ -178,10 +177,10 @@ export const books = t.router({
             // TODO: Create publisher
 
             if (rating) {
-              await updateRating(trx, bookId, userId, rating);
+              await updateRating(trx, workId, userId, rating);
             }
 
-            return { bookId, editionId };
+            return { workId, editionId };
           });
 
         const assetUrl = await uploadUrl(

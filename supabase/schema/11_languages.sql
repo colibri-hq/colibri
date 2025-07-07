@@ -1,10 +1,4 @@
-create type public.language_type as enum (
-    'living',
-    'historical',
-    'extinct',
-    'constructed',
-    'special'
-    );
+create type public.language_type as enum ( 'living', 'historical', 'extinct', 'constructed', 'special' );
 alter type public.language_type owner to postgres;
 comment on type public.language_type is 'An ISO 639-3 language type, as defined here: https://iso639-3.sil.org/about/types';
 
@@ -13,7 +7,7 @@ create table public.language
     iso_639_3 character(3)         not null,
     iso_639_1 character(2),
     type      public.language_type not null,
-    name      character varying
+    name      text
 );
 alter table public.language
     owner to postgres;
@@ -31,5 +25,4 @@ alter table only public.language
     add constraint language_pkey primary key (iso_639_3);
 
 alter table only public.edition
-    add constraint edition_language_fkey foreign key (language) references public.language (iso_639_3)
-        on update cascade on delete set null;
+    add constraint edition_language_fkey foreign key (language) references public.language (iso_639_3) on update cascade on delete set null;

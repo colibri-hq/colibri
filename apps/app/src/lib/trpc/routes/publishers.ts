@@ -1,7 +1,7 @@
 import { procedure, t } from "$lib/trpc/t";
 import {
   listPublishers,
-  loadBooksForPublisher,
+  loadWorksForPublisher,
   loadCreatorsForPublisher,
   loadPublisher,
 } from "@colibri-hq/sdk";
@@ -19,7 +19,7 @@ export const publishers = t.router({
   loadBooksForPublisher: procedure()
     .input(z.string())
     .query(({ input, ctx: { database } }) =>
-      loadBooksForPublisher(database, input),
+      loadWorksForPublisher(database, input),
     ),
 
   loadCreatorsForPublisher: procedure()

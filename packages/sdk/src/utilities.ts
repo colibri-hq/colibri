@@ -1,6 +1,11 @@
 import type { DB } from "./schema.js";
 import { jsonBuildObject } from "kysely/helpers/postgres";
-import { type SelectQueryBuilder, sql } from "kysely";
+import {
+  type Expression,
+  type RawBuilder,
+  type SelectQueryBuilder,
+  sql,
+} from "kysely";
 import type { Database } from "./database.js";
 
 type ExtractTableAlias<DB, TE> = TE extends `${string} as ${infer TA}`
@@ -59,4 +64,22 @@ export function paginate<T extends keyof DB, O>(
       .limit(limit)
       .offset(offset)
   );
+}
+
+export function upper(expr: Expression<string>) {
+  return sql<string>`upper(${expr})`;
+}
+
+export function lower(expr: Expression<string>) {
+  return sql<string>`lower(${expr})`;
+}
+
+export function concat<T extends Expression<V>, V extends string>(
+  ...expressions: T[]
+): RawBuilder<V> {
+  return sql.join(expressions, sql<string>`||`) as RawBuilder<V>;
+}
+
+export function mergeJson<A, B>(a: Expression<A>, b: Expression<B>) {
+  return sql<A & B>`${a} || ${b}`;
 }

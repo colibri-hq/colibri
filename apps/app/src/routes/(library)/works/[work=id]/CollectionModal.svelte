@@ -8,14 +8,14 @@
   import { invalidateAll } from '$app/navigation';
   import Modal from '$lib/components/Modal.svelte';
   import { savable, trpc } from '$lib/trpc/client';
-  import type { Book } from '@colibri-hq/sdk';
+  import type { Work } from '@colibri-hq/sdk';
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
 
   interface Props {
     open?: boolean;
     loading?: boolean;
-    book: Pick<Book, 'id'>;
+    book: Pick<Work, 'id'>;
   }
 
   let {

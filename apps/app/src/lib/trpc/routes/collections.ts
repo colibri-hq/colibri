@@ -1,38 +1,40 @@
 import { procedure, t } from "$lib/trpc/t";
 import {
   addCollectionComment,
-  loadCollectionBooks,
   loadCollectionComments,
   loadCollectionCommentsLegacy,
   loadCollectionForUser,
   loadCollectionsForUser,
+  loadCollectionWorks,
 } from "@colibri-hq/sdk";
 import { z } from "zod";
 
 export const collections = t.router({
   list: procedure()
     .input(z.object({ book: z.string().optional() }).optional())
-    .query(({ ctx }) => loadCollectionsForUser(ctx.database, ctx.userId)),
+    .query(({ ctx: { database, userId } }) => loadCollectionsForUser(database, userId)),
 
   load: procedure()
     .input(z.string())
-    .query(({ input, ctx }) =>
-      loadCollectionForUser(ctx.database, input, ctx.userId),
+    .query(({ input, ctx: { database, userId } }) =>
+      loadCollectionForUser(database, input, userId),
     ),
 
   loadBooks: procedure()
     .input(z.string())
-    .query(({ input, ctx }) => loadCollectionBooks(ctx.database, input)),
+    .query(({ input, ctx: { database } }) =>
+      loadCollectionWorks(database, input),
+    ),
 
   loadCommentsWithReactions: procedure()
     .input(z.string())
-    .query(({ input, ctx }) =>
-      loadCollectionCommentsLegacy(ctx.database, input),
+    .query(({ input, ctx: { database } }) =>
+      loadCollectionCommentsLegacy(database, input),
     ),
 
   loadComments: procedure()
     .input(z.string())
-    .query(({ input, ctx }) => loadCollectionComments(ctx.database, input)),
+    .query(({ input, ctx: { database } }) => loadCollectionComments(database, input)),
 
   addComment: procedure()
     .input(
@@ -58,10 +60,10 @@ export const collections = t.router({
       }),
     )
     .mutation(async ({ input: { book, collection }, _ctx }) => {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (trx) => {
         const existsInCollection =
           0 ===
-          (await tx.collection.count({
+          (await trx.collection.count({
             where: {
               id: collection,
               books: {
@@ -72,7 +74,7 @@ export const collections = t.router({
             },
           }));
 
-        await tx.collection.update({
+        await trx.collection.update({
           where: { id: collection },
           data: {
             books: {

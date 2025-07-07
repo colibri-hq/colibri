@@ -1,5 +1,5 @@
 import { env } from "$env/dynamic/private";
-import { loadBook, loadCreatorsForBook, NoResultError } from "@colibri-hq/sdk";
+import { loadWork, loadCreatorsForWork, NoResultError } from "@colibri-hq/sdk";
 import { error, type RequestHandler } from "@sveltejs/kit";
 
 /**
@@ -14,14 +14,14 @@ export const GET = async function ({ params, locals: { database } }) {
     });
   }
 
-  const bookId = params.book!;
-  let book;
+  const workId = params.work!;
+  let work;
   let creators;
 
   try {
-    [book, creators] = await Promise.all([
-      loadBook(database, bookId),
-      loadCreatorsForBook(database, bookId),
+    [work, creators] = await Promise.all([
+      loadWork(database, workId),
+      loadCreatorsForWork(database, workId),
     ]);
   } catch (cause) {
     if (cause instanceof NoResultError) {
@@ -34,11 +34,11 @@ export const GET = async function ({ params, locals: { database } }) {
   }
 
   return new Response(
-    `# title: ${book.title}
+    `# title: ${work.title}
     
     > Written by ${creators.map((creator) => creator.name).join(" & ")}
 
-    ${book.synopsis}
+    ${work.synopsis}
     
     ## Editions
     // TODO

@@ -68,8 +68,8 @@ alter table only public.comment_reaction
         on update cascade on delete cascade;
 -- endregion
 
-alter table only public.book_comment
-    add constraint book_comment_comment_id_fkey foreign key (comment_id) references public.comment (id)
+alter table only public.work_comment
+    add constraint work_comment_comment_id_fkey foreign key (comment_id) references public.comment (id)
         on update cascade on delete cascade;
 alter table only public.collection_comment
     add constraint collection_comment_comment_id_fkey foreign key (comment_id) references public.comment (id)

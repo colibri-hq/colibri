@@ -5,13 +5,13 @@
 
 import type { ColumnType } from "kysely";
 
-export type ArrayType<T> =
-  ArrayTypeImpl<T> extends (infer U)[] ? U[] : ArrayTypeImpl<T>;
+export type ArrayType<T> = ArrayTypeImpl<T> extends (infer U)[]
+  ? U[]
+  : ArrayTypeImpl<T>;
 
-export type ArrayTypeImpl<T> =
-  T extends ColumnType<infer S, infer I, infer U>
-    ? ColumnType<S[], I[], U[]>
-    : T[];
+export type ArrayTypeImpl<T> = T extends ColumnType<infer S, infer I, infer U>
+  ? ColumnType<S[], I[], U[]>
+  : T[];
 
 export type AuthenticationColorScheme = "dark" | "light" | "system";
 
@@ -19,25 +19,15 @@ export type AuthenticationPkceChallengeMethod = "S256";
 
 export type AuthenticationUserRole = "admin" | "adult" | "child" | "guest";
 
-export type AuthenticationWebauthnTransport =
-  | "ble"
-  | "cable"
-  | "hybrid"
-  | "internal"
-  | "nfc"
-  | "smart-card"
-  | "usb";
+export type AuthenticationWebauthnTransport = "ble" | "cable" | "hybrid" | "internal" | "nfc" | "smart-card" | "usb";
 
-export type Generated<T> =
-  T extends ColumnType<infer S, infer I, infer U>
-    ? ColumnType<S, I | undefined, U>
-    : ColumnType<T, T | undefined, T>;
+export type ContributionRole = "abr" | "acp" | "act" | "adi" | "adp" | "aft" | "anc" | "anl" | "anm" | "ann" | "ant" | "ape" | "apl" | "app" | "aqt" | "arc" | "ard" | "arr" | "art" | "asg" | "asn" | "ato" | "att" | "auc" | "aud" | "aue" | "aui" | "aup" | "aus" | "aut" | "bdd" | "bjd" | "bka" | "bkd" | "bkp" | "blw" | "bnd" | "bpd" | "brd" | "brl" | "bsl" | "cad" | "cas" | "ccp" | "chr" | "cli" | "cll" | "clr" | "clt" | "cmm" | "cmp" | "cmt" | "cnd" | "cng" | "cns" | "coe" | "col" | "com" | "con" | "cop" | "cor" | "cos" | "cot" | "cou" | "cov" | "cpc" | "cpe" | "cph" | "cpl" | "cpt" | "cre" | "crp" | "crr" | "crt" | "csl" | "csp" | "cst" | "ctb" | "cte" | "ctg" | "ctr" | "cts" | "ctt" | "cur" | "cwt" | "dbd" | "dbp" | "dfd" | "dfe" | "dft" | "dgc" | "dgg" | "dgs" | "dis" | "djo" | "dln" | "dnc" | "dnr" | "dpc" | "dpt" | "drm" | "drt" | "dsr" | "dst" | "dtc" | "dte" | "dtm" | "dto" | "dub" | "edc" | "edd" | "edm" | "edt" | "egr" | "elg" | "elt" | "eng" | "enj" | "etr" | "evp" | "exp" | "fac" | "fds" | "fld" | "flm" | "fmd" | "fmk" | "fmo" | "fmp" | "fnd" | "fon" | "fpy" | "frg" | "gdv" | "gis" | "his" | "hnr" | "hst" | "ill" | "ilu" | "ins" | "inv" | "isb" | "itr" | "ive" | "ivr" | "jud" | "jug" | "lbr" | "lbt" | "ldr" | "led" | "lee" | "lel" | "len" | "let" | "lgd" | "lie" | "lil" | "lit" | "lsa" | "lse" | "lso" | "ltg" | "ltr" | "lyr" | "mcp" | "mdc" | "med" | "mfp" | "mfr" | "mka" | "mod" | "mon" | "mrb" | "mrk" | "msd" | "mte" | "mtk" | "mup" | "mus" | "mxe" | "nan" | "nrt" | "onp" | "opn" | "org" | "orm" | "osp" | "oth" | "own" | "pad" | "pan" | "pat" | "pbd" | "pbl" | "pdr" | "pfr" | "pht" | "plt" | "pma" | "pmn" | "pop" | "ppm" | "ppt" | "pra" | "prc" | "prd" | "pre" | "prf" | "prg" | "prm" | "prn" | "pro" | "prp" | "prs" | "prt" | "prv" | "pta" | "pte" | "ptf" | "pth" | "ptt" | "pup" | "rap" | "rbr" | "rcd" | "rce" | "rcp" | "rdd" | "red" | "ren" | "res" | "rev" | "rpc" | "rps" | "rpt" | "rpy" | "rse" | "rsg" | "rsp" | "rsr" | "rst" | "rth" | "rtm" | "rxa" | "sad" | "sce" | "scl" | "scr" | "sde" | "sds" | "sec" | "sfx" | "sgd" | "sgn" | "sht" | "sll" | "sng" | "spk" | "spn" | "spy" | "srv" | "std" | "stg" | "stl" | "stm" | "stn" | "str" | "swd" | "tau" | "tcd" | "tch" | "ths" | "tld" | "tlg" | "tlh" | "tlp" | "trc" | "trl" | "tyd" | "tyg" | "uvp" | "vac" | "vdg" | "vfx" | "wac" | "wal" | "wam" | "wat" | "wdc" | "wde" | "wfs" | "wft" | "win" | "wit" | "wpr" | "wst" | "wts";
 
-export type Int8 = ColumnType<
-  string,
-  bigint | number | string,
-  bigint | number | string
->;
+export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
+  ? ColumnType<S, I | undefined, U>
+  : ColumnType<T, T | undefined, T>;
+
+export type Int8 = ColumnType<string, bigint | number | string, bigint | number | string>;
 
 export type Json = JsonValue;
 
@@ -51,12 +41,7 @@ export type JsonPrimitive = boolean | number | string | null;
 
 export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 
-export type LanguageType =
-  | "constructed"
-  | "extinct"
-  | "historical"
-  | "living"
-  | "special";
+export type LanguageType = "constructed" | "extinct" | "historical" | "living" | "special";
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
@@ -70,6 +55,10 @@ export interface Asset {
   media_type: string;
   metadata: Generated<Json>;
   size: number;
+  /**
+   * Address of the file in a physical storage location as an s3:// URL.
+   */
+  storage_reference: string | null;
   updated_at: Timestamp | null;
   updated_by: Int8 | null;
 }
@@ -241,7 +230,7 @@ export interface AuthenticationDeviceChallenge {
    */
   scopes: string[] | null;
   /**
-   * Timestamp when the device code has been used to issue an access token, and thus cannot be used anymore.
+   * Timestamp when the device code has been used to issue an access token, and thus cannot be used anymore. 
    */
   used_at: Timestamp | null;
   /**
@@ -297,6 +286,7 @@ export interface AuthenticationUser {
   created_at: Generated<Timestamp>;
   email: string;
   id: Generated<Int8>;
+  image_id: Int8 | null;
   name: string | null;
   /**
    * The authorization role of a user.
@@ -325,35 +315,6 @@ export interface AuthenticationUserConsent {
    */
   scopes: string[];
   user_id: Generated<Int8>;
-}
-
-export interface Book {
-  created_at: Generated<Timestamp>;
-  created_by: Int8 | null;
-  id: Generated<Int8>;
-  /**
-   * The main, or preferred, edition of a book. Represents the book in listings and collections.
-   */
-  main_edition_id: Int8 | null;
-  updated_at: Timestamp | null;
-  updated_by: Int8 | null;
-}
-
-export interface BookComment {
-  book_id: Generated<Int8>;
-  comment_id: Int8;
-}
-
-export interface BookRating {
-  book_id: Generated<Int8>;
-  created_at: Generated<Timestamp>;
-  rating: number;
-  user_id: Int8;
-}
-
-export interface BookTag {
-  book_id: Generated<Int8>;
-  tag_id: Int8;
 }
 
 export interface Catalog {
@@ -431,10 +392,6 @@ export interface CollectionComment {
 }
 
 export interface CollectionEntry {
-  /**
-   * Reference to the book this entry refers to. Unless a specific edition is referenced in `edition_id`, the main edition will be used.
-   */
-  book_id: Int8;
   collection_id: Int8;
   created_at: Generated<Timestamp>;
   created_by: Int8 | null;
@@ -448,6 +405,10 @@ export interface CollectionEntry {
   position: number;
   updated_at: Timestamp | null;
   updated_by: Int8 | null;
+  /**
+   * Reference to the book this entry refers to. Unless a specific edition is referenced in `edition_id`, the main edition will be used.
+   */
+  work_id: Int8;
 }
 
 export interface CollectionTag {
@@ -484,75 +445,28 @@ export interface Contribution {
    */
   essential: Generated<boolean>;
   /**
-   * The kind of contribution the creator made to the given book edition, e.g. "authored", "illustrated", or "co-authored".
+   * The role the creator had in the creation of the given book edition, e.g. "aut" (Author) or "ill" (Illustrator).
    */
-  type: string | null;
-}
-
-export interface Cover {
-  /**
-   * A blurhash representation of the image; see https://blurha.sh/. Blurhashes are simple string representations of an image that can be used to render a blurred approximation of the original image.
-   */
-  blurhash: string;
-  /**
-   * An SHA1 hash of the file, used for ETag headers and sanity checks.
-   */
-  checksum: Buffer;
-  created_at: Generated<Timestamp>;
-  created_by: Int8 | null;
-  /**
-   * A human-readable description of the image intended for visually impaired users.
-   */
-  description: string | null;
-  /**
-   * Name, or key, of the file as persisted to the storage bucket.
-   */
-  filename: string;
-  /**
-   * Height of the image, in pixels.
-   */
-  height: number;
-  id: Generated<Int8>;
-  /**
-   * A media type string describing the type of image file (e.g. "image/png" for a PNG file).
-   */
-  media_type: string;
-  /**
-   * JSON object containing image file metadata.
-   */
-  metadata: Generated<Json>;
-  /**
-   * Size of the file, in bytes.
-   */
-  size: number;
-  updated_at: Timestamp | null;
-  updated_by: Int8 | null;
-  /**
-   * Width of the image, in pixels.
-   */
-  width: number;
-}
-
-export interface CoverCreator {
-  cover_id: Generated<Int8>;
-  creator_id: Int8;
-  essential: Generated<boolean>;
+  role: Generated<ContributionRole>;
 }
 
 export interface Creator {
   amazon_id: string | null;
+  birth_date: Timestamp | null;
   created_at: Generated<Timestamp>;
+  death_date: Timestamp | null;
   /**
    * Description, or biography, of a creator (e.g. an author). Free-text, providing more information on a given creator. Should be provided as Markdown.
    */
   description: string | null;
   goodreads_id: string | null;
   id: Generated<Int8>;
-  image: string | null;
+  image_id: Int8 | null;
   /**
    * Full name of the creator.
    */
   name: string;
+  sorting_key: string | null;
   updated_at: Timestamp | null;
   updated_by: Int8 | null;
   /**
@@ -569,11 +483,14 @@ export interface CreatorComment {
 
 export interface Edition {
   /**
+   * Amazon Standard Identification Number (ASIN) of this edition of the book. This is a 10-character alphanumeric identifier.
+   */
+  asin: string | null;
+  /**
    * Type of binding of this edition of the book (e.g. "hardcover").
    */
   binding: string | null;
-  book_id: Int8 | null;
-  cover_id: Int8 | null;
+  cover_image_id: Int8 | null;
   created_at: Generated<Timestamp>;
   /**
    * An excerpt from the content of the book.
@@ -620,6 +537,61 @@ export interface Edition {
   title: string;
   updated_at: Timestamp | null;
   updated_by: Int8 | null;
+  work_id: Int8 | null;
+}
+
+export interface Image {
+  /**
+   * A blurhash representation of the image; see https://blurha.sh/. Blurhashes are simple string representations of an image that can be used to render a blurred approximation of the original image.
+   */
+  blurhash: string;
+  /**
+   * An SHA1 hash of the file, used for ETag headers and sanity checks.
+   */
+  checksum: Buffer;
+  created_at: Generated<Timestamp>;
+  created_by: Int8 | null;
+  /**
+   * A human-readable description of the image intended for visually impaired users.
+   */
+  description: string | null;
+  /**
+   * Name, or key, of the file as persisted to the storage bucket.
+   */
+  filename: string;
+  /**
+   * Height of the image, in pixels.
+   */
+  height: number;
+  id: Generated<Int8>;
+  /**
+   * A media type string describing the type of image file (e.g. "image/png" for a PNG file).
+   */
+  media_type: string;
+  /**
+   * JSON object containing image file metadata.
+   */
+  metadata: Generated<Json>;
+  /**
+   * Size of the file, in bytes.
+   */
+  size: number;
+  /**
+   * Address of the file in a physical storage location as an s3:// URL.
+   */
+  storage_reference: string;
+  updated_at: Timestamp | null;
+  updated_by: Int8 | null;
+  /**
+   * Width of the image, in pixels.
+   */
+  width: number;
+}
+
+export interface ImageCreator {
+  creator_id: Int8;
+  essential: Generated<boolean>;
+  image_id: Generated<Int8>;
 }
 
 export interface Language {
@@ -633,7 +605,7 @@ export interface Publisher {
   created_at: Generated<Timestamp>;
   description: string | null;
   id: Generated<Int8>;
-  image: string | null;
+  image_id: Int8 | null;
   name: string;
   sorting_key: string;
   updated_at: Timestamp | null;
@@ -700,12 +672,12 @@ export interface SeriesComment {
 }
 
 export interface SeriesEntry {
-  book_id: Generated<Int8>;
   /**
    * Position of the given boko in the series.
    */
   position: number | null;
   series_id: Int8;
+  work_id: Generated<Int8>;
 }
 
 export interface SeriesTag {
@@ -748,6 +720,58 @@ export interface UserCreatorFavorite {
   user_id: Generated<Int8>;
 }
 
+export interface VaultDecryptedSecrets {
+  created_at: Timestamp | null;
+  decrypted_secret: string | null;
+  description: string | null;
+  id: string | null;
+  key_id: string | null;
+  name: string | null;
+  nonce: Buffer | null;
+  secret: string | null;
+  updated_at: Timestamp | null;
+}
+
+export interface VaultSecrets {
+  created_at: Generated<Timestamp>;
+  description: Generated<string>;
+  id: Generated<string>;
+  key_id: Generated<string | null>;
+  name: string | null;
+  nonce: Generated<Buffer | null>;
+  secret: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface Work {
+  created_at: Generated<Timestamp>;
+  created_by: Int8 | null;
+  id: Generated<Int8>;
+  /**
+   * The main, or preferred, edition of a book. Represents the book in listings and collections.
+   */
+  main_edition_id: Int8 | null;
+  updated_at: Timestamp | null;
+  updated_by: Int8 | null;
+}
+
+export interface WorkComment {
+  comment_id: Int8;
+  work_id: Generated<Int8>;
+}
+
+export interface WorkRating {
+  created_at: Generated<Timestamp>;
+  rating: number;
+  user_id: Int8;
+  work_id: Generated<Int8>;
+}
+
+export interface WorkTag {
+  tag_id: Int8;
+  work_id: Generated<Int8>;
+}
+
 export interface DB {
   asset: Asset;
   "authentication.access_token": AuthenticationAccessToken;
@@ -763,10 +787,6 @@ export interface DB {
   "authentication.scope": AuthenticationScope;
   "authentication.user": AuthenticationUser;
   "authentication.user_consent": AuthenticationUserConsent;
-  book: Book;
-  book_comment: BookComment;
-  book_rating: BookRating;
-  book_tag: BookTag;
   catalog: Catalog;
   collection: Collection;
   collection_comment: CollectionComment;
@@ -775,11 +795,11 @@ export interface DB {
   comment: Comment;
   comment_reaction: CommentReaction;
   contribution: Contribution;
-  cover: Cover;
-  cover_creator: CoverCreator;
   creator: Creator;
   creator_comment: CreatorComment;
   edition: Edition;
+  image: Image;
+  image_creator: ImageCreator;
   language: Language;
   publisher: Publisher;
   publisher_comment: PublisherComment;

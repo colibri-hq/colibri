@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Icon } from '@colibri-hq/ui';
-  import type { Creator } from '@colibri-hq/sdk';
+  import type { Creator } from '@colibri-hq/sdk/schema';
 
   interface Props {
     creator: Pick<Creator, 'image' | 'id' | 'name'>;

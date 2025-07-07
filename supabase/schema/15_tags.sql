@@ -37,8 +37,8 @@ alter table only public.tag
     add constraint tag_created_by_fkey foreign key (created_by) references authentication."user" (id)
         on update cascade on delete set null;
 
-alter table only public.book_tag
-    add constraint book_tag_tag_id_fkey foreign key (tag_id) references public.tag (id)
+alter table only public.work_tag
+    add constraint work_tag_tag_id_fkey foreign key (tag_id) references public.tag (id)
         on update cascade on delete cascade;
 alter table only public.collection_tag
     add constraint collection_tag_tag_id_fkey foreign key (tag_id) references public.tag (id)

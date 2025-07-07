@@ -11,7 +11,7 @@
   }
 
   let { data }: Props = $props();
-  let book = $derived(data.book);
+  let book = $derived(data.work);
   let creators = $derived(data.creators);
 
   let title = $state(data.book.title);

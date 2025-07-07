@@ -1,25 +1,23 @@
 import { read } from "$lib/server/storage";
 import type { RequestHandler } from "@sveltejs/kit";
 import { error, redirect } from "@sveltejs/kit";
+import { loadWork } from "@colibri-hq/sdk";
 
-const handler: RequestHandler = async function ({
+const handler = async function ({
   params,
   request,
   url,
   locals: { database, storage },
 }): Promise<Response> {
-  const book = await prisma.book.findFirstOrThrow({
-    where: { id: params.book },
-    include: { assets: true },
-  });
+  const work = await loadWork(database, params.work!);
 
-  if (book.assets.length === 0) {
+  if (work.assets.length === 0) {
     throw error(404);
   }
 
   const asset = params.asset
-    ? book.assets.find((asset) => asset.id === params.asset)
-    : book.assets.at(0);
+    ? work.assets.find((asset) => asset.id === params.asset)
+    : work.assets.at(0);
 
   if (!asset) {
     return error(404, "Failed to locate asset");
@@ -42,7 +40,7 @@ const handler: RequestHandler = async function ({
       "Last-Modified": asset.updatedAt.toUTCString() as string,
     },
   });
-};
+} satisfies RequestHandler;
 
 // noinspection JSUnusedGlobalSymbols
 export const GET = handler;

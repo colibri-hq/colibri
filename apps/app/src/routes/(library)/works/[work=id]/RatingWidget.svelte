@@ -45,7 +45,7 @@
     try {
       await trpc($page).books.updateRating.mutate(
         savable({
-          bookId: book.id,
+          workId: book.id,
           rating,
         }),
       );

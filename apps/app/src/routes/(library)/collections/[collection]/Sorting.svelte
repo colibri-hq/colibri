@@ -2,13 +2,13 @@
   import { Button } from '@colibri-hq/ui';
   import { Icon } from '@colibri-hq/ui';
   import { createMenu } from 'svelte-headlessui';
-  import type { Book } from '@colibri-hq/sdk';
+  import type { Work } from '@colibri-hq/sdk';
 
   const menu = createMenu({ label: 'Actions' });
 
   interface Props {
-    field?: keyof Book;
-    onChange?: (event: { field: keyof Book }) => unknown;
+    field?: keyof Work;
+    onChange?: (event: { field: keyof Work }) => unknown;
   }
 
   let { field = $bindable('updated_at'), onChange }: Props = $props();
@@ -22,7 +22,7 @@
     onChange?.({ field });
   }
 
-  const options: { icon: string; field: keyof Book; label: string }[] = [
+  const options: { icon: string; field: keyof Work; label: string }[] = [
     { icon: 'event', label: `Last Updated`, field: 'updated_at' },
     { icon: 'title', label: `Title`, field: 'title' },
     { icon: 'star', label: `Rating`, field: 'rating' },

@@ -17,7 +17,7 @@ create table public.collection
 );
 alter table public.collection
     owner to postgres;
-comment on table public.collection is 'A collection of books created by a user';
+comment on table public.collection is 'A collection of works created by a user';
 comment on column public.collection.name is 'Mandatory collection name. Must be less than 150 characters.';
 comment on column public.collection.color is 'Optional hex color to tint this collection. Does not allow transparency (which will be applied by the application).';
 comment on column public.collection.emoji is 'Optional emoji to represent this collection, acting as an icon.';
@@ -96,7 +96,7 @@ alter table only public.collection_comment
 create table public.collection_entry
 (
     collection_id bigint                                 not null,
-    book_id       bigint                                 not null,
+    work_id       bigint                                 not null,
     edition_id    bigint                                 not null,
     "position"    integer                                not null,
     updated_by    bigint,
@@ -106,9 +106,9 @@ create table public.collection_entry
 );
 alter table public.collection_entry
     owner to postgres;
-comment on table public.collection_entry is 'Junction table for books in a collection.';
-comment on column public.collection_entry.book_id is 'Reference to the book this entry refers to. Unless a specific edition is referenced in `edition_id`, the main edition will be used.';
-comment on column public.collection_entry.edition_id is 'Optional specific edition of a book to add. This is useful to create a collection of audio books, for example. If not set, the main edition of the book will be used.';
+comment on table public.collection_entry is 'Junction table for works in a collection.';
+comment on column public.collection_entry.work_id is 'Reference to the work this entry refers to. Unless a specific edition is referenced in `edition_id`, the main edition will be used.';
+comment on column public.collection_entry.edition_id is 'Optional specific edition of a work to add. This is useful to create a collection of audio books, for example. If not set, the main edition of the work will be used.';
 comment on column public.collection_entry."position" is 'Order position of the collection entry. Applies to all users. To change the position, a reordering of all other collection entries is required.';
 
 grant all on table public.collection_entry to anon;
@@ -119,10 +119,10 @@ alter table public.collection_entry
     enable row level security;
 
 alter table only public.collection_entry
-    add constraint collection_entry_pkey primary key (collection_id, book_id, edition_id);
+    add constraint collection_entry_pkey primary key (collection_id, work_id, edition_id);
 
 alter table only public.collection_entry
-    add constraint collection_entry_book_id_fkey foreign key (book_id) references public.book (id)
+    add constraint collection_entry_work_id_fkey foreign key (work_id) references public.work (id)
         on update cascade on delete cascade;
 alter table only public.collection_entry
     add constraint collection_entry_collection_id_fkey foreign key (collection_id) references public.collection (id)

@@ -31,13 +31,13 @@ export function loadCommentsOn<T extends Commentable = Commentable>(
   );
 }
 
-export function loadCommentsOnBook(database: Database, id: number | string) {
+export function loadCommentsOnWork(database: Database, id: number | string) {
   return database
-    .selectFrom("book")
+    .selectFrom("work")
     .selectAll()
-    .innerJoin("book_comment", "book_comment.book_id", "book.id")
-    .innerJoin(table, "book_comment.comment_id", "id")
-    .where("book.id", "=", id.toString())
+    .innerJoin("work_comment", "work_comment.work_id", "work.id")
+    .innerJoin(table, "work_comment.comment_id", "id")
+    .where("work.id", "=", id.toString())
     .execute();
 }
 
@@ -63,7 +63,7 @@ export type CommentWithReactions = Comment & {
 export type CommentWithUserAndReactions = CommentWithUser &
   Omit<CommentWithReactions, "created_by">;
 export type Commentable =
-  | "book"
+  | "work"
   | "collection"
   | "creator"
   | "publisher"

@@ -1,7 +1,7 @@
 <script lang="ts" module>
   import type { PageData } from './$types';
 
-  export type Book = PageData['book'];
+  export type Book = PageData['work'];
   export type Creator = Awaited<PageData['creators']>[number];
   export type Publisher = Awaited<PageData['publisher']>;
   export type Rating = Awaited<PageData['ratings']>[number];
@@ -29,7 +29,7 @@
   }
 
   let { data }: Props = $props();
-  let book = $derived(data.book);
+  let book = $derived(data.work);
   let creators = $derived(data.creators);
   let publisher = $derived(data.publisher);
   let ratings = $derived(data.ratings);
