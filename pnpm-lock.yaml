@@ -34,8 +34,8 @@ catalogs:
       specifier: ^10.45.2
       version: 10.45.2
     '@trpc/server':
-      specifier: ^10.45.2
-      version: 10.45.2
+      specifier: ^11.4.3
+      version: 11.4.3
     '@types/jsonwebtoken':
       specifier: ^9.0.10
       version: 9.0.10
@@ -142,10 +142,10 @@ importers:
         version: 13.1.2
       '@trpc/client':
         specifier: 'catalog:'
-        version: 10.45.2(@trpc/server@10.45.2)
+        version: 10.45.2(@trpc/server@11.4.3(typescript@5.8.3))
       '@trpc/server':
         specifier: 'catalog:'
-        version: 10.45.2
+        version: 11.4.3(typescript@5.8.3)
       bytemd:
         specifier: ^1.22.0
         version: 1.22.0
@@ -190,7 +190,7 @@ importers:
         version: 3.3.1
       trpc-sveltekit:
         specifier: ^3.6.3
-        version: 3.6.3(@sveltejs/adapter-node@5.2.12(@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.35.2)(vite@6.3.5(@types/node@24.0.10)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0)))(svelte@5.35.2)(vite@6.3.5(@types/node@24.0.10)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0))))(@trpc/client@10.45.2(@trpc/server@10.45.2))(@trpc/server@10.45.2)(ws@8.18.3)
+        version: 3.6.3(@sveltejs/adapter-node@5.2.12(@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.35.2)(vite@6.3.5(@types/node@24.0.10)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0)))(svelte@5.35.2)(vite@6.3.5(@types/node@24.0.10)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0))))(@trpc/client@10.45.2(@trpc/server@11.4.3(typescript@5.8.3)))(@trpc/server@11.4.3(typescript@5.8.3))(ws@8.18.3)
       trpc-transformer:
         specifier: ^3.2.2
         version: 3.2.2(decimal.js@10.6.0)(superjson@2.2.2)
@@ -2563,8 +2563,10 @@ packages:
     peerDependencies:
       '@trpc/server': 10.45.2
 
-  '@trpc/server@10.45.2':
-    resolution: {integrity: sha512-wOrSThNNE4HUnuhJG6PfDRp4L2009KDVxsd+2VYH8ro6o/7/jwYZ8Uu5j+VaW+mOmc8EHerHzGcdbGNQSAUPgg==}
+  '@trpc/server@11.4.3':
+    resolution: {integrity: sha512-wnWq3wiLlMOlYkaIZz+qbuYA5udPTLS4GVVRyFkr6aT83xpdCHyVtURT+u4hSoIrOXQM9OPCNXSXsAujWZDdaw==}
+    peerDependencies:
+      typescript: '>=5.7.2'
 
   '@tsconfig/node10@1.0.11':
     resolution: {integrity: sha512-DcRjDCujK/kCk/cUe8Xz8ZSpm8mS3mNNpta+jGCA6USEDfktlNvm1+IuZ9eTcDbNk41BHwpHHeW+N1lKCz4zOw==}
@@ -9258,11 +9260,13 @@ snapshots:
 
   '@tokenizer/token@0.3.0': {}
 
-  '@trpc/client@10.45.2(@trpc/server@10.45.2)':
+  '@trpc/client@10.45.2(@trpc/server@11.4.3(typescript@5.8.3))':
     dependencies:
-      '@trpc/server': 10.45.2
+      '@trpc/server': 11.4.3(typescript@5.8.3)
 
-  '@trpc/server@10.45.2': {}
+  '@trpc/server@11.4.3(typescript@5.8.3)':
+    dependencies:
+      typescript: 5.8.3
 
   '@tsconfig/node10@1.0.11':
     optional: true
@@ -13482,11 +13486,11 @@ snapshots:
 
   trough@2.2.0: {}
 
-  trpc-sveltekit@3.6.3(@sveltejs/adapter-node@5.2.12(@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.35.2)(vite@6.3.5(@types/node@24.0.10)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0)))(svelte@5.35.2)(vite@6.3.5(@types/node@24.0.10)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0))))(@trpc/client@10.45.2(@trpc/server@10.45.2))(@trpc/server@10.45.2)(ws@8.18.3):
+  trpc-sveltekit@3.6.3(@sveltejs/adapter-node@5.2.12(@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.35.2)(vite@6.3.5(@types/node@24.0.10)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0)))(svelte@5.35.2)(vite@6.3.5(@types/node@24.0.10)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0))))(@trpc/client@10.45.2(@trpc/server@11.4.3(typescript@5.8.3)))(@trpc/server@11.4.3(typescript@5.8.3))(ws@8.18.3):
     dependencies:
       '@sveltejs/adapter-node': 5.2.12(@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@5.1.0(svelte@5.35.2)(vite@6.3.5(@types/node@24.0.10)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0)))(svelte@5.35.2)(vite@6.3.5(@types/node@24.0.10)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0)))
-      '@trpc/client': 10.45.2(@trpc/server@10.45.2)
-      '@trpc/server': 10.45.2
+      '@trpc/client': 10.45.2(@trpc/server@11.4.3(typescript@5.8.3))
+      '@trpc/server': 11.4.3(typescript@5.8.3)
       ws: 8.18.3
 
   trpc-transformer@3.2.2(decimal.js@10.6.0)(superjson@2.2.2):
