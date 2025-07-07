@@ -72,21 +72,23 @@ async function request<T>(request: Request) {
   try {
     response = await fetch(request);
     plainBody = await response.text();
-  } catch (error) {
-    if (!(error instanceof Error)) {
-      throw error;
+  } catch (cause) {
+    if (!(cause instanceof Error)) {
+      throw cause;
     }
 
     throw new Error(
-      `Failed to fetch data from Open Library API: Connection error: ${error.message}`,
+      `Failed to fetch data from Open Library API: Connection error: ${cause.message}`,
+      { cause },
     );
   }
 
   try {
     body = JSON.parse(plainBody);
-  } catch (error) {
+  } catch (cause) {
     throw new Error(
       `Failed to fetch data from Open Library API: Invalid JSON response: ${plainBody}`,
+      { cause },
     );
   }
 
