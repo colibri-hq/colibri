@@ -12,7 +12,7 @@ catalog:
   '@sveltejs/vite-plugin-svelte': ^5.1.0
   '@tailwindcss/vite': ^4.1.11
   '@trpc/client': ^10.45.2
-  '@trpc/server': ^10.45.2
+  '@trpc/server': ^11.5.0
   '@types/jsonwebtoken': ^9.0.10
   '@types/node': ^24.0.10
   '@types/turndown': ^5.0.5
