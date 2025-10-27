@@ -11,7 +11,7 @@ catalog:
   '@sveltejs/kit': ^2.22.2
   '@sveltejs/vite-plugin-svelte': ^5.1.0
   '@tailwindcss/vite': ^4.1.11
-  '@trpc/client': ^10.45.2
+  '@trpc/client': ^11.7.0
   '@trpc/server': ^10.45.2
   '@types/jsonwebtoken': ^9.0.10
   '@types/node': ^24.0.10
