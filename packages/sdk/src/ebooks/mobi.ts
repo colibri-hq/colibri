@@ -44,6 +44,7 @@ export async function loadMobiMetadata(
       pdbHeader: metadata.pdbHeader,
       ...properties,
     },
+    series: loadSeries(metadata),
     sortingKey: titleFileAs ?? title,
     synopsis,
     tags: loadTags(metadata),
@@ -104,6 +105,23 @@ function loadContributors({
   }
 
   return contributors;
+}
+
+function loadSeries({
+  calibreSeries,
+  calibreSeriesIndex,
+}: Pick<
+  Awaited<ReturnType<typeof parse>>,
+  "calibreSeries" | "calibreSeriesIndex"
+>): Metadata["series"] {
+  if (!calibreSeries) {
+    return undefined;
+  }
+
+  return {
+    name: calibreSeries,
+    position: calibreSeriesIndex,
+  };
 }
 
 function loadTags(

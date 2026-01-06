@@ -2,6 +2,7 @@ import type { Database, Schema } from "../database.js";
 import { lower, paginate } from "../utilities.js";
 import type { ContributionRole, Creator as $Creator } from "../schema.js";
 import type { Selectable } from "kysely";
+import { sql } from "kysely";
 
 const table = "creator" as const;
 
@@ -126,6 +127,49 @@ export function findCreatorByName(database: Database, name: string) {
     .executeTakeFirst();
 }
 
+/**
+ * Find creators with similar names using pg_trgm fuzzy matching.
+ *
+ * Uses PostgreSQL's trigram similarity to find creators whose names are
+ * similar to the input name. This helps detect duplicates like:
+ * - "J.K. Rowling" vs "J. K. Rowling"
+ * - "Tolkien, J.R.R." vs "J.R.R. Tolkien"
+ *
+ * @param database - Database connection
+ * @param name - Creator name to match against
+ * @param threshold - Minimum similarity score (0-1), default 0.7
+ * @returns Array of creators with similarity scores, ordered by similarity (highest first)
+ */
+export async function findSimilarCreators(
+  database: Database,
+  name: string,
+  threshold: number = 0.7,
+): Promise<Array<{ creator: Creator; similarity: number }>> {
+  const normalizedName = name.toLowerCase().trim();
+
+  const rows = await database
+    .selectFrom(table)
+    .selectAll()
+    .select(
+      sql<number>`COALESCE(similarity(lower(name), ${normalizedName}), 0)`.as(
+        "similarity",
+      ),
+    )
+    .where(
+      sql<boolean>`similarity(lower(name), ${normalizedName}) >= ${threshold}`,
+    )
+    .orderBy(sql`similarity(lower(name), ${normalizedName})`, "desc")
+    .execute();
+
+  return rows.map((row) => {
+    const { similarity, ...creator } = row;
+    return {
+      creator: creator as Creator,
+      similarity,
+    };
+  });
+}
+
 export function createContribution(
   database: Database,
   creatorId: string,
@@ -145,5 +189,9 @@ export function createContribution(
     .executeTakeFirstOrThrow();
 }
 
-type Table = Schema[typeof table];
+export function deleteCreator(database: Database, id: string) {
+  return database.deleteFrom(table).where("id", "=", id).execute();
+}
+
+type _Table = Schema[typeof table];
 export type Creator = Selectable<$Creator>;

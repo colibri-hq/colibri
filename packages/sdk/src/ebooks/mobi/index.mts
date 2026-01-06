@@ -393,7 +393,8 @@ function countBitsSet(x) {
 function countUnsetEnd(x) {
   let count = 0;
   while ((x & 1) === 0) {
-    (x = x >> 1), count++;
+    x = x >> 1;
+    count++;
   }
   return count;
 }
@@ -498,7 +499,9 @@ async function huffcdic(
     const bitLength = byteArray.byteLength * 8;
     for (let i = 0; i < bitLength; ) {
       const bits = Number(read32Bits(byteArray, i));
-      let [found, codeLength, value] = table1[bits >>> 24];
+      const [found, codeLength_, value_] = table1[bits >>> 24];
+      let codeLength = codeLength_;
+      let value = value_;
       if (!found) {
         while (bits >>> (32 - codeLength) < table2[codeLength][0]) {
           codeLength += 1;
@@ -510,7 +513,8 @@ async function huffcdic(
       }
 
       const code = value - (bits >>> (32 - codeLength));
-      let [result, decompressed] = dictionary[code];
+      const [initialResult, decompressed] = dictionary[code];
+      let result = initialResult;
       if (!decompressed) {
         // the result is itself compressed
         result = decompress(result);

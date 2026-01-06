@@ -13,8 +13,8 @@ import { slugify } from "@colibri-hq/shared";
 const table = "asset" as const;
 
 type NewAsset = {
-  metadata?: JsonObject;
-  userId?: number | string;
+  metadata?: JsonObject | undefined;
+  userId?: number | string | undefined;
 };
 
 export async function createAsset(
@@ -71,4 +71,4 @@ export async function createAsset(
   }
 }
 
-type Table = Schema[typeof table];
+type _Table = Schema[typeof table];

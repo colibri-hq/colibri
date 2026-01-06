@@ -915,8 +915,7 @@ export class Epub {
       const subject =
         typeof subjects[index] === "string"
           ? { value: subjects[index], authority: undefined, term: undefined }
-          :  
-            subjects[index]!;
+          : subjects[index]!;
 
       subject[entry.properties["property"]] = entry.value;
       subjects.splice(index, 1, subject as DcSubject);
@@ -1026,7 +1025,6 @@ export class Epub {
           ),
       )
       .sort((a, b) => {
-         
         const refinementA = titleRefinements.find(
           (entry) =>
             entry.properties["property"] === "display-seq" &&
@@ -1039,7 +1037,7 @@ export class Epub {
         )!;
         const sortA = parseInt(refinementA.value!, 10);
         const sortB = parseInt(refinementB.value!, 10);
-         
+
         return sortA - sortB;
       });
 

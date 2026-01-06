@@ -5,13 +5,13 @@
 
 import type { ColumnType } from "kysely";
 
-export type ArrayType<T> = ArrayTypeImpl<T> extends (infer U)[]
-  ? U[]
-  : ArrayTypeImpl<T>;
+export type ArrayType<T> =
+  ArrayTypeImpl<T> extends (infer U)[] ? U[] : ArrayTypeImpl<T>;
 
-export type ArrayTypeImpl<T> = T extends ColumnType<infer S, infer I, infer U>
-  ? ColumnType<S[], I[], U[]>
-  : T[];
+export type ArrayTypeImpl<T> =
+  T extends ColumnType<infer S, infer I, infer U>
+    ? ColumnType<S[], I[], U[]>
+    : T[];
 
 export type AuthenticationColorScheme = "dark" | "light" | "system";
 
@@ -19,15 +19,326 @@ export type AuthenticationPkceChallengeMethod = "S256";
 
 export type AuthenticationUserRole = "admin" | "adult" | "child" | "guest";
 
-export type AuthenticationWebauthnTransport = "ble" | "cable" | "hybrid" | "internal" | "nfc" | "smart-card" | "usb";
+export type AuthenticationWebauthnTransport =
+  | "ble"
+  | "cable"
+  | "hybrid"
+  | "internal"
+  | "nfc"
+  | "smart-card"
+  | "usb";
 
-export type ContributionRole = "abr" | "acp" | "act" | "adi" | "adp" | "aft" | "anc" | "anl" | "anm" | "ann" | "ant" | "ape" | "apl" | "app" | "aqt" | "arc" | "ard" | "arr" | "art" | "asg" | "asn" | "ato" | "att" | "auc" | "aud" | "aue" | "aui" | "aup" | "aus" | "aut" | "bdd" | "bjd" | "bka" | "bkd" | "bkp" | "blw" | "bnd" | "bpd" | "brd" | "brl" | "bsl" | "cad" | "cas" | "ccp" | "chr" | "cli" | "cll" | "clr" | "clt" | "cmm" | "cmp" | "cmt" | "cnd" | "cng" | "cns" | "coe" | "col" | "com" | "con" | "cop" | "cor" | "cos" | "cot" | "cou" | "cov" | "cpc" | "cpe" | "cph" | "cpl" | "cpt" | "cre" | "crp" | "crr" | "crt" | "csl" | "csp" | "cst" | "ctb" | "cte" | "ctg" | "ctr" | "cts" | "ctt" | "cur" | "cwt" | "dbd" | "dbp" | "dfd" | "dfe" | "dft" | "dgc" | "dgg" | "dgs" | "dis" | "djo" | "dln" | "dnc" | "dnr" | "dpc" | "dpt" | "drm" | "drt" | "dsr" | "dst" | "dtc" | "dte" | "dtm" | "dto" | "dub" | "edc" | "edd" | "edm" | "edt" | "egr" | "elg" | "elt" | "eng" | "enj" | "etr" | "evp" | "exp" | "fac" | "fds" | "fld" | "flm" | "fmd" | "fmk" | "fmo" | "fmp" | "fnd" | "fon" | "fpy" | "frg" | "gdv" | "gis" | "his" | "hnr" | "hst" | "ill" | "ilu" | "ins" | "inv" | "isb" | "itr" | "ive" | "ivr" | "jud" | "jug" | "lbr" | "lbt" | "ldr" | "led" | "lee" | "lel" | "len" | "let" | "lgd" | "lie" | "lil" | "lit" | "lsa" | "lse" | "lso" | "ltg" | "ltr" | "lyr" | "mcp" | "mdc" | "med" | "mfp" | "mfr" | "mka" | "mod" | "mon" | "mrb" | "mrk" | "msd" | "mte" | "mtk" | "mup" | "mus" | "mxe" | "nan" | "nrt" | "onp" | "opn" | "org" | "orm" | "osp" | "oth" | "own" | "pad" | "pan" | "pat" | "pbd" | "pbl" | "pdr" | "pfr" | "pht" | "plt" | "pma" | "pmn" | "pop" | "ppm" | "ppt" | "pra" | "prc" | "prd" | "pre" | "prf" | "prg" | "prm" | "prn" | "pro" | "prp" | "prs" | "prt" | "prv" | "pta" | "pte" | "ptf" | "pth" | "ptt" | "pup" | "rap" | "rbr" | "rcd" | "rce" | "rcp" | "rdd" | "red" | "ren" | "res" | "rev" | "rpc" | "rps" | "rpt" | "rpy" | "rse" | "rsg" | "rsp" | "rsr" | "rst" | "rth" | "rtm" | "rxa" | "sad" | "sce" | "scl" | "scr" | "sde" | "sds" | "sec" | "sfx" | "sgd" | "sgn" | "sht" | "sll" | "sng" | "spk" | "spn" | "spy" | "srv" | "std" | "stg" | "stl" | "stm" | "stn" | "str" | "swd" | "tau" | "tcd" | "tch" | "ths" | "tld" | "tlg" | "tlh" | "tlp" | "trc" | "trl" | "tyd" | "tyg" | "uvp" | "vac" | "vdg" | "vfx" | "wac" | "wal" | "wam" | "wat" | "wdc" | "wde" | "wfs" | "wft" | "win" | "wit" | "wpr" | "wst" | "wts";
+export type ContributionRole =
+  | "abr"
+  | "acp"
+  | "act"
+  | "adi"
+  | "adp"
+  | "aft"
+  | "anc"
+  | "anl"
+  | "anm"
+  | "ann"
+  | "ant"
+  | "ape"
+  | "apl"
+  | "app"
+  | "aqt"
+  | "arc"
+  | "ard"
+  | "arr"
+  | "art"
+  | "asg"
+  | "asn"
+  | "ato"
+  | "att"
+  | "auc"
+  | "aud"
+  | "aue"
+  | "aui"
+  | "aup"
+  | "aus"
+  | "aut"
+  | "bdd"
+  | "bjd"
+  | "bka"
+  | "bkd"
+  | "bkp"
+  | "blw"
+  | "bnd"
+  | "bpd"
+  | "brd"
+  | "brl"
+  | "bsl"
+  | "cad"
+  | "cas"
+  | "ccp"
+  | "chr"
+  | "cli"
+  | "cll"
+  | "clr"
+  | "clt"
+  | "cmm"
+  | "cmp"
+  | "cmt"
+  | "cnd"
+  | "cng"
+  | "cns"
+  | "coe"
+  | "col"
+  | "com"
+  | "con"
+  | "cop"
+  | "cor"
+  | "cos"
+  | "cot"
+  | "cou"
+  | "cov"
+  | "cpc"
+  | "cpe"
+  | "cph"
+  | "cpl"
+  | "cpt"
+  | "cre"
+  | "crp"
+  | "crr"
+  | "crt"
+  | "csl"
+  | "csp"
+  | "cst"
+  | "ctb"
+  | "cte"
+  | "ctg"
+  | "ctr"
+  | "cts"
+  | "ctt"
+  | "cur"
+  | "cwt"
+  | "dbd"
+  | "dbp"
+  | "dfd"
+  | "dfe"
+  | "dft"
+  | "dgc"
+  | "dgg"
+  | "dgs"
+  | "dis"
+  | "djo"
+  | "dln"
+  | "dnc"
+  | "dnr"
+  | "dpc"
+  | "dpt"
+  | "drm"
+  | "drt"
+  | "dsr"
+  | "dst"
+  | "dtc"
+  | "dte"
+  | "dtm"
+  | "dto"
+  | "dub"
+  | "edc"
+  | "edd"
+  | "edm"
+  | "edt"
+  | "egr"
+  | "elg"
+  | "elt"
+  | "eng"
+  | "enj"
+  | "etr"
+  | "evp"
+  | "exp"
+  | "fac"
+  | "fds"
+  | "fld"
+  | "flm"
+  | "fmd"
+  | "fmk"
+  | "fmo"
+  | "fmp"
+  | "fnd"
+  | "fon"
+  | "fpy"
+  | "frg"
+  | "gdv"
+  | "gis"
+  | "his"
+  | "hnr"
+  | "hst"
+  | "ill"
+  | "ilu"
+  | "ins"
+  | "inv"
+  | "isb"
+  | "itr"
+  | "ive"
+  | "ivr"
+  | "jud"
+  | "jug"
+  | "lbr"
+  | "lbt"
+  | "ldr"
+  | "led"
+  | "lee"
+  | "lel"
+  | "len"
+  | "let"
+  | "lgd"
+  | "lie"
+  | "lil"
+  | "lit"
+  | "lsa"
+  | "lse"
+  | "lso"
+  | "ltg"
+  | "ltr"
+  | "lyr"
+  | "mcp"
+  | "mdc"
+  | "med"
+  | "mfp"
+  | "mfr"
+  | "mka"
+  | "mod"
+  | "mon"
+  | "mrb"
+  | "mrk"
+  | "msd"
+  | "mte"
+  | "mtk"
+  | "mup"
+  | "mus"
+  | "mxe"
+  | "nan"
+  | "nrt"
+  | "onp"
+  | "opn"
+  | "org"
+  | "orm"
+  | "osp"
+  | "oth"
+  | "own"
+  | "pad"
+  | "pan"
+  | "pat"
+  | "pbd"
+  | "pbl"
+  | "pdr"
+  | "pfr"
+  | "pht"
+  | "plt"
+  | "pma"
+  | "pmn"
+  | "pop"
+  | "ppm"
+  | "ppt"
+  | "pra"
+  | "prc"
+  | "prd"
+  | "pre"
+  | "prf"
+  | "prg"
+  | "prm"
+  | "prn"
+  | "pro"
+  | "prp"
+  | "prs"
+  | "prt"
+  | "prv"
+  | "pta"
+  | "pte"
+  | "ptf"
+  | "pth"
+  | "ptt"
+  | "pup"
+  | "rap"
+  | "rbr"
+  | "rcd"
+  | "rce"
+  | "rcp"
+  | "rdd"
+  | "red"
+  | "ren"
+  | "res"
+  | "rev"
+  | "rpc"
+  | "rps"
+  | "rpt"
+  | "rpy"
+  | "rse"
+  | "rsg"
+  | "rsp"
+  | "rsr"
+  | "rst"
+  | "rth"
+  | "rtm"
+  | "rxa"
+  | "sad"
+  | "sce"
+  | "scl"
+  | "scr"
+  | "sde"
+  | "sds"
+  | "sec"
+  | "sfx"
+  | "sgd"
+  | "sgn"
+  | "sht"
+  | "sll"
+  | "sng"
+  | "spk"
+  | "spn"
+  | "spy"
+  | "srv"
+  | "std"
+  | "stg"
+  | "stl"
+  | "stm"
+  | "stn"
+  | "str"
+  | "swd"
+  | "tau"
+  | "tcd"
+  | "tch"
+  | "ths"
+  | "tld"
+  | "tlg"
+  | "tlh"
+  | "tlp"
+  | "trc"
+  | "trl"
+  | "tyd"
+  | "tyg"
+  | "uvp"
+  | "vac"
+  | "vdg"
+  | "vfx"
+  | "wac"
+  | "wal"
+  | "wam"
+  | "wat"
+  | "wdc"
+  | "wde"
+  | "wfs"
+  | "wft"
+  | "win"
+  | "wit"
+  | "wpr"
+  | "wst"
+  | "wts";
 
-export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
-  ? ColumnType<S, I | undefined, U>
-  : ColumnType<T, T | undefined, T>;
+export type Generated<T> =
+  T extends ColumnType<infer S, infer I, infer U>
+    ? ColumnType<S, I | undefined, U>
+    : ColumnType<T, T | undefined, T>;
 
-export type Int8 = ColumnType<string, bigint | number | string, bigint | number | string>;
+export type Int8 = ColumnType<
+  string,
+  bigint | number | string,
+  bigint | number | string
+>;
 
 export type Json = JsonValue;
 
@@ -41,7 +352,12 @@ export type JsonPrimitive = boolean | number | string | null;
 
 export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 
-export type LanguageType = "constructed" | "extinct" | "historical" | "living" | "special";
+export type LanguageType =
+  | "constructed"
+  | "extinct"
+  | "historical"
+  | "living"
+  | "special";
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
@@ -55,10 +371,7 @@ export interface Asset {
   media_type: string;
   metadata: Generated<Json>;
   size: number;
-  /**
-   * Address of the file in a physical storage location as an s3:// URL.
-   */
-  storage_reference: string | null;
+  storage_reference: string;
   updated_at: Timestamp | null;
   updated_by: Int8 | null;
 }
@@ -70,13 +383,7 @@ export interface AuthenticationAccessToken {
   id: Generated<Int8>;
   revoked_at: Timestamp | null;
   scopes: string[];
-  /**
-   * The access token value.
-   */
   token: string;
-  /**
-   * User ID the access token belongs to. Will be NULL for service tokens.
-   */
   user_id: Int8 | null;
 }
 
@@ -98,34 +405,16 @@ export interface AuthenticationAuthenticator {
 }
 
 export interface AuthenticationAuthorizationCode {
-  /**
-   * The PKCE code challenge associated with the authorization code.
-   */
   challenge: string;
   challenge_method: Generated<AuthenticationPkceChallengeMethod>;
   client_id: string;
-  /**
-   * Actual authorization code value.
-   */
   code: string;
   created_at: Generated<Timestamp>;
   expires_at: Timestamp;
   id: Generated<Int8>;
-  /**
-   * Redirect URI where the response will be sent.
-   */
   redirect_uri: string;
-  /**
-   * Whether this authorization code has been revoked and cannot be used anymore.
-   */
   revoked: Generated<boolean>;
-  /**
-   * Effective OAuth scopes granted by the user to the client which generated this authorization code.
-   */
   scopes: string[];
-  /**
-   * Timestamp when this authorization code has been used by a client to issue an access token, and thus cannot be used anymore.
-   */
   used_at: Timestamp | null;
   user_id: Int8;
 }
@@ -135,9 +424,6 @@ export interface AuthenticationAuthorizationRequest {
   code_challenge: string;
   code_challenge_method: string;
   created_at: Generated<Timestamp>;
-  /**
-   * TImestamp the authorization request expires.
-   */
   expires_at: Timestamp;
   id: Generated<Int8>;
   identifier: Generated<string>;
@@ -145,9 +431,6 @@ export interface AuthenticationAuthorizationRequest {
   response_type: string;
   scopes: string[] | null;
   state: string | null;
-  /**
-   * Timestamp the authorization request has been used.
-   */
   used_at: Timestamp | null;
 }
 
@@ -160,37 +443,16 @@ export interface AuthenticationChallenge {
 }
 
 export interface AuthenticationClient {
-  /**
-   * Whether the client is in active use. Inactive clients will not be able to issue access tokens.
-   */
   active: Generated<boolean>;
   created_at: Generated<Timestamp>;
   description: string | null;
-  /**
-   * Alphanumeric ID of the client.
-   */
   id: string;
   name: string | null;
-  /**
-   * Whether this client is only available to its owner. Must be FALSE for system clients.
-   */
   personal: Generated<boolean>;
-  /**
-   * OAuth Redirect URIs registered for this client. A server-side client must not have any redirect URIs, otherwise it cannot be used with the client_credentials grant.
-   */
   redirect_uris: string[] | null;
-  /**
-   * Whether the client has been revoked. Any token or authorization code issued by the client will also be regarded as revoked.
-   */
   revoked: Generated<boolean>;
-  /**
-   * OAuth client secret for this client. Must be NULL unless intended for server-side clients (which may only use the client_credentials grant type).
-   */
   secret: string | null;
   updated_at: Timestamp | null;
-  /**
-   * Owner of this client. Must be NULL for system clients, which cannot be modified in the user interface and will skip the permission dialogs.
-   */
   user_id: Int8 | null;
 }
 
@@ -200,42 +462,15 @@ export interface AuthenticationClientScope {
 }
 
 export interface AuthenticationDeviceChallenge {
-  /**
-   * Whether the challenge has been approved by the user (true), denied (false), or is still pending (NULL).
-   */
   approved: boolean | null;
-  /**
-   * ID of the client that created the challenge.
-   */
   client_id: string;
-  /**
-   * Creation time of this device challenge.
-   */
   created_at: Generated<Timestamp>;
-  /**
-   * Verification code for this challenge as generated by the authorization server.
-   */
   device_code: string;
-  /**
-   * Expiration time of this device challenge.
-   */
   expires_at: Timestamp;
   id: Generated<Int8>;
-  /**
-   * Last time the client has polled for the current challenge status, used to prevent abuse. Will be NULL if the client has not polled yet.
-   */
   last_poll_at: Timestamp | null;
-  /**
-   * Optional set of scopes requested by the client for this specific challenge. Only used if a subset of the available client scopes is provided.
-   */
   scopes: string[] | null;
-  /**
-   * Timestamp when the device code has been used to issue an access token, and thus cannot be used anymore. 
-   */
   used_at: Timestamp | null;
-  /**
-   * Verification code the user has to enter on the device screen; should be short (usually 6-8 numbers and/or letters). Maximum of 8 characters for usability reasons.
-   */
   user_code: string;
 }
 
@@ -255,42 +490,23 @@ export interface AuthenticationRefreshToken {
   revoked_at: Timestamp | null;
   scopes: string[];
   token: string;
-  /**
-   * User ID the refresh token belongs to. Will be NULL for service tokens.
-   */
   user_id: Int8 | null;
 }
 
 export interface AuthenticationScope {
   created_at: Generated<Timestamp>;
   description: string | null;
-  /**
-   * Name of the scope. Must
-   */
   id: string;
-  /**
-   * Whether this scope is only available to server-side client integrations using the client_credentials grant.
-   */
   server: Generated<boolean>;
 }
 
 export interface AuthenticationUser {
-  /**
-   * The birthdate of a user. This is used to automatically apply age restrictions, if the user has the child role.
-   */
   birthdate: Timestamp | null;
-  /**
-   * Preferred color scheme to display the application in.
-   */
   color_scheme: Generated<AuthenticationColorScheme | null>;
   created_at: Generated<Timestamp>;
   email: string;
   id: Generated<Int8>;
-  image_id: Int8 | null;
   name: string | null;
-  /**
-   * The authorization role of a user.
-   */
   role: Generated<AuthenticationUserRole>;
   updated_at: Timestamp | null;
   verified: Generated<boolean>;
@@ -298,90 +514,41 @@ export interface AuthenticationUser {
 
 export interface AuthenticationUserConsent {
   client_id: string;
-  /**
-   * Timestamp of consent expiration. To avoid indefinitely granting consent to a client, users have to reconfirm their choices after a given amount of time.
-   */
   expires_at: Timestamp;
-  /**
-   * Timestamp the user has granted consent to the client.
-   */
   granted_at: Generated<Timestamp>;
-  /**
-   * Timestamp the user revoked their consent for the client. Effectively the same as having never given consent at all. If NULL, the user did not revoke their consent yet.
-   */
   revoked_at: Timestamp | null;
-  /**
-   * Scopes the user has granted the client to use at the time of consent.
-   */
   scopes: string[];
   user_id: Generated<Int8>;
 }
 
 export interface Catalog {
-  /**
-   * Whether this catalog is currently active and used in the app.
-   */
   active: Generated<boolean>;
-  /**
-   * The minimum required age to access this catalog
-   */
   age_requirement: Generated<number>;
   color: string | null;
   created_at: Generated<Timestamp>;
   credentials_required: Generated<boolean>;
-  /**
-   * Description of this feed; usually retrieved from the summary entry of the feed itself.
-   */
   description: string | null;
-  /**
-   * The OPDS feed URL to retrieve this catalog.
-   */
   feed_url: string;
   id: Generated<Int8>;
-  /**
-   * An optional URL to an image representing the feed; usually retrieved from the thumbnail image link of the feed itself.
-   */
   image_url: string | null;
-  /**
-   * Name of this feed; usually retrieved from the title entry of the feed itself.
-   */
   title: string | null;
   updated_at: Timestamp | null;
   updated_by: Int8 | null;
-  /**
-   * The website of the feed provider.
-   */
   url: string | null;
 }
 
 export interface Collection {
-  /**
-   * Minimum age in years users must reach to access this collection. This obviously will only work if a birthdate has been set for a user.
-   */
   age_requirement: Generated<number>;
-  /**
-   * Optional hex color to tint this collection. Does not allow transparency (which will be applied by the application).
-   */
   color: Buffer | null;
   created_at: Generated<Timestamp>;
   created_by: Int8 | null;
-  /**
-   * Optional long-form description of this collection formatted as Markdown.
-   */
   description: string | null;
-  /**
-   * Optional emoji to represent this collection, acting as an icon.
-   */
-  emoji: string | null;
+  icon: string | null;
   id: Generated<Int8>;
-  /**
-   * Mandatory collection name. Must be less than 150 characters.
-   */
+  like_count: Generated<number>;
   name: string;
-  /**
-   * Shared collections are accessible by all users; personal collections (shared is false) are only visible to the user who created them.
-   */
-  shared: Generated<boolean>;
+  search_vector: Generated<string | null>;
+  shared: boolean | null;
   updated_at: Timestamp | null;
   updated_by: Int8 | null;
 }
@@ -395,19 +562,10 @@ export interface CollectionEntry {
   collection_id: Int8;
   created_at: Generated<Timestamp>;
   created_by: Int8 | null;
-  /**
-   * Optional specific edition of a book to add. This is useful to create a collection of audio books, for example. If not set, the main edition of the book will be used.
-   */
   edition_id: Int8;
-  /**
-   * Order position of the collection entry. Applies to all users. To change the position, a reordering of all other collection entries is required.
-   */
   position: number;
   updated_at: Timestamp | null;
   updated_by: Int8 | null;
-  /**
-   * Reference to the book this entry refers to. Unless a specific edition is referenced in `edition_id`, the main edition will be used.
-   */
   work_id: Int8;
 }
 
@@ -420,7 +578,11 @@ export interface Comment {
   content: string;
   created_at: Generated<Timestamp>;
   created_by: Int8 | null;
+  hidden_at: Timestamp | null;
+  hidden_by: Int8 | null;
+  hidden_reason: string | null;
   id: Generated<Int8>;
+  parent_comment_id: Int8 | null;
   updated_at: Timestamp | null;
 }
 
@@ -431,22 +593,21 @@ export interface CommentReaction {
   user_id: Int8;
 }
 
+export interface CommentReport {
+  comment_id: Int8;
+  created_at: Generated<Timestamp>;
+  id: Generated<Int8>;
+  reason: string;
+  reported_by: Int8;
+  resolution: string | null;
+  resolved_at: Timestamp | null;
+  resolved_by: Int8 | null;
+}
+
 export interface Contribution {
-  /**
-   * Reference to a creator that contributed to the given edition of a book.
-   */
   creator_id: Int8;
-  /**
-   * Reference to an edition of a book the given creator contributed to.
-   */
   edition_id: Int8;
-  /**
-   * Whether the contribution should be considered essential to the edition; non-essential contributors may not be displayed at all times.
-   */
   essential: Generated<boolean>;
-  /**
-   * The role the creator had in the creation of the given book edition, e.g. "aut" (Author) or "ill" (Illustrator).
-   */
   role: Generated<ContributionRole>;
 }
 
@@ -455,23 +616,17 @@ export interface Creator {
   birth_date: Timestamp | null;
   created_at: Generated<Timestamp>;
   death_date: Timestamp | null;
-  /**
-   * Description, or biography, of a creator (e.g. an author). Free-text, providing more information on a given creator. Should be provided as Markdown.
-   */
   description: string | null;
   goodreads_id: string | null;
   id: Generated<Int8>;
   image_id: Int8 | null;
-  /**
-   * Full name of the creator.
-   */
   name: string;
+  openlibrary_id: string | null;
+  patreon_id: string | null;
+  search_vector: Generated<string | null>;
   sorting_key: string | null;
   updated_at: Timestamp | null;
   updated_by: Int8 | null;
-  /**
-   * Link to the website operated by, or another location on the internet representative of, the creator.
-   */
   url: string | null;
   wikipedia_url: string | null;
 }
@@ -481,59 +636,38 @@ export interface CreatorComment {
   creator_id: Generated<Int8>;
 }
 
+export interface EnrichmentResult {
+  id: Generated<string>;
+  work_id: Int8;
+  user_id: Int8;
+  created_at: Generated<Timestamp>;
+  status: Generated<string>;
+  preview: JsonValue;
+  improvements: JsonValue;
+  sources: Generated<ArrayType<string>>;
+  applied_at: Timestamp | null;
+  dismissed_at: Timestamp | null;
+}
+
 export interface Edition {
-  /**
-   * Amazon Standard Identification Number (ASIN) of this edition of the book. This is a 10-character alphanumeric identifier.
-   */
   asin: string | null;
-  /**
-   * Type of binding of this edition of the book (e.g. "hardcover").
-   */
   binding: string | null;
   cover_image_id: Int8 | null;
   created_at: Generated<Timestamp>;
-  /**
-   * An excerpt from the content of the book.
-   */
   excerpt: string | null;
   format: string | null;
   id: Generated<Int8>;
-  /**
-   * Legacy ISBN-10 identifier of this edition of the book.
-   */
   isbn_10: string | null;
-  /**
-   * Modern ISBN-13 identifier of this edition of the book.
-   */
   isbn_13: string | null;
   language: string | null;
-  /**
-   * Any legal information associated with this edition of a book, for example on copyright holders or usage permissions.
-   */
   legal_information: string | null;
-  /**
-   * Number of pages in this edition of the book.
-   */
+  openlibrary_id: string | null;
   pages: number | null;
-  /**
-   * Date the edition of the book has been published.
-   */
   published_at: Timestamp | null;
-  /**
-   * Reference to the publisher of this edition of the book.
-   */
   publisher_id: Int8 | null;
-  /**
-   * A version of the book title intended to used for sorting a list of books (e.g. "Prisoner of Azkaban, the").
-   */
+  search_vector: Generated<string | null>;
   sorting_key: string | null;
-  /**
-   * Synopsis of this edition of the book.
-   */
   synopsis: string | null;
-  /**
-   * Title of this edition of the book.
-   */
   title: string;
   updated_at: Timestamp | null;
   updated_by: Int8 | null;
@@ -541,50 +675,20 @@ export interface Edition {
 }
 
 export interface Image {
-  /**
-   * A blurhash representation of the image; see https://blurha.sh/. Blurhashes are simple string representations of an image that can be used to render a blurred approximation of the original image.
-   */
   blurhash: string;
-  /**
-   * An SHA1 hash of the file, used for ETag headers and sanity checks.
-   */
   checksum: Buffer;
   created_at: Generated<Timestamp>;
   created_by: Int8 | null;
-  /**
-   * A human-readable description of the image intended for visually impaired users.
-   */
   description: string | null;
-  /**
-   * Name, or key, of the file as persisted to the storage bucket.
-   */
   filename: string;
-  /**
-   * Height of the image, in pixels.
-   */
   height: number;
   id: Generated<Int8>;
-  /**
-   * A media type string describing the type of image file (e.g. "image/png" for a PNG file).
-   */
   media_type: string;
-  /**
-   * JSON object containing image file metadata.
-   */
   metadata: Generated<Json>;
-  /**
-   * Size of the file, in bytes.
-   */
   size: number;
-  /**
-   * Address of the file in a physical storage location as an s3:// URL.
-   */
   storage_reference: string;
   updated_at: Timestamp | null;
   updated_by: Int8 | null;
-  /**
-   * Width of the image, in pixels.
-   */
   width: number;
 }
 
@@ -601,12 +705,56 @@ export interface Language {
   type: LanguageType;
 }
 
+export interface ModerationLog {
+  action_type: string;
+  created_at: Generated<Timestamp>;
+  details: Json | null;
+  id: Generated<Int8>;
+  performed_by: Int8;
+  target_id: Int8;
+  target_type: string;
+}
+
+export interface Notification {
+  created_at: Generated<Timestamp>;
+  id: Generated<Int8>;
+  link: string | null;
+  message: string | null;
+  read_at: Timestamp | null;
+  source_id: Int8 | null;
+  source_type: string | null;
+  title: string;
+  type: string;
+  user_id: Int8;
+}
+
+export interface NotificationPreference {
+  comment_mentions: Generated<boolean>;
+  comment_reactions: Generated<boolean>;
+  comment_replies: Generated<boolean>;
+  updated_at: Generated<Timestamp>;
+  user_id: Int8;
+}
+
+export interface PendingIngestion {
+  checksum: string;
+  created_at: Generated<Timestamp>;
+  duplicate_info: Json;
+  expires_at: Generated<Timestamp>;
+  extracted_metadata: Json;
+  id: Generated<string>;
+  s3_key: string;
+  upload_id: string;
+  user_id: Int8;
+}
+
 export interface Publisher {
   created_at: Generated<Timestamp>;
   description: string | null;
   id: Generated<Int8>;
   image_id: Int8 | null;
   name: string;
+  search_vector: Generated<string | null>;
   sorting_key: string;
   updated_at: Timestamp | null;
   updated_by: Int8 | null;
@@ -620,37 +768,16 @@ export interface PublisherComment {
 }
 
 export interface Review {
-  /**
-   * Full content of the review, formatted as Markdown.
-   */
   content: string;
   created_at: Generated<Timestamp>;
-  /**
-   * Reference to the edition of a book this review refers to.
-   */
   edition_id: Int8;
-  /**
-   * An excerpt from the full review as provided in content. Must not be longer than 200 characters.
-   */
   excerpt: string | null;
   id: Generated<Int8>;
-  /**
-   * Name of the publication the review has been published in (e.g. "New York Times", "NPR").
-   */
   publication_name: string | null;
-  /**
-   * Date the review has been published.
-   */
   published_at: Timestamp | null;
-  /**
-   * Reference to an existing creator that published the review. This is useful for reviews by another author, for example.
-   */
   reviewer_id: Int8 | null;
   updated_at: Timestamp | null;
   updated_by: Int8 | null;
-  /**
-   * URL of the page the review has been published at.
-   */
   url: string | null;
 }
 
@@ -658,9 +785,6 @@ export interface Series {
   created_at: Generated<Timestamp>;
   id: Generated<Int8>;
   language: string | null;
-  /**
-   * Name of the series of books.
-   */
   name: string | null;
   updated_at: Timestamp | null;
   updated_by: Int8 | null;
@@ -672,9 +796,6 @@ export interface SeriesComment {
 }
 
 export interface SeriesEntry {
-  /**
-   * Position of the given boko in the series.
-   */
   position: number | null;
   series_id: Int8;
   work_id: Generated<Int8>;
@@ -698,7 +819,7 @@ export interface SettingsRevision {
   data: Json;
   updated_at: Generated<Timestamp>;
   updated_by: Int8 | null;
-  version: number;
+  version: Generated<number>;
 }
 
 export interface Tag {
@@ -708,6 +829,12 @@ export interface Tag {
   emoji: string | null;
   id: Generated<Int8>;
   value: string;
+}
+
+export interface UserBlock {
+  blocked_id: Int8;
+  blocker_id: Int8;
+  created_at: Generated<Timestamp>;
 }
 
 export interface UserCollectionFavorite {
@@ -747,9 +874,6 @@ export interface Work {
   created_at: Generated<Timestamp>;
   created_by: Int8 | null;
   id: Generated<Int8>;
-  /**
-   * The main, or preferred, edition of a book. Represents the book in listings and collections.
-   */
   main_edition_id: Int8 | null;
   updated_at: Timestamp | null;
   updated_by: Int8 | null;
@@ -794,13 +918,19 @@ export interface DB {
   collection_tag: CollectionTag;
   comment: Comment;
   comment_reaction: CommentReaction;
+  comment_report: CommentReport;
   contribution: Contribution;
   creator: Creator;
   creator_comment: CreatorComment;
   edition: Edition;
+  enrichment_result: EnrichmentResult;
   image: Image;
   image_creator: ImageCreator;
   language: Language;
+  moderation_log: ModerationLog;
+  notification: Notification;
+  notification_preference: NotificationPreference;
+  pending_ingestion: PendingIngestion;
   publisher: Publisher;
   publisher_comment: PublisherComment;
   review: Review;
@@ -811,6 +941,7 @@ export interface DB {
   settings: Settings;
   settings_revision: SettingsRevision;
   tag: Tag;
+  user_block: UserBlock;
   user_collection_favorite: UserCollectionFavorite;
   user_creator_favorite: UserCreatorFavorite;
   "vault.decrypted_secrets": VaultDecryptedSecrets;

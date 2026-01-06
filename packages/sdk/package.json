@@ -2,7 +2,7 @@
   "name": "@colibri-hq/sdk",
   "version": "0.0.1",
   "type": "module",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "description": "The Colibri SDK",
   "keywords": [
     "colibri",
@@ -41,21 +41,23 @@
     "types": "kysely-codegen --dialect postgres --env-file ../../.env --url 'env(DB_URL)' --out-file ./src/schema.d.ts --type-only-imports --default-schema public --exclude-pattern \"auth.*\" --include-pattern \"(public|authentication|vault).*\""
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.842.0",
-    "@aws-sdk/lib-storage": "^3.842.0",
-    "@aws-sdk/s3-request-presigner": "^3.842.0",
+    "@aws-sdk/client-s3": "^3.958.0",
+    "@aws-sdk/lib-storage": "^3.958.0",
+    "@aws-sdk/s3-request-presigner": "^3.958.0",
+    "@colibri-hq/languages": "workspace:*",
     "@colibri-hq/mobi": "workspace:*",
     "@colibri-hq/oauth": "workspace:*",
+    "@colibri-hq/open-library-client": "workspace:*",
     "@colibri-hq/pdf": "workspace:*",
     "@colibri-hq/shared": "workspace:*",
-    "@simplewebauthn/server": "^13.1.2",
-    "@zip.js/zip.js": "^2.7.63",
+    "@simplewebauthn/server": "^13.2.2",
+    "@zip.js/zip.js": "^2.8.11",
     "esm-env": "catalog:",
-    "fast-xml-parser": "^5.2.5",
-    "file-type": "^21.0.0",
+    "fast-xml-parser": "^5.3.3",
+    "file-type": "^21.2.0",
     "he": "^1.2.0",
     "jsonwebtoken": "catalog:",
-    "kysely": "^0.28.2",
+    "kysely": "^0.28.9",
     "pg": "^8.16.3",
     "turndown": "catalog:",
     "typescript": "catalog:",
@@ -66,17 +68,18 @@
     "@types/he": "^1.2.3",
     "@types/jsonwebtoken": "catalog:",
     "@types/node": "catalog:",
-    "@types/pg": "^8.15.4",
+    "@types/pg": "^8.16.0",
     "@types/turndown": "catalog:",
     "@types/xmldom": "^0.1.34",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
     "eslint": "catalog:",
-    "kanel": "^3.14.1",
-    "kanel-kysely": "^0.7.1",
-    "kysely-codegen": "^0.18.5",
+    "kanel": "^3.16.0",
+    "kanel-kysely": "^0.8.0",
+    "kysely-codegen": "^0.19.0",
     "prettier": "catalog:",
     "rimraf": "catalog:",
+    "sharp": "^0.34.5",
     "vitest": "catalog:"
   },
   "module": "dist/index.js",
@@ -84,6 +87,14 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./server": {
+      "import": "./dist/server.js",
+      "types": "./dist/server.d.ts"
+    },
+    "./client": {
+      "import": "./dist/client.js",
+      "types": "./dist/client.d.ts"
     },
     "./schema": {
       "import": "./src/schema.d.ts",
@@ -101,6 +112,23 @@
       "import": "./dist/ebooks/index.js",
       "browser": "./dist/ebooks/index.js",
       "types": "./dist/ebooks/index.d.ts"
+    },
+    "./metadata": {
+      "import": "./dist/metadata/index.js",
+      "browser": "./dist/metadata/index.js",
+      "types": "./dist/metadata/index.d.ts"
+    },
+    "./ingestion": {
+      "import": "./dist/ingestion/index.js",
+      "types": "./dist/ingestion/index.d.ts"
+    },
+    "./settings": {
+      "import": "./dist/settings/index.js",
+      "types": "./dist/settings/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types.js",
+      "types": "./dist/types.d.ts"
     }
   },
   "sideEffects": false,

@@ -7,7 +7,7 @@ import {
 import type { User } from "./authentication/index.js";
 import type { Database, Schema } from "../database.js";
 import type { DB } from "../schema.js";
-import type { Comment } from "./comment.js";
+import type { CommentWithUserAndReactions } from "./comment.js";
 
 const table = "collection" as const;
 
@@ -119,7 +119,7 @@ export function loadCollectionCommentsLegacy(
 export function loadCollectionComments(
   database: Database,
   id: number | string,
-): Promise<Comment[]> {
+): Promise<CommentWithUserAndReactions[]> {
   return database
     .selectFrom(table)
     .innerJoin(
@@ -150,10 +150,19 @@ export function loadCollectionComments(
         .as("reactions"),
     )
     .select(({ fn }) => fn.toJson("u").as("created_by"))
+    .select((eb) =>
+      eb
+        .selectFrom("comment as replies")
+        .select(({ fn }) => fn.countAll().as("count"))
+        .whereRef("replies.parent_comment_id", "=", "comment.id")
+        .as("reply_count"),
+    )
     .where("collection.id", "=", id.toString())
+    .where("comment.parent_comment_id", "is", null)
     .groupBy("comment.id")
     .groupBy("u.id")
-    .execute();
+    .orderBy("comment.created_at", "asc")
+    .execute() as Promise<CommentWithUserAndReactions[]>;
 }
 
 export function loadCollectionWorks(database: Database, id: number | string) {
@@ -167,10 +176,14 @@ export function loadCollectionWorks(database: Database, id: number | string) {
     .innerJoin("work", "collection_entry.work_id", "work.id")
     .leftJoin("edition", "work.main_edition_id", "edition.id")
     .leftJoin("image", "edition.cover_image_id", "image.id")
-    .selectAll("work")
-    .select("edition.id as edition_id")
-    .select("image.blurhash as cover_blurhash")
+    .selectAll("edition")
+    .select(({ ref }) => ref("work.id").as("id"))
+    .select(({ ref }) => ref("work.id").as("work_id"))
+    .select(({ ref }) => ref("work.main_edition_id").as("main_edition_id"))
+    .select(({ ref }) => ref("image.blurhash").as("cover_blurhash"))
+    .select(({ ref }) => ref("collection_entry.position").as("position"))
     .where("collection.id", "=", id.toString())
+    .orderBy("collection_entry.position", "asc")
     .execute();
 }
 
@@ -200,6 +213,12 @@ export async function addCollectionComment(
   });
 }
 
+/**
+ * Apply access controls for authenticated users based on collection visibility:
+ * - shared = true (public): Accessible by everyone
+ * - shared = null (shared): Accessible by all authenticated instance users
+ * - shared = false (private): Only accessible by the owner
+ */
 function applyAccessControls(
   query: SelectQueryBuilder<DB, typeof table, unknown>,
   userId: string,
@@ -210,12 +229,15 @@ function applyAccessControls(
     )
     .where((builder) =>
       builder.and([
-        // region Shared/private collections
+        // region Visibility controls
         builder.or([
-          // Collection is shared with all users
+          // Public collections (shared = true) are accessible by everyone
           builder.eb("collection.shared", "=", true),
 
-          // Collection is private but belongs to the user
+          // Shared collections (shared = null) are accessible by authenticated users
+          builder.eb("collection.shared", "is", null),
+
+          // Private collections (shared = false) are only accessible by owner
           builder.and([
             builder.eb("collection.shared", "=", false),
             builder.eb(
@@ -253,4 +275,262 @@ function applyAccessControls(
     );
 }
 
+/**
+ * Apply access controls for public (unauthenticated) access.
+ * Only public collections with no age requirement are accessible.
+ */
+function _applyPublicAccessControls(
+  query: SelectQueryBuilder<DB, typeof table, unknown>,
+) {
+  return query.where((builder) =>
+    builder.and([
+      // Only public collections
+      builder.eb("collection.shared", "=", true),
+      // No age requirement for unauthenticated users
+      builder.eb("collection.age_requirement", "=", 0),
+    ]),
+  );
+}
+
+type NewCollection = {
+  name: string;
+  description?: string | null;
+  icon?: string | null;
+  color?: Buffer | null;
+  /** Visibility: null = shared (all users), false = private (owner only), true = public (unauthenticated) */
+  shared?: boolean | null;
+  ageRequirement?: number;
+};
+
+export function createCollection(
+  database: Database,
+  userId: string,
+  {
+    name,
+    description,
+    icon,
+    color,
+    shared = null, // Default to shared (null = visible to all instance users)
+    ageRequirement: age_requirement = 0,
+  }: NewCollection,
+) {
+  return database
+    .insertInto(table)
+    .values({
+      name,
+      description,
+      icon,
+      color,
+      shared,
+      age_requirement,
+      created_by: userId,
+      updated_by: userId,
+    })
+    .returningAll()
+    .executeTakeFirstOrThrow();
+}
+
+type UpdatedCollection = Partial<NewCollection>;
+
+export function updateCollection(
+  database: Database,
+  id: string,
+  userId: string,
+  {
+    name,
+    description,
+    icon,
+    color,
+    shared,
+    ageRequirement: age_requirement,
+  }: UpdatedCollection,
+) {
+  return database
+    .updateTable(table)
+    .set({
+      name,
+      description,
+      icon,
+      color,
+      shared,
+      age_requirement,
+      updated_by: userId,
+    })
+    .where("id", "=", id)
+    .returningAll()
+    .executeTakeFirstOrThrow();
+}
+
+export function deleteCollection(database: Database, id: string) {
+  return database.deleteFrom(table).where("id", "=", id).execute();
+}
+
+export async function toggleWorkInCollection(
+  database: Database,
+  collectionId: string,
+  workId: string,
+  userId?: string,
+): Promise<{ added: boolean }> {
+  // Check if the work is already in the collection
+  const existing = await database
+    .selectFrom("collection_entry")
+    .where("collection_id", "=", collectionId)
+    .where("work_id", "=", workId)
+    .selectAll()
+    .executeTakeFirst();
+
+  if (existing) {
+    // Remove from collection
+    await database
+      .deleteFrom("collection_entry")
+      .where("collection_id", "=", collectionId)
+      .where("work_id", "=", workId)
+      .execute();
+    return { added: false };
+  } else {
+    // Get the main edition of the work
+    const work = await database
+      .selectFrom("work")
+      .select("main_edition_id")
+      .where("id", "=", workId)
+      .executeTakeFirstOrThrow();
+
+    // Get the next position in the collection
+    const { max_position } = await database
+      .selectFrom("collection_entry")
+      .select(({ fn }) => fn.max("position").as("max_position"))
+      .where("collection_id", "=", collectionId)
+      .executeTakeFirstOrThrow();
+
+    const nextPosition = (max_position ?? 0) + 1;
+
+    // Add to collection
+    await database
+      .insertInto("collection_entry")
+      .values({
+        collection_id: collectionId,
+        work_id: workId,
+        edition_id: work.main_edition_id!,
+        position: nextPosition,
+        created_by: userId,
+      })
+      .execute();
+    return { added: true };
+  }
+}
+
 export type Collection = Selectable<Schema[typeof table]>;
+
+/**
+ * Toggle a like on a collection. Returns the new like state and count.
+ */
+export async function toggleCollectionLike(
+  database: Database,
+  collectionId: string,
+  userId: string,
+): Promise<{ liked: boolean; likeCount: number }> {
+  // Check if already liked
+  const existing = await database
+    .selectFrom("user_collection_favorite")
+    .where("collection_id", "=", collectionId)
+    .where("user_id", "=", userId)
+    .selectAll()
+    .executeTakeFirst();
+
+  if (existing) {
+    // Unlike: remove favorite and decrement count
+    await database.transaction().execute(async (trx) => {
+      await trx
+        .deleteFrom("user_collection_favorite")
+        .where("collection_id", "=", collectionId)
+        .where("user_id", "=", userId)
+        .execute();
+
+      await trx
+        .updateTable("collection")
+        .set((eb) => ({
+          like_count: eb("like_count", "-", 1),
+        }))
+        .where("id", "=", collectionId)
+        .execute();
+    });
+
+    const collection = await database
+      .selectFrom("collection")
+      .select("like_count")
+      .where("id", "=", collectionId)
+      .executeTakeFirstOrThrow();
+
+    return { liked: false, likeCount: collection.like_count };
+  } else {
+    // Like: add favorite and increment count
+    await database.transaction().execute(async (trx) => {
+      await trx
+        .insertInto("user_collection_favorite")
+        .values({
+          collection_id: collectionId,
+          user_id: userId,
+        })
+        .execute();
+
+      await trx
+        .updateTable("collection")
+        .set((eb) => ({
+          like_count: eb("like_count", "+", 1),
+        }))
+        .where("id", "=", collectionId)
+        .execute();
+    });
+
+    const collection = await database
+      .selectFrom("collection")
+      .select("like_count")
+      .where("id", "=", collectionId)
+      .executeTakeFirstOrThrow();
+
+    return { liked: true, likeCount: collection.like_count };
+  }
+}
+
+/**
+ * Check if a user has liked a collection
+ */
+export async function isCollectionLikedByUser(
+  database: Database,
+  collectionId: string,
+  userId: string,
+): Promise<boolean> {
+  const existing = await database
+    .selectFrom("user_collection_favorite")
+    .where("collection_id", "=", collectionId)
+    .where("user_id", "=", userId)
+    .selectAll()
+    .executeTakeFirst();
+
+  return !!existing;
+}
+
+/**
+ * Reorder entries in a collection. Updates positions in a transaction.
+ */
+export async function reorderCollectionEntries(
+  database: Database,
+  collectionId: string,
+  entries: Array<{ workId: string; position: number }>,
+  userId: string,
+): Promise<void> {
+  await database.transaction().execute(async (trx) => {
+    for (const { workId, position } of entries) {
+      await trx
+        .updateTable("collection_entry")
+        .set({
+          position,
+          updated_by: userId,
+          updated_at: new Date(),
+        })
+        .where("collection_id", "=", collectionId)
+        .where("work_id", "=", workId)
+        .execute();
+    }
+  });
+}

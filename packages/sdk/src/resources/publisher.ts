@@ -1,4 +1,5 @@
 import type { Selectable } from "kysely";
+import { sql } from "kysely";
 import { withCover } from "./work.js";
 import type { Database, Schema } from "../database.js";
 import type { Publisher as $Publisher } from "../schema.js";
@@ -69,6 +70,49 @@ export function findPublisherByName(database: Database, name: string) {
     .selectAll()
     .where((eb) => eb(lower(eb.ref("name")), "=", name.toLowerCase()))
     .executeTakeFirst();
+}
+
+/**
+ * Find publishers with similar names using pg_trgm fuzzy matching.
+ *
+ * Uses PostgreSQL's trigram similarity to find publishers whose names are
+ * similar to the input name. This helps detect duplicates like:
+ * - "Penguin Books" vs "Penguin Publishing"
+ * - "HarperCollins" vs "Harper Collins Publishers"
+ *
+ * @param database - Database connection
+ * @param name - Publisher name to match against
+ * @param threshold - Minimum similarity score (0-1), default 0.7
+ * @returns Array of publishers with similarity scores, ordered by similarity (highest first)
+ */
+export async function findSimilarPublishers(
+  database: Database,
+  name: string,
+  threshold: number = 0.7,
+): Promise<Array<{ publisher: Publisher; similarity: number }>> {
+  const normalizedName = name.toLowerCase().trim();
+
+  const rows = await database
+    .selectFrom(table)
+    .selectAll()
+    .select(
+      sql<number>`COALESCE(similarity(lower(name), ${normalizedName}), 0)`.as(
+        "similarity",
+      ),
+    )
+    .where(
+      sql<boolean>`similarity(lower(name), ${normalizedName}) >= ${threshold}`,
+    )
+    .orderBy(sql`similarity(lower(name), ${normalizedName})`, "desc")
+    .execute();
+
+  return rows.map((row) => {
+    const { similarity, ...publisher } = row;
+    return {
+      publisher: publisher as Publisher,
+      similarity,
+    };
+  });
 }
 
 type NewPublisher = {
@@ -142,5 +186,9 @@ export function updatePublisher(
     .executeTakeFirstOrThrow();
 }
 
-type Table = Schema[typeof table];
+export function deletePublisher(database: Database, id: string) {
+  return database.deleteFrom(table).where("id", "=", id).execute();
+}
+
+type _Table = Schema[typeof table];
 export type Publisher = Selectable<$Publisher>;

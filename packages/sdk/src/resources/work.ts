@@ -1,7 +1,7 @@
 import type { Selectable, SelectQueryBuilder } from "kysely";
+import { sql } from "kysely";
 import type { Database, Schema } from "../database.js";
 import type { Creator, Edition } from "../schema.js";
-import { Buffer } from "node:buffer";
 
 const table = "work" as const;
 
@@ -9,6 +9,7 @@ export function loadWorks(database: Database, input?: string) {
   const query = database
     .selectFrom(table)
     .leftJoin("edition", "edition.id", "work.main_edition_id")
+    .leftJoin("image", "image.id", "edition.cover_image_id")
     .leftJoin("contribution", (join) =>
       join
         .onRef("contribution.edition_id", "=", "edition.id")
@@ -18,8 +19,12 @@ export function loadWorks(database: Database, input?: string) {
     .select(({ fn }) => fn.jsonAgg("creator").as("creators"))
     .selectAll("edition")
     .select(({ ref }) => ref("work.id").as("id"))
+    .select(({ ref }) => ref("work.id").as("work_id"))
+    .select(({ ref }) => ref("work.main_edition_id").as("main_edition_id"))
+    .select(({ ref }) => ref("image.blurhash").as("cover_blurhash"))
     .groupBy("work.id")
-    .groupBy("edition.id");
+    .groupBy("edition.id")
+    .groupBy("image.id");
 
   if (input) {
     return (
@@ -49,6 +54,27 @@ export function loadWork(database: Database, id: string | number) {
     .groupBy("language.iso_639_3")
     .groupBy("image.id")
     .executeTakeFirstOrThrow();
+}
+
+export async function loadWorkWithAssets(
+  database: Database,
+  id: string | number,
+) {
+  const work = await loadWork(database, id);
+  const assets = await database
+    .selectFrom("asset")
+    .selectAll()
+    .where("edition_id", "=", work.edition_id)
+    .execute();
+
+  return {
+    ...work,
+    assets: assets.map((asset) => ({
+      ...asset,
+      updatedAt: asset.updated_at ?? asset.created_at,
+      mediaType: asset.media_type,
+    })),
+  };
 }
 
 export function loadCreatorsForWork(
@@ -259,10 +285,217 @@ export function findAssetByChecksum(
 ) {
   return database
     .selectFrom("asset")
-    .where("checksum", "=", Buffer.from(checksum))
+    .where("checksum", "=", checksum as unknown as Buffer)
     .selectAll()
     .executeTakeFirst();
 }
+
+// region Duplicate Detection
+
+/**
+ * Find an edition by ISBN (checks both ISBN-10 and ISBN-13 columns)
+ */
+export function findEditionByISBN(database: Database, isbn: string) {
+  const normalizedIsbn = isbn.replace(/[-\s]/g, "");
+
+  return database
+    .selectFrom("edition")
+    .innerJoin("work", "work.id", "edition.work_id")
+    .selectAll("edition")
+    .select("work.id as work_id")
+    .where((eb) =>
+      eb.or([
+        eb("edition.isbn_10", "=", normalizedIsbn),
+        eb("edition.isbn_13", "=", normalizedIsbn),
+      ]),
+    )
+    .executeTakeFirst();
+}
+
+/**
+ * Find an edition by ASIN
+ */
+export function findEditionByASIN(database: Database, asin: string) {
+  return database
+    .selectFrom("edition")
+    .innerJoin("work", "work.id", "edition.work_id")
+    .selectAll("edition")
+    .select("work.id as work_id")
+    .where("edition.asin", "=", asin)
+    .executeTakeFirst();
+}
+
+/**
+ * Find editions by any identifier type (ISBN or ASIN)
+ */
+export function findEditionByIdentifier(
+  database: Database,
+  type: "isbn" | "asin",
+  value: string,
+) {
+  if (type === "isbn") {
+    return findEditionByISBN(database, value);
+  }
+  return findEditionByASIN(database, value);
+}
+
+/**
+ * Find editions matching any of the provided identifiers
+ */
+export function findEditionsByIdentifiers(
+  database: Database,
+  identifiers: Array<{ type: "isbn" | "asin"; value: string }>,
+) {
+  if (identifiers.length === 0) {
+    return Promise.resolve([]);
+  }
+
+  const isbns = identifiers
+    .filter((id) => id.type === "isbn")
+    .map((id) => id.value.replace(/[-\s]/g, ""));
+  const asins = identifiers
+    .filter((id) => id.type === "asin")
+    .map((id) => id.value);
+
+  let query = database
+    .selectFrom("edition")
+    .innerJoin("work", "work.id", "edition.work_id")
+    .selectAll("edition")
+    .select("work.id as work_id");
+
+  if (isbns.length > 0 && asins.length > 0) {
+    query = query.where((eb) =>
+      eb.or([
+        eb("edition.isbn_10", "in", isbns),
+        eb("edition.isbn_13", "in", isbns),
+        eb("edition.asin", "in", asins),
+      ]),
+    );
+  } else if (isbns.length > 0) {
+    query = query.where((eb) =>
+      eb.or([
+        eb("edition.isbn_10", "in", isbns),
+        eb("edition.isbn_13", "in", isbns),
+      ]),
+    );
+  } else if (asins.length > 0) {
+    query = query.where("edition.asin", "in", asins);
+  }
+
+  return query.execute();
+}
+
+/**
+ * Find works by title, optionally filtered by creator name.
+ * Uses case-insensitive matching for title comparison.
+ * Returns works with their main edition and essential creators.
+ */
+export function findWorksByTitle(
+  database: Database,
+  title: string,
+  options?: { creatorName?: string; limit?: number },
+) {
+  const normalizedTitle = title.toLowerCase().trim();
+  const limit = options?.limit ?? 10;
+
+  let query = database
+    .selectFrom("work")
+    .innerJoin("edition", "edition.id", "work.main_edition_id")
+    .leftJoin("contribution", (join) =>
+      join
+        .onRef("contribution.edition_id", "=", "edition.id")
+        .on("contribution.essential", "=", true),
+    )
+    .leftJoin("creator", "creator.id", "contribution.creator_id")
+    .select(({ fn }) => fn.jsonAgg("creator").as("creators"))
+    .selectAll("edition")
+    .select("work.id as work_id")
+    .groupBy("work.id")
+    .groupBy("edition.id")
+    .limit(limit);
+
+  // Case-insensitive title matching
+  query = query.where((eb) =>
+    eb(eb.fn("lower", [eb.ref("edition.title")]), "=", normalizedTitle),
+  );
+
+  // Optional creator name filter
+  if (options?.creatorName) {
+    const normalizedCreator = options.creatorName.toLowerCase().trim();
+    query = query.having((eb) =>
+      eb(
+        eb.fn("lower", [
+          eb.fn("string_agg", [eb.ref("creator.name"), eb.val(", ")]),
+        ]),
+        "like",
+        `%${normalizedCreator}%`,
+      ),
+    );
+  }
+
+  return query.execute();
+}
+
+/**
+ * Find works with titles similar to the given title using trigram similarity.
+ * Requires pg_trgm extension to be enabled in the database.
+ * Falls back to ILIKE matching if similarity function is not available.
+ */
+export function findSimilarWorks(
+  database: Database,
+  title: string,
+  options?: { creatorName?: string; limit?: number; minSimilarity?: number },
+) {
+  const normalizedTitle = title.toLowerCase().trim();
+  const limit = options?.limit ?? 10;
+  const minSimilarity = options?.minSimilarity ?? 0.3;
+
+  let query = database
+    .selectFrom("work")
+    .innerJoin("edition", "edition.id", "work.main_edition_id")
+    .leftJoin("contribution", (join) =>
+      join
+        .onRef("contribution.edition_id", "=", "edition.id")
+        .on("contribution.essential", "=", true),
+    )
+    .leftJoin("creator", "creator.id", "contribution.creator_id")
+    .select(({ fn }) => fn.jsonAgg("creator").as("creators"))
+    .selectAll("edition")
+    .select("work.id as work_id")
+    // Add similarity score using pg_trgm (gracefully degrades if not available)
+    .select(
+      sql<number>`COALESCE(similarity(lower(edition.title), ${normalizedTitle}), 0)`.as(
+        "title_similarity",
+      ),
+    )
+    .groupBy("work.id")
+    .groupBy("edition.id")
+    .orderBy(sql`similarity(lower(edition.title), ${normalizedTitle})`, "desc")
+    .limit(limit);
+
+  // Filter by minimum similarity using properly typed sql expression
+  query = query.where(
+    sql<boolean>`similarity(lower(edition.title), ${normalizedTitle}) >= ${minSimilarity}`,
+  );
+
+  // Optional creator name filter
+  if (options?.creatorName) {
+    const normalizedCreator = options.creatorName.toLowerCase().trim();
+    query = query.having((eb) =>
+      eb(
+        eb.fn("lower", [
+          eb.fn("string_agg", [eb.ref("creator.name"), eb.val(", ")]),
+        ]),
+        "like",
+        `%${normalizedCreator}%`,
+      ),
+    );
+  }
+
+  return query.execute();
+}
+
+// endregion
 
 type Table = Schema[typeof table];
 export type Work = Selectable<Table> & {

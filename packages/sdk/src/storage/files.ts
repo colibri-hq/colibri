@@ -68,10 +68,12 @@ export async function generatePresignedUploadUrl(
   metadata?: Record<string, string>,
   bucket: string = defaultBucket,
 ): Promise<string> {
+  // Note: Do not include Expires in PutObjectCommand - it adds the header to
+  // the signature, requiring clients to send it. Use expiresIn in getSignedUrl
+  // for URL expiration instead.
   const command = new PutObjectCommand({
     Bucket: bucket,
     Key: filename,
-    Expires: new Date(Date.now() + expiresIn * 1_000),
     ChecksumSHA256: encodeToBase64(checksum),
     Metadata: { ...metadata },
   });

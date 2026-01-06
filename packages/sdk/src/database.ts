@@ -1,4 +1,7 @@
-import { Kysely, PostgresDialect } from "kysely";
+import { Kysely, PostgresDialect, sql } from "kysely";
+
+// Re-export sql helper for use in raw queries
+export { sql };
 import { Buffer } from "node:buffer";
 import { Pool } from "pg";
 import type { DB } from "./schema.js";
@@ -61,9 +64,13 @@ export function initialize(
         const query = sql.replaceAll(/\$\d+/g, (match) => {
           const parameter = parameters[parseInt(match.slice(1)) - 1];
 
-          return parameter instanceof Buffer
-            ? `<Buffer len="${parameter.length}">`
-            : JSON.stringify(parameter);
+          if (parameter instanceof Buffer) {
+            return `<Buffer len="${parameter.length}">`;
+          }
+          if (typeof parameter === "bigint") {
+            return parameter.toString();
+          }
+          return JSON.stringify(parameter);
         });
         const duration = queryDurationMillis.toLocaleString(undefined, {
           maximumFractionDigits: 2,

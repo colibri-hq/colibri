@@ -36,6 +36,7 @@ export async function loadEpubMetadata(
     modified: dateModified,
     published: datePublished,
     rights,
+    series,
     sortAs,
     subject = [],
     title,
@@ -50,11 +51,12 @@ export async function loadEpubMetadata(
     identifiers: loadIdentifiers({ identifier }),
     contributors: loadContributors({ contributors, publisher }),
     legalInformation: rights ?? undefined,
-    tags: subject.map(({ name, term }) => term ?? name),
+    tags: loadSubjects(subject),
     language: wrapArray(language).shift(),
     properties,
     datePublished,
     cover,
+    series,
   } as Metadata;
 }
 
@@ -106,6 +108,38 @@ function loadContributors({
     }));
 }
 
+/**
+ * Extract and normalize subjects from EPUB metadata
+ * Handles compound subjects like "Fiction / Fantasy / Epic"
+ */
+function loadSubjects(
+  subjects: Array<{
+    name: string;
+    term?: string | undefined;
+    authority?: string | undefined;
+  }>,
+): string[] {
+  const allSubjects: string[] = [];
+
+  for (const subject of subjects) {
+    const subjectText = subject.term ?? subject.name;
+
+    // Split on " / " for BISAC-style compound subjects
+    if (subjectText.includes(" / ")) {
+      const parts = subjectText
+        .split(" / ")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+      allSubjects.push(...parts);
+    } else {
+      allSubjects.push(subjectText);
+    }
+  }
+
+  // Deduplicate and filter empty strings
+  return [...new Set(allSubjects)].filter((s) => s.length > 0);
+}
+
 export async function loadEpub(
   file: File,
   signal?: AbortSignal,
@@ -121,7 +155,7 @@ export async function loadEpub(
   async function readFile<T>(href: string, sink: Writer<T>) {
     const file = resolveFile(href);
 
-    if (!file || !file.getData) {
+    if (!file || !("getData" in file)) {
       throw new Error(`File not found: ${href}`);
     }
 

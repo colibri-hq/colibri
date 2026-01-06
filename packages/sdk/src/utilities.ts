@@ -47,7 +47,8 @@ export function paginate<T extends keyof DB, O>(
   return (
     database
       .with("_pagination", (eb) =>
-        eb.selectFrom(table).select(({ fn, lit, cast }) =>
+        // @ts-ignore
+        eb.selectFrom(table).select(({ fn, lit, cast }: any) =>
           jsonBuildObject({
             last_page: sql<number>`ceil
               (count(*) / ${cast(lit(limit), "float4")})`,
@@ -82,4 +83,12 @@ export function concat<T extends Expression<V>, V extends string>(
 
 export function mergeJson<A, B>(a: Expression<A>, b: Expression<B>) {
   return sql<A & B>`${a} || ${b}`;
+}
+
+/**
+ * PostgreSQL similarity function (requires pg_trgm extension)
+ * Returns a similarity score between 0 and 1
+ */
+export function similarity(expr: Expression<string>, value: string) {
+  return sql<number>`similarity(${expr}, ${value})`;
 }

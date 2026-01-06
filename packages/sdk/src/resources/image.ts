@@ -94,5 +94,5 @@ export function findImageByChecksum(
     .executeTakeFirst();
 }
 
-type Table = Schema[typeof table];
+type _Table = Schema[typeof table];
 export type Image = Selectable<$Image>;

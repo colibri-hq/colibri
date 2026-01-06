@@ -1,6 +1,6 @@
 import type { Database, Schema } from "../database.js";
 import type { Settings as $Settings } from "../schema.js";
-import type { Selectable, Updateable } from "kysely";
+import type { Insertable, Selectable } from "kysely";
 
 const table = "settings" as const;
 
@@ -15,11 +15,11 @@ export function loadSettings(database: Database) {
 
 export function updateSettings(
   database: Database,
-  settings: Updateable<Selectable<Schema["settings_revision"]>>,
+  settings: Omit<Insertable<Schema["settings_revision"]>, "version">,
 ) {
   return database
-    .updateTable("settings_revision")
-    .set(settings)
+    .insertInto("settings_revision")
+    .values(settings as Insertable<Schema["settings_revision"]>)
     .returningAll()
     .executeTakeFirstOrThrow();
 }

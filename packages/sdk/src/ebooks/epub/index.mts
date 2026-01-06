@@ -1,17 +1,9 @@
 /// <reference lib="dom" />
-import { type Relator, relatorRoles } from "../contributions.js";
-import { wrapArray } from "@colibri-hq/shared";
 import { XMLParser } from "fast-xml-parser";
-import {
-  cfiToElement,
-  cfiToRange,
-  parseCfi,
-  parseCfiFromElements,
-  type RegularCfi,
-} from "./cfi.js";
 
 // DOM-like wrapper for fast-xml-parser
-class XMLNode {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+class _XMLNode {
   _node: any;
   _namespaces: Record<string, string>;
   nodeType: number;
@@ -77,14 +69,14 @@ class XMLNode {
   get childNodes() {
     if (typeof this._node !== "object") return [];
 
-    const result: XMLNode[] = [];
+    const result: _XMLNode[] = [];
     // If it's a structured node object
     if (Array.isArray(this._node)) {
       for (const item of this._node) {
         if (typeof item === "object") {
-          result.push(new XMLNode(item, this._namespaces));
+          result.push(new _XMLNode(item, this._namespaces));
         } else if (item !== undefined) {
-          result.push(new XMLNode(item, this._namespaces));
+          result.push(new _XMLNode(item, this._namespaces));
         }
       }
       return result;
@@ -104,28 +96,28 @@ class XMLNode {
       const value = this._node[key];
       if (Array.isArray(value)) {
         for (const item of value) {
-          result.push(new XMLNode({ [key]: item }, this._namespaces));
+          result.push(new _XMLNode({ [key]: item }, this._namespaces));
         }
       } else if (value !== undefined) {
-        result.push(new XMLNode({ [key]: value }, this._namespaces));
+        result.push(new _XMLNode({ [key]: value }, this._namespaces));
       }
     }
 
     // Add text node if it exists
     if (this._node["#text"] !== undefined) {
-      result.push(new XMLNode(this._node["#text"], this._namespaces));
+      result.push(new _XMLNode(this._node["#text"], this._namespaces));
     }
 
     return result;
   }
 
   getElementsByTagName(name: string) {
-    const results: XMLNode[] = [];
+    const results: _XMLNode[] = [];
     this._getElementsByTagName(name, results);
     return results;
   }
 
-  _getElementsByTagName(name: string, results: XMLNode[]) {
+  _getElementsByTagName(name: string, results: _XMLNode[]) {
     for (const child of this.childNodes) {
       if (child.nodeType === child.ELEMENT_NODE) {
         if (child.localName === name) {
@@ -137,12 +129,12 @@ class XMLNode {
   }
 
   getElementsByTagNameNS(namespace: string, name: string) {
-    const results: XMLNode[] = [];
+    const results: _XMLNode[] = [];
     this._getElementsByTagNameNS(namespace, name, results);
     return results;
   }
 
-  _getElementsByTagNameNS(namespace: string, name: string, results: XMLNode[]) {
+  _getElementsByTagNameNS(namespace: string, name: string, results: _XMLNode[]) {
     for (const child of this.childNodes) {
       if (child.nodeType === child.ELEMENT_NODE) {
         if (child.localName === name && child.namespaceURI === namespace) {
@@ -157,7 +149,7 @@ class XMLNode {
     return this._getElementById(id);
   }
 
-  _getElementById(id: string): XMLNode | null {
+  _getElementById(id: string): _XMLNode | null {
     if (typeof this._node !== "object") return null;
 
     if (this.getAttribute("id") === id) return this;
@@ -199,7 +191,7 @@ class XMLNode {
 
   querySelectorAll(selector: string) {
     // Basic implementation for common selectors
-    const results: XMLNode[] = [];
+    const results: _XMLNode[] = [];
 
     if (selector.includes("[") && selector.includes("]")) {
       const attrMatch = selector.match(
@@ -217,7 +209,7 @@ class XMLNode {
     return results;
   }
 
-  _getElementByAttribute(attr: string, value: string): XMLNode | null {
+  _getElementByAttribute(attr: string, value: string): _XMLNode | null {
     if (typeof this._node !== "object") return null;
 
     if (this.getAttribute(attr) === value) return this;
@@ -235,7 +227,7 @@ class XMLNode {
   _getElementsByAttribute(
     attr: string,
     value: string | undefined,
-    results: XMLNode[],
+    results: _XMLNode[],
   ) {
     if (typeof this._node !== "object") return;
 
@@ -255,7 +247,8 @@ class XMLNode {
   }
 }
 
-class DOMWrapper {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+class _DOMWrapper {
   _parser: XMLParser;
 
   constructor() {
@@ -263,7 +256,8 @@ class DOMWrapper {
       ignoreAttributes: false,
       attributeNamePrefix: "@_",
       textNodeName: "#text",
-      isArray: (name, jpath, isLeafNode, isAttribute) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      isArray: (name, _jpath, _isLeafNode, _isAttribute) => {
         // Known elements that should always be arrays
         const arrayElements = [
           "item",
@@ -289,7 +283,8 @@ class DOMWrapper {
     });
   }
 
-  parseFromString(xmlText: string, mimeType: string) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  parseFromString(xmlText: string, _mimeType: string) {
     try {
       const parsed = this._parser.parse(xmlText);
       // Create namespace map

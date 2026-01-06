@@ -1,6 +1,6 @@
-type EpubSource = {
+type _EpubSource = {
   load: (signal?: AbortSignal) => Promise<string>;
   loadBlob: (signal?: AbortSignal) => Promise<Blob>;
 };
 
-export function parse(file: File) {}
+export function parse(_file: File) {}

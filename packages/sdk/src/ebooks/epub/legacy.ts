@@ -429,6 +429,73 @@ export class Epub {
       ),
     ].filter((item): item is ContributorMetadata => !!item);
 
+    // Extract series information
+    let series: { name: string; position?: number } | undefined;
+
+    // First, check for EPUB 3 belongs-to-collection with collection-type="series"
+    const collections = wrapArray(documentMetadata?.belongsToCollection ?? []);
+    const seriesCollection = collections.find((col) => {
+      if (typeof col === "string") return false;
+      return col.collectionType === "series";
+    });
+
+    if (seriesCollection && typeof seriesCollection !== "string") {
+      const seriesName = firstValue(extractMetadataValue([seriesCollection]));
+      const positionValue = seriesCollection.groupPosition;
+      const position =
+        positionValue !== undefined
+          ? Number.parseFloat(String(positionValue))
+          : undefined;
+
+      if (seriesName) {
+        if (position !== undefined && !Number.isNaN(position)) {
+          series = {
+            name: seriesName,
+            position,
+          };
+        } else {
+          series = {
+            name: seriesName,
+          };
+        }
+      }
+    }
+
+    // If no EPUB 3 series, check for Calibre metadata (in OPF meta tags)
+    if (!series) {
+      const opfMeta = resources.opf.getElementsByTagName("meta");
+      let calibreSeries: string | undefined;
+      let calibreSeriesIndex: number | undefined;
+
+      for (let i = 0; i < opfMeta.length; i++) {
+        const meta = opfMeta[i];
+        const name = meta?.getAttribute("name");
+        const content = meta?.getAttribute("content");
+
+        if (name === "calibre:series" && content) {
+          calibreSeries = content;
+        } else if (name === "calibre:series_index" && content) {
+          const parsed = Number.parseFloat(content);
+          if (!Number.isNaN(parsed)) {
+            calibreSeriesIndex = parsed;
+          }
+        }
+      }
+
+      if (calibreSeries) {
+        if (calibreSeriesIndex !== undefined) {
+          series = {
+            name: calibreSeries,
+            position: calibreSeriesIndex,
+          };
+        } else {
+          series = {
+            name: calibreSeries,
+          };
+        }
+      }
+    }
+
     return {
       contributors,
       description,
@@ -438,6 +505,7 @@ export class Epub {
       published,
       publisher,
       rights,
+      series,
       sortAs,
       subject,
       subtitle,
@@ -765,7 +833,7 @@ const METADATA = [
   },
 ] satisfies MetadataDescriptor[];
 
-const contributorLabels = {
+const _contributorLabels = {
   art: "artist",
   aut: "author",
   bkp: "producer",
@@ -2152,9 +2220,15 @@ type BookMetadata = {
     | undefined;
   rights: string | undefined;
   contributors: ContributorMetadata[] | undefined;
+  series:
+    | {
+        name: string;
+        position?: number | undefined;
+      }
+    | undefined;
 };
 
-type RelatorRoleSpec = Relator | { value: Relator; scheme?: string };
+type _RelatorRoleSpec = Relator | { value: Relator; scheme?: string };
 
 function cached<T>(
   resolver: (href: string) => Promise<T>,
