@@ -1,10 +1,9 @@
 <script lang="ts">
-  // @ts-nocheck
+  // @ts-expect-error svelte-gravatar doesn't have type declarations
   import Gravatar from 'svelte-gravatar';
-  import type { AuthenticationUser } from '@colibri-hq/sdk/schema';
 
   interface Props {
-    user: Pick<AuthenticationUser, 'email'>;
+    user: { email: string };
     size?: number;
 
     [key: string]: unknown;

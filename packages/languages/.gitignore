@@ -1,0 +1,16 @@
+# Downloaded data from SIL (regenerate with: pnpm download)
+data/
+
+# Build output
+dist/
+
+# Generated data is committed to version control for reproducible builds
+# Regenerate with: pnpm update
+# src/generated/
+
+# Cache
+.cache/
+.turbo/
+
+# Coverage
+coverage/

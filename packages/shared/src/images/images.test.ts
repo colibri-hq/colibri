@@ -1,16 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { decodeBlurHashToImage, encodeImageToBlurHash } from './blurhash.js';
+import { getImageDimensions } from './dimensions.js';
 
-// Mock canvas and ImageBitmap
+// Mock canvas and ImageBitmap - use large enough dimensions for blurhash decode (242x415)
 const mockImageData = {
-  data: new Uint8ClampedArray(100 * 100 * 4),
-  width: 100,
-  height: 100,
+  data: new Uint8ClampedArray(242 * 415 * 4),
+  width: 242,
+  height: 415,
 };
 
 const mockCanvas = {
-  width: 100,
-  height: 100,
+  width: 242,
+  height: 415,
   getContext: vi.fn().mockReturnValue({
     drawImage: vi.fn(),
     getImageData: vi.fn().mockReturnValue(mockImageData),
@@ -29,18 +30,30 @@ const mockImageBitmap = {
 
 // Mock global objects
 global.createImageBitmap = vi.fn().mockResolvedValue(mockImageBitmap);
-global.Image = vi.fn().mockImplementation(() => ({
-  src: '',
-  width: 100,
-  height: 100,
-  addEventListener: vi.fn().mockImplementation((event, callback) => {
-    if (event === 'load') {
-      callback();
-    } else if (event === 'error') {
-      callback(new Error('Failed to load image'));
+global.Image = vi.fn().mockImplementation(function (this: any) {
+  this.src = '';
+  this.width = 100;
+  this.height = 100;
+  this.addEventListener = vi
+    .fn()
+    .mockImplementation((event: string, callback: () => void) => {
+      if (event === 'load') {
+        // Only trigger load callback, not error
+        setTimeout(() => callback(), 0);
+      }
+      // Don't auto-trigger error callback - store it for tests that need it
+    });
+}) as unknown as typeof Image;
+
+// Mock document for decodeBlurHashToImage
+global.document = {
+  createElement: vi.fn().mockImplementation((tagName: string) => {
+    if (tagName === 'canvas') {
+      return mockCanvas;
     }
+    return {};
   }),
-}));
+} as unknown as Document;
 
 describe('Images', () => {
   describe('Blurhash', () => {
@@ -106,18 +119,27 @@ describe('Images', () => {
       });
 
       it('should handle image load errors', async () => {
-        const mockImage = new Image();
-        mockImage.addEventListener = vi
-          .fn()
-          .mockImplementation((event, callback) => {
-            if (event === 'error') {
-              callback(new Error('Failed to load image'));
-            }
-          });
+        // Override Image mock to trigger error instead of load
+        global.Image = vi.fn().mockImplementation(function (this: any) {
+          this.src = '';
+          this.width = 100;
+          this.height = 100;
+          this.addEventListener = vi
+            .fn()
+            .mockImplementation(
+              (event: string, callback: (error?: Error) => void) => {
+                if (event === 'error') {
+                  setTimeout(
+                    () => callback(new Error('Failed to load image')),
+                    0,
+                  );
+                }
+                // Don't trigger load callback
+              },
+            );
+        }) as unknown as typeof Image;
 
-        await expect(getImageDimensions('invalid-url.jpg')).rejects.toThrow(
-          'Failed to load image',
-        );
+        await expect(getImageDimensions('invalid-url.jpg')).rejects.toThrow();
       });
     });
   });

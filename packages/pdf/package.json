@@ -2,7 +2,7 @@
   "name": "@colibri-hq/pdf",
   "version": "0.0.1",
   "type": "module",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "description": "A wrapper for the pdf.js library that re-exports the API with conditional module exports.",
   "keywords": [
     "colibri",
@@ -39,7 +39,7 @@
   "dependencies": {
     "@colibri-hq/shared": "workspace:*",
     "esm-env": "catalog:",
-    "pdfjs-dist": "^5.3.93"
+    "pdfjs-dist": "^5.4.530"
   },
   "devDependencies": {
     "eslint": "catalog:",

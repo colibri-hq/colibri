@@ -45,7 +45,7 @@
 </script>
 
 <TabsRoot
-  bind:value={value}
+  bind:value={value as string}
   class={twMerge('flex flex-col gap-2', className)}
   onValueChange={onChange}
   {disabled}
@@ -71,7 +71,9 @@
 
   {#each Object.keys(tabs) as key (key)}
     <TabContent value={key.toString()}>
-      {@render contentSnippets[`${key}Content`]?.(key.toString())}
+      {#if typeof contentSnippets[`${key}Content`] === 'function'}
+        {@render (contentSnippets[`${key}Content`] as Snippet<[string]>)(key.toString())}
+      {/if}
     </TabContent>
   {/each}
 

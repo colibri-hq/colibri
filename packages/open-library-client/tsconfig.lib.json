@@ -2,19 +2,9 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "composite": true,
-    "lib": [
-      "DOM",
-      "DOM.AsyncIterable",
-      "ESNext"
-    ],
+    "lib": ["DOM", "DOM.AsyncIterable", "ESNext"],
     "tsBuildInfoFile": ".cache/tsbuildinfo.lib.json"
   },
-  "exclude": [
-    "src/**/*.test.ts",
-    "src/**/*.spec.ts"
-  ],
-  "include": [
-    "src/**/*.ts"
-  ]
+  "exclude": ["src/**/*.test.ts", "src/**/*.spec.ts"],
+  "include": ["src/**/*.ts"]
 }

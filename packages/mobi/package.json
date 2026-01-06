@@ -2,7 +2,7 @@
   "name": "@colibri-hq/mobi",
   "version": "0.0.1",
   "type": "module",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "description": "MOBI file parser for Colibri",
   "keywords": [
     "colibri",
@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@colibri-hq/shared": "workspace:*",
-    "binary-parser": "^2.2.1",
+    "binary-parser": "^2.3.0",
     "esm-env": "catalog:"
   },
   "devDependencies": {

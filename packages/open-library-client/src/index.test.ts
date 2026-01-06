@@ -6,7 +6,7 @@ const baseUrl = "https://openlibrary.org";
 const coversBaseUrl = "https://covers.openlibrary.org";
 
 const sampleWork = { key: "/works/OL123W", title: "Test Work" };
-const sampleBookshelves = {
+const sampleBookshelveStats = {
   counts: { want_to_read: 1, currently_reading: 2, already_read: 3 },
 };
 const sampleRatings = {
@@ -115,11 +115,11 @@ describe("Open Library Client", () => {
     await expect(client.loadWork("OL404W")).resolves.toBeNull();
   });
 
-  it("loads bookshelves by work id", async () => {
-    mockFetch.mockImplementation(() => mockResponse(sampleBookshelves));
+  it("loads bookshelve stats by work id", async () => {
+    mockFetch.mockImplementation(() => mockResponse(sampleBookshelveStats));
 
-    await expect(client.loadBookshelvesByWorkId("OL123W")).resolves.toEqual(
-      sampleBookshelves,
+    await expect(client.loadBookshelveStatsByWorkId("OL123W")).resolves.toEqual(
+      sampleBookshelveStats,
     );
   });
 
@@ -150,7 +150,9 @@ describe("Open Library Client", () => {
   it("loads an edition by ISBN", async () => {
     mockFetch.mockImplementation(() => mockResponse(sampleIsbn));
 
-    await expect(client.loadIsbn("1234567890")).resolves.toEqual(sampleIsbn);
+    await expect(client.loadEditionByIsbn("1234567890")).resolves.toEqual(
+      sampleIsbn,
+    );
   });
 
   it("loads an author by id", async () => {

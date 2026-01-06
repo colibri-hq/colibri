@@ -5,52 +5,92 @@
   import type { Snippet } from 'svelte';
 
   interface ControlProps {
+    /**
+     * The type of the field. Defaults to 'text'.
+     */
     type?: HTMLInputAttributes['type'];
+
+    /**
+     * The name of the field. Used for form submission.
+     */
     name?: HTMLInputAttributes['name'];
+
+    /**
+     * The placeholder text for the field. Displayed when the field is empty.
+     */
     placeholder?: HTMLInputAttributes['placeholder'];
+
+    /**
+     * The autocomplete attribute for the field. Used for browser autocomplete suggestions.
+     */
     autocomplete?: HTMLInputAttributes['autocomplete'];
+
+    /**
+     * Whether the field is disabled. When true, the field is not interactive and cannot be focused.
+     */
     disabled?: HTMLInputAttributes['disabled'];
+
+    /**
+     * Whether the field is read-only. When true, the field cannot be edited, but can be focused.
+     */
     readonly?: HTMLInputAttributes['readonly'];
+
+    /**
+     * Whether the field is required. When true, the field must be filled out before submission.
+     */
     required?: HTMLInputAttributes['required'];
+
+    /**
+     * Whether the field should be focused automatically when the page loads.
+     * When true, the field receives focus as soon as it is rendered.
+     *
+     * Note: Using the `autofocus` attribute is not recommended for accessibility reasons. It can be disruptive for
+     * users who rely on assistive technologies or keyboard navigation.
+     */
     autofocus?: HTMLInputAttributes['autofocus'];
+
+    /**
+     * The step attribute for the field. Used for numeric input types to specify the granularity of the input.
+     */
     step?: HTMLInputAttributes['step'];
+
+    /**
+     * The maximum value for the field. Used for numeric input types to specify the upper limit of the input.
+     */
     max?: HTMLInputAttributes['max'];
+
+    /**
+     * The maximum length of the input value. Used to limit the number of characters that can be entered in the field.
+     */
     maxlength?: HTMLInputAttributes['maxlength'];
+
+    /**
+     * The minimum value for the field. Used for numeric input types to specify the lower limit of the input.
+     */
     min?: HTMLInputAttributes['min'];
+
+    /**
+     * The minimum length of the input value. Used to enforce a minimum number of characters that must be entered in
+     * the field.
+     */
     minlength?: HTMLInputAttributes['minlength'];
+
+    /**
+     * The size of the field. Used to specify the width of the field in characters.
+     */
     size?: HTMLInputAttributes['size'];
+
+    /**
+     * The pattern attribute for the field. Used to specify a regular expression that the input value must match.
+     */
     pattern?: HTMLInputAttributes['pattern'];
+
+    /**
+     * The inputmode attribute for the field. Used to specify the type of keyboard to display on mobile devices.
+     */
     inputmode?: HTMLInputAttributes['inputmode'];
-  }
 
-  interface Props extends ControlProps {
-    // region Field Props
-    class?: string;
-    value?: string;
-    label?: string | Snippet;
-    labelText?: Snippet;
-    appendLabel?: Snippet;
-    hint?: string | Snippet;
-    error?: string | Snippet;
-    messages?: Snippet<[{
-      attributes: Record<string, string>;
-      errorAttributes: Record<string, string>;
-      hintAttributes: Record<string, string>;
-      error: string | Snippet | undefined;
-      hint: string | Snippet | undefined;
-    }]>;
-    prepend?: Snippet;
-    prependIcon?: string | Snippet;
-    appendIcon?: string | Snippet;
-    children?: Snippet<[string]>;
-    control?: Snippet<[ControlProps & {
-      value: string;
-      id: string;
-    }]>;
-    postfix?: Snippet;
-    // endregion
-
-    // region Events
+    // Event handlers
     onSubmit?: () => unknown;
     onPaste?: (event: ClipboardEvent) => unknown;
     onKeydown?: (event: KeyboardEvent) => unknown;
@@ -59,182 +99,122 @@
     onChange?: (event: Event) => unknown;
     onFocus?: (event: FocusEvent) => unknown;
     onBlur?: (event: FocusEvent) => unknown;
+  }
 
+  interface Props extends ControlProps {
+    // region Field Props
+
+    /**
+     * Additional class names for the field.
+     */
+    class?: string;
+    value?: string;
+
+    /**
+     * Content of the field label. Accepts a string for the plain label content or a Snippet for custom label rendering.
+     */
+    label?: string | Snippet;
+
+    /**
+     * Override label text.
+     */
+    labelText?: Snippet;
+
+    /**
+     * Optional snippet to append to the label.
+     */
+    appendLabel?: Snippet;
+
+    /**
+     * Optional hint text to display below the field. Accepted as a string or a Snippet.
+     */
+    hint?: string | Snippet;
+
+    /**
+     * Optional error message to display below the field. Accepted as a string or a Snippet.
+     */
+    error?: string | Snippet;
+
+    /**
+     * Optional snippet to display additional messages. If `messages` is provided, it needs to handle the rendering of
+     * error and hint messages.
+     */
+    messages?: Snippet<[{
+      attributes: Record<string, string>;
+      errorAttributes: Record<string, string>;
+      hintAttributes: Record<string, string>;
+      error: string | Snippet | undefined;
+      hint: string | Snippet | undefined;
+    }]>;
+    /**
+     * Optional snippet to display before the field content.
+     */
+    prepend?: Snippet;
+
+    /**
+     * Optional icon to display before the field content. Can be a string representing the icon name or a Snippet for
+     * custom rendering.
+     */
+    prependIcon?: string | Snippet;
+
+    /**
+     * Optional snippet to display after the field content. Can be a string representing the icon name or a Snippet for
+     * custom rendering.
+     */
+    appendIcon?: string | Snippet;
+
+    /**
+     * Optional snippet to display after the field control.
+     */
+    children?: Snippet<[string]>;
+
+    /**
+     * Snippet to override the default field control. It receives the field props  and the current value as arguments.
+     */
+    control?: Snippet<[ControlProps & {
+      value: string;
+      id: string;
+    }]>;
+
+    /**
+     * Optional snippet to display after the field content.
+     */
+    postfix?: Snippet;
     // endregion
 
     [key: string]: unknown;
   }
 
-  let { value = $bindable(''), ...props }: Props = $props();
-  const {
-
-    /**
-     * Additional class names for the field.
-     */
+  let {
+    value = $bindable(''),
     class: className = '',
-
-    /**
-     * Content of the field label. Accepts a string for the plain label content,
-     * or a Snippet for custom label rendering.
-     */
     label,
-
-    /**
-     * Override label text.
-     */
     labelText,
-
-    /**
-     * Optional snippet to append to the label.
-     */
     appendLabel,
-
-    /**
-     * Optional snippet to display additional messages. If `messages` is
-     * provided, it needs to handle the rendering of error and hint messages.
-     */
     messages,
-
-    /**
-     * Optional hint text to display below the field. Accepted as a string or
-     * a Snippet.
-     */
     hint,
-
-    /**
-     * Optional error message to display below the field. Accepted as a string
-     * or a Snippet.
-     */
     error,
-
-    /**
-     * Optional snippet to display before the field content.
-     */
     prepend,
-
-    /**
-     * Optional icon to display before the field content. Can be a string
-     * representing the icon name or a Snippet for custom rendering.
-     */
     prependIcon,
-
-    /**
-     * Optional snippet to display after the field content. Can be a string
-     * representing the icon name or a Snippet for custom rendering.
-     */
     appendIcon,
-
-    /**
-     * Optional snippet to display after the field control.
-     */
     children,
-
-    /**
-     * Snippet to override the default field control. It receives the field props
-     * and the current value as arguments.
-     */
     control,
-
-    /**
-     * Optional snippet to display after the field content.
-     */
     postfix,
-
-    /**
-     * The type of the field. Defaults to 'text'.
-     */
     type = 'text',
-
-    /**
-     * The name of the field. Used for form submission.
-     */
     name,
-
-    /**
-     * The placeholder text for the field. Displayed when the field is empty.
-     */
     placeholder,
-
-    /**
-     * The autocomplete attribute for the field. Used for browser autocomplete
-     * suggestions.
-     */
     autocomplete,
-
-    /**
-     * Whether the field is disabled. When true, the field is not interactive and
-     * cannot be focused.
-     */
     disabled = false,
-
-    /**
-     * Whether the field is read-only. When true, the field cannot be edited,
-     * but can be focused.
-     */
     readonly = false,
-
-    /**
-     * Whether the field is required. When true, the field must be filled out
-     * before submission.
-     */
     required = false,
-
-    /**
-     * Whether the field should be focused automatically when the page loads.
-     * When true, the field receives focus as soon as it is rendered.
-     *
-     * Note: Using the `autofocus` attribute is not recommended for
-     * accessibility reasons. It can be disruptive for users who rely on
-     * assistive technologies or keyboard navigation.
-     */
     autofocus = false,
-
-    /**
-     * The step attribute for the field. Used for numeric input types to specify
-     * the granularity of the input.
-     */
     step,
-
-    /**
-     * The maximum value for the field. Used for numeric input types to specify
-     * the upper limit of the input.
-     */
     max,
-
-    /**
-     * The maximum length of the input value. Used to limit the number of
-     * characters that can be entered in the field.
-     */
     maxlength,
-
-    /**
-     * The minimum value for the field. Used for numeric input types to specify
-     * the lower limit of the input.
-     */
     min,
-
-    /**
-     * The minimum length of the input value. Used to enforce a minimum number
-     * of characters that must be entered in the field.
-     */
     minlength,
-
-    /**
-     * The size of the field. Used to specify the width of the field in
-     * characters.
-     */
     size,
-
-    /**
-     * The pattern attribute for the field. Used to specify a regular
-     * expression that the input value must match.
-     */
     pattern,
-
-    /**
-     * The inputmode attribute for the field. Used to specify the type of
-     * keyboard to display on mobile devices.
-     */
     inputmode,
 
     onSubmit,
@@ -247,7 +227,7 @@
     onBlur,
 
     ...rest
-  } = props;
+  }: Props = $props();
   const id = $props.id();
 
   function handleKeydown(event: KeyboardEvent) {
@@ -258,7 +238,7 @@
     onKeydown?.(event);
   }
 
-  const classList = twMerge(
+  const classList = $derived(twMerge(
     'relative flex items-center flex-wrap ring-1 ring-gray-200 dark:ring-gray-700 rounded-md ' +
     'mb-2 bg-white dark:bg-black transition shadow focus:outline-none focus-within:ring-2 ' +
     'focus-within:ring-blue-500 focus-within:shadow-blue-500/10 focus-within:shadow-lg ' +
@@ -268,7 +248,7 @@
     'has-[[readonly]]:pointer-events-none has-[[data-form-field="messages"]]:mb-7 group',
     error ? 'ring-red-500 dark:ring-red-400' : '',
     className,
-  );
+  ));
 </script>
 
 <label
@@ -299,7 +279,35 @@
 
   <span class="peer/control order-3 flex flex-auto" data-form-field="control">
     {#if control}
-      {@render control({ ...props, value, id })}
+      {@render control({
+        ...rest,
+        autocomplete,
+        autofocus,
+        disabled,
+        id,
+        inputmode,
+        max,
+        maxlength,
+        min,
+        minlength,
+        name,
+        onBlur,
+        onChange,
+        onFocus,
+        onInput,
+        onKeydown,
+        onKeyup,
+        onPaste,
+        onSubmit,
+        pattern,
+        placeholder,
+        readonly,
+        required,
+        size,
+        step,
+        type,
+        value,
+      })}
     {:else}
 
       <!-- See https://stackoverflow.com/questions/57392773/75298645#75298645 -->

@@ -6,17 +6,15 @@
 
 <script lang="ts">
   import Field from '../Field/Field.svelte';
-  import { slide } from 'svelte/transition';
-  import { quintOut } from 'svelte/easing';
   import CategoryNavigation from './CategoryNavigation.svelte';
   import { emoji, emoji as items, type GroupName } from './emoji.js';
   import { onDestroy, type Snippet } from 'svelte';
   import { BROWSER } from 'esm-env';
-  import { Popover } from 'bits-ui';
+  import { Picker } from '../Picker/index.js';
 
   interface Props {
     open?: boolean;
-    trigger?: Snippet<[{ open: boolean }]>;
+    trigger?: Snippet<[{ open: boolean; props: Record<string, unknown> }]>;
     class?: string;
     onInput?: (event: EmojiPickerInputEvent) => unknown;
   }
@@ -97,40 +95,31 @@
   }
 </script>
 
-<Popover.Root bind:open={open}>
-  {#if trigger}
-    <Popover.Trigger>
-      {@render trigger({ open })}
-    </Popover.Trigger>
-  {/if}
+<Picker
+  bind:open
+  {trigger}
+  class="w-96 rounded-3xl bg-white/75 shadow-xl backdrop-blur-3xl backdrop-saturate-200
+    dark:bg-black dark:ring dark:ring-gray-800 dark:ring-opacity-50 {className}"
+>
+  <header class="px-4 pt-2">
+    <CategoryNavigation {groups} bind:active={activeGroup} />
+    <Field placeholder="Search" />
+  </header>
 
-  <Popover.Content>
-    <article
-      transition:slide={{ duration: 125, easing: quintOut }}
-      class="absolute left-0 top-full z-40 -ml-4 mt-2 w-96 rounded-3xl bg-white/75 {className}
-      shadow-xl backdrop-blur-3xl backdrop-saturate-200 dark:bg-black dark:ring dark:ring-gray-800 dark:ring-opacity-50"
-    >
-      <header class="px-4 pt-2">
-        <CategoryNavigation {groups} bind:active={activeGroup} />
-        <Field placeholder="Search" />
-      </header>
-
-      <div class="relative h-48 overflow-y-auto px-4 pt-2 select-none">
-        <ul class="grid grid-cols-8 gap-1">
-          {#each activeGroupEmoji as emoji (emoji)}
-            <li class="contents">
-              <button
-                class="focus-visible:ring-primary-500 flex h-10 w-10 items-center justify-center rounded-lg
-                outline-none transition hover:bg-gray-100 focus-visible:bg-blue-50 cursor-pointer
-                focus-visible:shadow focus-visible:ring dark:hover:bg-gray-800 dark:focus-visible:bg-blue-950/75"
-                onclick={pick(emoji)}
-              >
-                <span class="text-2xl">{emoji}</span>
-              </button>
-            </li>
-          {/each}
-        </ul>
-      </div>
-    </article>
-  </Popover.Content>
-</Popover.Root>
+  <div class="relative h-48 overflow-y-auto px-4 pt-2 select-none">
+    <ul class="grid grid-cols-8 gap-1">
+      {#each activeGroupEmoji as emoji (emoji)}
+        <li class="contents">
+          <button
+            class="focus-visible:ring-primary-500 flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg
+              outline-none transition hover:bg-gray-100 focus-visible:bg-blue-50
+              focus-visible:shadow focus-visible:ring dark:hover:bg-gray-800 dark:focus-visible:bg-blue-950/75"
+            onclick={pick(emoji)}
+          >
+            <span class="text-2xl">{emoji}</span>
+          </button>
+        </li>
+      {/each}
+    </ul>
+  </div>
+</Picker>

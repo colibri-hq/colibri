@@ -1,0 +1,64 @@
+{
+  "name": "@colibri-hq/languages",
+  "version": "0.0.1",
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "description": "ISO 639-3 language code resolution for Colibri",
+  "keywords": [
+    "colibri",
+    "iso-639",
+    "languages",
+    "i18n"
+  ],
+  "homepage": "https://github.com/colibri-hq/colibri",
+  "author": {
+    "name": "Moritz Mazetti",
+    "email": "m@9dev.de",
+    "url": "https://mazetti.me"
+  },
+  "repository": {
+    "url": "git+https://github.com/colibri-hq/colibri.git",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "scripts": {
+    "build": "rimraf dist; tsc",
+    "dev": "tsc --watch",
+    "check": "tsc --noEmit",
+    "download": "tsx scripts/download.ts",
+    "generate": "tsx scripts/generate.ts",
+    "update": "pnpm download && pnpm generate",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
+    "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
+    "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
+    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content .",
+    "prepack": "pnpm run fmt && pnpm run check && pnpm run lint && pnpm run build"
+  },
+  "devDependencies": {
+    "@colibri-hq/shared": "workspace:*",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "rimraf": "catalog:",
+    "tsx": "^4.19.4",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "esnext": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ]
+}

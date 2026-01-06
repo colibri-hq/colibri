@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import Icon from '../Icon/Icon.svelte';
+  import { IconRenderer } from '../IconRenderer/index.js';
   import type { Snippet } from 'svelte';
   import { Button, NavigationMenu } from 'bits-ui';
 
@@ -18,8 +18,8 @@
     /**
      * The icon to display next to the title.
      *
-     * If a string is provided, it will be used as the icon name. Otherwise, a
-     * Svelte component can be rendered directly.
+     * If a string is provided, it will be used as an icon URN (e.g., `urn:colibri:icon:mdi:home`).
+     * Otherwise, a Svelte component can be rendered directly.
      */
     icon?: string | Snippet;
 
@@ -27,11 +27,6 @@
      * Additional content to display inside the link.
      */
     children?: Snippet;
-
-    /**
-     * An optional emoji to display next to the title.
-     */
-    emoji?: string;
 
     /**
      * A callback function to be called when the link is clicked, if `to` is not
@@ -44,7 +39,7 @@
     [key: string]: unknown;
   }
 
-  const { title, to, icon, emoji, onClick, children, ...rest }: Props = $props();
+  const { title, to, icon, onClick, children, ...rest }: Props = $props();
 
   const ButtonRoot = Button.Root;
   const NavigationMenuItem = NavigationMenu.Item;
@@ -78,11 +73,9 @@
         aria-current={active ? 'page' : 'false'}
       >
         {#if typeof icon === 'string'}
-          <Icon class="mt-[1.5px] text-3xl sm:text-xl" name={icon} />
-        {:else if emoji}
-          <span class="text-3xl sm:text-xl">{emoji}</span>
-        {:else}
-          {@render icon?.()}
+          <IconRenderer icon={icon} class="mt-[1.5px] text-3xl sm:text-xl" fallback="folder" />
+        {:else if icon}
+          {@render icon()}
         {/if}
 
         <span class="hidden sm:contents">

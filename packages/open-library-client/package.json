@@ -2,7 +2,7 @@
   "name": "@colibri-hq/open-library-client",
   "version": "0.0.1",
   "type": "module",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "description": "Client for the Open Library API",
   "keywords": [
     "colibri",
@@ -23,7 +23,7 @@
     "url": "https://github.com/colibri-hq/colibri/issues"
   },
   "scripts": {
-    "build": "rimraf dist; tsc",
+    "build": "rimraf dist; tsc --project tsconfig.lib.json",
     "dev": "tsc --watch",
     "check": "tsc --noEmit --project tsconfig.lib.json && tsc --noEmit --project tsconfig.node.json",
     "coverage": "npx make-coverage-badge --output-path ./badges/coverage.svg",

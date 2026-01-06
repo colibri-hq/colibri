@@ -63,10 +63,10 @@ export class Client {
     return await this.loadOne<Work>(`/works/${id}.json`);
   }
 
-  async loadBookshelvesByWorkId(
+  async loadBookshelveStatsByWorkId(
     id: WorkId,
-  ): Promise<BookshelvesResponse | null> {
-    return await this.loadOne<BookshelvesResponse>(
+  ): Promise<BookshelveStatsResponse | null> {
+    return await this.loadOne<BookshelveStatsResponse>(
       `/works/${id}/bookshelves.json`,
     );
   }
@@ -110,7 +110,7 @@ export class Client {
 
   // region ISBNs
 
-  async loadIsbn(isbn: string): Promise<Edition | null> {
+  async loadEditionByIsbn(isbn: string): Promise<Edition | null> {
     return await this.loadOne<Edition>(`/isbn/${isbn}.json`, {
       redirect: "follow",
     });
@@ -485,7 +485,7 @@ type RatingsResponse = {
   counts: { "1": number; "2": number; "3": number; "4": number; "5": number };
 };
 
-type BookshelvesResponse = {
+type BookshelveStatsResponse = {
   counts: {
     want_to_read: number;
     currently_reading: number;

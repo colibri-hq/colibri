@@ -21,7 +21,7 @@
     speed = 'normal',
   }: Props = $props();
 
-  const classList = $derived.by(() => twMerge(
+  const classList = $derived(twMerge(
     {
       small: 'w-12 h-8 after:shadow-[0_1px_0_0.5px_rgba(0,0,0,0.2)]',
       medium: 'w-24 h-16 after:shadow-[0_2px_0_1px_rgba(0,0,0,0.2)]',
@@ -40,22 +40,22 @@
 
 <div class={twMerge(className, 'px-1')}>
   <div
-    class="relative flex [transform-style:preserve-3d] after:absolute after:bottom-[10%] after:left-0 after:right-0
+    class="relative flex transform-3d after:absolute after:bottom-[10%] after:left-0 after:right-0
     after:top-[5%] after:-z-10 after:bg-gray-200 after:content-[''] {classList}"
   >
     <div
-      class="absolute left-0 top-0 -mt-[10%] h-full w-1/2 bg-gradient-to-r
+      class="absolute left-0 top-0 -mt-[10%] h-full w-1/2 bg-linear-to-r
       from-gray-100 via-gray-50 via-30% to-gray-100 shadow-[0_1px_0_1px_rgba(0,0,0,0.005),0_3px_0_1px_rgba(0,0,0,0.01)]
       [clip-path:url(#book-curvature)]"
     ></div>
     <div
-      class="absolute left-1/2 top-0 -mt-[10%] h-full w-1/2 bg-gradient-to-r
+      class="absolute left-1/2 top-0 -mt-[10%] h-full w-1/2 bg-linear-to-r
       from-gray-100 via-gray-50 via-30% to-gray-100 shadow-[inset_1px_0_0_-0.5px_rgba(0,0,0,0.1)]
       [clip-path:url(#book-curvature)]"
     ></div>
     <div
       class="absolute left-0 top-0 -mt-[10%] h-full w-1/2 origin-right
-      bg-gradient-to-r from-gray-200 via-gray-100 via-30% to-gray-200 [clip-path:url(#book-curvature)]"
+      bg-linear-to-r from-gray-200 via-gray-100 via-30% to-gray-200 [clip-path:url(#book-curvature)]"
       data-flipping-page
     ></div>
   </div>

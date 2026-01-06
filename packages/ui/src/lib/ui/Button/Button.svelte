@@ -11,11 +11,22 @@
     size?: 'small' | 'medium' | 'large';
     variant?: 'subtle' | 'default' | 'primary' | 'ghost' | undefined;
 
+    /** @deprecated Use onclick instead (all lowercase) */
     onClick?: (event: MouseEvent) => unknown;
+    /** @deprecated Use onkeydown instead (all lowercase) */
     onKeydown?: (event: KeyboardEvent) => unknown;
+    /** @deprecated Use onkeypress instead (all lowercase) */
     onKeypress?: (event: KeyboardEvent) => unknown;
+    /** @deprecated Use onkeyup instead (all lowercase) */
     onKeyup?: (event: KeyboardEvent) => unknown;
+    /** @deprecated Use onsubmit instead (all lowercase) */
     onSubmit?: (event: Event) => unknown;
+
+    onclick?: (event: MouseEvent) => unknown;
+    onkeydown?: (event: KeyboardEvent) => unknown;
+    onkeypress?: (event: KeyboardEvent) => unknown;
+    onkeyup?: (event: KeyboardEvent) => unknown;
+    onsubmit?: (event: Event) => unknown;
 
     children?: Snippet;
 
@@ -34,6 +45,11 @@
     onKeypress = undefined,
     onKeyup = undefined,
     onSubmit = undefined,
+    onclick = onClick,
+    onkeydown = onKeydown,
+    onkeypress = onKeypress,
+    onkeyup = onKeyup,
+    onsubmit = onSubmit,
 
     children,
     ...rest
@@ -67,11 +83,11 @@
 <ButtonRoot
   {...rest}
   class={classList}
-  onclick={onClick}
-  onkeydown={onKeydown}
-  onkeypress={onKeypress}
-  onkeyup={onKeyup}
-  onsubmit={onSubmit}
+  {onclick}
+  {onkeydown}
+  {onkeypress}
+  {onkeyup}
+  {onsubmit}
   role={'href' in rest ? 'link' : 'button'}
 >
     {#if children}

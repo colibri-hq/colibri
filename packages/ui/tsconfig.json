@@ -2,25 +2,15 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
-    "composite": true,
-    "tsBuildInfoFile": ".cache/tsbuildinfo.json",
     "allowJs": true,
     "checkJs": true,
-    "declaration": true,
-    "declarationMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "importsNotUsedAsValues": "error",
-    "inlineSourceMap": true,
-    "inlineSources": true,
     "noUncheckedIndexedAccess": true,
-    "preserveValueImports": false,
-    "removeComments": false,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
-    "strict": true,
-    "stripInternal": true
+    "strict": true
   },
   "include": [
     "./.svelte-kit/ambient.d.ts",
@@ -32,13 +22,5 @@
     "./tests/**/*.ts",
     "./tests/**/*.svelte"
   ],
-  "exclude": ["../node_modules/**", "src/**/*.stories.svelte"],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    },
-    {
-      "path": "./tsconfig.storybook.json"
-    }
-  ]
+  "exclude": ["../node_modules/**", "src/**/*.stories.svelte"]
 }

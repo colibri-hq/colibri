@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildSearchQuery } from "./search.ts";
+import { buildSearchQuery } from "./search.js";
 
 describe("Search", () => {
   describe("Query Builder", () => {

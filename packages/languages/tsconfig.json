@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "tsBuildInfoFile": ".cache/tsbuildinfo.json"
+  },
+  "exclude": ["src/**/*.test.ts", "src/**/*.spec.ts"],
+  "include": ["src/**/*.ts"],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
+}

@@ -16,6 +16,6 @@ export default defineConfig({
     environment: "node",
     globals: true,
     include: ["tests/**/*.test.ts"],
-    reporters: ["verbose", "github-actions", "json"],
+    reporters: ["tree", "github-actions", "json"],
   },
 });

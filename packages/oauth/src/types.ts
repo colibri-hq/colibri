@@ -723,10 +723,10 @@ export interface AuthorizationServerOptions<
   AccessToken extends Entities.AccessToken = Entities.AccessToken,
   RefreshToken extends Entities.RefreshToken = Entities.RefreshToken,
   DeviceChallenge extends Entities.DeviceChallenge = Entities.DeviceChallenge,
-  AuthorizationCode extends
-    Entities.AuthorizationCode = Entities.AuthorizationCode,
-  AuthorizationRequest extends
-    Entities.AuthorizationRequest = Entities.AuthorizationRequest,
+  AuthorizationCode extends Entities.AuthorizationCode =
+    Entities.AuthorizationCode,
+  AuthorizationRequest extends Entities.AuthorizationRequest =
+    Entities.AuthorizationRequest,
 > {
   accessTokenTtl?: number;
 

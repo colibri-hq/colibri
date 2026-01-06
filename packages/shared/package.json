@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "description": "The Colibri SDK",
   "keywords": [
     "colibri",
@@ -41,26 +41,28 @@
   },
   "dependencies": {
     "blurhash": "^2.0.5",
-    "canvas": "^3.1.2",
-    "exif-reader": "^2.0.2",
-    "fast-xml-parser": "^5.2.5"
+    "canvas": "^3.2.0",
+    "exif-reader": "^2.0.3",
+    "fast-xml-parser": "^5.3.3"
   },
   "devDependencies": {
     "@eslint/js": "catalog:",
     "@sveltejs/kit": "catalog:",
     "@types/node": "catalog:",
+    "@vitest/browser": "catalog:",
+    "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
     "eslint": "catalog:",
-    "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-oxlint": "^1.6.0",
-    "eslint-plugin-svelte": "^3.10.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-oxlint": "^1.36.0",
+    "eslint-plugin-svelte": "^3.13.1",
     "globals": "catalog:",
-    "oxlint": "^1.6.0",
+    "oxlint": "^1.36.0",
     "prettier": "catalog:",
-    "prettier-plugin-organize-imports": "^4.1.0",
-    "prettier-plugin-svelte": "^3.4.0",
-    "prettier-plugin-tailwindcss": "^0.6.13",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "prettier-plugin-svelte": "^3.4.1",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "rimraf": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
@@ -103,6 +105,11 @@
       "types": "./config.d.ts",
       "default": "./vitest.config.ts"
     },
+    "./vitest.browser.config": {
+      "import": "./vitest.browser.config.ts",
+      "types": "./config.d.ts",
+      "default": "./vitest.browser.config.ts"
+    },
     "./theme.css": "./theme.css"
   },
   "sideEffects": false,
@@ -111,7 +118,9 @@
     "dist",
     "theme.css",
     "prettier.config.ts",
-    "eslint.config.ts"
+    "eslint.config.ts",
+    "vitest.config.ts",
+    "vitest.browser.config.ts"
   ],
   "publishConfig": {
     "access": "public"

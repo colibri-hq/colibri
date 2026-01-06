@@ -39,8 +39,8 @@
   /* endregion */
 }
 
-@source "../../packages/ui/src/**/*.{js,ts,svelte}";
-@source "./lib/**/*";
+@source '../../packages/ui/src/**/*.{js,ts,svelte}';
+@source './lib/**/*';
 
 @layer base {
   /* https://tailwindcss.com/docs/upgrade-guide#buttons-use-the-default-cursor */
@@ -64,12 +64,16 @@
 }
 
 @custom-variant dark {
+  /* System preference: only when no explicit color scheme is set */
   @media (prefers-color-scheme: dark) {
-    /*noinspection CssInvalidAtRule*/
-    @slot;
+    &:where(:not([data-color-scheme='light'] *, [data-color-scheme='light'])) {
+      /*noinspection CssInvalidAtRule*/
+      @slot;
+    }
   }
 
-  &:where([data-color-scheme='dark'], [data-color-scheme='dark'] *) {
+  /* Explicit dark: when inside data-color-scheme='dark' */
+  &:where([data-color-scheme='dark'] *, [data-color-scheme='dark']) {
     /*noinspection CssInvalidAtRule*/
     @slot;
   }
@@ -107,7 +111,7 @@ div.markdown-body {
     @apply text-base;
 
     & + p {
-      @apply mb-1 mt-2;
+      @apply mt-2 mb-1;
     }
   }
 
@@ -115,7 +119,7 @@ div.markdown-body {
   & h2,
   & h3,
   & h4 {
-    @apply mb-1 mt-2 font-bold;
+    @apply mt-2 mb-1 font-bold;
   }
 
   & h1 {

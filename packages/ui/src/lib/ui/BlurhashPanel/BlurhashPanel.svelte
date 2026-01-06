@@ -28,7 +28,7 @@
 
   let { class: additionalClasses = '', blurhash, size = 32 }: Props = $props();
   let canvas: HTMLCanvasElement | undefined = $state();
-  let className = twMerge('bg-white dark:bg-black dark:opacity-70', additionalClasses);
+  let className = $derived(twMerge('bg-white dark:bg-black dark:opacity-70', additionalClasses));
 
   function render(blurhash: string, size: number) {
 
@@ -41,7 +41,7 @@
     const context = canvas?.getContext('2d');
     const pixels = decode(blurhash, size, size);
 
-    context?.putImageData(new ImageData(pixels, size, size), 0, 0);
+    context?.putImageData(new ImageData(new Uint8ClampedArray(pixels.buffer as ArrayBuffer), size, size), 0, 0);
   }
 
   // Rendering will only work in the browser

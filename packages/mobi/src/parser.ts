@@ -760,6 +760,23 @@ const exthRecordParser = Parser.start()
         }),
         529: exthStringParser("originalSourceDescription"),
         535: exthStringParser("kindlegenBuildRevisionNumber"),
+
+        /**
+         * Calibre series name - custom EXTH record added by Calibre
+         * @see https://wiki.mobileread.com/wiki/Calibre_User_Manual#MOBI_Output_Metadata
+         */
+        536: exthStringParser("calibreSeries"),
+
+        /**
+         * Calibre series index/position - custom EXTH record added by Calibre
+         * Format is usually a decimal number (e.g., "1.0", "2.5")
+         */
+        537: exthStringParser("calibreSeriesIndex", {
+          formatter: (value) => {
+            const parsed = Number.parseFloat(value);
+            return Number.isNaN(parsed) ? undefined : parsed;
+          },
+        }),
       },
       defaultChoice: Parser.start<object, object>().buffer("fallback", {
         length() {
@@ -773,6 +790,8 @@ export type ExtendedHeader = {
   asin?: string;
   uuid?: string;
   bookType?: string;
+  calibreSeries?: string;
+  calibreSeriesIndex?: number;
   clippingLimit?: number;
   contributor?: string;
   coverOffset?: number;

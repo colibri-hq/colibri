@@ -33,24 +33,24 @@ npm install @colibri-hq/mobi
 ### Basic Parsing
 
 ```typescript
-import { parse } from '@colibri-hq/mobi';
+import { parse } from "@colibri-hq/mobi";
 
 // Parse a MOBI file
-const fileInput = document.getElementById('file-input');
-fileInput.addEventListener('change', async (event) => {
+const fileInput = document.getElementById("file-input");
+fileInput.addEventListener("change", async (event) => {
   const file = event.target.files[0];
   const mobi = await parse(file);
 
-  console.log('Title:', mobi.title);
-  console.log('Author:', mobi.creator);
-  console.log('Publisher:', mobi.publisher);
+  console.log("Title:", mobi.title);
+  console.log("Author:", mobi.creator);
+  console.log("Publisher:", mobi.publisher);
 
   // Access the cover image (if available)
   if (mobi.coverImage) {
-    const blob = new Blob([mobi.coverImage], { type: 'image/jpeg' });
+    const blob = new Blob([mobi.coverImage], { type: "image/jpeg" });
     const imageUrl = URL.createObjectURL(blob);
 
-    const img = document.createElement('img');
+    const img = document.createElement("img");
     img.src = imageUrl;
     document.body.appendChild(img);
   }
@@ -65,28 +65,28 @@ The parser extracts a rich set of metadata from the MOBI file:
 // Metadata available in the parsed object
 const {
   // Basic info
-  title,                   // Book title
-  creator,                 // Author
-  publisher,               // Publisher
+  title, // Book title
+  creator, // Author
+  publisher, // Publisher
 
   // Publishing information
-  publishingDate,          // Publication date
-  isbn,                    // ISBN number
-  asin,                    // Amazon identifier
+  publishingDate, // Publication date
+  isbn, // ISBN number
+  asin, // Amazon identifier
 
   // Content information
-  language,                // Book language
-  locale,                  // Book locale
-  subject,                 // Subject/category
-  synopsis,                // Book description
+  language, // Book language
+  locale, // Book locale
+  subject, // Subject/category
+  synopsis, // Book description
 
   // Technical details
-  mobiHeader,              // Raw MOBI header data
-  palmDocHeader,           // Raw PalmDoc header data
-  pdbHeader,               // Raw PDB header
+  mobiHeader, // Raw MOBI header data
+  palmDocHeader, // Raw PalmDoc header data
+  pdbHeader, // Raw PDB header
 
   // Media
-  coverImage,              // Cover image as Uint8Array
+  coverImage, // Cover image as Uint8Array
 } = mobi;
 ```
 
@@ -99,10 +99,10 @@ const {
 Parses a MOBI file and returns a promise that resolves to a `MobiBook` object containing all the extracted data.
 
 - **Parameters:**
-    - `file`: A File object representing the MOBI file to parse
+  - `file`: A File object representing the MOBI file to parse
 
 - **Returns:**
-    - Promise resolving to a `MobiBook` object
+  - Promise resolving to a `MobiBook` object
 
 ### Types
 

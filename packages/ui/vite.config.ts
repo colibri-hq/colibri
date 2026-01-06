@@ -1,3 +1,4 @@
+import { playwright } from "@vitest/browser-playwright";
 import { sveltekit } from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { svelteTesting } from "@testing-library/svelte/vite";
@@ -6,7 +7,8 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
   test: {
-    workspace: [
+    // Renamed from 'workspace' to 'projects' in Vitest 4
+    projects: [
       {
         extends: "./vite.config.ts",
         plugins: [svelteTesting()],
@@ -26,6 +28,18 @@ export default defineConfig({
           environment: "node",
           include: ["src/**/*.{test,spec}.{js,ts}"],
           exclude: ["src/**/*.svelte.{test,spec}.{js,ts}"],
+        },
+      },
+      {
+        extends: "./vite.config.ts",
+        test: {
+          name: "browser",
+          include: ["src/**/*.browser.{test,spec}.{js,ts}"],
+          browser: {
+            enabled: true,
+            provider: playwright(),
+            instances: [{ browser: "chromium" }],
+          },
         },
       },
     ],
