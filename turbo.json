@@ -39,6 +39,18 @@
         ".env*"
       ]
     },
+    "test:coverage": {
+      "dependsOn": [
+        "^test:coverage"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*"
+      ],
+      "outputs": [
+        "coverage/**"
+      ]
+    },
     "check-types": {
       "dependsOn": [
         "^check-types"

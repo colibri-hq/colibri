@@ -1,5 +1,6 @@
 -- region Slugify Function
-create extension if not exists unaccent schema public;
+create extension if not exists unaccent schema extensions;
+create extension if not exists pg_trgm schema extensions;
 create function public.slugify(value text) returns text
     language plpgsql
     immutable strict set search_path to '' as
@@ -8,7 +9,7 @@ declare
     slug text;
 begin
     -- removes accents (diacritic signs) from a given string --
-    with "unaccented" as (select public.unaccent("slugify"."value") as "value"),
+    with "unaccented" as (select extensions.unaccent("slugify"."value") as "value"),
          "lowercase" as (select lower("unaccented"."value") as "value" from "unaccented"),
          "removed_quotes" as (select regexp_replace("lowercase"."value", '[''"]+', '', 'gi') as "value"
                               from "lowercase"),

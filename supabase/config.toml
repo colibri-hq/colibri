@@ -36,9 +36,14 @@ default_pool_size = 20
 # Maximum number of client connections allowed.
 max_client_conn = 100
 
+[db.migrations]
+schema_paths = [
+  "./schemas/*.sql",
+]
+
 [db.seed]
 enabled = true
-sql_paths = ['../database/seeds/*.sql']
+sql_paths = ['./seeds/*.sql']
 
 [realtime]
 enabled = true
@@ -81,6 +86,9 @@ allowed_mime_types = ["image/*"]
 
 [storage.buckets.assets]
 public = false
+
+[storage.buckets.colibri]
+public = true
 
 [auth]
 enabled = true

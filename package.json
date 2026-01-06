@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "type": "module",
   "private": true,
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "description": "The Colibri server",
   "keywords": [
     "colibri",
@@ -31,20 +31,25 @@
     "postinstall": "lefthook install",
     "fmt": "turbo fmt",
     "lint": "turbo lint",
+    "check": "turbo check",
     "dev": "turbo dev",
     "dev:app": "turbo dev --filter=@colibri-hq/app...",
+    "dev:docs": "turbo dev --filter=@colibri-hq/docs...",
     "dev:cli": "turbo dev --filter=@colibri-hq/cli...",
     "build": "turbo build",
     "build:app": "turbo build --filter=@colibri-hq/app...",
     "build:cli": "turbo build --filter=@colibri-hq/cli...",
     "test": "turbo test",
+    "test:coverage": "turbo test:coverage",
+    "test:e2e": "pnpm --filter=@colibri-hq/app run test",
     "storybook": "pnpm --filter=@colibri-hq/ui run storybook"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild",
       "lefthook",
-      "msw"
+      "msw",
+      "statue-ssg"
     ],
     "ignoredBuiltDependencies": [
       "unrs-resolver",
@@ -53,7 +58,10 @@
   },
   "packageManager": "pnpm@10.11.0",
   "devDependencies": {
-    "lefthook": "^1.11.16",
-    "turbo": "^2.5.4"
+    "lefthook": "^1.13.6",
+    "turbo": "^2.7.2"
+  },
+  "dependencies": {
+    "glob": "^13.0.0"
   }
 }

@@ -54,3 +54,17 @@ Colibri does not aim to:
 - Replace your existing ebook reader (nor Calibre, for that matter)
 - Make it easy to pirate books
 - Be a community for exchanging books with lots of people
+
+Licensing
+---------
+Colibri is licensed under the [GNU AGPL v3](LICENSE). This means you can use, modify, and distribute it freely, but if
+you run a modified version of Colibri that is accessible to others, you must also make your modifications available
+under the same license.  
+Considering Colibri is expressly *not* intended to be run as a commercial service, this license should be a good fit.
+
+**This license applies to all packages in this monorepo, unless otherwise noted.**
+
+Contributing
+------------
+If you'd like to contribute to Colibri, please read the [contributing guidelines](CONTRIBUTING.md) first.  
+All contributions are welcome, be it code, documentation, design, or anything else!

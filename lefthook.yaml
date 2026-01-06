@@ -1,28 +1,23 @@
 pre-commit:
+  parallel: true
   commands:
     fmt:
-      run: pnpm run fmt -- '{staged_files}'
+      # Run formatter on changed files only
+      run: |
+        staged=({staged_files})
+        if [ ${#staged[@]} -gt 0 ]; then
+          pnpx prettier --write --ignore-unknown "${staged[@]}"
+        fi
       stage_fixed: true
-      glob: "*.{ts,js,svelte,css,html,md}"
+      glob: "*.{ts,js,svelte,css,html,json,md}"
       skip:
         - merge
         - rebase
-    lint:
-      run: pnpm run lint -- --filter=$(dirname) '{staged_files}'
-      stage_fixed: true
-      glob: "*.{ts,js,svelte,css,html,md}"
-    check:
-      run: pnpm run check -- '{staged_files}'
-      stage_fixed: true
-      glob:
-        - "*.{ts,js,svelte}"
-        - "tsconfig*.json"
-    test:
-      run: pnpm run test
-      glob:
-        - "*.{ts,js,svelte}"
 
 pre-push:
+  parallel: true
   commands:
+    check:
+      run: pnpm turbo run check
     test:
       run: pnpm test

@@ -23,7 +23,7 @@ services:
         host_ip: "127.0.0.1"
 
   postgres:
-    image: ghcr.io/colibri-hq/postgres:latest
+    image: ghcr.io/colibri-hq/postgres:18
     environment:
       POSTGRES_USER: colibri
       POSTGRES_PASSWORD: colibri
@@ -40,7 +40,7 @@ services:
         mode: 0777
     volumes:
       - source: postgres
-        target: /var/lib/postgresql/data
+        target: /var/lib/postgresql
         consistency: delegated
         type: volume
       - source: ./supabase
@@ -76,10 +76,7 @@ services:
         type: volume
     healthcheck:
       # language=bash
-      test: >
-        timeout 5s
-        bash -c ':> /dev/tcp/127.0.0.1/9000' 
-          || exit 1
+      test: [ "CMD", "curl", "-fs", "localhost:9000/minio/health/live" ]
       interval: 5s
       timeout: 20s
       retries: 10
