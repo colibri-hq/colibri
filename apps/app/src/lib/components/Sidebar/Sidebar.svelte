@@ -90,6 +90,7 @@
     <NavigationSection label="Library" open>
       <NavigationLink icon="person" title="Creators" to="/creators" />
       <NavigationLink icon="book" title="Books" to="/works" />
+      <NavigationLink icon="library_books" title="Series" to="/series" />
       <NavigationLink icon="domain" title="Publishers" to="/publishers" />
     </NavigationSection>
     <!-- endregion -->

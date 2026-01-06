@@ -9,6 +9,7 @@ export const load: PageLoad = async function load(event) {
   const publisher = router.books.loadPublisher.query({ workId });
   const ratings = router.books.loadRatings.query({ workId });
   const reviews = router.books.loadReviews.query({ workId });
+  const series = router.series.getForWork.query({ workId });
 
   return {
     ...event.data, // Pass through server data (work)
@@ -16,5 +17,6 @@ export const load: PageLoad = async function load(event) {
     publisher,
     ratings,
     reviews,
+    series,
   };
 };

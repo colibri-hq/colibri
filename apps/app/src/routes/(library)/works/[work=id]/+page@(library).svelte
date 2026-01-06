@@ -6,6 +6,7 @@
   export type Publisher = Awaited<PageData['publisher']>;
   export type Rating = Awaited<PageData['ratings']>[number];
   export type Review = Awaited<PageData['reviews']>[number];
+  export type SeriesInfo = Awaited<PageData['series']>[number];
 </script>
 
 <script lang="ts">
@@ -29,6 +30,7 @@
   import EnrichmentBadge from '$lib/components/Enrichment/EnrichmentBadge.svelte';
   import EnrichmentReviewModal from '$lib/components/Enrichment/EnrichmentReviewModal.svelte';
   import { getEnrichmentStatus, markEnriching, markEnrichmentAvailable, clearEnrichmentStatus } from '$lib/enrichment';
+  import SeriesBadge from '$lib/components/SeriesBadge.svelte';
   import type { PageProps } from './$types';
 
   let { data }: PageProps = $props();
@@ -37,6 +39,7 @@
   let publisher = $derived(data.publisher);
   let ratings = $derived(data.ratings);
   let reviews = $derived(data.reviews);
+  let series = $derived(data.series);
 
   let comments = writable<RouterOutputs['comments']['load']>([]);
   let commentsLoading = $state(true);
@@ -291,6 +294,16 @@
                 <span>{index < essentialCreators.length - 1 ? ' & ' : ''}</span>
               {/each}
             </span>
+          {/await}
+
+          {#await series then seriesList}
+            {#if seriesList.length > 0}
+              <div class="mt-2 flex flex-wrap gap-2">
+                {#each seriesList as s (s.id)}
+                  <SeriesBadge series={s} />
+                {/each}
+              </div>
+            {/if}
           {/await}
 
           <RatingWidget work={work} class="-ml-3" data-animatable="ratings" {ratings} />

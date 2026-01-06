@@ -232,5 +232,54 @@ export function deleteSeries(database: Database, id: string) {
   return database.deleteFrom(table).where("id", "=", id).execute();
 }
 
+/**
+ * Load all series a work belongs to
+ */
+export function loadSeriesForWork(database: Database, workId: string) {
+  return database
+    .selectFrom("series_entry")
+    .innerJoin("series", "series.id", "series_entry.series_id")
+    .selectAll("series")
+    .select("series_entry.position as series_position")
+    .where("series_entry.work_id", "=", workId)
+    .orderBy("series.name", "asc")
+    .execute();
+}
+
+/**
+ * Load series with work counts for list views
+ */
+export function loadSeriesWithWorkCount(
+  database: Database,
+  page?: number,
+  perPage: number = 50,
+) {
+  let query = database
+    .selectFrom(table)
+    .leftJoin("series_entry", "series_entry.series_id", "series.id")
+    .selectAll("series")
+    .select((eb) => eb.fn.count("series_entry.work_id").as("work_count"))
+    .groupBy("series.id")
+    .orderBy("name", "asc");
+
+  if (page !== undefined && page > 0) {
+    query = query.limit(perPage).offset((page - 1) * perPage);
+  }
+
+  return query.execute();
+}
+
+/**
+ * Count total series for pagination
+ */
+export async function countSeries(database: Database) {
+  const result = await database
+    .selectFrom(table)
+    .select((eb) => eb.fn.countAll().as("count"))
+    .executeTakeFirstOrThrow();
+
+  return Number(result.count);
+}
+
 type _Table = Schema[typeof table];
 export type Series = Selectable<$Series>;

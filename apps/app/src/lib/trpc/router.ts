@@ -8,6 +8,7 @@ import { languages } from "$lib/trpc/routes/languages";
 import { notifications } from "$lib/trpc/routes/notifications";
 import { publishers } from "$lib/trpc/routes/publishers";
 import { search } from "$lib/trpc/routes/search";
+import { series } from "$lib/trpc/routes/series";
 import { settings } from "$lib/trpc/routes/settings";
 import { users } from "$lib/trpc/routes/users";
 import { t } from "$lib/trpc/t";
@@ -28,6 +29,7 @@ export const router = t.router({
   notifications,
   publishers,
   search,
+  series,
   settings,
   users,
 });
