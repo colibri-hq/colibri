@@ -1,11 +1,90 @@
 {
-  "name": "docs",
+  "name": "@colibri-hq/docs",
+  "description": "Documentation for Colibri",
+  "keywords": [
+    "colibri",
+    "server",
+    "ebooks",
+    "ebook-management",
+    "epub",
+    "opds"
+  ],
   "version": "0.0.1",
-  "type": "module",
+  "license": "AGPL-3.0-or-later",
   "private": true,
-  "license": "MIT",
-  "scripts": {
-    "build": "true"
+  "type": "module",
+  "homepage": "https://github.com/colibri-hq/colibri",
+  "author": {
+    "name": "Moritz Mazetti",
+    "email": "m@9dev.de",
+    "url": "https://mazetti.me"
   },
-  "devDependencies": {}
+  "repository": {
+    "url": "git+https://github.com/colibri-hq/colibri.git",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "dependencies": {
+    "@colibri-hq/shared": "workspace:*",
+    "@colibri-hq/ui": "workspace:*",
+    "@fontsource-variable/material-symbols-outlined": "catalog:",
+    "@fontsource/neuton": "catalog:",
+    "@fontsource/titillium-web": "catalog:",
+    "@lucide/svelte": "^0.562.0",
+    "gray-matter": "^4.0.3",
+    "hash-wasm": "^4.12.0",
+    "marked": "^17.0.1",
+    "mermaid": "^11.12.2",
+    "rehype-mermaid": "^3.0.0",
+    "unist-util-visit": "^5.0.0"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/kit": "catalog:",
+    "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "eslint": "catalog:",
+    "github-slugger": "^2.0.0",
+    "glob": "^11.0.0",
+    "mdsvex": "^0.12.6",
+    "pagefind": "^1.4.0",
+    "prettier": "catalog:",
+    "rehype-slug": "^6.0.0",
+    "rehype-unwrap-images": "^1.0.0",
+    "remark": "^15.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-toc": "^9.0.0",
+    "shiki": "^3.20.0",
+    "svelte": "catalog:",
+    "svelte-check": "catalog:",
+    "tailwind-merge": "catalog:",
+    "tailwindcss": "catalog:",
+    "tsx": "^4.21.0",
+    "typescript": "catalog:",
+    "unified": "^11.0.5",
+    "vite": "catalog:"
+  },
+  "scripts": {
+    "dev": "vite dev",
+    "prebuild": "node scripts/generate-git-dates.js",
+    "build": "vite build && pagefind --site dist",
+    "preview": "vite preview",
+    "prepare": "svelte-kit sync || echo ''",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
+    "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
+    "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
+    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content .",
+    "test-ct": "playwright test -c playwright-ct.config.ts",
+    "test": "playwright test -c playwright.config.ts",
+    "test:vitest": "vitest",
+    "test:browser": "vitest --project browser"
+  },
+  "config": {
+    "contentDir": "content/",
+    "outputDir": "dist/"
+  }
 }

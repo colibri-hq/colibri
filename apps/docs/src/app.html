@@ -1,0 +1,38 @@
+<!doctype html>
+<html
+  lang="en"
+  class="bg-radial-[at_150%_0%] from-gray-50 via-gray-100 via-80% to-gray-200 to-100% text-black transition
+  duration-300 dark:from-black dark:via-gray-950 dark:to-gray-900 dark:text-white scheme-light dark:scheme-dark"
+>
+<head>
+  <meta charset="utf-8" />
+  <script>
+    // Apply theme immediately to prevent flash
+    (function() {
+      const theme = localStorage.getItem('theme');
+      const html = document.documentElement;
+      if (theme === 'light' || theme === 'dark') {
+        html.setAttribute('data-color-scheme', theme);
+        html.style.colorScheme = theme;
+      } else {
+        // 'auto' or no preference - let system preference take over
+        html.style.colorScheme = 'light dark';
+      }
+    })();
+  </script>
+  <link rel="icon" type="image/svg+xml" href="%sveltekit.assets%/favicon.svg" />
+  <link rel="icon" type="image/png" href="%sveltekit.assets%/favicon.png" />
+  <link rel="apple-touch-icon" href="%sveltekit.assets%/apple-touch-icon.png" />
+  <link
+    rel="alternate"
+    type="application/rss+xml"
+    title="Colibri Documentation RSS"
+    href="/feed.xml"
+  />
+  <meta name="viewport" content="width=device-width" />
+  %sveltekit.head%
+</head>
+<body data-sveltekit-preload-data="hover" class="min-h-screen flex flex-col">
+<div style="display: contents">%sveltekit.body%</div>
+</body>
+</html>
