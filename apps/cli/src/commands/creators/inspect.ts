@@ -52,8 +52,14 @@ export default class Inspect extends BaseCommand<typeof Inspect> {
           { key: "Image", value: creator.image },
           { key: "URL", value: creator.url },
           { key: "Sorting Key", value: creator.sorting_key },
-          { key: "Created At", value: creator.created_at.toLocaleString(this.flags.displayLocale) },
-          { key: "Updated At", value: creator.updated_at?.toLocaleString(this.flags.displayLocale) },
+          {
+            key: "Created At",
+            value: creator.created_at.toLocaleString(this.flags.displayLocale),
+          },
+          {
+            key: "Updated At",
+            value: creator.updated_at?.toLocaleString(this.flags.displayLocale),
+          },
           { key: "Updated By", value: creator.updated_by },
         ],
         [

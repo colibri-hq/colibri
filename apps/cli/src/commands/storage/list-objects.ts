@@ -56,7 +56,7 @@ export class ListObjects extends BaseCommand<typeof ListObjects> {
         { accessor: "Owner", name: "Owner" },
         { accessor: "StorageClass", name: "Storage Class" },
         {
-          format: (etag) => etag?.toString()?.replace(/"/g, "") ?? "—",
+          format: (etag) => etag?.toString()?.replaceAll('"', "") ?? "—",
           name: "ETag",
         },
       ]),

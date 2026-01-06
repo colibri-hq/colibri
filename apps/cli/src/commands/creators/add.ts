@@ -1,7 +1,7 @@
 import { createCreator, findCreatorByName } from "@colibri-hq/sdk";
 import { Args, Flags } from "@oclif/core";
-import { BaseCommand } from "../../command.js";
 import { bold, gray } from "ansis";
+import { BaseCommand } from "../../command.js";
 
 export class Add extends BaseCommand<typeof Add> {
   static override args = {

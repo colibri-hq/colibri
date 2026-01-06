@@ -36,9 +36,16 @@ export default class Connect extends BaseCommand<typeof Connect> {
   ];
 
   async run() {
-    const instanceUri = this.instance
-      ? this.instance.url
-      : await promptForInstance();
+    // For the connect command, we get the instance URL directly from flags
+    // rather than through this.instance (which would throw if not configured)
+    let instanceUri: URL;
+    if (this.flags.instance) {
+      instanceUri = new URL("/", this.flags.instance);
+    } else if (this.colibriConfig?.defaultInstance) {
+      instanceUri = new URL("/", this.colibriConfig.defaultInstance);
+    } else {
+      instanceUri = await promptForInstance();
+    }
 
     try {
       // Try to connect to the database

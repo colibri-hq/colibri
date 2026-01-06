@@ -1,6 +1,5 @@
 import { getStorageDsn, updateStorageDsn } from "@colibri-hq/sdk/storage";
 import { Flags } from "@oclif/core";
-import { dim } from "ansis";
 import { BaseCommand } from "../../command.js";
 
 export class Connect extends BaseCommand<typeof Connect> {
@@ -59,9 +58,9 @@ export class Connect extends BaseCommand<typeof Connect> {
     } = this.flags;
     const dsn = new URL(endpoint);
 
-    if (dsn.protocol !== "http:") {
+    if (dsn.protocol !== "http:" && dsn.protocol !== "https:") {
       this.error(
-        `Invalid protocol "${dsn.protocol}" in endpoint URL: Only "http(s):" is supported`,
+        `Invalid protocol "${dsn.protocol}" in endpoint URL: Only "http:" or "https:" is supported`,
       );
     }
 
@@ -73,16 +72,22 @@ export class Connect extends BaseCommand<typeof Connect> {
       dsn.searchParams.set("region", region);
     }
 
-    const existingDsn = await getStorageDsn(database);
+    // Check if a storage connection already exists
+    let existingDsn: null | string = null;
+    try {
+      existingDsn = await getStorageDsn(database);
+    } catch {
+      // No existing DSN configured - this is fine for initial setup
+    }
 
     if (existingDsn && !force) {
       this.error(
-        `Storage connection already exists at "${existingDsn}". Use --force to overwrite.`,
+        `Storage connection already exists at "${new URL(existingDsn).origin}". Use --force to overwrite.`,
       );
     }
 
     await updateStorageDsn(database, dsn.toString());
 
-    this.logToStderr(dim(`Connected to storage provider "${dsn.origin}".`));
+    this.log(`Connected to storage provider "${dsn.origin}".`);
   }
 }

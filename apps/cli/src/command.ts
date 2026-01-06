@@ -110,6 +110,25 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     return this.#storage;
   }
 
+  protected async catch(err: Error & { exitCode?: number }) {
+    if (err.cause === Aborted) {
+      this.logToStderr("Aborted.");
+      this.exit(2);
+    }
+
+    return super.catch(err);
+  }
+
+  protected async finally(_error: Error | undefined) {
+    try {
+      await this.#instance?.database?.destroy();
+    } catch {
+      // no-op
+    }
+    // Let oclif handle the exit - don't call this.exit() explicitly
+    // as it can cause output buffering issues
+  }
+
   public async init() {
     await super.init();
 
@@ -125,24 +144,5 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
     this.args = args as Args<T>;
     this.rawArgs = argv.map((arg) => String(arg).trim());
     this.colibriConfig = await flags["config-file"].load();
-  }
-
-  protected async catch(err: Error & { exitCode?: number }) {
-    if (err.cause === Aborted) {
-      this.logToStderr("Aborted.");
-      this.exit(2);
-    }
-
-    return super.catch(err);
-  }
-
-  protected async finally(error: Error | undefined) {
-    try {
-      await this.instance.database?.destroy();
-    } catch {
-      // no-op
-    }
-
-    return super.finally(error);
   }
 }

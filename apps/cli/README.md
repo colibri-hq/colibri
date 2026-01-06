@@ -22,7 +22,7 @@ $ npm install -g @colibri-hq/cli
 $ colibri COMMAND
 running command...
 $ colibri (--version)
-@colibri-hq/cli/0.0.1 darwin-arm64 node-v23.10.0
+@colibri-hq/cli/0.0.1 darwin-arm64 node-v24.3.0
 $ colibri --help [COMMAND]
 USAGE
   $ colibri COMMAND
@@ -36,6 +36,16 @@ USAGE
 <!-- commands -->
 
 - [`colibri connect DSN`](#colibri-connect-dsn)
+- [`colibri creators`](#colibri-creators)
+- [`colibri creators add NAME`](#colibri-creators-add-name)
+- [`colibri creators edit IDENTIFIER`](#colibri-creators-edit-identifier)
+- [`colibri creators get IDENTIFIER`](#colibri-creators-get-identifier)
+- [`colibri creators inspect IDENTIFIER`](#colibri-creators-inspect-identifier)
+- [`colibri creators list`](#colibri-creators-list)
+- [`colibri creators ls`](#colibri-creators-ls)
+- [`colibri creators show IDENTIFIER`](#colibri-creators-show-identifier)
+- [`colibri discovery preview [INPUT]`](#colibri-discovery-preview-input)
+- [`colibri discovery preview-coordinator [TITLE]`](#colibri-discovery-preview-coordinator-title)
 - [`colibri help [COMMAND]`](#colibri-help-command)
 - [`colibri login`](#colibri-login)
 - [`colibri oauth`](#colibri-oauth)
@@ -53,16 +63,24 @@ USAGE
 - [`colibri plugins uninstall [PLUGIN]`](#colibri-plugins-uninstall-plugin)
 - [`colibri plugins unlink [PLUGIN]`](#colibri-plugins-unlink-plugin)
 - [`colibri plugins update`](#colibri-plugins-update)
+- [`colibri publishers`](#colibri-publishers)
+- [`colibri publishers edit IDENTIFIER`](#colibri-publishers-edit-identifier)
+- [`colibri publishers get IDENTIFIER`](#colibri-publishers-get-identifier)
+- [`colibri publishers inspect IDENTIFIER`](#colibri-publishers-inspect-identifier)
+- [`colibri publishers list`](#colibri-publishers-list)
+- [`colibri publishers ls`](#colibri-publishers-ls)
+- [`colibri publishers show IDENTIFIER`](#colibri-publishers-show-identifier)
 - [`colibri settings`](#colibri-settings)
 - [`colibri settings get`](#colibri-settings-get)
 - [`colibri settings set KEY VALUE`](#colibri-settings-set-key-value)
 - [`colibri settings version`](#colibri-settings-version)
-- [`colibri storage config`](#colibri-storage-config)
-- [`colibri storage config get`](#colibri-storage-config-get)
-- [`colibri storage config set`](#colibri-storage-config-set)
+- [`colibri storage connect`](#colibri-storage-connect)
 - [`colibri storage copy SOURCE DESTINATION`](#colibri-storage-copy-source-destination)
 - [`colibri storage cp SOURCE DESTINATION`](#colibri-storage-cp-source-destination)
+- [`colibri storage lb`](#colibri-storage-lb)
 - [`colibri storage list [BUCKET]`](#colibri-storage-list-bucket)
+- [`colibri storage list-buckets`](#colibri-storage-list-buckets)
+- [`colibri storage list-objects [BUCKET]`](#colibri-storage-list-objects-bucket)
 - [`colibri storage ls [BUCKET]`](#colibri-storage-ls-bucket)
 - [`colibri storage make-bucket BUCKET`](#colibri-storage-make-bucket-bucket)
 - [`colibri storage mb BUCKET`](#colibri-storage-mb-bucket)
@@ -76,6 +94,11 @@ USAGE
 - [`colibri users add EMAIL`](#colibri-users-add-email)
 - [`colibri users remove USER`](#colibri-users-remove-user)
 - [`colibri users update USER`](#colibri-users-update-user)
+- [`colibri works`](#colibri-works)
+- [`colibri works add FILE`](#colibri-works-add-file)
+- [`colibri works inspect FILE`](#colibri-works-inspect-file)
+- [`colibri works list`](#colibri-works-list)
+- [`colibri works ls`](#colibri-works-ls)
 
 ## `colibri connect DSN`
 
@@ -107,6 +130,366 @@ EXAMPLES
 
 _See code: [src/commands/connect.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/connect.ts)_
 
+## `colibri creators`
+
+List all creators in the database
+
+```
+USAGE
+  $ colibri creators [--json] [-c <value>] [-i <value>] [-v]
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  List all creators in the database
+
+ALIASES
+  $ colibri creators
+  $ colibri creators ls
+
+EXAMPLES
+  $ colibri creators
+```
+
+## `colibri creators add NAME`
+
+Add a new creator to the database
+
+```
+USAGE
+  $ colibri creators add NAME [--json] [-c <value>] [-i <value>] [-v] [-a <value>] [-d <value>] [-g <value>] [-I
+    <value>] [--no-discovery] [-s <value>] [-u <value>] [-w <value>]
+
+ARGUMENTS
+  NAME  Name of the creator
+
+FLAGS
+  -I, --image=<value>          Image file for the creator
+  -a, --amazon-id=<value>      Amazon Author ID
+  -d, --description=<value>    Description of the creator
+  -g, --goodreads-id=<value>   Goodreads Author ID
+  -s, --sorting-key=<value>    Key used for sorting. Defaults to the creator's name
+  -u, --url=<value>            URL to creator's website
+  -w, --wikipedia-url=<value>  URL to creator's Wikipedia page
+      --no-discovery           Disable automatic discovery of missing metadata for this creator and leave fields empty
+                               instead
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  Add a new creator to the database
+
+EXAMPLES
+  $ colibri creators add
+```
+
+_See code: [src/commands/creators/add.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/creators/add.ts)_
+
+## `colibri creators edit IDENTIFIER`
+
+Edit an existing creator
+
+```
+USAGE
+  $ colibri creators edit IDENTIFIER [--json] [-c <value>] [-i <value>] [-v] [-a <value>] [-d <value>] [-g <value>]
+    [-I <value>] [-n <value>] [-s <value>] [-u <value>] [-w <value>]
+
+ARGUMENTS
+  IDENTIFIER  ID of the creator to edit
+
+FLAGS
+  -I, --image=<value>          Image file for the creator
+  -a, --amazon-id=<value>      Amazon Author ID
+  -d, --description=<value>    Description of the creator
+  -g, --goodreads-id=<value>   Goodreads Author ID
+  -n, --name=<value>           Name of the creator
+  -s, --sorting-key=<value>    Key used for sorting. Defaults to the creator's name
+  -u, --url=<value>            URL to creator's website
+  -w, --wikipedia-url=<value>  URL to creator's Wikipedia page
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  Edit an existing creator
+```
+
+_See code: [src/commands/creators/edit.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/creators/edit.ts)_
+
+## `colibri creators get IDENTIFIER`
+
+Inspect a creator by ID or name
+
+```
+USAGE
+  $ colibri creators get IDENTIFIER [--json] [-c <value>] [-i <value>] [-v]
+
+ARGUMENTS
+  IDENTIFIER  The ID or name of the creator to inspect
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  Inspect a creator by ID or name
+
+ALIASES
+  $ colibri creators get
+  $ colibri creators show
+
+EXAMPLES
+  $ colibri creators get
+```
+
+## `colibri creators inspect IDENTIFIER`
+
+Inspect a creator by ID or name
+
+```
+USAGE
+  $ colibri creators inspect IDENTIFIER [--json] [-c <value>] [-i <value>] [-v]
+
+ARGUMENTS
+  IDENTIFIER  The ID or name of the creator to inspect
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  Inspect a creator by ID or name
+
+ALIASES
+  $ colibri creators get
+  $ colibri creators show
+
+EXAMPLES
+  $ colibri creators inspect
+```
+
+_See code: [src/commands/creators/inspect.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/creators/inspect.ts)_
+
+## `colibri creators list`
+
+List all creators in the database
+
+```
+USAGE
+  $ colibri creators list [--json] [-c <value>] [-i <value>] [-v]
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  List all creators in the database
+
+ALIASES
+  $ colibri creators
+  $ colibri creators ls
+
+EXAMPLES
+  $ colibri creators list
+```
+
+_See code: [src/commands/creators/list.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/creators/list.ts)_
+
+## `colibri creators ls`
+
+List all creators in the database
+
+```
+USAGE
+  $ colibri creators ls [--json] [-c <value>] [-i <value>] [-v]
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  List all creators in the database
+
+ALIASES
+  $ colibri creators
+  $ colibri creators ls
+
+EXAMPLES
+  $ colibri creators ls
+```
+
+## `colibri creators show IDENTIFIER`
+
+Inspect a creator by ID or name
+
+```
+USAGE
+  $ colibri creators show IDENTIFIER [--json] [-c <value>] [-i <value>] [-v]
+
+ARGUMENTS
+  IDENTIFIER  The ID or name of the creator to inspect
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  Inspect a creator by ID or name
+
+ALIASES
+  $ colibri creators get
+  $ colibri creators show
+
+EXAMPLES
+  $ colibri creators show
+```
+
+## `colibri discovery preview [INPUT]`
+
+Preview enhanced metadata discovery from ebook files with optional flag overrides, or manual input search
+
+```
+USAGE
+  $ colibri discovery preview [INPUT] [--json] [-c <value>] [-i <value>] [-v] [-c <value>...] [-f] [-i <value>] [-l
+    <value>] [--output-format table|json|detailed] [-p <value>] [--show-confidence] [--show-raw] [-s <value>...]
+    [--year-from <value>] [--year-to <value>]
+
+ARGUMENTS
+  INPUT  Ebook file path or title of the book to discover metadata for
+
+FLAGS
+  -c, --creator=<value>...      Names of creators/authors (overrides embedded metadata when provided)
+  -f, --fuzzy                   Use fuzzy matching for search terms
+  -i, --isbn=<value>            ISBN of the book (overrides embedded metadata when provided)
+  -l, --language=<value>        Language code (e.g., 'en', 'fr', 'spa') - overrides embedded metadata when provided
+  -p, --publisher=<value>       Publisher name (overrides embedded metadata when provided)
+  -s, --subject=<value>...      Subject/genre terms (overrides embedded metadata when provided)
+      --output-format=<option>  [default: detailed] Output format: table, json, detailed
+                                <options: table|json|detailed>
+      --show-confidence         Show confidence scores and source attribution
+      --show-raw                Show raw metadata from each provider
+      --year-from=<value>       Earliest publication year (overrides embedded date when provided)
+      --year-to=<value>         Latest publication year (overrides embedded date when provided)
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  Preview enhanced metadata discovery from ebook files with optional flag overrides, or manual input search
+
+EXAMPLES
+  Preview metadata discovery from an EPUB file
+
+    $ colibri discovery preview ./book.epub
+
+  Preview metadata discovery from a PDF file
+
+    $ colibri discovery preview ./document.pdf
+
+  Preview metadata discovery from a MOBI file
+
+    $ colibri discovery preview ./book.mobi
+
+  Override embedded metadata with custom author and language
+
+    $ colibri discovery preview ./book.epub --creator 'Override Author' --language eng
+
+  Add ISBN and subject when missing from embedded metadata
+
+    $ colibri discovery preview ./book.pdf --isbn '978-0-123456-78-9' --subject 'Science Fiction'
+
+  Override publisher and specify publication year range
+
+    $ colibri discovery preview ./book.epub --publisher 'Custom Publisher' --year-from 2020 --year-to 2023
+
+  Preview metadata discovery for 'The Great Gatsby' (manual input)
+
+    $ colibri discovery preview 'The Great Gatsby'
+
+  Preview metadata discovery by ISBN only
+
+    $ colibri discovery preview --isbn '978-0-7432-7356-5'
+
+  Manual search with fuzzy matching enabled
+
+    $ colibri discovery preview --creator 'F. Scott Fitzgerald' --subject 'Classic Literature' --fuzzy
+```
+
+_See code: [src/commands/discovery/preview.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/discovery/preview.ts)_
+
+## `colibri discovery preview-coordinator [TITLE]`
+
+Preview enhanced metadata discovery with multiple providers and coordination
+
+```
+USAGE
+  $ colibri discovery preview-coordinator [TITLE] [--json] [-c <value>] [-i <value>] [-v] [-c <value>...] [-f] [-i <value>] [-l
+    <value>] [-p <value>] [--show-confidence] [--show-raw] [-s <value>...] [--year-from <value>] [--year-to <value>]
+
+ARGUMENTS
+  TITLE  Title of the book to discover metadata for
+
+FLAGS
+  -c, --creator=<value>...  Names of creators associated with the book
+  -f, --fuzzy               Use fuzzy matching for search terms
+  -i, --isbn=<value>        ISBN of the book
+  -l, --language=<value>    Language of the book
+  -p, --publisher=<value>   Publisher of the book
+  -s, --subject=<value>...  One or more subjects of the book
+      --show-confidence     Show confidence scores and source attribution
+      --show-raw            Show raw metadata from each provider
+      --year-from=<value>   Earliest publication year
+      --year-to=<value>     Latest publication year
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  Preview enhanced metadata discovery with multiple providers and coordination
+
+EXAMPLES
+  Preview coordinated metadata discovery for 'The Great Gatsby'
+
+    $ colibri discovery preview-coordinator 'The Great Gatsby'
+
+  Preview coordinated metadata discovery by ISBN
+
+    $ colibri discovery preview-coordinator --isbn '978-0-7432-7356-5'
+
+  Preview multi-provider, multi-criteria metadata discovery
+
+    $ colibri discovery preview-coordinator 'The Hobbit' --creator 'J.R.R. Tolkien' --language eng --subject Fantasy
+```
+
+_See code: [src/commands/discovery/preview-coordinator.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/discovery/preview-coordinator.ts)_
+
 ## `colibri help [COMMAND]`
 
 Display help for colibri.
@@ -125,7 +508,7 @@ DESCRIPTION
   Display help for colibri.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.2.28/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.2.32/src/commands/help.ts)_
 
 ## `colibri login`
 
@@ -356,7 +739,7 @@ EXAMPLES
   $ colibri plugins
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.38/src/commands/plugins/index.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.46/src/commands/plugins/index.ts)_
 
 ## `colibri plugins add PLUGIN`
 
@@ -430,7 +813,7 @@ EXAMPLES
   $ colibri plugins inspect myplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.38/src/commands/plugins/inspect.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.46/src/commands/plugins/inspect.ts)_
 
 ## `colibri plugins install PLUGIN`
 
@@ -479,7 +862,7 @@ EXAMPLES
     $ colibri plugins install someuser/someplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.38/src/commands/plugins/install.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.46/src/commands/plugins/install.ts)_
 
 ## `colibri plugins link PATH`
 
@@ -510,7 +893,7 @@ EXAMPLES
   $ colibri plugins link myplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.38/src/commands/plugins/link.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.46/src/commands/plugins/link.ts)_
 
 ## `colibri plugins remove [PLUGIN]`
 
@@ -551,7 +934,7 @@ FLAGS
   --reinstall  Reinstall all plugins after uninstalling.
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.38/src/commands/plugins/reset.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.46/src/commands/plugins/reset.ts)_
 
 ## `colibri plugins uninstall [PLUGIN]`
 
@@ -579,7 +962,7 @@ EXAMPLES
   $ colibri plugins uninstall myplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.38/src/commands/plugins/uninstall.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.46/src/commands/plugins/uninstall.ts)_
 
 ## `colibri plugins unlink [PLUGIN]`
 
@@ -623,7 +1006,204 @@ DESCRIPTION
   Update installed plugins.
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.38/src/commands/plugins/update.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.4.46/src/commands/plugins/update.ts)_
+
+## `colibri publishers`
+
+List all publishers
+
+```
+USAGE
+  $ colibri publishers [--json] [-c <value>] [-i <value>] [-v]
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  List all publishers
+
+ALIASES
+  $ colibri publishers
+  $ colibri publishers ls
+
+EXAMPLES
+  List all publishers
+
+    $ colibri publishers
+```
+
+## `colibri publishers edit IDENTIFIER`
+
+Edit a publisher
+
+```
+USAGE
+  $ colibri publishers edit IDENTIFIER [--json] [-c <value>] [-i <value>] [-v] [-d <value>] [-I <value>] [-n <value>]
+    [-s <value>] [-u <value>] [-w <value>]
+
+ARGUMENTS
+  IDENTIFIER  The ID of the publisher to edit
+
+FLAGS
+  -I, --image=<value>          Image file for the publisher
+  -d, --description=<value>    New description for the publisher
+  -n, --name=<value>           New name for the publisher
+  -s, --sorting-key=<value>    Key used for sorting. Defaults to the publisher's name
+  -u, --url=<value>            URL to publisher's website
+  -w, --wikipedia-url=<value>  URL to publisher's Wikipedia page
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  Edit a publisher
+
+EXAMPLES
+  $ colibri publishers edit <identifier>
+
+  $ colibri publishers edit <identifier> --name 'New Publisher Name'
+```
+
+_See code: [src/commands/publishers/edit.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/publishers/edit.ts)_
+
+## `colibri publishers get IDENTIFIER`
+
+Inspect a publisher
+
+```
+USAGE
+  $ colibri publishers get IDENTIFIER [--json] [-c <value>] [-i <value>] [-v]
+
+ARGUMENTS
+  IDENTIFIER  The ID of the publisher to inspect
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  Inspect a publisher
+
+ALIASES
+  $ colibri publishers get
+  $ colibri publishers show
+```
+
+## `colibri publishers inspect IDENTIFIER`
+
+Inspect a publisher
+
+```
+USAGE
+  $ colibri publishers inspect IDENTIFIER [--json] [-c <value>] [-i <value>] [-v]
+
+ARGUMENTS
+  IDENTIFIER  The ID of the publisher to inspect
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  Inspect a publisher
+
+ALIASES
+  $ colibri publishers get
+  $ colibri publishers show
+```
+
+_See code: [src/commands/publishers/inspect.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/publishers/inspect.ts)_
+
+## `colibri publishers list`
+
+List all publishers
+
+```
+USAGE
+  $ colibri publishers list [--json] [-c <value>] [-i <value>] [-v]
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  List all publishers
+
+ALIASES
+  $ colibri publishers
+  $ colibri publishers ls
+
+EXAMPLES
+  List all publishers
+
+    $ colibri publishers list
+```
+
+_See code: [src/commands/publishers/list.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/publishers/list.ts)_
+
+## `colibri publishers ls`
+
+List all publishers
+
+```
+USAGE
+  $ colibri publishers ls [--json] [-c <value>] [-i <value>] [-v]
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  List all publishers
+
+ALIASES
+  $ colibri publishers
+  $ colibri publishers ls
+
+EXAMPLES
+  List all publishers
+
+    $ colibri publishers ls
+```
+
+## `colibri publishers show IDENTIFIER`
+
+Inspect a publisher
+
+```
+USAGE
+  $ colibri publishers show IDENTIFIER [--json] [-c <value>] [-i <value>] [-v]
+
+ARGUMENTS
+  IDENTIFIER  The ID of the publisher to inspect
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  Inspect a publisher
+
+ALIASES
+  $ colibri publishers get
+  $ colibri publishers show
+```
 
 ## `colibri settings`
 
@@ -716,71 +1296,22 @@ DESCRIPTION
 
 _See code: [src/commands/settings/version.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/settings/version.ts)_
 
-## `colibri storage config`
+## `colibri storage connect`
 
-Get the current storage configuration.
-
-```
-USAGE
-  $ colibri storage config [-c <value>] [-i <value>] [-v] [-E | --json]
-
-FLAGS
-  -E, --env  Output the configuration in a format suitable for .env files.
-
-GLOBAL FLAGS
-  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
-  -i, --instance=<value>     The URL of your Colibri instance.
-  -v, --verbose              Show verbose output.
-      --json                 Format output as json.
-
-DESCRIPTION
-  Get the current storage configuration.
-
-ALIASES
-  $ colibri storage config
-```
-
-## `colibri storage config get`
-
-Get the current storage configuration.
+Connect to the storage service.
 
 ```
 USAGE
-  $ colibri storage config get [-c <value>] [-i <value>] [-v] [-E | --json]
-
-FLAGS
-  -E, --env  Output the configuration in a format suitable for .env files.
-
-GLOBAL FLAGS
-  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
-  -i, --instance=<value>     The URL of your Colibri instance.
-  -v, --verbose              Show verbose output.
-      --json                 Format output as json.
-
-DESCRIPTION
-  Get the current storage configuration.
-
-ALIASES
-  $ colibri storage config
-```
-
-_See code: [src/commands/storage/config/get.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/storage/config/get.ts)_
-
-## `colibri storage config set`
-
-Connect to a storage provider.
-
-```
-USAGE
-  $ colibri storage config set -e <value> [--json] [-c <value>] [-i <value>] [-v] [-u <value>] [-P] [-r <value>] [-p
+  $ colibri storage connect -a <value> -e <value> -s <value> [--json] [-c <value>] [-i <value>] [-v] [-f] [-F] [-r
     <value>]
 
 FLAGS
-  -P, --[no-]force-path-style      Force path style URLs.
-  -e, --endpoint=<value>           (required) The storage endpoint URL.
-  -p, --secret-access-key=<value>  The secret access key for the storage.
-  -r, --region=<value>             [default: eu-west-1] The region of the storage endpoint.
-  -u, --access-key-id=<value>      The access key ID for the storage.
+  -F, --[no-]force-path-style      Force path-style URLs for the storage service
+  -a, --access-key-id=<value>      (required) Access key ID for the storage service
+  -e, --endpoint=<value>           (required) Custom endpoint for the storage service
+  -f, --force                      Force overwriting any existing storage connection
+  -r, --region=<value>             Region for the storage service
+  -s, --secret-access-key=<value>  (required) Secret access key for the storage service
 
 GLOBAL FLAGS
   -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
@@ -789,10 +1320,18 @@ GLOBAL FLAGS
       --json                 Format output as json.
 
 DESCRIPTION
-  Connect to a storage provider.
+  Connect to the storage service.
+
+ALIASES
+  $ colibri storage connect
+
+EXAMPLES
+  Connect to a storage provider
+
+    $ colibri storage connect
 ```
 
-_See code: [src/commands/storage/config/set.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/storage/config/set.ts)_
+_See code: [src/commands/storage/connect.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/storage/connect.ts)_
 
 ## `colibri storage copy SOURCE DESTINATION`
 
@@ -856,9 +1395,35 @@ EXAMPLES
     $ colibri storage cp assets/foo assets/bar
 ```
 
+## `colibri storage lb`
+
+List all available buckets.
+
+```
+USAGE
+  $ colibri storage lb [--json] [-c <value>] [-i <value>] [-v]
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  List all available buckets.
+
+ALIASES
+  $ colibri storage lb
+
+EXAMPLES
+  List all available storage buckets
+
+    $ colibri storage lb
+```
+
 ## `colibri storage list [BUCKET]`
 
-List buckets, or objects in a storage bucket.
+List all objects in a storage bucket.
 
 ```
 USAGE
@@ -874,26 +1439,89 @@ GLOBAL FLAGS
       --json                 Format output as json.
 
 DESCRIPTION
-  List buckets, or objects in a storage bucket.
+  List all objects in a storage bucket.
 
 ALIASES
+  $ colibri storage list
   $ colibri storage ls
 
 EXAMPLES
-  List all available storage buckets
+  List all objects in the default bucket
 
     $ colibri storage list
 
-  List all files in the 'assets' bucket
+  List all objects in the 'assets' bucket
 
     $ colibri storage list assets
 ```
 
-_See code: [src/commands/storage/list.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/storage/list.ts)_
+## `colibri storage list-buckets`
+
+List all available buckets.
+
+```
+USAGE
+  $ colibri storage list-buckets [--json] [-c <value>] [-i <value>] [-v]
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  List all available buckets.
+
+ALIASES
+  $ colibri storage lb
+
+EXAMPLES
+  List all available storage buckets
+
+    $ colibri storage list-buckets
+```
+
+_See code: [src/commands/storage/list-buckets.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/storage/list-buckets.ts)_
+
+## `colibri storage list-objects [BUCKET]`
+
+List all objects in a storage bucket.
+
+```
+USAGE
+  $ colibri storage list-objects [BUCKET] [--json] [-c <value>] [-i <value>] [-v]
+
+ARGUMENTS
+  BUCKET  Name of the bucket to list
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  List all objects in a storage bucket.
+
+ALIASES
+  $ colibri storage list
+  $ colibri storage ls
+
+EXAMPLES
+  List all objects in the default bucket
+
+    $ colibri storage list-objects
+
+  List all objects in the 'assets' bucket
+
+    $ colibri storage list-objects assets
+```
+
+_See code: [src/commands/storage/list-objects.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/storage/list-objects.ts)_
 
 ## `colibri storage ls [BUCKET]`
 
-List buckets, or objects in a storage bucket.
+List all objects in a storage bucket.
 
 ```
 USAGE
@@ -909,17 +1537,18 @@ GLOBAL FLAGS
       --json                 Format output as json.
 
 DESCRIPTION
-  List buckets, or objects in a storage bucket.
+  List all objects in a storage bucket.
 
 ALIASES
+  $ colibri storage list
   $ colibri storage ls
 
 EXAMPLES
-  List all available storage buckets
+  List all objects in the default bucket
 
     $ colibri storage ls
 
-  List all files in the 'assets' bucket
+  List all objects in the 'assets' bucket
 
     $ colibri storage ls assets
 ```
@@ -1314,5 +1943,136 @@ EXAMPLES
 ```
 
 _See code: [src/commands/users/update.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/users/update.ts)_
+
+## `colibri works`
+
+List all works in the database
+
+```
+USAGE
+  $ colibri works [--json] [-c <value>] [-i <value>] [-v]
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  List all works in the database
+
+ALIASES
+  $ colibri works
+  $ colibri works ls
+
+EXAMPLES
+  $ colibri works
+```
+
+## `colibri works add FILE`
+
+Add a work to Colibri
+
+```
+USAGE
+  $ colibri works add FILE [--json] [-c <value>] [-i <value>] [-v]
+
+ARGUMENTS
+  FILE  The file to add
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  Add a work to Colibri
+
+EXAMPLES
+  Create a work from 'some-file.epub'
+
+    $ colibri works add some-file.epub
+```
+
+_See code: [src/commands/works/add.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/works/add.ts)_
+
+## `colibri works inspect FILE`
+
+Inspect an ebook file
+
+```
+USAGE
+  $ colibri works inspect FILE [--json] [-c <value>] [-i <value>] [-v]
+
+ARGUMENTS
+  FILE  The file to inspect
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  Inspect an ebook file
+
+EXAMPLES
+  $ colibri works inspect some-file.epub
+```
+
+_See code: [src/commands/works/inspect.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/works/inspect.ts)_
+
+## `colibri works list`
+
+List all works in the database
+
+```
+USAGE
+  $ colibri works list [--json] [-c <value>] [-i <value>] [-v]
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  List all works in the database
+
+ALIASES
+  $ colibri works
+  $ colibri works ls
+
+EXAMPLES
+  $ colibri works list
+```
+
+_See code: [src/commands/works/list.ts](https://github.com/colibri-hq/colibri/blob/v0.0.1/src/commands/works/list.ts)_
+
+## `colibri works ls`
+
+List all works in the database
+
+```
+USAGE
+  $ colibri works ls [--json] [-c <value>] [-i <value>] [-v]
+
+GLOBAL FLAGS
+  -c, --config-file=<value>  [default: (nearest config file)] Configuration file to use.
+  -i, --instance=<value>     The URL of your Colibri instance.
+  -v, --verbose              Show verbose output.
+      --json                 Format output as json.
+
+DESCRIPTION
+  List all works in the database
+
+ALIASES
+  $ colibri works
+  $ colibri works ls
+
+EXAMPLES
+  $ colibri works ls
+```
 
 <!-- commandsstop -->

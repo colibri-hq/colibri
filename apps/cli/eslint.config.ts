@@ -3,7 +3,7 @@ import eslint from "@eslint/js";
 import prettier from "eslint-config-prettier/flat";
 import imports from "eslint-plugin-import";
 import node from "eslint-plugin-n";
-import perfectionist from "eslint-plugin-perfectionist";
+import { configs as perfectionist } from "eslint-plugin-perfectionist";
 import unicorn from "eslint-plugin-unicorn";
 import globals from "globals";
 import typescript, { configs } from "typescript-eslint";
@@ -22,7 +22,7 @@ const config = typescript.config(
   unicorn.configs.recommended,
   imports.flatConfigs.recommended,
   imports.flatConfigs.typescript,
-  perfectionist.configs["recommended-natural"],
+  perfectionist["recommended-natural"],
   prettier,
   // endregion
 
@@ -103,7 +103,7 @@ const config = typescript.config(
       "perfectionist/sort-imports": [
         "error",
         {
-          newlinesBetween: "never",
+          newlinesBetween: "ignore",
           type: "natural",
         },
       ],
