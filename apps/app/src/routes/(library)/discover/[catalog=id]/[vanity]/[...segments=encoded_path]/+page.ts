@@ -20,7 +20,7 @@ export const load = async function load(event) {
     .split("/")
     .filter((value) => !!value)
     .map((value) => decodeBreadcrumbs(value));
-  const breadcrumbs: { link: string; title: string | null }[] = segments.reduce(
+  const breadcrumbs: { link: string; title: string }[] = segments.reduce(
     (breadcrumbs, [link, title], i) => {
       // Since we're reducing with array containing the first item, we can work off of offset 1
       // and access the previous breadcrumb using our current index.
@@ -42,7 +42,7 @@ export const load = async function load(event) {
     [
       {
         link: `/discover/${id}/${catalog.slug}`,
-        title: catalog.title,
+        title: catalog.title ?? catalog.slug!.toString(),
       },
     ],
   );

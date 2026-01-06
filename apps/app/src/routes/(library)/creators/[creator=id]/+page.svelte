@@ -1,13 +1,9 @@
 <script lang="ts">
-  import type { PageData } from './$types';
+  import type { PageProps } from './$types';
   import { Icon } from '@colibri-hq/ui';
-  import BookLink from '$lib/components/Links/BookLink.svelte';
+  import WorkLink from '$lib/components/Links/WorkLink.svelte';
 
-  interface Props {
-    data: PageData;
-  }
-
-  let { data }: Props = $props();
+  let { data }: PageProps = $props();
   let creator = $derived(data.creator);
   let contributions = $derived(data.contributions);
 </script>
@@ -17,9 +13,9 @@
     class="mb-4 grid grid-cols-[min-content_auto] grid-rows-[auto_1fr] gap-4"
   >
     <div
-      class="row-span-2 flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-gray-100 object-cover shadow"
+      class="row-span-2 flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-gray-100 object-cover shadow dark:bg-gray-700"
     >
-      {#if creator.image}
+      {#if creator.image_id}
         <img
           src="/creators/{creator.id}/picture"
           class="h-full w-full rounded-full object-cover"
@@ -42,13 +38,13 @@
       <span>Loading...</span>
     {:then contributions}
       <ul class="grid grid-cols-2 gap-8 md:grid-cols-4 xl:grid-cols-6">
-        {#each contributions as work, index (index)}
+        {#each contributions as contribution, index (index)}
           <li class="contents">
-            <BookLink
-              book={work.book_id ?? ''}
-              edition={work.id}
-              title={work.title}
-              blurhash={work.cover_blurhash}
+            <WorkLink
+              work={contribution.work_id ?? ''}
+              edition={contribution.id}
+              title={contribution.title}
+              blurhash={contribution.cover_blurhash}
             />
           </li>
         {/each}

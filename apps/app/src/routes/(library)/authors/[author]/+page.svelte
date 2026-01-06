@@ -1,13 +1,11 @@
 <script lang="ts">
-  import Book from '$lib/components/Links/BookLink.svelte';
-  import type { PageData } from './$types';
+  import WorkLink from '$lib/components/Links/WorkLink.svelte';
+  import type { PageProps } from './$types';
   import { Icon } from '@colibri-hq/ui';
 
-  interface Props {
-    data: PageData;
-  }
-
-  let { data }: Props = $props();
+  let { data }: PageProps = $props();
+  let author = $derived(data.author);
+  let works = $derived(data.works);
 
   let authorInfoLoading: boolean = false;
 </script>
@@ -15,21 +13,29 @@
 <div class="mx-auto flex w-full max-w-6xl px-8 py-16">
   <article class="grow">
     <header class="mb-8 flex items-center">
-      <img
-        alt="Picture of {data.author.name}"
-        class="mr-4 h-32 w-32 shrink-0 rounded-full bg-gray-200 object-cover"
-        src={data.author.pictureUrl}
-      />
+      <div
+        class="mr-4 flex h-32 w-32 shrink-0 items-center justify-center rounded-full bg-gray-200 object-cover dark:bg-gray-700"
+      >
+        {#if author.image_id}
+          <img
+            alt="Picture of {author.name}"
+            class="h-full w-full rounded-full object-cover"
+            src="/creators/{author.id}/picture"
+          />
+        {:else}
+          <Icon name="person" class="text-4xl text-gray-500" />
+        {/if}
+      </div>
       <div class="flex flex-col">
-        <h1 class="text-4xl font-bold">{data.author.name}</h1>
+        <h1 class="text-4xl font-bold">{author.name}</h1>
 
-        {#if data.author.description}
+        {#if author.description}
           <p class="mt-4">
-            <span>{data.author.description}</span>
-            {#if data.author.wikipediaUrl}
+            <span>{author.description}</span>
+            {#if author.wikipedia_url}
               <a
                 target="_blank"
-                href={data.author.wikipediaUrl}
+                href={author.wikipedia_url}
                 rel="noopener noreferrer"
                 class="text-blue-500 underline">Wikipedia</a
               >
@@ -61,13 +67,22 @@
         <h2 class="text-2xl">Works</h2>
       </header>
 
-      <ul class="grid grid-cols-2 gap-8 md:grid-cols-4 xl:grid-cols-6">
-        {#each data.author.books as book, index (index)}
-          <li class="contents">
-            <Book {book} />
-          </li>
-        {/each}
-      </ul>
+      {#await works}
+        <span>Loading...</span>
+      {:then works}
+        <ul class="grid grid-cols-2 gap-8 md:grid-cols-4 xl:grid-cols-6">
+          {#each works as work, index (index)}
+            <li class="contents">
+              <WorkLink
+                work={work.work_id ?? work.id}
+                title={work.title}
+                edition={work.id}
+                blurhash={work.cover_blurhash}
+              />
+            </li>
+          {/each}
+        </ul>
+      {/await}
     </section>
   </article>
 </div>

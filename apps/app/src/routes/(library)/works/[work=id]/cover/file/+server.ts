@@ -8,7 +8,7 @@ export const GET = async function ({
   locals: { database, storage },
 }) {
   const edition = url.searchParams.get("edition");
-  const id = params.book;
+  const id = params.work;
 
   if (typeof id === "undefined") {
     throw error(400, "Invalid request");
@@ -53,7 +53,7 @@ export const GET = async function ({
 
   const body = await stream(await storage, cover.storage_reference);
 
-  return new Response(body, {
+  return new Response(body as BodyInit, {
     status: 200,
     headers: {
       "Content-Type": cover.media_type,

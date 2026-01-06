@@ -1,12 +1,44 @@
 import { log } from "$lib/logging";
 import { trpc as t } from "$lib/trpc/client";
-import type { WorkerMessage } from "$lib/workers/workers";
+import type {
+  CancelPayload,
+  CancelUploadRequest,
+  ResumePayload,
+  ResumeRequest,
+  UploadPayload,
+  UploadRequest,
+  UploadResponse,
+  UploadStatus,
+} from "$lib/workers/upload.worker.types";
 import { encodeToBase64 } from "@colibri-hq/shared";
 import { loadMetadata, type Metadata } from "@colibri-hq/sdk/ebooks";
 
+// Re-export types for any code that imports directly from the worker
+export type {
+  CancelPayload,
+  CancelUploadRequest,
+  ResumePayload,
+  ResumeRequest,
+  UploadPayload,
+  UploadRequest,
+  UploadResponse,
+  UploadStatus,
+} from "$lib/workers/upload.worker.types";
+
+// In web workers, self.location.href is a blob URL like "blob:http://localhost:5173/uuid"
+// We need to extract the actual origin for the tRPC client
+function getWorkerOriginUrl(): URL {
+  const href = self.location.href;
+  if (href.startsWith("blob:")) {
+    // Extract origin from blob URL: "blob:http://localhost:5173/uuid" -> "http://localhost:5173"
+    return new URL(href.slice(5));
+  }
+  return new URL(href);
+}
+
 const trpc = t({
   fetch,
-  url: new URL(self.location.href),
+  url: getWorkerOriginUrl(),
 });
 
 const pending = new Map<string, AbortController>();
@@ -21,19 +53,21 @@ self.addEventListener("unhandledrejection", ({ reason }) => {
 self.addEventListener("message", handleMessage);
 
 async function handleMessage({
-  data: { type, payload },
+  data,
 }: MessageEvent<UploadRequest | ResumeRequest | CancelUploadRequest>) {
+  const { type, payload } = data;
+
   switch (type) {
     case "cancel":
-      return payload.id
-        ? await handleCancelUpload({ id: payload.id })
-        : await handleCancelAllUploads(payload);
+      return (payload as CancelPayload).id
+        ? await handleCancelUpload({ id: (payload as CancelPayload).id! })
+        : await handleCancelAllUploads(payload as CancelPayload);
 
     case "upload":
-      return await handleUpload(payload);
+      return await handleUpload(payload as UploadPayload);
 
     case "resume":
-      return handleResumption(payload);
+      return handleResumption(payload as ResumePayload);
   }
 }
 
@@ -66,51 +100,66 @@ async function handleUpload({ files }: UploadPayload) {
           error: "Upload Cancelled",
           failed: true,
           id,
+          name,
         },
       } satisfies UploadResponse);
     }
 
     const asset = await handle.getFile();
-
-    // Extract details and metadata from the file
-    const result = await processFile(id, asset, container, signal);
     const checksum = await crypto.subtle.digest("SHA-256", buffer);
 
-    // Persist the new book in the database
-    const reply = await trpc.books.create.mutate({
-      asset: {
-        checksum: encodeToBase64(checksum),
-        mimeType: asset.type,
-        size: asset.size,
-      },
-      contributors: result.metadata.contributors,
-      title: result.metadata.title ?? "Untitled",
-      numberOfPages: result.metadata.numberOfPages,
-      language: result.metadata.language,
-      legalInformation: result.metadata.legalInformation,
+    // Notify main thread that we're starting the upload
+    self.postMessage({
+      type: "upload",
+      payload: { id, name, status: "uploading" as const, failed: false },
+    } satisfies UploadResponse);
+
+    // Step 1: Get upload URL (checks for exact duplicates by checksum)
+    const uploadResult = await trpc.books.getUploadUrl.mutate({
+      uploadId: id,
+      checksum: encodeToBase64(checksum),
+      mimeType: asset.type,
+      size: asset.size,
+      filename: name,
     });
 
-    if (!reply) {
+    if (uploadResult.duplicate) {
+      // Exact duplicate found - skip upload and clean up
+      await finalizeUpload(id);
       self.postMessage({
         type: "upload",
-        payload: { duplicate: true, failed: false, id },
+        payload: { id, name, duplicate: true, failed: false },
       } satisfies UploadResponse);
-
       return handle;
     }
 
-    const { assetUrl } = reply;
+    // Step 2: Upload file to S3
+    const { uploadUrl, s3Key } = uploadResult;
+    log("worker:upload", "info", `Uploading to S3: ${s3Key}`);
 
-    console.log("Saved book, got upload URL", {
-      assetUrl,
-    });
+    await uploadAsset(uploadUrl, asset, checksum, signal);
 
-    await uploadAsset(assetUrl, asset, signal);
-    await finalizeUpload(id);
-
+    // Step 3: Trigger server-side ingestion
+    // The server will emit SSE events for progress updates and completion
     self.postMessage({
       type: "upload",
-      payload: { failed: false, result, id },
+      payload: { id, name, status: "processing" as const, failed: false },
+    } satisfies UploadResponse);
+
+    await trpc.books.ingest.mutate({
+      uploadId: id,
+      s3Key,
+      filename: name,
+    });
+
+    // Step 4: Clean up OPFS
+    await finalizeUpload(id);
+
+    // Notify main thread that upload phase is complete
+    // The actual import status will come via SSE
+    self.postMessage({
+      type: "upload",
+      payload: { id, name, status: "ingesting" as const, failed: false },
     } satisfies UploadResponse);
 
     return handle;
@@ -128,7 +177,12 @@ async function handleUpload({ files }: UploadPayload) {
   }
 }
 
-async function uploadAsset(url: string, asset: File, signal?: AbortSignal) {
+async function uploadAsset(
+  url: string,
+  asset: File,
+  checksum: ArrayBuffer,
+  signal?: AbortSignal,
+) {
   const controller = new AbortController();
   const { signal: uploadSignal } = controller;
 
@@ -179,26 +233,108 @@ async function handleResumption({ ids }: ResumePayload) {
 
   const directory = await getUploadsDirectory();
   const resumable = await resolveResumableFiles(directory, ids);
-  const results = await Promise.all(
-    resumable.map(
-      async ({ id, file, container }) =>
-        [id, await processFile(id, file, container)] as const,
-    ),
-  );
-  await Promise.all(
-    resumable.map(({ id }) => directory.removeEntry(id, { recursive: true })),
-  );
 
-  results.forEach(([id, result]) =>
+  // Notify main thread about items that couldn't be found in OPFS
+  const resumableIds = new Set(resumable.map(({ id }) => id));
+  const staleIds = ids.filter((id) => !resumableIds.has(id));
+  for (const id of staleIds) {
     self.postMessage({
       type: "upload",
       payload: {
-        failed: false,
-        result,
         id,
+        name: "Unknown",
+        failed: true,
+        error: "Upload data not found - please re-upload",
       },
-    } satisfies UploadResponse),
-  );
+    } satisfies UploadResponse);
+  }
+
+  // Resume uploads using the same flow as new uploads
+  for (const { id, file, container } of resumable) {
+    const controller = new AbortController();
+    pending.set(id, controller);
+    const { signal } = controller;
+
+    try {
+      const buffer = await file.arrayBuffer();
+      const checksum = await crypto.subtle.digest("SHA-256", buffer);
+
+      // Notify main thread
+      self.postMessage({
+        type: "upload",
+        payload: {
+          id,
+          name: file.name,
+          status: "uploading" as const,
+          failed: false,
+        },
+      } satisfies UploadResponse);
+
+      // Get upload URL
+      const uploadResult = await trpc.books.getUploadUrl.mutate({
+        uploadId: id,
+        checksum: encodeToBase64(checksum),
+        mimeType: file.type,
+        size: file.size,
+        filename: file.name,
+      });
+
+      if (uploadResult.duplicate) {
+        await directory.removeEntry(id, { recursive: true });
+        self.postMessage({
+          type: "upload",
+          payload: { id, name: file.name, duplicate: true, failed: false },
+        } satisfies UploadResponse);
+        continue;
+      }
+
+      // Upload to S3
+      const { uploadUrl, s3Key } = uploadResult;
+      await uploadAsset(uploadUrl, file, checksum, signal);
+
+      // Trigger ingestion
+      self.postMessage({
+        type: "upload",
+        payload: {
+          id,
+          name: file.name,
+          status: "processing" as const,
+          failed: false,
+        },
+      } satisfies UploadResponse);
+
+      await trpc.books.ingest.mutate({
+        uploadId: id,
+        s3Key,
+        filename: file.name,
+      });
+
+      // Clean up
+      await directory.removeEntry(id, { recursive: true });
+
+      self.postMessage({
+        type: "upload",
+        payload: {
+          id,
+          name: file.name,
+          status: "ingesting" as const,
+          failed: false,
+        },
+      } satisfies UploadResponse);
+    } catch (error) {
+      self.postMessage({
+        type: "upload",
+        payload: {
+          id,
+          name: file.name,
+          failed: true,
+          error: error instanceof Error ? error.message : "Unknown error",
+        },
+      } satisfies UploadResponse);
+    } finally {
+      pending.delete(id);
+    }
+  }
 }
 
 async function handleCancelUpload({ id }: Required<CancelPayload>) {
@@ -211,10 +347,14 @@ async function handleCancelUpload({ id }: Required<CancelPayload>) {
 
   upload.abort("cancelled");
   self.postMessage({
-    id,
-    failed: true,
-    error: "Upload Cancelled",
-  } satisfies UploadResponsePayload);
+    type: "upload",
+    payload: {
+      id,
+      name: "Unknown", // Name not available during cancel
+      failed: true,
+      error: "Upload Cancelled",
+    },
+  } satisfies UploadResponse);
 }
 
 async function handleCancelAllUploads(_payload: CancelPayload) {
@@ -224,10 +364,14 @@ async function handleCancelAllUploads(_payload: CancelPayload) {
     controller.abort("cancelled");
 
     self.postMessage({
-      id,
-      failed: true,
-      error: "Upload Cancelled",
-    } satisfies UploadResponsePayload);
+      type: "upload",
+      payload: {
+        id,
+        name: "Unknown", // Name not available during cancel
+        failed: true,
+        error: "Upload Cancelled",
+      },
+    } satisfies UploadResponse);
   }
 }
 
@@ -369,22 +513,36 @@ async function resolveResumableFiles(
 ) {
   const fragments = await Promise.all(
     ids.map(async (id) => {
-      const container = await directory.getDirectoryHandle(id, {
-        create: false,
-      });
-      let file: File | undefined = undefined;
+      try {
+        const container = await directory.getDirectoryHandle(id, {
+          create: false,
+        });
+        let file: File | undefined = undefined;
 
-      for await (const entry of container.values()) {
-        if (
-          entry.kind === "file" &&
-          ![metadataFilename, coverFilename].includes(entry.name)
-        ) {
-          file = await entry.getFile();
-          break;
+        for await (const entry of container.values()) {
+          if (
+            entry.kind === "file" &&
+            ![metadataFilename, coverFilename].includes(entry.name)
+          ) {
+            file = await entry.getFile();
+            break;
+          }
         }
-      }
 
-      return { id, file, container };
+        return { id, file, container };
+      } catch (error) {
+        // Directory doesn't exist in OPFS - this can happen if the browser
+        // was closed before the upload completed and OPFS was cleaned up
+        if (error instanceof DOMException && error.name === "NotFoundError") {
+          log(
+            "worker:upload",
+            "warning",
+            `OPFS directory for upload ${id} not found, skipping`,
+          );
+          return { id, file: undefined, container: undefined };
+        }
+        throw error;
+      }
     }),
   );
 
@@ -401,36 +559,3 @@ type Resumable = {
   file: File;
   container: FileSystemDirectoryHandle;
 };
-
-type UploadPayload = {
-  files: { id: string; name: string; buffer: ArrayBuffer }[];
-};
-export type UploadRequest = WorkerMessage<"upload", UploadPayload>;
-
-type ResumePayload = {
-  ids: string[];
-};
-export type ResumeRequest = WorkerMessage<"resume", ResumePayload>;
-
-type CancelPayload = {
-  id?: string;
-};
-export type CancelUploadRequest = WorkerMessage<"cancel", CancelPayload>;
-
-type UploadResponsePayload =
-  | {
-      id: string;
-      failed: true;
-      error: string;
-    }
-  | {
-      id: string;
-      failed: false;
-      duplicate: true;
-    }
-  | {
-      id: string;
-      failed: false;
-      result: Record<string, unknown>;
-    };
-export type UploadResponse = WorkerMessage<"upload", UploadResponsePayload>;

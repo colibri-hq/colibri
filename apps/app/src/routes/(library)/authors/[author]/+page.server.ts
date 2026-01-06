@@ -8,9 +8,10 @@ export const load = async function load(event) {
   const { author: id } = event.params;
 
   try {
-    const author = await caller.authors.load(id);
+    const author = await caller.creators.load({ id });
+    const works = caller.creators.loadContributions({ id });
 
-    return { author };
+    return { author, works };
   } catch {
     throw error(404, "Author not found");
   }

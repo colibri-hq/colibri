@@ -1,13 +1,9 @@
 <script lang="ts">
-  import type { PageData } from './$types';
+  import type { PageProps } from './$types';
   import PaginatedList from '$lib/components/Pagination/PaginatedList.svelte';
   import CreatorLink from '$lib/components/Links/CreatorLink.svelte';
 
-  interface Props {
-    data: PageData;
-  }
-
-  let { data }: Props = $props();
+  let { data }: PageProps = $props();
   let creators = $derived(data.creators);
 </script>
 

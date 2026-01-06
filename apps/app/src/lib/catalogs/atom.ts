@@ -123,13 +123,15 @@ function createParser() {
        * @param value
        * @param name
        */
-      function processAtomLinkType(value, name) {
+      function processAtomLinkType(value: string, name: string) {
         if (name === "type" && value.startsWith("application/atom+xml")) {
           return `mime=${value}`
             .split(";")
             .map((part) => part.split("="))
             .reduce<Record<string, string>>((acc, [key, value]) => {
-              acc[key] = value;
+              if (key && value) {
+                acc[key] = value;
+              }
               return acc;
             }, {});
         }

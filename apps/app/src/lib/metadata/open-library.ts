@@ -35,7 +35,9 @@ export async function searchBook(params: BookSearchParams) {
         : [[parameterName, value]];
     })
     .reduce((acc, [key, value]) => {
-      acc.set(key, value);
+      if (key && value !== undefined) {
+        acc.set(key, value as string);
+      }
 
       return acc;
     }, url.searchParams);

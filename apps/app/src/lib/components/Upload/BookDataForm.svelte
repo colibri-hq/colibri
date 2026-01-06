@@ -1,52 +1,71 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
-  import type { SubmitFunction } from '$app/forms';
+  import type { SubmitFunction } from '@sveltejs/kit';
   import { enhance } from '$app/forms';
   import AuthorInput from '$lib/components/Form/AuthorInput.svelte';
-  import { Button } from '@colibri-hq/ui';
-  import { Field } from '@colibri-hq/ui';
-  import ImageInput from '$lib/components/Form/ImageInput.svelte';
+  import { Button, Field, Icon, ImageInput } from '@colibri-hq/ui';
   import PublisherInput from '$lib/components/Form/PublisherInput.svelte';
-  import { Icon } from '@colibri-hq/ui';
   import { encodeImageToBlurHash } from '@colibri-hq/shared';
-  import type { FileResponse } from '$lib/workers/epub.worker';
-  import type {
-    BlurhashRequest,
-    BlurhashResponse,
-  } from '$lib/workers/image.worker';
+  import type { BlurhashRequest, BlurhashResponse } from '$lib/workers/image.worker';
   import { workerOperation } from '$lib/workers/workers';
   import { Editor } from 'bytemd';
   import 'bytemd/dist/index.css';
-  import { createEventDispatcher, tick } from 'svelte';
+  import { tick } from 'svelte';
+  // @ts-expect-error - No type definitions available for turndown
   import Turndown from 'turndown';
+
+  // Define types inline since epub.worker.ts is commented out
+  interface CoverData {
+    data: ArrayBuffer;
+    type: string;
+    width: number;
+    height: number;
+    hash?: string;
+  }
+
+  interface Metadata {
+    author?: string;
+    cover?: string;
+    date?: Date;
+    description?: string;
+    doi?: string;
+    isbn?: string;
+    jdcn?: string;
+    language?: string;
+    publisher?: string;
+    rights?: string;
+    title?: string;
+    uuid?: string;
+    [key: string]: string | Date | undefined;
+  }
 
   interface Props {
     file: File;
-    cover: File | undefined;
-    data: FileResponse['metadata'];
+    cover: CoverData | undefined;
+    data: Metadata;
+    onsubmit?: () => void;
+    oncancel?: () => void;
   }
 
-  let { file, cover, data }: Props = $props();
+  let { file, cover, data, onsubmit, oncancel }: Props = $props();
 
   let loading: boolean = $state(false);
-  let fileInput: HTMLInputElement = $state();
+  let fileInput: HTMLInputElement | undefined = $state(undefined);
 
-  type KnownProperty = keyof typeof data;
+  type KnownProperty = keyof Metadata;
   type MetadataEntries = [KnownProperty, string][];
-  let author: string = $state();
-  let authorName: string = $state();
-  let description: string = $state();
-  let doi: string;
-  let isbn: string = $state();
-  let jdcn: string;
-  let language: string = $state();
-  let publisher: string = $state();
-  let publisherName: string = $state();
-  let publishingDate: Date = $state();
-  let rights: string = $state();
-  let title: string = $state();
-  let uuid: string;
+  let author: string | undefined = $state(undefined);
+  let authorName: string = $state('');
+  let description: string = $state('');
+  let doi: string | undefined = $state(undefined);
+  let isbn: string = $state('');
+  let jdcn: string | undefined = $state(undefined);
+  let language: string = $state('');
+  let publisher: string | undefined = $state(undefined);
+  let publisherName: string = $state('');
+  let publishingDate: Date | undefined = $state(undefined);
+  let rights: string = $state('');
+  let title: string = $state('');
+  let uuid: string | undefined = $state(undefined);
   let metadata: [string, string][] = $state([]);
   let coverFile: File | undefined = $state(undefined);
   let coverHash: string | undefined = $state(undefined);
@@ -55,35 +74,25 @@
 
   const turndown = new Turndown();
 
-  const dispatch = createEventDispatcher<{
-    submit: never;
-    cancel: never;
-  }>();
-
-  function removeMetaProperty<
-    A extends MetadataEntries,
-    K extends A[number][0],
-    T extends K,
-  >(data: A, property: T) {
-    type NotT<E extends [K]> = Exclude<(typeof E)[0], T>;
-
-    return data.filter(
-      (entry): entry is [NotT<typeof entry>, string] => entry[0] !== property,
-    );
+  function removeMetaProperty(
+    data: [string, string][],
+    property: string,
+  ): [string, string][] {
+    return data.filter((entry) => entry[0] !== property);
   }
 
   async function init() {
     // Known book metadata properties
-    authorName = data.author;
+    authorName = data.author ?? '';
     description = parseDescription(data.description);
     doi = data.doi;
-    isbn = data.isbn;
+    isbn = data.isbn ?? '';
     jdcn = data.jdcn;
-    language = data.language;
-    publisherName = data.publisher || '';
+    language = data.language ?? '';
+    publisherName = data.publisher ?? '';
     publishingDate = data.date;
-    rights = data.rights || '';
-    title = data.title;
+    rights = data.rights ?? '';
+    title = data.title ?? '';
     uuid = data.uuid;
 
     const knownProperties: KnownProperty[] = [
@@ -103,7 +112,9 @@
 
     // ...everything else.
     metadata = Object.entries(data).filter(
-      (pair): pair is [string, string] => !knownProperties.includes(pair[0]),
+      (pair): pair is [string, string] =>
+        !knownProperties.includes(pair[0] as KnownProperty) &&
+        typeof pair[1] === 'string'
     );
 
     loading = false;
@@ -150,30 +161,34 @@
       );
     }
 
-    return encodeImageToBlurHash(coverFile, canvasNode.getContext('2d'));
+    const context = canvasNode.getContext('2d');
+    if (!context) {
+      throw new Error('Failed to get 2D canvas context');
+    }
+
+    return encodeImageToBlurHash(coverFile, { width, height });
   }
 
   async function encodeBlurhashInWorker(
     data: ArrayBuffer,
     canvas: OffscreenCanvas,
   ): Promise<string> {
-    const { hash } = await workerOperation<BlurhashRequest, BlurhashResponse>(
+    const result = (await workerOperation(
       import('$lib/workers/image.worker?worker'),
-      'blurhash',
-      { data, canvas },
+      { type: 'blurhash', payload: { data, canvas } },
       [data, canvas],
-    );
+    )) as BlurhashResponse;
 
-    return hash;
+    return result.hash;
   }
 
-  run(() => {
+  $effect(() => {
     if (file) {
       init();
     }
   });
 
-  run(() => {
+  $effect(() => {
     if (file && fileInput) {
       const container = new DataTransfer();
       container.items.add(file);
@@ -182,13 +197,15 @@
   });
 
   const submit: SubmitFunction = () => {
-    dispatch('submit');
+    onsubmit?.();
 
-    return ({ update }) => update();
+    return async ({ update }) => {
+      await update();
+    };
   };
 
   function cancel() {
-    dispatch('cancel');
+    oncancel?.();
   }
 </script>
 
@@ -211,7 +228,7 @@
           bind:value={author}
           name="author"
         />
-        <input name="authorName" type="hidden" value={authorName} />
+        <input name="authorName" type="hidden" value={authorName || ''} />
       </dd>
 
       <dt class="mr-2 font-bold">Publisher</dt>
@@ -221,7 +238,7 @@
           name="publisher"
           query={publisherName}
         />
-        <input name="publisherName" type="hidden" value={publisherName} />
+        <input name="publisherName" type="hidden" value={publisherName || ''} />
       </dd>
 
       <dt class="mr-2 font-bold">Description</dt>
@@ -229,7 +246,7 @@
         <Field name="description">
           {#snippet control()}
             <div class="contents">
-              <input type="hidden" name="description" value={description} />
+              <input type="hidden" name="description" value={description || ''} />
               <Editor
                 bind:value={description}
                 on:change={(event) => (description = event.detail.value)}
@@ -245,7 +262,7 @@
         <Field name="rights">
           {#snippet control()}
             <div class="contents">
-              <input type="hidden" name="rights" value={rights} />
+              <input type="hidden" name="rights" value={rights || ''} />
               <Editor
                 bind:value={rights}
                 on:change={(event) => (rights = event.detail.value)}
@@ -294,12 +311,12 @@
     </dl>
 
     <div class="mt-8 md:col-span-2 md:mt-0">
-      <input name="coverHash" type="hidden" value={coverHash} />
-      <input name="coverWidth" type="hidden" value={coverWidth} />
-      <input name="coverHeight" type="hidden" value={coverHeight} />
+      <input name="coverHash" type="hidden" value={coverHash ?? ''} />
+      <input name="coverWidth" type="hidden" value={coverWidth ?? ''} />
+      <input name="coverHeight" type="hidden" value={coverHeight ?? ''} />
       <ImageInput
         accept="*/*"
-        bind:value={coverFile}
+        bind:file={coverFile}
         label="Cover"
         name="cover"
       />

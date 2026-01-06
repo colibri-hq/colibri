@@ -1,35 +1,37 @@
 <script lang="ts">
   import { goto, invalidateAll } from '$app/navigation';
-  import { Button } from '@colibri-hq/ui';
+  import { Button, ToggleField } from '@colibri-hq/ui';
   import { Field } from '@colibri-hq/ui';
   import { Icon } from '@colibri-hq/ui';
   import { savable, trpc } from '$lib/trpc/client';
   import Gravatar from 'svelte-gravatar';
-  import type { PageData } from './$types';
+  import type { PageProps } from './$types';
   import ProfileSection from './ProfileSection.svelte';
-  import type { Authenticator } from '@colibri-hq/sdk';
+  import type { Authenticator } from '@colibri-hq/sdk/types';
   import relativeTime from 'dayjs/plugin/relativeTime';
   import dayjs from 'dayjs';
   import AuthenticatorListItem from './AuthenticatorListItem.svelte';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
+  import { resolve } from '$app/paths';
 
   dayjs.extend(relativeTime);
 
-  interface Props {
-    data: PageData;
-  }
-
-  let { data }: Props = $props();
+  let { data }: PageProps = $props();
 
   let loading: boolean = $state(false);
   let updatedName: string = $state(data.user.name || '');
   let updatedEmailAddress: string = $state(data.user.email);
 
+  // Notification preferences
+  let notifyOnReplies: boolean = $state(data.notificationPreferences?.comment_replies ?? true);
+  let notifyOnReactions: boolean = $state(data.notificationPreferences?.comment_reactions ?? true);
+  let notifyOnMentions: boolean = $state(data.notificationPreferences?.comment_mentions ?? true);
+
   async function updateName() {
     loading = true;
 
     try {
-      await trpc($page).users.updateCurrent.mutate(
+      await trpc(page).users.updateCurrent.mutate(
         savable({ name: updatedName }),
       );
       await invalidateAll();
@@ -42,15 +44,14 @@
     loading = true;
 
     try {
-      await trpc($page).users.updateCurrentEmail.mutate(updatedEmailAddress);
+      await trpc(page).users.updateCurrentEmail.mutate(updatedEmailAddress);
       await invalidateAll();
     } finally {
       loading = false;
     }
   }
-
   function registerAuthenticator() {
-    return goto('/auth/attestation');
+    return goto(resolve('/auth/attestation'));
   }
 
   function removeAuthenticator(authenticator: Authenticator) {
@@ -58,12 +59,27 @@
       loading = true;
 
       try {
-        await trpc($page).users.removeAuthenticator.mutate(authenticator.id);
+        await trpc(page).users.removeAuthenticator.mutate(authenticator.id);
         await invalidateAll();
       } finally {
         loading = false;
       }
     };
+  }
+
+  async function updateNotificationPreference(
+    key: 'comment_replies' | 'comment_reactions' | 'comment_mentions',
+    value: boolean,
+  ) {
+    try {
+      await trpc(page).notifications.updatePreferences.mutate({
+        [key]: value,
+      });
+    } catch (error) {
+      console.error('Failed to update notification preference:', error);
+      // Revert the local state on error
+      await invalidateAll();
+    }
   }
 </script>
 
@@ -161,6 +177,37 @@
     {#snippet after()}
       <Button label="Add new" onClick={registerAuthenticator} />
     {/snippet}
+  </ProfileSection>
+
+  <ProfileSection title="Notification Preferences">
+    {#snippet help()}
+      <p>
+        Control when you receive notifications about activity on your&nbsp;comments.
+      </p>
+    {/snippet}
+
+    <div class="space-y-2">
+      <ToggleField
+        label="Replies"
+        hint="Get notified when someone replies to your comments"
+        bind:checked={notifyOnReplies}
+        onCheckedChange={(checked) => updateNotificationPreference('comment_replies', checked)}
+      />
+
+      <ToggleField
+        label="Reactions"
+        hint="Get notified when someone reacts to your comments"
+        bind:checked={notifyOnReactions}
+        onCheckedChange={(checked) => updateNotificationPreference('comment_reactions', checked)}
+      />
+
+      <ToggleField
+        label="Mentions"
+        hint="Get notified when someone mentions you in a comment"
+        bind:checked={notifyOnMentions}
+        onCheckedChange={(checked) => updateNotificationPreference('comment_mentions', checked)}
+      />
+    </div>
   </ProfileSection>
 
   <div class="mt-8 block md:hidden">

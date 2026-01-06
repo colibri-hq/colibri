@@ -1,7 +1,7 @@
 import { read } from "$lib/server/storage";
 import type { RequestHandler } from "@sveltejs/kit";
 import { error, redirect } from "@sveltejs/kit";
-import { loadWork } from "@colibri-hq/sdk";
+import { loadWorkWithAssets } from "@colibri-hq/sdk";
 
 const handler = async function ({
   params,
@@ -9,17 +9,18 @@ const handler = async function ({
   url,
   locals: { database, storage },
 }): Promise<Response> {
-  const work = await loadWork(database, params.work!);
+  const work = await loadWorkWithAssets(database, params.work!);
 
   if (work.assets.length === 0) {
     throw error(404);
   }
 
-  const asset = params.asset
-    ? work.assets.find((asset) => asset.id === params.asset)
+  const assetId = params.asset;
+  const asset = assetId
+    ? work.assets.find((a) => a.id === assetId)
     : work.assets.at(0);
 
-  if (!asset) {
+  if (!asset || !asset.storage_reference) {
     return error(404, "Failed to locate asset");
   }
 
@@ -33,7 +34,8 @@ const handler = async function ({
     }
   }
 
-  return new Response(await read(await storage, asset.storage_reference), {
+  const data = await read(await storage, asset.storage_reference);
+  return new Response(data as unknown as BodyInit, {
     status: 200,
     headers: {
       "Content-Type": asset.mediaType as string,

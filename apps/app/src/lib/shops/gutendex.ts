@@ -191,6 +191,7 @@ interface BookResponse {
   media_type: string;
   formats: Format;
   download_count: number;
+  placeholder: true;
 }
 
 type Format = Record<

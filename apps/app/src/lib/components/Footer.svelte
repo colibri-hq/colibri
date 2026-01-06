@@ -14,7 +14,8 @@
       </a>
 
       <span class="me-auto">
-        © 2025, the Colibri maintainers. Colibri is open source software.
+        &copy; {new Date().getFullYear()}, the Colibri maintainers.
+        Colibri is Open Source Software, licensed under AGPL v3.0.
       </span>
 
       <nav class="flex items-center gap-4 select-none">

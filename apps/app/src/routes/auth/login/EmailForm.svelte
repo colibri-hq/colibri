@@ -3,7 +3,7 @@
   import { Field } from '@colibri-hq/ui';
   import { enhance } from '$app/forms';
   import type { ZodIssue } from 'zod';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   interface Props {
     email: string;
@@ -23,7 +23,7 @@
   let webauthnIssue = $derived(
     issues.find((issue) => issue.path[0] === 'webauthn')?.message,
   );
-  let previous = $derived($page.url.searchParams.get('previous') || '/');
+  let previous = $derived(page.url.searchParams.get('previous') || '/');
 </script>
 
 <form action="?/request" method="POST" use:enhance>

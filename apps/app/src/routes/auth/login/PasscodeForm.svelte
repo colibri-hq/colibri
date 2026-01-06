@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { DigitsChangeEvent } from '$lib/components/Auth/Digits/DigitInput.svelte';
   import DigitInput from '$lib/components/Auth/Digits/DigitInput.svelte';
   import { Button } from '@colibri-hq/ui';
   import type { SubmitFunction } from './$types';
@@ -21,8 +20,7 @@
   let passcode = $state<string | undefined>();
   let previous = $derived(page.url.searchParams.get('previous') ?? '/');
 
-  async function verifyPasscode(event: DigitsChangeEvent) {
-    ({ value: passcode } = event.detail);
+  async function verifyPasscode() {
 
     // Wait for a moment for the hidden form input to update
     await tick();
@@ -64,7 +62,7 @@
 
   <input name="email" required type="hidden" value={email} />
   <input name="passcode" required type="hidden" value={passcode} />
-  <DigitInput disabled={loading} numeric on:input={verifyPasscode} />
+  <DigitInput disabled={loading} numeric oninput={verifyPasscode} />
 
   <div class="flex items-center justify-end">
     <Button

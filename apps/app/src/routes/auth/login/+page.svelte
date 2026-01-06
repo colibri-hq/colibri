@@ -1,26 +1,18 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { ceremony } from './webauthn';
-  import type { ActionData, PageData } from './$types';
   import { browserSupportsWebAuthn } from '@simplewebauthn/browser';
   import EmailForm from './EmailForm.svelte';
   import PasscodeForm from './PasscodeForm.svelte';
   import type { ZodIssue } from 'zod';
   import PageHeader from '$lib/components/Page/PageHeader.svelte';
+	import type { PageProps } from './$types';
 
-  interface Props {
-    data: PageData;
-    form: ActionData;
-  }
-
-  let { data, form }: Props = $props();
+  let { form }: PageProps = $props();
 
   let issues = $state<ZodIssue[]>(form?.issues ?? []);
   let webauthnAvailable = $state(true);
-  let email = $state(form?.email ?? '');
-  $effect(() => {
-    email = form?.email ?? email;
-  });
+  let email = $derived(form?.email ?? '');
 
   async function webauthn() {
     if (!browserSupportsWebAuthn()) {

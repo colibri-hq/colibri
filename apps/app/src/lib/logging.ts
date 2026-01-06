@@ -3,13 +3,13 @@ export function log(
   level: "error",
   error: Error,
   context?: Record<string, unknown>,
-);
+): void;
 export function log(
   channel: string,
   level: string,
   message: string,
   context?: Record<string, unknown>,
-);
+): void;
 export function log(
   channel: string,
   level: "error" | string,

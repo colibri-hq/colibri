@@ -10,7 +10,7 @@
 </script>
 
 <button
-  class="flex cursor-pointer items-center rounded-full
+  class="flex cursor-pointer items-center rounded-full ring-gray-300
   px-1 py-0.5 transition outline-none hover:ring focus-visible:ring active:ring-blue-700
   {active
     ? 'bg-blue-300 dark:bg-blue-800 dark:hover:bg-blue-800/75'

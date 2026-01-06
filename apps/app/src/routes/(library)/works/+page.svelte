@@ -1,20 +1,16 @@
 <script lang="ts">
   import { Field } from '@colibri-hq/ui';
-  import BookLink from '$lib/components/Links/BookLink.svelte';
-  import type { PageData } from './$types';
+  import WorkLink from '$lib/components/Links/WorkLink.svelte';
+  import type { PageProps } from './$types';
 
-  interface Props {
-    data: PageData;
-  }
-
-  let { data }: Props = $props();
-  let books = $derived(data.books);
+  let { data }: PageProps = $props();
+  let works = $derived(data.works);
   let searchTerm = $state('');
 </script>
 
 <article>
   <header class="flex items-center justify-between pb-8">
-    <h1 class="font-serif text-4xl font-medium">Books</h1>
+    <h1 class="font-serif text-4xl font-medium">Works</h1>
 
     <div class="actions">
       <Field
@@ -27,13 +23,13 @@
   </header>
 
   <ul class="grid grid-cols-2 gap-8 md:grid-cols-4 xl:grid-cols-6">
-    {#each books as book, index (index)}
+    {#each works as work, index (index)}
       <li class="contents">
-        <BookLink
-          book={book.book_id ?? book.id}
-          title={book.title}
-          edition={book.main_edition_id}
-          blurhash={book.cover_blurhash}
+        <WorkLink
+          work={work.work_id ?? work.id}
+          title={work.title ?? 'Untitled'}
+          edition={work.main_edition_id ?? work.id}
+          blurhash={work.cover_blurhash}
         />
       </li>
     {/each}

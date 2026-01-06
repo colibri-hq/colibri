@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Cannot set properties of undefined (setting 'next') -->
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import PaginationButton from '$lib/components/Pagination/PaginationButton.svelte';
@@ -6,10 +7,10 @@
 
   const dispatch = createEventDispatcher<{
     page: number;
-    first;
-    previous;
-    next;
-    last;
+    first: void;
+    previous: void;
+    next: void;
+    last: void;
   }>();
 
   let className = '';

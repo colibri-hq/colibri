@@ -64,15 +64,16 @@ export const sticky: Action<
 
   mutationObserver.observe(node.parentNode as HTMLElement, { childList: true });
 
-  const intersectionObserver = new IntersectionObserver(([entry]) =>
+  const intersectionObserver = new IntersectionObserver(([entry]) => {
+    if (!entry) return;
     node.dispatchEvent(
       new CustomEvent("stuck", {
         detail: {
           isStuck: !entry.isIntersecting && isValidYPosition(entry),
         },
       }),
-    ),
-  );
+    );
+  });
 
   const isValidYPosition = ({
     target,

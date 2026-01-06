@@ -7,7 +7,7 @@
   import SettingsPane from './SettingsPane.svelte';
 
   let colorScheme: AuthenticationColorScheme = $state(
-    page.data.user.color_scheme,
+    page.data.user?.color_scheme ?? 'system',
   );
   let loading = $state(false);
 

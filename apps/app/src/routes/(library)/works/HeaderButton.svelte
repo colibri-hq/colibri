@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { createBubbler } from 'svelte/legacy';
-
-  const bubble = createBubbler();
+  import type { Snippet } from 'svelte';
 
   interface Props {
     class?: string;
     tag?: string;
-    children?: import('svelte').Snippet;
+    children?: Snippet;
+    onclick?: (event: MouseEvent) => void;
+    onkeydown?: (event: KeyboardEvent) => void;
 
     [key: string]: unknown;
   }
@@ -15,6 +15,8 @@
     class: className = '',
     tag = 'button',
     children,
+    onclick,
+    onkeydown,
     ...rest
   }: Props = $props();
 </script>
@@ -26,8 +28,8 @@
   transition outline-none hover:bg-white/15 hover:shadow-lg hover:backdrop-blur
   hover:backdrop-saturate-200 focus-visible:bg-white/15 focus-visible:shadow-lg focus-visible:ring
   focus-visible:backdrop-blur focus-visible:backdrop-saturate-200 dark:text-gray-100 {className}"
-  onclick={bubble('click')}
-  onkeydown={bubble('keydown')}
+  onclick={onclick}
+  onkeydown={onkeydown}
   role="button"
   tabindex="0"
 >

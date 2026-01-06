@@ -1,10 +1,16 @@
 import { dispatchPasscode } from "$lib/server/auth";
 import { procedure, t } from "$lib/trpc/t";
-import { userExists } from "@colibri-hq/sdk";
 import {
-  generateRandomDigits,
-  inferNameFromEmailAddress,
-} from "@colibri-hq/shared";
+  blockUser,
+  createPasscode,
+  createUser,
+  findUserByEmail,
+  getBlockedUsers,
+  unblockUser,
+  userExists,
+} from "@colibri-hq/sdk";
+import { inferNameFromEmailAddress } from "@colibri-hq/shared";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 export const accounts = t.router({
@@ -19,29 +25,23 @@ export const accounts = t.router({
         emailAddress: z.string(),
       }),
     )
-    .mutation(async ({ input: { emailAddress, name }, ctx: { platform } }) => {
-      const user = await prisma.user.create({
-        data: {
+    .mutation(
+      async ({
+        input: { emailAddress, name },
+        ctx: { database, platform },
+      }) => {
+        const user = await createUser(database, {
           name: name || inferNameFromEmailAddress(emailAddress),
           email: emailAddress,
-          passwordHash: "",
-        },
-      });
+        });
 
-      const code = generateRandomDigits(6);
+        const { code } = await createPasscode(database, user);
 
-      await prisma.passCode.create({
-        data: {
-          expiresAt: new Date(+new Date() + 60_000 * 5),
-          userId: user.id,
-          code,
-        },
-      });
+        await dispatchPasscode(platform, user, code);
 
-      await dispatchPasscode(platform, user, code);
-
-      return user.id;
-    }),
+        return user.id;
+      },
+    ),
 
   requestPassCode: procedure()
     .input(
@@ -49,33 +49,71 @@ export const accounts = t.router({
         emailAddress: z.string(),
       }),
     )
-    .mutation(async ({ input, ctx: { platform } }) => {
+    .mutation(async ({ input, ctx: { database, platform } }) => {
       const emailAddress = input.emailAddress;
-      let user = await prisma.user.findUnique({
-        where: { email: emailAddress },
-      });
+      let user;
 
-      if (!user) {
-        user = await prisma.user.create({
-          data: {
-            name: inferNameFromEmailAddress(emailAddress),
-            email: emailAddress,
-            passwordHash: "",
-          },
+      try {
+        user = await findUserByEmail(database, emailAddress);
+      } catch {
+        // User doesn't exist, create one
+        user = await createUser(database, {
+          name: inferNameFromEmailAddress(emailAddress),
+          email: emailAddress,
         });
       }
 
-      const code = generateRandomDigits(6);
-
-      await prisma.passCode.create({
-        data: {
-          expiresAt: new Date(+new Date() + 60_000 * 5),
-          userId: user.id,
-          code,
-        },
-      });
+      const { code } = await createPasscode(database, user);
 
       console.log(`Dispatching passcode notification with code ${code}`);
       await dispatchPasscode(platform, user, code);
     }),
+
+  // region User Blocking
+
+  /**
+   * Block a user (hide their comments from you)
+   */
+  blockUser: procedure()
+    .input(
+      z.object({
+        userId: z.string(),
+      }),
+    )
+    .mutation(
+      async ({ input: { userId: blockedId }, ctx: { database, userId } }) => {
+        if (blockedId === userId) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "You cannot block yourself",
+          });
+        }
+
+        await blockUser(database, userId, blockedId);
+      },
+    ),
+
+  /**
+   * Unblock a user
+   */
+  unblockUser: procedure()
+    .input(
+      z.object({
+        userId: z.string(),
+      }),
+    )
+    .mutation(
+      async ({ input: { userId: blockedId }, ctx: { database, userId } }) => {
+        await unblockUser(database, userId, blockedId);
+      },
+    ),
+
+  /**
+   * Get list of blocked users
+   */
+  getBlockedUsers: procedure().query(async ({ ctx: { database, userId } }) => {
+    return getBlockedUsers(database, userId);
+  }),
+
+  // endregion
 });

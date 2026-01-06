@@ -1,31 +1,24 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
-  import type { PageData } from './$types';
-  import { Field } from '@colibri-hq/ui';
-  import { Button } from '@colibri-hq/ui';
-  import MultilineField from '$lib/components/Form/MultilineField.svelte';
+  import { Button, Field, TextareaField } from '@colibri-hq/ui';
   import FetchMetadataButton from '../FetchMetadataButton.svelte';
+  import type { PageProps } from './$types';
 
-  interface Props {
-    data: PageData;
-  }
+  let { data }: PageProps = $props();
+  let work = $derived(data.work);
 
-  let { data }: Props = $props();
-  let book = $derived(data.work);
-  let creators = $derived(data.creators);
-
-  let title = $state(data.book.title);
+  let title = $state(data.work.title);
   let sortingKey = $derived(title.toLowerCase().replace(/[^a-z0-9]+/g, '_'));
 </script>
 
 <article>
   <header class="mb-8">
-    <h1 class="font-serif text-3xl font-bold">Edit book: {book.title}</h1>
+    <h1 class="font-serif text-3xl font-bold">Edit work: {work.title}</h1>
     <p class="mt-2 text-gray-500 dark:text-gray-400">
-      On this page, you can edit the details of the book.
+      On this page, you can edit the details of the work.
     </p>
   </header>
-  <FetchMetadataButton {book} {creators} />
+  <FetchMetadataButton workId={work.id} />
 
   <form method="post" use:enhance>
     <div class="grid gap-4">
@@ -42,44 +35,44 @@
             readonly
             value={sortingKey}
           />
-          <MultilineField
+          <TextareaField
             class="col-span-2"
             label="Synopsis"
             name="synopsis"
-            value={book.synopsis || ''}
+            value={work.synopsis || ''}
           />
-          <MultilineField
+          <TextareaField
             class="col-span-2"
             label="Excerpt"
             name="excerpt"
-            value={book.excerpt || ''}
+            value={work.excerpt || ''}
           />
-          <MultilineField
+          <TextareaField
             class="col-span-2"
             label="Legal Information"
             name="legal_information"
-            value={book.legal_information || ''}
+            value={work.legal_information || ''}
           />
         </div>
       </section>
 
       <section>
         <header class="mb-2">
-          <h2 class="font-serif text-lg font-semibold">Book Specifics</h2>
+          <h2 class="font-serif text-lg font-semibold">Work Specifics</h2>
         </header>
 
         <div class="grid grid-cols-3 gap-4">
-          <Field label="Binding" name="binding" value={book.binding || ''} />
-          <Field label="Format" name="format" value={book.format || ''} />
+          <Field label="Binding" name="binding" value={work.binding || ''} />
+          <Field label="Format" name="format" value={work.format || ''} />
           <Field
             label="Pages"
             min="0"
             name="pages"
             step="1"
             type="number"
-            value={book.pages?.toString() || ''}
+            value={work.pages?.toString() || ''}
           />
-          <!--          <LanguageField label="Language" name="language" value={book.language || ""} />-->
+          <!--          <LanguageField label="Language" name="language" value={work.language || ""} />-->
         </div>
       </section>
 
@@ -93,7 +86,7 @@
             label="Publication date"
             name="published_at"
             type="date"
-            value={book.published_at || ''}
+            value={work.published_at ? new Date(work.published_at).toISOString().split('T')[0] : ''}
           />
         </div>
       </section>
@@ -104,15 +97,15 @@
         </header>
 
         <div class="grid grid-cols-2 gap-4">
-          <Field label="ISBN 10" name="isbn_10" value={book.isbn_10 || ''} />
-          <Field label="ISBN 13" name="isbn_13" value={book.isbn_13 || ''} />
+          <Field label="ISBN 10" name="isbn_10" value={work.isbn_10 || ''} />
+          <Field label="ISBN 13" name="isbn_13" value={work.isbn_13 || ''} />
         </div>
       </section>
     </div>
 
     <footer class="mt-8 flex space-x-2">
       <Button type="submit">Save</Button>
-      <Button href="/books/{book.id}" variant="subtle">Cancel</Button>
+      <Button href="/works/{work.id}" variant="subtle">Cancel</Button>
     </footer>
   </form>
 </article>

@@ -10,7 +10,10 @@
 
   let filteredIssues = $derived(
     fields !== null
-      ? issues.filter((issue) => fields.includes(issue.path[0]))
+      ? issues.filter((issue) => {
+          const pathItem = issue.path[0];
+          return pathItem !== undefined && fields.includes(pathItem);
+        })
       : issues,
   );
 </script>

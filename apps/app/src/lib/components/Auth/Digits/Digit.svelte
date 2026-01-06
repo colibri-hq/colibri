@@ -1,34 +1,5 @@
-<script lang="ts" module>
-  interface Input {
-    value: string;
-  }
-
-  export type InputEvent = CustomEvent<Input>;
-
-  interface Paste {
-    value: string;
-  }
-
-  export type PasteEvent = CustomEvent<Paste>;
-
-  type Backspace = {
-    focusPrevious: boolean;
-  };
-
-  export type BackspaceEvent = CustomEvent<Backspace>;
-
-  type Clear = void;
-
-  export type ClearEvent = CustomEvent<Clear>;
-</script>
-
 <script lang="ts">
-  import { preventDefault } from 'svelte/legacy';
-
-  import { createEventDispatcher } from 'svelte';
-
   interface Props {
-    // region Props
     name: string;
     id?: string | undefined;
     value?: string;
@@ -36,6 +7,11 @@
     disabled?: boolean;
     numeric?: boolean;
     autofocus?: boolean;
+
+    onbackspace?: (event: { focusPrevious: boolean }) => void;
+    oninput?: (value: string) => void;
+    onpaste?: (value: string) => void;
+    onclear?: () => void;
   }
 
   let {
@@ -46,19 +22,17 @@
     disabled = false,
     numeric = false,
     autofocus = false,
+    onbackspace,
+    oninput,
+    onpaste,
+    onclear,
   }: Props = $props();
-  // endregion
 
-  const dispatch = createEventDispatcher<{
-    backspace: Backspace;
-    input: Input;
-    paste: Paste;
-    clear: Clear;
-  }>();
-
-  let digit: HTMLInputElement = $state();
+  let digit = $state<HTMLInputElement>();
 
   function handlePaste(event: Event) {
+    event.preventDefault();
+
     // Get pasted data via clipboard API
     let clipboardData = (event as ClipboardEvent).clipboardData;
     let value = clipboardData
@@ -71,14 +45,14 @@
     }
 
     updateValue(value.slice(0, 1));
-    dispatch('paste', { value });
+    onpaste?.(value);
   }
 
   function handleKey(event: KeyboardEvent) {
     // Clear all digits on CMD + Backspace
     if (event.metaKey && event.key === 'Backspace') {
       event.preventDefault();
-      dispatch('clear');
+      onclear?.();
       value = '';
 
       return;
@@ -92,7 +66,7 @@
     // Delete the digit on backspace. If the digit is empty, focus the previous digit
     if (event.key === 'Backspace') {
       event.preventDefault();
-      dispatch('backspace', { focusPrevious: value === '' });
+      onbackspace?.({ focusPrevious: value === '' });
       value = '';
 
       return;
@@ -112,11 +86,11 @@
     }
 
     value = newValue.toUpperCase();
-    dispatch('input', { value });
+    oninput?.(value);
   }
 
   export function focus(selectDigit = false) {
-    digit.focus();
+    digit?.focus();
 
     if (selectDigit) {
       select();
@@ -124,7 +98,7 @@
   }
 
   export function select() {
-    digit.select();
+    digit?.select();
   }
 </script>
 
@@ -141,7 +115,7 @@
     maxlength={1}
     {name}
     onkeydown={handleKey}
-    onpaste={preventDefault(handlePaste)}
+    onpaste={handlePaste}
     {placeholder}
     type="text"
     {value}

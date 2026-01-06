@@ -1,26 +1,8 @@
 {
-  "name": "@colibri-hq/app",
-  "version": "0.0.1",
-  "type": "module",
-  "license": "MIT",
-  "description": "The Colibri server",
-  "keywords": [
-    "colibri",
-    "server",
-    "ebooks",
-    "ebook-management",
-    "epub",
-    "opds"
-  ],
-  "homepage": "https://github.com/colibri-hq/colibri",
   "author": {
     "name": "Moritz Mazetti",
     "email": "m@9dev.de",
     "url": "https://mazetti.me"
-  },
-  "repository": {
-    "url": "git+https://github.com/colibri-hq/colibri.git",
-    "type": "git"
   },
   "bugs": {
     "url": "https://github.com/colibri-hq/colibri/issues"
@@ -33,36 +15,39 @@
     "@fontsource-variable/material-symbols-outlined": "catalog:",
     "@fontsource/neuton": "catalog:",
     "@fontsource/titillium-web": "catalog:",
-    "@simplewebauthn/browser": "^13.1.2",
-    "@simplewebauthn/server": "^13.1.2",
+    "@simplewebauthn/browser": "^13.2.2",
+    "@simplewebauthn/server": "^13.2.2",
     "@trpc/client": "catalog:",
     "@trpc/server": "catalog:",
     "bytemd": "^1.22.0",
-    "dayjs": "^1.11.13",
-    "debounce": "^2.2.0",
+    "dayjs": "^1.11.19",
+    "debounce": "^3.0.0",
     "jsonwebtoken": "catalog:",
     "mdsvex": "^0.12.6",
     "pg-cloudflare": "^1.2.7",
-    "playwright": "^1.53.2",
+    "playwright": "^1.57.0",
     "svelte": "catalog:",
+    "svelte-dnd-action": "^0.9.69",
     "svelte-file-dropzone": "^2.0.9",
     "svelte-gravatar": "^1.0.3",
     "svelte-headlessui": "^0.0.46",
     "svelte-reactive-debounce": "^0.0.2",
+    "svelte-sonner": "^1.0.7",
     "svelte-transition": "^0.0.17",
     "tailwind-merge": "catalog:",
     "trpc-sveltekit": "^3.6.3",
     "trpc-transformer": "^3.2.2",
-    "turndown": "^7.2.0",
-    "ua-parser-js": "^2.0.4",
+    "turndown": "^7.2.2",
+    "ua-parser-js": "^2.0.7",
     "xml2js": "^0.6.2",
     "zod": "catalog:"
   },
+  "description": "The Colibri server",
   "devDependencies": {
-    "@playwright/test": "^1.53.2",
+    "@playwright/test": "^1.57.0",
     "@simplewebauthn/types": "^12.0.0",
     "@sveltejs/adapter-auto": "catalog:",
-    "@sveltejs/adapter-node": "^5.2.12",
+    "@sveltejs/adapter-node": "^5.4.0",
     "@sveltejs/kit": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",
@@ -70,9 +55,11 @@
     "@types/node": "catalog:",
     "@types/ua-parser-js": "^0.7.39",
     "@types/web-app-manifest": "^1.0.9",
-    "@types/wicg-file-system-access": "^2023.10.6",
+    "@types/wicg-file-system-access": "^2023.10.7",
     "@types/xml2js": "^0.4.14",
-    "dotenv": "^17.0.1",
+    "@vitest/browser": "catalog:",
+    "@vitest/browser-playwright": "catalog:",
+    "dotenv": "^17.2.3",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "svelte": "catalog:",
@@ -80,7 +67,23 @@
     "tailwindcss": "catalog:",
     "tslib": "^2.8.1",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "homepage": "https://github.com/colibri-hq/colibri",
+  "keywords": [
+    "colibri",
+    "server",
+    "ebooks",
+    "ebook-management",
+    "epub",
+    "opds"
+  ],
+  "license": "AGPL-3.0-or-later",
+  "name": "@colibri-hq/app",
+  "repository": {
+    "url": "git+https://github.com/colibri-hq/colibri.git",
+    "type": "git"
   },
   "scripts": {
     "dev": "ORIGIN=http://localhost:5173 vite dev",
@@ -94,6 +97,10 @@
     "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
     "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content .",
     "test-ct": "playwright test -c playwright-ct.config.ts",
-    "test": "playwright test -c playwright.config.ts"
-  }
+    "test": "playwright test -c playwright.config.ts",
+    "test:vitest": "vitest",
+    "test:browser": "vitest --project browser"
+  },
+  "type": "module",
+  "version": "0.0.1"
 }

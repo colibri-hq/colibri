@@ -1,40 +1,69 @@
 <script lang="ts">
-  import { loadWorker } from '$lib/workers/workers';
-  import { onDestroy, onMount } from 'svelte';
-  import type { Book, Creator } from './+page@(library).svelte';
-  import type { BookMetadataWorker } from '$lib/workers/book-metadata.worker';
-  import type { MaybePromise } from '@colibri-hq/shared';
+  import { Button, Icon } from '@colibri-hq/ui';
+  import { page } from '$app/state';
+  import { trpc } from '$lib/trpc/client';
+  import { getEnrichmentStatus, markEnriching, markEnrichmentAvailable, clearEnrichmentStatus } from '$lib/enrichment';
 
   interface Props {
-    book: MaybePromise<Book>;
-    creators: MaybePromise<Creator[]>;
+    workId: string;
+    class?: string;
   }
 
-  let { book, creators }: Props = $props();
+  let { workId, class: className }: Props = $props();
 
-  let worker: BookMetadataWorker;
+  // Get reactive enrichment status from store
+  const enrichmentStore = getEnrichmentStatus(workId);
+  let status = $derived($enrichmentStore.status);
+  let loading = $state(false);
 
-  async function loadMetadata() {
-    const payload = {
-      ...(await book),
-      creators: await creators,
-    };
+  async function handleClick() {
+    if (status === 'enriching' || loading) return;
 
-    worker.postMessage({ type: 'loadMetadata', payload });
+    loading = true;
+    markEnriching(workId);
+
+    try {
+      await trpc(page).books.triggerEnrichment.mutate({ workId });
+
+      // Check if enrichment produced results
+      const result = await trpc(page).books.hasEnrichment.query({ workId });
+      if (result.hasEnrichment) {
+        const { improvementCount, sources } = result as {
+          hasEnrichment: true;
+          improvementCount: number;
+          sources: string[];
+        };
+        if (improvementCount > 0) {
+          markEnrichmentAvailable(workId, improvementCount, sources ?? []);
+        } else {
+          clearEnrichmentStatus(workId);
+        }
+      } else {
+        clearEnrichmentStatus(workId);
+      }
+    } catch (err) {
+      console.error('Failed to trigger enrichment:', err);
+      clearEnrichmentStatus(workId);
+    } finally {
+      loading = false;
+    }
   }
-
-  onMount(async () => {
-    worker = await loadWorker<BookMetadataWorker>(
-      import('$lib/workers/book-metadata.worker?worker'),
-    );
-    worker.onmessage = (event) => {
-      console.log('Received message from worker:', event);
-    };
-  });
-
-  // TODO: We probably don't want to terminate the worker on destroy. If it's still trying to
-  //       fetch data, we should let it finish. We should probably have a way to cancel the fetch.
-  onDestroy(() => worker?.terminate());
 </script>
 
-<button onclick={loadMetadata}> Load metadata </button>
+<Button
+  variant="subtle"
+  onclick={handleClick}
+  disabled={status === 'enriching' || loading}
+  class={className}
+>
+  {#if status === 'enriching' || loading}
+    <Icon name="sync" class="mr-1.5 animate-spin" />
+    Fetching metadata...
+  {:else if status === 'available'}
+    <Icon name="auto_fix_high" class="mr-1.5 text-amber-500" />
+    Review improvements
+  {:else}
+    <Icon name="auto_fix_high" class="mr-1.5" />
+    Fetch metadata
+  {/if}
+</Button>

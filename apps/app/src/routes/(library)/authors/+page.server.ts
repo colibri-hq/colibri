@@ -4,8 +4,8 @@ import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async (event) => {
   const caller = createCaller(await createContext(event));
-  const query = event.url.searchParams.get("q") || undefined;
-  const authors = await caller.authors.list(query);
+  const page = parseInt(event.url.searchParams.get("page") || "1", 10);
+  const authors = await caller.creators.list({ page });
 
   return {
     authors,

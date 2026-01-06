@@ -1,36 +1,77 @@
 <script lang="ts">
-  import AutocompleteInput from '$lib/components/Form/AutocompleteInput.svelte';
+  import { Autocomplete } from '@colibri-hq/ui';
   import { trpc } from '$lib/trpc/client';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
 
   interface Props {
     name?: string;
     label?: string | undefined;
-    value: string | undefined;
+    value?: string | undefined;
     query?: string | undefined;
   }
 
   let {
     name = 'language',
     label = undefined,
-    value = $bindable(),
-    query = $bindable(undefined),
+    value = $bindable(undefined),
+    query = $bindable(''),
   }: Props = $props();
 
-  async function fetchSuggestions(term: string) {
-    const languages = await trpc($page).languages.autocomplete.query(term);
+  let items = $state<Array<{ id: string; label: string }>>([]);
+  let loading = $state(false);
+  let debounceTimer = $state<ReturnType<typeof setTimeout> | null>(null);
 
-    return languages.map(({ iso_639_3, name }) => ({
-      id: iso_639_3,
-      value: name,
-    }));
+  async function fetchSuggestions(term: string) {
+    if (!term || term.length < 2) {
+      items = [];
+      return;
+    }
+
+    loading = true;
+    try {
+      const languages = await trpc(page).languages.autocomplete.query(term);
+      items = languages.map(({ iso_639_3, name }) => ({ id: iso_639_3, label: name }));
+    } catch (error) {
+      console.error(`Failed to fetch suggestions: ${(error as Error).message}`);
+      items = [];
+    } finally {
+      loading = false;
+    }
+  }
+
+  function handleQueryChange(newQuery: string) {
+    query = newQuery;
+
+    // Clear the value if user modifies the query
+    if (items.find((item) => item.id === value)?.label !== newQuery) {
+      value = undefined;
+    }
+
+    // Debounce the search
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+    debounceTimer = setTimeout(() => {
+      fetchSuggestions(newQuery);
+    }, 250);
+  }
+
+  function handleSelect(item: { id: string; label: string } | null) {
+    if (item) {
+      value = item.id;
+      query = item.label;
+    }
   }
 </script>
 
-<AutocompleteInput
+<Autocomplete
   bind:query
   bind:value
+  {items}
   {label}
+  {loading}
   {name}
-  suggestions={fetchSuggestions}
+  onQueryChange={handleQueryChange}
+  onSelect={handleSelect}
+  placeholder="Search languages…"
 />

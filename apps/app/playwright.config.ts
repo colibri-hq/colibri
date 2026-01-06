@@ -1,16 +1,17 @@
 import { defineConfig, devices } from "@playwright/test";
+import dotenv from "dotenv";
 import { join } from "node:path";
 
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-import "dotenv/config";
+dotenv.config({ path: join(import.meta.dirname, "..", "..", ".env") });
 
 export const storageState = join(
   import.meta.dirname,
-  "tests",
-  ".storageState.json",
+  ".cache",
+  "playwright.json",
 );
 
 // noinspection JSUnusedGlobalSymbols
@@ -36,7 +37,9 @@ export default defineConfig({
   timeout: 5_000,
 
   //  Reporter to use. See https://playwright.dev/docs/test-reporters
-  reporter: [["html", { outputFolder: "test-results" }]],
+  reporter: process.env.CI
+    ? [["github"], ["dot"]]
+    : [["list"], ["html", { outputFolder: "test-results", open: "never" }]],
 
   // Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions.
   use: {

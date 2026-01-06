@@ -7,13 +7,10 @@
 <script lang="ts">
   import ContentSection from '$lib/components/ContentSection.svelte';
   import CatalogNavigation from './CatalogNavigation.svelte';
+  import type { PageProps } from './$types';
+  import type { Snippet } from 'svelte';
 
-  interface Props {
-    data: PageData;
-    children?: import('svelte').Snippet;
-  }
-
-  let { data, children }: Props = $props();
+  let { data, children }: PageProps & { children?: Snippet } = $props();
   let catalogs = $derived(data.catalogs);
 </script>
 

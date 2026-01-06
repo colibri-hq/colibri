@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Publisher } from '@prisma/client';
+  import type { Publisher } from '@colibri-hq/sdk/types';
   import { Icon } from '@colibri-hq/ui';
 
   interface Props {

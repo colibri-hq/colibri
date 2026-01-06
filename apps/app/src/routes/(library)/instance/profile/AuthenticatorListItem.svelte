@@ -1,7 +1,7 @@
 <script lang="ts">
   import { tick } from 'svelte';
   import dayjs from 'dayjs';
-  import type { Authenticator } from '@colibri-hq/sdk';
+  import type { Authenticator } from '@colibri-hq/sdk/types';
   import { BrowserIcon } from '@colibri-hq/ui';
   import { Button } from '@colibri-hq/ui';
   import { Icon } from '@colibri-hq/ui';

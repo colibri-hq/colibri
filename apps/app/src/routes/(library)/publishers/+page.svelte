@@ -1,12 +1,8 @@
 <script lang="ts">
   import { default as PublisherLink } from '$lib/components/Links/Publisher.svelte';
-  import type { PageData } from './$types';
+  import type { PageProps } from './$types';
 
-  interface Props {
-    data: PageData;
-  }
-
-  let { data }: Props = $props();
+  let { data }: PageProps = $props();
 </script>
 
 <article>

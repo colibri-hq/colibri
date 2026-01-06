@@ -6,22 +6,22 @@
 
 <script lang="ts">
   import { invalidateAll } from '$app/navigation';
-  import Modal from '$lib/components/Modal.svelte';
+  import { IconRenderer, Modal } from '@colibri-hq/ui';
   import { savable, trpc } from '$lib/trpc/client';
-  import type { Work } from '@colibri-hq/sdk';
-  import { page } from '$app/stores';
+  import type { Work } from '@colibri-hq/sdk/types';
+  import { page } from '$app/state';
   import { onMount } from 'svelte';
 
   interface Props {
     open?: boolean;
     loading?: boolean;
-    book: Pick<Work, 'id'>;
+    work: Pick<Work, 'id'>;
   }
 
   let {
     open = $bindable(false),
     loading = $bindable(false),
-    book,
+    work,
   }: Props = $props();
   let collections: Collection[] = $state([]);
 
@@ -29,7 +29,7 @@
     loading = true;
 
     try {
-      collections = await trpc($page).collections.list.query();
+      collections = await trpc(page).collections.list.query();
     } finally {
       loading = false;
     }
@@ -40,10 +40,10 @@
       loading = true;
 
       try {
-        await trpc($page).collections.toggleBook.mutate(
+        await trpc(page).collections.toggleBook.mutate(
           savable({
             collection: id,
-            book: book.id,
+            book: work.id,
           }),
         );
         await Promise.all([loadCollections(), invalidateAll()]);
@@ -73,7 +73,7 @@
           dark:hover:bg-gray-800 dark:focus-visible:bg-gray-800"
           onclick={addToCollection(collection)}
         >
-          <span class="mr-2">{collection.emoji}</span>
+          <IconRenderer icon={collection.icon} class="mr-2 text-xl" fallback="collections_bookmark" />
           <span class="mr-auto">{collection.name}</span>
           <span class="ml-4 text-sm text-gray-500">
             {#if entries === 0}

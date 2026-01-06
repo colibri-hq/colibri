@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { Icon } from '@colibri-hq/ui';
+  import { Icon, Markdown, Modal } from '@colibri-hq/ui';
   import type { MaybePromise } from '@colibri-hq/shared';
   import type { Review } from './+page@(library).svelte';
-  import Modal from '$lib/components/Modal.svelte';
-  import MarkdownContent from '$lib/components/MarkdownContent.svelte';
   import ContentSection from '$lib/components/ContentSection.svelte';
   import dayjs from 'dayjs';
   import relativeTime from 'dayjs/plugin/relativeTime';
@@ -63,7 +61,7 @@
                 {/if}
                 {#if review.reviewer && review.publication_name}
                   <span class="text-gray-500 dark:text-gray-400"
-                    >&hairsp;—&hairsp;</span
+                  >&hairsp;—&hairsp;</span
                   >
                 {/if}
                 {#if review.publication_name}
@@ -87,7 +85,7 @@
                 dark:group-focus-visible:text-gray-200"
               >
                 <span class="mr-1" id="review-label-{review.id}"
-                  >Read full review</span
+                >Read full review</span
                 >
                 <Icon
                   name="arrow_right_alt"
@@ -101,14 +99,14 @@
         {/each}
       </ul>
 
-      <Modal bind:open={reviewModalOpen} on:close={handleModalClosed}>
+      <Modal bind:open={reviewModalOpen} onClose={handleModalClosed}>
         {#snippet header()}
           <h2 class="font-bold dark:text-gray-200">Review</h2>
         {/snippet}
 
         <ContentSection narrow>
           {#if activeReview}
-            <MarkdownContent source={activeReview.content} />
+            <Markdown source={activeReview.content} />
 
             <footer
               class="mt-8 mb-4 flex items-center justify-between text-sm text-gray-500"
@@ -128,7 +126,7 @@
               {/if}
 
               <span
-                >Last updated: {dayjs(activeReview.created_at).fromNow()}</span
+              >Last updated: {dayjs(activeReview.created_at).fromNow()}</span
               >
             </footer>
           {/if}

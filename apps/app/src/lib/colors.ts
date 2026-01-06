@@ -78,9 +78,11 @@ export function parseCssColor(color: string) {
     }
 
     // Convert the hex value to decimal
-    const [r, g, b, a = 1] = hex
-      .match(/[A-Fa-f0-9]{2}/g)!
-      .map((value) => parseInt(value, 16));
+    const matches = hex.match(/[A-Fa-f0-9]{2}/g)!;
+    const r = parseInt(matches[0]!, 16);
+    const g = parseInt(matches[1]!, 16);
+    const b = parseInt(matches[2]!, 16);
+    const a = matches[3] ? parseInt(matches[3], 16) : 1;
 
     return [r, g, b, a] satisfies Color;
   }
@@ -95,7 +97,7 @@ export function parseCssColor(color: string) {
 
   const { r, g, b, a } = result.groups!;
 
-  return [+r, +g, +b, +a] satisfies Color;
+  return [+r!, +g!, +b!, a ? +a : 1] satisfies Color;
 }
 
 function rgbToHsl([r, g, b]: Color) {
@@ -183,13 +185,13 @@ export function rgbToHex([r, g, b]: Color) {
 }
 
 function deriveLuminance(color: Color) {
-  const [red, green, blue] = color.map((v) => {
+  const normalized = color.map((v) => {
     v /= 255;
 
     return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
   });
 
-  return red * 0.2126 + green * 0.7152 + blue * 0.0722;
+  return normalized[0]! * 0.2126 + normalized[1]! * 0.7152 + normalized[2]! * 0.0722;
 }
 
 function deriveContrast(color1: Color, color2: Color) {

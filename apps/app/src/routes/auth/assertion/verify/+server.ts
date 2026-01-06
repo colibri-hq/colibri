@@ -175,7 +175,7 @@ async function verify(
       expectedOrigin,
       expectedRPID,
       credential: {
-        publicKey: decodeFromBase64(public_key),
+        publicKey: decodeFromBase64(public_key) as Uint8Array<ArrayBuffer>,
         counter: Number(counter),
         transports,
         id,

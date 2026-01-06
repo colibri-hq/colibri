@@ -8,6 +8,7 @@
   import CatalogSettings from './CatalogSettings.svelte';
   import InstanceSettings from './InstanceSettings.svelte';
   import MemberSettings from './MemberSettings.svelte';
+  import MetadataProviders from './MetadataProviders.svelte';
   import PersonalSettings from './PersonalSettings.svelte';
   import SharingSettings from './SharingSettings.svelte';
   import { page } from '$app/state';
@@ -20,6 +21,7 @@
     instance: 'Instance',
     members: 'Members',
     catalogs: 'Catalogs',
+    metadata: 'Metadata',
     sharing: 'Sharing',
   };
   type Slug = keyof typeof tabs;
@@ -75,6 +77,10 @@
 
     {#snippet catalogsContent()}
       <CatalogSettings></CatalogSettings>
+    {/snippet}
+
+    {#snippet metadataContent()}
+      <MetadataProviders></MetadataProviders>
     {/snippet}
 
     {#snippet sharingContent()}

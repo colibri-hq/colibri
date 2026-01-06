@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 
 export function auth(t: Trpc) {
   return t.middleware(async function auth({ next, ctx, meta }) {
-    if (!meta?.guarded) {
+    if (!(meta as { guarded?: boolean } | undefined)?.guarded) {
       return next();
     }
 

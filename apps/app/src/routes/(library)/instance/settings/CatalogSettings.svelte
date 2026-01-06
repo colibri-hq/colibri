@@ -4,13 +4,13 @@
   import { Button } from '@colibri-hq/ui';
   import AddCatalogModal from './AddCatalogModal.svelte';
   import { type PaginationData, trpc } from '$lib/trpc/client';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import CatalogListItem, { type DisableCatalogEvent, type EnableCatalogEvent } from './CatalogListItem.svelte';
   import PaginatedList from '$lib/components/Pagination/PaginatedList.svelte';
   import SettingsPane from './SettingsPane.svelte';
 
   let data: MaybePromise<[Catalog[], PaginationData]> = $derived(
-    $page.data.catalogs,
+    page.data.catalogs,
   );
 
   let catalogModalOpen = $state(false);
@@ -20,7 +20,7 @@
     catalogsLoading.push(catalog.id);
 
     try {
-      await trpc($page).catalogs.enable.mutate({
+      await trpc(page).catalogs.enable.mutate({
         id: catalog.id,
       });
     } finally {
@@ -32,7 +32,7 @@
     catalogsLoading.push(catalog.id);
 
     try {
-      await trpc($page).catalogs.disable.mutate({
+      await trpc(page).catalogs.disable.mutate({
         id: catalog.id,
       });
     } finally {

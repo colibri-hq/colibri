@@ -11,26 +11,27 @@
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import { fade } from 'svelte/transition';
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { encodeBreadcrumbs } from './breadcrumbs';
   import Breadcrumbs from './Breadcrumbs.svelte';
   import EntryItem from './Entry.svelte';
   import { Icon } from '@colibri-hq/ui';
 
+  import type { PageProps } from './$types';
+  import { resolve } from '$app/paths';
+
+  let { data }: PageProps = $props();
+
   const transition = { duration: 100 };
 
-  interface Props {
-    data: PageData;
-  }
-
-  let { data }: Props = $props();
   let catalog = $derived(data.catalog);
   let feed = $derived(data.feed);
   let breadcrumbs = $derived(data.breadcrumbs);
 
   function showCategory({ detail: { link, title } }: NavigateEvent) {
     const encoded = encodeBreadcrumbs([link, title ?? '']);
-    const newUrl = new URL(`${$page.url.pathname}/${encoded}`, $page.url.href);
+    // @ts-expect-error page.url is always defined in a page component
+    const newUrl = resolve(`${page.url.pathname}/${encoded}`);
 
     return goto(newUrl);
   }
@@ -107,10 +108,10 @@
         <strong class="font-semibold">{error.message}</strong>
         <pre
           class="mt-2 overflow-x-auto rounded-xl bg-red-100 p-4 text-sm shadow-inner-sm">{JSON.stringify(
-            error,
-            null,
-            2,
-          )}</pre>
+          error,
+          null,
+          2,
+        )}</pre>
       </details>
     </div>
   {/await}

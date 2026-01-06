@@ -8,7 +8,9 @@
   interface Props {
     email: string;
     name: string | null;
+    role?: 'admin' | 'adult' | 'child' | 'guest';
     class?: string;
+    moderationEnabled?: boolean;
 
     [key: string]: unknown;
   }
@@ -16,9 +18,13 @@
   let {
     email,
     name = $bindable(),
+    role,
     class: className,
+    moderationEnabled = false,
     ...rest
   }: Props = $props();
+
+  let isAdmin = $derived(role === 'admin');
 
   async function logout() {
     await fetch('/auth/logout', {
@@ -33,7 +39,7 @@
   }
 
   onMount(() => {
-    name = name || inferNameFromEmail(email);
+    name = name || inferNameFromEmail(email) || null;
   });
 </script>
 
@@ -62,5 +68,13 @@
     active={page.url.pathname === '/instance/settings'}
     icon="settings"
   />
+  {#if isAdmin && moderationEnabled}
+    <NavigationKnob
+      href="/instance/moderation"
+      label="Moderation"
+      active={page.url.pathname === '/instance/moderation'}
+      icon="shield"
+    />
+  {/if}
   <NavigationKnob label="Log out" onClick={logout} icon="logout" />
 </div>

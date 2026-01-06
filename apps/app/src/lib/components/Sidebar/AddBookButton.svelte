@@ -10,7 +10,7 @@
 
 <Button
   class="w-full justify-center bg-black py-4 text-white"
-  onclick={onClick}
+  onClick={onClick}
   type="button"
   variant="primary"
 >

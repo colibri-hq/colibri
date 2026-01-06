@@ -1,30 +1,19 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { goto } from '$app/navigation';
   import { Button } from '@colibri-hq/ui';
   import PageHeader from '$lib/components/Page/PageHeader.svelte';
-  import {
-    browserSupportsWebAuthn,
-    startRegistration,
-  } from '@simplewebauthn/browser';
+  import { browserSupportsWebAuthn, startRegistration } from '@simplewebauthn/browser';
   import type { RegistrationResponseJSON } from '@simplewebauthn/types';
   import { onMount } from 'svelte';
   import type { VerificationResponse } from './verify/+server';
-  import type { PageData } from './$types';
+  import type { PageProps } from './$types';
+  import { resolve } from '$app/paths';
 
-  interface Props {
-    data: PageData;
-  }
-
-  let { data }: Props = $props();
+  let { data }: PageProps = $props();
 
   let webAuthnSupported: boolean = $state(true);
   let registered: boolean = $state(false);
-  let passkeyError: { title?: string; message: string } | null = $state();
-  run(() => {
-    passkeyError = data.error ?? null;
-  });
+  let passkeyError = $derived<{ title?: string; message: string } | null>(data.error ?? null);
   onMount(() => (webAuthnSupported = browserSupportsWebAuthn()));
 
   async function init() {
@@ -124,11 +113,11 @@
 
     registered = true;
 
-    return goto('/');
+    return goto(resolve('/'));
   }
 
   function skip() {
-    return goto('/');
+    return goto(resolve('/'));
   }
 </script>
 

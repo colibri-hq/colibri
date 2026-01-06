@@ -13,14 +13,14 @@ onmessage = async ({ data }: MessageEvent<WorkerMessage>) => {
     case "dimensions":
       response = {
         type: "dimensions",
-        payload: await dimensions(data.payload),
+        payload: await dimensions(data.payload as DimensionsRequest),
       };
       break;
 
     case "blurhash":
       response = {
         type: "blurhash",
-        payload: await blurhash(data.payload),
+        payload: await blurhash(data.payload as BlurhashRequest),
       };
       break;
 

@@ -1,21 +1,23 @@
 <script lang="ts">
-  import type { Author, Book, Publisher } from '@prisma/client';
+  import type { Creator, Work, Publisher } from '@colibri-hq/sdk/types';
 
   interface Props {
     class?: string;
-    book: Book & { author: Author; publisher?: Publisher };
+    work: Work & { creator?: Creator; publisher?: Publisher };
   }
 
-  let { class: className = '', book }: Props = $props();
+  let { class: className = '', work }: Props = $props();
 </script>
 
 <nav class={className}>
-  <a href="/books/similar?id={book.id}">Similar books</a>
-  <a href="/authors/{book.author?.id}">Other books by {book.author?.name}</a>
+  <a href="/works/similar?id={work.id}">Similar works</a>
+  {#if work.creator}
+    <a href="/creators/{work.creator?.id}">Other works by {work.creator?.name}</a>
+  {/if}
 
-  {#if book.publisher}
-    <a href="/publishers/{book.publisher?.id}"
-      >Other books by {book.publisher?.name}</a
+  {#if work.publisher}
+    <a href="/publishers/{work.publisher?.id}"
+      >Other works by {work.publisher?.name}</a
     >
   {/if}
 </nav>

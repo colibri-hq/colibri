@@ -7,7 +7,7 @@
 </script>
 
 <script lang="ts">
-  import Toggle, { type ToggleEvent } from '$lib/components/Form/Toggle.svelte';
+  import { Toggle } from '@colibri-hq/ui';
   import { createEventDispatcher } from 'svelte';
   import { Icon } from '@colibri-hq/ui';
   import { parseCssColor, rgbToCssColor } from '$lib/colors';
@@ -24,7 +24,7 @@
     disable: DisableCatalogEvent['detail'];
   }>();
 
-  function toggle({ detail: active }: ToggleEvent) {
+  function toggle(active: boolean) {
     if (disabled || catalog.active === active) {
       return;
     }
@@ -114,10 +114,10 @@
     <!-- region Toggle -->
     <div class="ml-auto flex items-center justify-center self-center">
       <Toggle
+        checked={catalog.active}
         {disabled}
-        on:change={toggle}
+        onCheckedChange={toggle}
         size="medium"
-        value={catalog.active}
       />
     </div>
     <!-- endregion -->

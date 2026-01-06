@@ -1,13 +1,11 @@
 <script lang="ts">
-  import Modal from '$lib/components/Modal.svelte';
-  import { Field } from '@colibri-hq/ui';
-  import { Button } from '@colibri-hq/ui';
+  import { Button, Field, Icon, Modal } from '@colibri-hq/ui';
   import { fade } from 'svelte/transition';
   import { trpc } from '$lib/trpc/client';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import type { RouterOutputs } from '$lib/trpc/router';
-  import { Icon } from '@colibri-hq/ui';
+  import { sleep } from '@colibri-hq/shared';
 
   interface Props {
     open?: boolean;
@@ -25,7 +23,7 @@
     $state(undefined);
 
   async function handlePastedUrl() {
-    await new Promise((resolve) => setTimeout(resolve, 1));
+    await sleep(1);
 
     if (!validCatalogUrl) {
       return;
@@ -43,7 +41,7 @@
     error = undefined;
 
     try {
-      result = await trpc($page).catalogs.fetchRemoteCatalog.query({ feedUrl });
+      result = await trpc(page).catalogs.fetchRemoteCatalog.query({ feedUrl });
     } catch (err) {
       console.error('Failed to fetch catalog:', err);
       error =
@@ -63,7 +61,7 @@
     loading = true;
 
     try {
-      await trpc($page).catalogs.addCatalog.mutate({
+      await trpc(page).catalogs.addCatalog.mutate({
         feedUrl,
         title,
         description,
@@ -106,9 +104,9 @@
     fetch the feed and display the books in the <em>Discover</em>
     section.<br />
     If you're not sure how this works, take a look at the&nbsp;<a
-      class="underline"
-      href="/help/catalogs">catalog&nbsp;documentation</a
-    >.
+    class="underline"
+    href="/help/catalogs">catalog&nbsp;documentation</a
+  >.
   </p>
 
   <div class="mt-4 grid grid-cols-[auto_min-content] items-center gap-4">
@@ -117,7 +115,7 @@
       class="col-span-2"
       label="OPDS feed URL"
       name="feed"
-      on:paste={handlePastedUrl}
+      onpaste={handlePastedUrl}
       required
       type="url"
     />

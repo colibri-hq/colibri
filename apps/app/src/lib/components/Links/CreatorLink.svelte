@@ -1,9 +1,12 @@
 <script lang="ts">
   import { Icon } from '@colibri-hq/ui';
-  import type { Creator } from '@colibri-hq/sdk/schema';
 
   interface Props {
-    creator: Pick<Creator, 'image' | 'id' | 'name'>;
+    creator: {
+      id: string;
+      name: string;
+      image_id?: string | null;
+    };
   }
 
   let { creator }: Props = $props();
@@ -13,9 +16,9 @@
   <article class="flex items-center" id="creator-{creator.id}">
     <header class="contents">
       <div
-        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 object-cover shadow"
+        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 object-cover shadow dark:bg-gray-700"
       >
-        {#if creator.image}
+        {#if creator.image_id}
           <img
             src="/creators/{creator.id}/picture"
             class="h-full w-full rounded-full object-cover"

@@ -1,7 +1,14 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
-  export let name: string | undefined = undefined;
-  export let value: string | number | undefined = undefined;
+  import type { Snippet } from 'svelte';
+
+  interface Props {
+    name?: string;
+    value?: string | number;
+    secondary?: Snippet;
+    children?: Snippet;
+  }
+
+  let { name, value, secondary, children }: Props = $props();
 </script>
 
 <li
@@ -9,15 +16,21 @@
   last:border-r-0 dark:border-r-gray-700"
 >
   <span class="mb-1 text-sm font-bold uppercase dark:text-gray-500">
-    <slot name="name">{name}</slot>
+    {name}
   </span>
   <div
     class="flex grow flex-col items-center justify-center dark:text-gray-300"
   >
     <span class="text-2xl leading-none font-bold">
-      <slot>{value}</slot>
+      {#if children}
+        {@render children()}
+      {:else}
+        {value}
+      {/if}
     </span>
 
-    <slot name="secondary" />
+    {#if secondary}
+      {@render secondary()}
+    {/if}
   </div>
 </li>

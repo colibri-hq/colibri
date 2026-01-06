@@ -3,8 +3,10 @@ export interface WorkerMessage<T extends string = string, P = unknown> {
   payload: P;
 }
 
-export interface WebWorker<I extends WorkerMessage, O extends WorkerMessage>
-  extends Worker {
+export interface WebWorker<
+  I extends WorkerMessage,
+  O extends WorkerMessage,
+> extends Worker {
   onmessage: ((this: Worker, ev: MessageEvent<O>) => unknown) | null;
 
   postMessage(message: I, transfer?: Transferable[]): unknown;
@@ -36,8 +38,10 @@ export interface WebWorker<I extends WorkerMessage, O extends WorkerMessage>
   ): unknown;
 }
 
-interface TypedMessagePort<I extends WorkerMessage, O extends WorkerMessage>
-  extends MessagePort {
+interface TypedMessagePort<
+  I extends WorkerMessage,
+  O extends WorkerMessage,
+> extends MessagePort {
   onmessage:
     | ((this: TypedMessagePort<I, O>, ev: MessageEvent<O>) => unknown)
     | null;
@@ -74,8 +78,10 @@ interface TypedMessagePort<I extends WorkerMessage, O extends WorkerMessage>
   ): unknown;
 }
 
-interface TypedSharedWorker<I extends WorkerMessage, O extends WorkerMessage>
-  extends SharedWorker {
+interface TypedSharedWorker<
+  I extends WorkerMessage,
+  O extends WorkerMessage,
+> extends SharedWorker {
   port: TypedMessagePort<I, O>;
 
   addEventListener(
@@ -151,8 +157,7 @@ class SharedWorkerImpl<
   W extends TypedSharedWorker<I, O>,
   I extends WorkerMessage,
   O extends WorkerMessage,
-> implements SharedWebWorker<I, O>
-{
+> implements SharedWebWorker<I, O> {
   readonly #worker: W;
 
   constructor(worker: W) {

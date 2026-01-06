@@ -6,6 +6,7 @@ import {
   listAuthenticatorsForUser,
   listUsers,
   removeAuthenticator,
+  searchUsers,
   type UpdatableUser,
   updateUser,
 } from "@colibri-hq/sdk";
@@ -18,6 +19,20 @@ export const users = t.router({
     .input(paginatable({}))
     .query(({ input: { page, perPage }, ctx: { database } }) =>
       paginatedResults(listUsers(database, page, perPage)),
+    ),
+
+  /**
+   * Search for users by name (for @mention autocomplete)
+   */
+  search: procedure()
+    .input(
+      z.object({
+        query: z.string().min(1).max(100),
+        limit: z.number().min(1).max(20).optional(),
+      }),
+    )
+    .query(({ input: { query, limit }, ctx: { database } }) =>
+      searchUsers(database, query, limit ?? 10),
     ),
 
   /**

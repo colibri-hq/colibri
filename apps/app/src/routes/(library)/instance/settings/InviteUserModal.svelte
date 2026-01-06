@@ -1,19 +1,12 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
-  import Modal from '$lib/components/Modal.svelte';
-  import { Field } from '@colibri-hq/ui';
-  import { Button } from '@colibri-hq/ui';
-  import { QrCode } from '@colibri-hq/ui';
+  import { Button, CopyToClipboard, Field, Modal, QrCode, ToggleField } from '@colibri-hq/ui';
   import { fly } from 'svelte/transition';
-  import ToggleField from '$lib/components/Form/ToggleField.svelte';
   import { trpc } from '$lib/trpc/client';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import dayjs from 'dayjs';
   import { z } from 'zod';
   import { debounce } from 'svelte-reactive-debounce';
   import { writable } from 'svelte/store';
-  import { CopyToClipboard } from '@colibri-hq/ui';
 
   interface Props {
     open?: boolean;
@@ -34,7 +27,7 @@
     loading = true;
 
     try {
-      invitationLink = await trpc($page).users.generateInvitationLink.query({
+      invitationLink = await trpc(page).users.generateInvitationLink.query({
         email,
         role: childAccount ? 'child' : 'adult',
         expiresAt: dayjs().add(14, 'days').toDate(),
@@ -56,9 +49,7 @@
   }
 
   let emailAddressValid = $derived(validate($emailAddress));
-  run(() => {
-    generateInvitationLink($debounced, childAccount);
-  });
+  $effect(() => void generateInvitationLink($debounced, childAccount));
 </script>
 
 <Modal bind:open class="max-w-96">
@@ -77,7 +68,7 @@
     type="email"
   />
   <ToggleField
-    bind:value={childAccount}
+    bind:checked={childAccount}
     class="mt-2"
     hint="Kids accounts will be restricted access to content."
     label="This is a Kids Account"

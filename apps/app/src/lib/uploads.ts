@@ -1,11 +1,14 @@
 import { browser } from "$app/environment";
 import type {
   CancelUploadRequest,
+  DuplicateCheckResult,
   ResumeRequest,
   UploadRequest,
   UploadResponse,
-} from "$lib/workers/upload.worker";
+  UploadStatus,
+} from "$lib/workers/upload.worker.types";
 import { loadWorker, type WebWorker } from "$lib/workers/workers";
+import { success, error as notifyError, warning } from "$lib/notifications";
 import { generateRandomUuid } from "@colibri-hq/shared";
 import { derived, get, writable } from "svelte/store";
 
@@ -63,8 +66,7 @@ export async function upload(items: (File | FileSystemFileHandle)[]) {
       name,
       type,
       size,
-      ready: false,
-      failed: false,
+      status: "pending",
       resumable: true,
     }),
   );
@@ -72,13 +74,27 @@ export async function upload(items: (File | FileSystemFileHandle)[]) {
   queue.update((queued) => [...queued, ...jobs]);
   // endregion
 
-  worker.addEventListener("message", ({ data: { type, payload } }) => {
-    // TODO: Show notification or something?
-    console.log("Got worker result [upload]", { type, payload });
+  worker.addEventListener("message", ({ data: { payload } }) => {
+    if (payload.failed) {
+      notifyError("Upload failed", {
+        message: `Failed to upload ${payload.name}`,
+      });
+    } else if ("duplicate" in payload && payload.duplicate) {
+      warning("Duplicate detected", {
+        message: `${payload.name} already exists in your library`,
+      });
+    }
+    // Note: Success notifications are now handled via SSE events
   });
 
   worker.addEventListener("error", (event) => {
-    console.error("Worker failed", { event });
+    console.error("Worker failed", {
+      message: event.message,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+      error: event.error,
+    });
 
     const jobIds = jobs.map(({ id }) => id);
     queue.update((queued) => queued.filter(({ id }) => !jobIds.includes(id)));
@@ -125,7 +141,7 @@ export async function promptForFiles() {
   const files = await showOpenFilePicker({
     multiple: true,
     startIn: "documents",
-    types: supportedUploadFormats,
+    types: supportedUploadFormats as unknown as FilePickerAcceptType[],
   });
 
   return Promise.all(files.map((file) => file.getFile()));
@@ -140,22 +156,38 @@ async function loadUploadsWorker() {
       UploadResponse
     >(workerModule);
 
-    worker.addEventListener(
-      "message",
-      ({
-        data: {
-          payload: { id, failed },
-        },
-      }) => {
-        queue.update((queue) =>
-          failed
-            ? queue.map((item) =>
-                item.id === id ? { ...item, failed } : item,
-              )!
-            : queue.filter((item) => item.id !== id),
-        );
-      },
-    );
+    worker.addEventListener("message", ({ data: { payload } }) => {
+      queue.update((currentQueue) => {
+        return currentQueue
+          .map((item) => {
+            if (item.id !== payload.id) return item;
+
+            if (payload.failed) {
+              return {
+                ...item,
+                status: "failed" as const,
+                error: payload.error,
+              };
+            }
+
+            if ("duplicate" in payload && payload.duplicate) {
+              // Remove from queue - duplicate detected by checksum
+              return null;
+            }
+
+            if ("status" in payload) {
+              // Update status based on worker progress
+              return {
+                ...item,
+                status: payload.status as QueuedUploadStatus,
+              };
+            }
+
+            return item;
+          })
+          .filter((item): item is QueuedUpload => item !== null);
+      });
+    });
   }
 
   return worker;
@@ -170,6 +202,96 @@ const queue = writable(initialValue);
 
 const exportedQueue = derived(queue, (s) => s);
 export { exportedQueue as queue };
+
+/**
+ * Derived store for active uploads (not completed or failed)
+ */
+export const activeUploads = derived(queue, ($queue) =>
+  $queue.filter((item) => !["completed", "failed"].includes(item.status)),
+);
+
+/**
+ * Derived store for upload progress summary
+ */
+export const uploadProgress = derived(queue, ($queue) => {
+  const total = $queue.length;
+  const completed = $queue.filter((item) => item.status === "completed").length;
+  const failed = $queue.filter((item) => item.status === "failed").length;
+  const active = $queue.filter(
+    (item) =>
+      !["completed", "failed", "needs-confirmation"].includes(item.status),
+  ).length;
+  const needsConfirmation = $queue.filter(
+    (item) => item.status === "needs-confirmation",
+  ).length;
+
+  return { total, completed, failed, active, needsConfirmation };
+});
+
+/**
+ * Update queue from SSE import events
+ */
+export function updateQueueFromSSE(event: {
+  type: string;
+  uploadId: string;
+  pendingId?: string;
+  duplicateInfo?: DuplicateCheckResult;
+  reason?: string;
+  error?: string;
+}) {
+  queue.update((currentQueue) => {
+    return currentQueue
+      .map((item) => {
+        if (item.id !== event.uploadId) return item;
+
+        switch (event.type) {
+          case "completed":
+            return { ...item, status: "completed" as const };
+
+          case "duplicate":
+            return {
+              ...item,
+              status: "needs-confirmation" as const,
+              pendingId: event.pendingId,
+              duplicateInfo: event.duplicateInfo,
+            };
+
+          case "skipped":
+            // Remove skipped items from queue
+            return null;
+
+          case "failed":
+            return {
+              ...item,
+              status: "failed" as const,
+              error: event.error,
+            };
+
+          default:
+            return item;
+        }
+      })
+      .filter((item): item is QueuedUpload => item !== null);
+  });
+}
+
+/**
+ * Remove completed and failed items from the queue
+ */
+export function clearCompletedUploads() {
+  queue.update((currentQueue) =>
+    currentQueue.filter(
+      (item) => !["completed", "failed"].includes(item.status),
+    ),
+  );
+}
+
+/**
+ * Remove a specific item from the queue by ID
+ */
+export function removeFromQueue(id: string) {
+  queue.update((currentQueue) => currentQueue.filter((item) => item.id !== id));
+}
 
 if (browser) {
   queue.subscribe((value) => localStorage.setItem(key, serialize(value)));
@@ -191,12 +313,24 @@ function deserialize(value: string): QueuedUpload[] {
   return JSON.parse(value);
 }
 
-interface QueuedUpload {
+export type QueuedUploadStatus =
+  | "pending" // Waiting to start
+  | "uploading" // Uploading to S3
+  | "processing" // Server processing
+  | "ingesting" // SDK ingestion running
+  | "completed" // Successfully imported
+  | "failed" // Upload or ingestion failed
+  | "needs-confirmation"; // Duplicate detected, awaiting user action
+
+export interface QueuedUpload {
   id: string;
   name: string;
   size: number;
   type: string;
-  ready: boolean;
-  failed: boolean;
+  status: QueuedUploadStatus;
+  error?: string;
   resumable: boolean;
+  // For duplicate confirmation
+  pendingId?: string;
+  duplicateInfo?: DuplicateCheckResult;
 }

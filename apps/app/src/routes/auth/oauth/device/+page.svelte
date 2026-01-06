@@ -1,33 +1,27 @@
 <script lang="ts">
-  import type { ActionData, PageData } from './$types';
-  import { Button } from '@colibri-hq/ui';
+  import type { PageProps } from './$types';
+  import { Button, Icon } from '@colibri-hq/ui';
   import { enhance } from '$app/forms';
   import DigitInput from '$lib/components/Auth/Digits/DigitInput.svelte';
-  import { Icon } from '@colibri-hq/ui';
   import AuthorizationPrompt from '$lib/components/Auth/OAuth/AuthorizationPrompt.svelte';
   import { tick } from 'svelte';
 
-  interface Props {
-    data: PageData;
-    form: ActionData;
-  }
-
-  let { data, form }: Props = $props();
+  let { data, form }: PageProps = $props();
 
   let value = $state('');
   let initialValue = $derived(data.userCode ?? '');
   let error = $derived(
     form?.errors && 'user_code' in form.errors
-      ? form.errors.user_code.join(', ')
+      ? form.errors.user_code?.join(', ')
       : undefined,
   );
 
-  let codeForm: HTMLFormElement = $state();
+  let codeForm = $state<HTMLFormElement>();
 
   async function submitOnComplete() {
     await tick();
 
-    codeForm.requestSubmit();
+    codeForm?.requestSubmit();
   }
 </script>
 
@@ -54,7 +48,7 @@
         separator
         autofocus
         {error}
-        on:input={submitOnComplete}
+        oninput={submitOnComplete}
       />
 
       <div class="flex items-center justify-self-end">

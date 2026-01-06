@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { Field, NavigationKnob, NavigationLink, NavigationMenu, NavigationSection } from '@colibri-hq/ui';
+  import { Field, NavigationKnob, NavigationLink, NavigationMenu, NavigationSection, NotificationBell } from '@colibri-hq/ui';
   import AccountPromotionBanner from '$lib/components/Sidebar/AccountPromotionBanner.svelte';
   import AddBookButton from '$lib/components/Sidebar/AddBookButton.svelte';
   import CollectionsList from '$lib/components/Sidebar/CollectionsList.svelte';
   import CurrentUser from '$lib/components/Sidebar/CurrentUser.svelte';
   import SiteBranding from '$lib/components/Sidebar/SiteBranding.svelte';
-  import type { Collection, User } from '@colibri-hq/sdk';
+  import NotificationCenter from '$lib/components/Notifications/NotificationCenter.svelte';
+  import { unreadCount } from '$lib/notifications';
+  import type { Collection, User } from '@colibri-hq/sdk/types';
   import type { MaybePromise } from '@colibri-hq/shared';
   import { page } from '$app/state';
   import { twMerge } from 'tailwind-merge';
@@ -15,6 +17,8 @@
     collections: MaybePromise<Collection[]>;
     user?: User | undefined;
     onUpload?: () => unknown;
+    notificationCenterOpen?: boolean;
+    moderationEnabled?: boolean;
   }
 
   let {
@@ -22,6 +26,8 @@
     collections,
     user = undefined,
     onUpload = () => void 0,
+    notificationCenterOpen = $bindable(false),
+    moderationEnabled = false,
   }: Props = $props();
   let searchTerm = $state('');
 </script>
@@ -32,12 +38,24 @@
   >
     <SiteBranding />
 
-    <NavigationKnob
-      href="/help"
-      label="Help"
-      active={page.url.pathname === '/help'}
-      icon="help"
-    />
+    <div class="flex items-center gap-2">
+      <NotificationCenter bind:open={notificationCenterOpen}>
+        {#snippet trigger({ open })}
+          <NotificationBell
+            unreadCount={$unreadCount}
+            active={open}
+            onClick={() => (notificationCenterOpen = !notificationCenterOpen)}
+          />
+        {/snippet}
+      </NotificationCenter>
+
+      <NavigationKnob
+        href="/help"
+        label="Help"
+        active={page.url.pathname === '/help'}
+        icon="help"
+      />
+    </div>
   </div>
 
   <NavigationMenu
@@ -71,7 +89,7 @@
     <!-- region Main Navigation -->
     <NavigationSection label="Library" open>
       <NavigationLink icon="person" title="Creators" to="/creators" />
-      <NavigationLink icon="book" title="Books" to="/books" />
+      <NavigationLink icon="book" title="Books" to="/works" />
       <NavigationLink icon="domain" title="Publishers" to="/publishers" />
     </NavigationSection>
     <!-- endregion -->
@@ -96,7 +114,7 @@
 
   <!-- region User Account Area -->
   {#if user}
-    <CurrentUser class="px-4" email={user.email} name={user.name} />
+    <CurrentUser class="px-4" email={user.email} name={user.name} role={user.role} {moderationEnabled} />
   {/if}
   <!-- endregion -->
 </div>

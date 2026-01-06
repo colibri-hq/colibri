@@ -1,9 +1,11 @@
-import { procedure, t } from "$lib/trpc/t";
+import { procedure, t, unguardedProcedure } from "$lib/trpc/t";
 import {
+  createPublisher,
   listPublishers,
   loadWorksForPublisher,
   loadCreatorsForPublisher,
   loadPublisher,
+  updatePublisher,
 } from "@colibri-hq/sdk";
 import { z } from "zod";
 
@@ -31,48 +33,46 @@ export const publishers = t.router({
   save: procedure()
     .input(
       z.object({
-        id: z.string(),
+        id: z.string().nullable().optional(),
         name: z.string().min(3).max(50).optional(),
         description: z.string().optional(),
         wikipediaUrl: z.string().optional(),
-        logoUrl: z.string().optional(),
       }),
     )
-    .mutation(({ input: { id, ...rest }, ctx: { userId } }) => {
-      if (id) {
-        // return prisma.publisher.update({
-        //   data: { ...rest, updatedByUserId: userId },
-        //   where: { id }
-        // });
-      }
+    .mutation(
+      async ({
+        input: { id, name, description, wikipediaUrl },
+        ctx: { database, userId },
+      }) => {
+        if (id) {
+          return updatePublisher(database, id, {
+            name,
+            description,
+            wikipediaUrl,
+          });
+        }
 
-      // return prisma.publisher.create({
-      //   data: { ...rest, name: rest.name || 'Unknown Publisher', updatedByUserId: userId }
-      // });
-    }),
+        return createPublisher(database, name || "Unknown Publisher", {
+          description,
+          wikipediaUrl,
+          userId,
+        });
+      },
+    ),
 
   fetchInfo: procedure()
     .input(z.string())
-    .query(
-      ({ input, ctx: { platform } }) => [],
-      // query(platform, input, ['Organization'])
-    ),
+    .query(() => []),
 
-  autocomplete: procedure()
+  autocomplete: unguardedProcedure()
     .input(z.string())
-    .query(
-      ({ input }) => [],
-      // prisma.publisher.findMany({
-      //   select: {
-      //     id: true,
-      //     name: true
-      //   },
-      //   orderBy: { name: 'desc' },
-      //   where: {
-      //     name: {
-      //       contains: input
-      //     }
-      //   }
-      // })
-    ),
+    .query(async ({ input, ctx: { database } }) => {
+      const publishers = await database
+        .selectFrom("publisher")
+        .select(["id", "name"])
+        .where("name", "ilike", `%${input}%`)
+        .orderBy("name", "desc")
+        .execute();
+      return publishers;
+    }),
 });

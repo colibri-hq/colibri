@@ -2,7 +2,7 @@
   import { Button } from '@colibri-hq/ui';
   import { Icon } from '@colibri-hq/ui';
   import { createMenu } from 'svelte-headlessui';
-  import type { Work } from '@colibri-hq/sdk';
+  import type { Work } from '@colibri-hq/sdk/types';
 
   const menu = createMenu({ label: 'Actions' });
 
@@ -13,13 +13,15 @@
 
   let { field = $bindable('updated_at'), onChange }: Props = $props();
 
-  function onSelect({
-    detail: { selected },
-  }: CustomEvent<{ selected: string }>) {
+  function onSelect(event: Event) {
+    const customEvent = event as CustomEvent<{ selected: string }>;
+    const selected = customEvent.detail.selected;
     const icon = selected.split(' ').shift();
-    field = options.find((item) => item.icon === icon)!.field;
-
-    onChange?.({ field });
+    const option = options.find((item) => item.icon === icon);
+    if (option) {
+      field = option.field;
+      onChange?.({ field });
+    }
   }
 
   const options: { icon: string; field: keyof Work; label: string }[] = [
@@ -42,7 +44,7 @@
 <div class="flex w-full flex-col items-center justify-center">
   <div class="relative text-right">
     <div class="relative inline-block text-left">
-      <div class="contents" onselect={onSelect} use:menu.button>
+      <div class="contents" on:select={onSelect} use:menu.button>
         <Button class="!pr-2" variant="subtle">
           <span class="mr-2">Sort by: {fieldLabel}</span>
           <Icon class="text-lg" name="expand_more" />

@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { preventDefault } from 'svelte/legacy';
-
   import QueueStatusWidget from '$lib/components/Upload/QueueStatusWidget.svelte';
-  import { queue, resume, supportedUploadFormats, upload } from '$lib/uploads';
+  import { activeUploads, resume, supportedUploadFormats, upload } from '$lib/uploads';
+  import { warning } from '$lib/notifications';
   import { onMount } from 'svelte';
 
   const allowedMimeTypes = supportedUploadFormats.flatMap((format) =>
@@ -10,10 +9,10 @@
   );
 
   let showDragOverlay = $state(false);
-  let pendingUploads = $derived($queue.length > 0);
 
   onMount(() => {
-    if (pendingUploads) {
+    // Resume any pending uploads from OPFS that weren't completed
+    if ($activeUploads.some((upload) => upload.resumable)) {
       resume();
     }
   });
@@ -27,6 +26,7 @@
   }
 
   async function handleDrop(event: DragEvent) {
+    event.preventDefault();
     showDragOverlay = false;
 
     if (!event.dataTransfer?.files || event.dataTransfer.files.length === 0) {
@@ -40,12 +40,12 @@
       // to the worker to avoid blocking the main thread.
       .filter(({ type }) => !type || allowedMimeTypes.includes(type));
 
-    // TODO: Show some kind of notification if no valid files are uploaded
-    console.log('Uploading files', { files });
-
-    if (files.length > 0) {
-      await upload(files);
+    if (files.length === 0) {
+      warning('No valid files', { message: 'Please upload EPUB, MOBI, or PDF files' });
+      return;
     }
+
+    await upload(files);
   }
 
   function handleDragLeave(
@@ -60,6 +60,8 @@
   }
 
   function continueDragging(event: DragEvent) {
+    event.preventDefault();
+
     if (event.dataTransfer) {
       event.dataTransfer.dropEffect = 'copy';
     }
@@ -70,8 +72,8 @@
   ondragenter={handleDragEnter}
   ondragexit={handleDragLeave}
   ondragleave={handleDragLeave}
-  ondragover={preventDefault(continueDragging)}
-  ondrop={preventDefault(handleDrop)}
+  ondragover={continueDragging}
+  ondrop={handleDrop}
 />
 
 <div
@@ -92,6 +94,5 @@
   </div>
 </div>
 
-{#if pendingUploads}
-  <QueueStatusWidget />
-{/if}
+<!-- QueueStatusWidget handles its own visibility based on active uploads -->
+<QueueStatusWidget />

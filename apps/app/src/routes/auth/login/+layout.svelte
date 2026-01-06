@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
   import type { LayoutData } from './$types';
 
   interface Props {
@@ -8,15 +7,9 @@
   }
 
   let { data, children }: Props = $props();
-
-  let error: string | undefined = $state(undefined);
-
-  run(() => {
-    error =
-      'error' in data && typeof data.error === 'string'
-        ? data.error
-        : undefined;
-  });
+  const error = $derived('error' in data && typeof data.error === 'string'
+    ? data.error
+    : undefined);
 </script>
 
 {@render children?.()}

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { Icon } from '@colibri-hq/ui';
 
-  let status: number = $derived($page.status ?? 500);
+  let status: number = $derived(page.status ?? 500);
 
-  let title = $derived($page.error?.title ?? status);
-  let message = $derived($page.error?.message.replace(/\.$/, '') + '.');
+  let title = $derived(page.error?.title ?? status);
+  let message = $derived(page.error?.message.replace(/\.$/, '') + '.');
 </script>
 
 <article class="error mx-auto my-16 max-w-prose">

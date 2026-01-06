@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { CommentWithUser } from '@colibri-hq/sdk';
+  import type { CommentWithUser } from '@colibri-hq/sdk/types';
   import AvatarGroup from '$lib/components/AvatarGroup.svelte';
   import { uniqueBy } from '@colibri-hq/shared';
 
@@ -12,13 +12,13 @@
   let amount = $derived(comments.length ?? 0);
   let commenters = $derived(
     uniqueBy(
-      comments.map(({ created_by }) => created_by),
-      'id',
+      comments.map(({ user }) => user).filter((u): u is NonNullable<typeof u> => u !== null),
+      'email',
     ),
   );
 </script>
 
-<div class="inline-flex items-center leading-none {className}">
+<div class="inline-flex items-center gap-2 leading-none {className}">
   <AvatarGroup users={commenters} />
 
   {#if amount === 0}

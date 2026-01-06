@@ -6,9 +6,9 @@ type DatabaseFixtures = {
 };
 
 export const test = base.extend<DatabaseFixtures>({
-  async database(_context, use) {
-    const database = initialize(process.env.DATABASE_URL!, {
-      certificate: process.env.DATABASE_CERTIFICATE!,
+  async database({}, use) {
+    const database = initialize(process.env.DB_URL!, {
+      certificate: process.env.DATABASE_CERTIFICATE,
       debug: true,
     });
 

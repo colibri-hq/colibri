@@ -1,22 +1,22 @@
 <script lang="ts">
-  import type { Author } from '@prisma/client';
+  import type { Creator } from '@colibri-hq/sdk/types';
 
   interface Props {
-    author: Author;
+    creator: Creator;
   }
 
-  let { author }: Props = $props();
+  let { creator }: Props = $props();
 </script>
 
-<a class="contents" href="/authors/{author.id}">
+<a class="contents" href="/creators/{creator.id}">
   <article class="flex items-center">
     <header class="contents">
       <img
-        alt="Picture of {author.name}"
+        alt="Picture of {creator.name}"
         class="h-12 w-12 shrink-0 rounded-full bg-gray-100 object-cover shadow"
-        src="/authors/{author.id}/picture"
+        src="/creators/{creator.id}/picture"
       />
-      <h3 class="ml-4 text-base font-bold">{author.name}</h3>
+      <h3 class="ml-4 text-base font-bold">{creator.name}</h3>
     </header>
   </article>
 </a>

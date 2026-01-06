@@ -9,7 +9,7 @@ export const POST: RequestHandler = async function handler({
   locals: { database },
 }) {
   try {
-    return oauth(database).handleTokenRevocation(request);
+    return oauth(database).handleTokenRevocationRequest(request);
   } catch (cause) {
     if (cause instanceof OAuthError) {
       const { response } = cause;

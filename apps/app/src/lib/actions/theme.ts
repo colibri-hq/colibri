@@ -1,6 +1,7 @@
 import type { Action } from "svelte/action";
 import { derived, writable } from "svelte/store";
-import type { AuthenticationColorScheme } from "../../database";
+
+type AuthenticationColorScheme = "dark" | "light" | "system";
 
 interface ThemeOptions {
   colorScheme: "dark" | "light" | undefined;

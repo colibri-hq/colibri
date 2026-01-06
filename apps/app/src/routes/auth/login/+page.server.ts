@@ -150,7 +150,12 @@ export const actions = {
     // region Token Issuance
     // Sign the user token: We have authenticated the user successfully using the passcode, so
     // they may use this JWT to create their pass *key*.
-    const token = issueUserToken(user);
+    const token = issueUserToken({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
 
     // Set the cookie on the response: It will be included in any requests to the server,
     // including for tRPC. This makes for a nice, transparent, and "just works" authentication

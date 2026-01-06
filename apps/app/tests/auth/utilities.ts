@@ -33,9 +33,10 @@ export function createHttpResponder(
         }
 
         const method = req.method || "GET";
+        const body = method !== "GET" ? await getBody(req) : null;
         const request = new Request(url, {
           method,
-          body: method !== "GET" ? await getBody(req) : null,
+          body: body ? new Uint8Array(body) : null,
           headers: Object.entries(req.headers).filter(
             (header): header is [string, string] => !!header[1],
           ),

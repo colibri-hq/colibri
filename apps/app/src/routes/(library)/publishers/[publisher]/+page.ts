@@ -2,10 +2,9 @@ import { trpc } from "$lib/trpc/client";
 import type { PageLoad } from "./$types";
 
 export const load = async function load(event) {
-  const publisher = await trpc(event).publishers.load.query(
-    event.params.publisher,
-  );
-  const books = trpc(event).publishers.loadBooksForPublisher.query(
+  // publisher is loaded from +page.server.ts with 404 handling
+  const { publisher } = event.data;
+  const works = trpc(event).publishers.loadBooksForPublisher.query(
     publisher.id,
   );
   const creators = trpc(event).publishers.loadCreatorsForPublisher.query(
@@ -13,8 +12,8 @@ export const load = async function load(event) {
   );
 
   return {
-    publisher,
+    ...event.data, // Pass through server data
     creators,
-    books,
+    works,
   };
 } satisfies PageLoad;

@@ -168,7 +168,14 @@ export const actions = {
       throw error(400, "The device code is missing");
     }
 
-    const [nonce, signature] = device.split(".");
+    const parts = device.split(".");
+    const nonce = parts[0];
+    const signature = parts[1];
+
+    if (!nonce || !signature) {
+      throw error(400, "The device code is malformed");
+    }
+
     const { userCode, deviceChallenge } = validated.data;
 
     await verifySignedPayload(
@@ -221,7 +228,14 @@ export const actions = {
       throw error(400, "The device code is missing.");
     }
 
-    const [nonce, signature] = device.split(".");
+    const parts = device.split(".");
+    const nonce = parts[0];
+    const signature = parts[1];
+
+    if (!nonce || !signature) {
+      throw error(400, "The device code is malformed");
+    }
+
     const { userCode, deviceChallenge } = validated.data;
 
     await verifySignedPayload(

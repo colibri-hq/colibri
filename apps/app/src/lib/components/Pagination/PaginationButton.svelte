@@ -1,14 +1,16 @@
 <script lang="ts">
-  import { createBubbler } from 'svelte/legacy';
   import { twMerge } from 'tailwind-merge';
-
-  const bubble = createBubbler();
+  import type { Snippet } from 'svelte';
 
   interface Props {
     label: string;
     active?: boolean;
     disabled?: boolean;
-    children?: import('svelte').Snippet;
+    children?: Snippet;
+    onclick?: (event: MouseEvent) => unknown;
+    onkeydown?: (event: KeyboardEvent) => unknown;
+    onkeypress?: (event: KeyboardEvent) => unknown;
+    onkeyup?: (event: KeyboardEvent) => unknown;
 
     [key: string]: any;
   }
@@ -18,15 +20,21 @@
     active = false,
     disabled = false,
     children,
+    onclick,
+    onkeydown,
+    onkeypress,
+    onkeyup,
     ...rest
   }: Props = $props();
 
   const classList = twMerge(
-    'w-8 h-8 flex justify-center items-center rounded-full leading-none p-2 transition ' +
-      'group-first/pagination:ml-0 group-last/pagination:mr-0 mx-0.5',
+    'size-8 flex justify-center items-center rounded-full leading-none p-2 transition ' +
+    'group-first/pagination:ml-0 group-last/pagination:mr-0 mx-0.5',
     active
-      ? 'font-bold bg-black text-white dark:text-gray-300 shadow-lg'
-      : 'disabled:opacity-50 dark:disabled:opacity-25 disabled:pointer-events-none hover:bg-gray-200 dark:hover:bg-gray-800',
+      ?
+      'font-bold bg-black text-white dark:text-gray-300 shadow-lg'
+      :
+      'disabled:opacity-50 dark:disabled:opacity-25 disabled:pointer-events-none hover:bg-gray-200 dark:hover:bg-gray-800',
   );
 </script>
 
@@ -36,10 +44,10 @@
   aria-label={label}
   class={classList}
   {disabled}
-  onclick={bubble('click')}
-  onkeydown={bubble('keydown')}
-  onkeypress={bubble('keypress')}
-  onkeyup={bubble('keyup')}
+  onclick={onclick}
+  onkeydown={onkeydown}
+  onkeypress={onkeypress}
+  onkeyup={onkeyup}
   type="button"
 >
   {@render children?.()}

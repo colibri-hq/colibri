@@ -1,12 +1,8 @@
 <script lang="ts">
-  import type { PageData } from './$types';
+  import type { PageProps } from './$types';
   import ContentSection from '$lib/components/ContentSection.svelte';
 
-  interface Props {
-    data: PageData;
-  }
-
-  let { data }: Props = $props();
+  let { data }: PageProps = $props();
   let featured = $derived(data.featured);
 </script>
 
@@ -35,6 +31,7 @@
       {:then books}
         <ul class="grid grid-cols-4 gap-4">
           {#each books as book, index (index)}
+            {@const htmlUrl = book.formats['text/html'] || book.formats['text/html; charset=utf-8']}
             <li
               class="flex flex-col items-center justify-between rounded-lg bg-white p-4 shadow-md"
             >
@@ -44,7 +41,9 @@
                   {book.authors.map(({ name }) => name).join(' & ')}
                 </p>
               </div>
-              <a href={book.url} target="_blank" class="text-blue-500">Read</a>
+              {#if htmlUrl}
+                <a href={htmlUrl} target="_blank" class="text-blue-500">Read</a>
+              {/if}
             </li>
           {/each}
         </ul>

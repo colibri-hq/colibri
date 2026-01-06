@@ -1,12 +1,14 @@
 import { accounts } from "$lib/trpc/routes/acounts";
-import { authors } from "$lib/trpc/routes/authors";
 import { books } from "$lib/trpc/routes/books";
 import { catalogs } from "$lib/trpc/routes/catalogs";
 import { collections } from "$lib/trpc/routes/collections";
 import { comments } from "$lib/trpc/routes/comments";
 import { creators } from "$lib/trpc/routes/creators";
 import { languages } from "$lib/trpc/routes/languages";
+import { notifications } from "$lib/trpc/routes/notifications";
 import { publishers } from "$lib/trpc/routes/publishers";
+import { search } from "$lib/trpc/routes/search";
+import { settings } from "$lib/trpc/routes/settings";
 import { users } from "$lib/trpc/routes/users";
 import { t } from "$lib/trpc/t";
 import {
@@ -17,14 +19,16 @@ import {
 
 export const router = t.router({
   accounts,
-  authors,
   books,
   catalogs,
   collections,
   comments,
   creators,
   languages,
+  notifications,
   publishers,
+  search,
+  settings,
   users,
 });
 

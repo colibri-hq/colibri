@@ -1,17 +1,12 @@
 <script lang="ts">
-  import { Icon } from '@colibri-hq/ui';
-  import Book from '$lib/components/Links/BookLink.svelte';
-  import type { PageData } from './$types';
-  import MarkdownContent from '$lib/components/MarkdownContent.svelte';
+  import { Icon, Markdown } from '@colibri-hq/ui';
+  import WorkLink from '$lib/components/Links/WorkLink.svelte';
+  import type { PageProps } from './$types';
   import CreatorLink from '$lib/components/Links/CreatorLink.svelte';
 
-  interface Props {
-    data: PageData;
-  }
-
-  let { data }: Props = $props();
+  let { data }: PageProps = $props();
   let publisher = $derived(data.publisher);
-  let books = $derived(data.books);
+  let works = $derived(data.works);
   let creators = $derived(data.creators);
 
   let publisherInfoLoading: boolean = false;
@@ -27,11 +22,11 @@
         border-gray-200 bg-gray-100 object-cover shadow-lg
         dark:border-gray-800 dark:bg-gray-700"
       >
-        {#if publisher.image}
+        {#if publisher.image_id}
           <img
-            src={publisher.image}
+            src="/publishers/{publisher.id}/picture"
             alt="Picture representing publisher {publisher.name}"
-            class="h-full w-full"
+            class="h-full w-full rounded-full object-cover"
           />
         {:else}
           <div class="flex items-center justify-center">
@@ -44,7 +39,7 @@
 
       {#if publisher.description}
         <div>
-          <MarkdownContent
+          <Markdown
             class="text-lg text-gray-700 dark:text-gray-300"
             source={publisher.description}
           />
@@ -105,13 +100,18 @@
         <h2 class="font-serif text-2xl font-medium">Published Works</h2>
       </header>
 
-      {#await books}
+      {#await works}
         <span>Loading...</span>
-      {:then books}
+      {:then works}
         <ul class="grid grid-cols-2 gap-8 md:grid-cols-4 xl:grid-cols-6">
-          {#each books as book, index (index)}
+          {#each works as work, index (index)}
             <li class="contents">
-              <Book {book} />
+              <WorkLink
+                work={work.work_id ?? work.id}
+                title={work.title ?? 'Untitled'}
+                edition={work.main_edition_id ?? work.id}
+                blurhash={work.cover_blurhash}
+              />
             </li>
           {/each}
         </ul>

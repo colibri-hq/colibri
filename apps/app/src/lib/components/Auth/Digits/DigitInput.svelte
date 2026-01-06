@@ -1,56 +1,62 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
-<script context="module" lang="ts">
+<script lang="ts">
   import Digit from '$lib/components/Auth/Digits/Digit.svelte';
-
-  export interface DigitsChange {
-    value: string | undefined;
-  }
-
-  export type DigitsChangeEvent = CustomEvent<DigitsChange>;
+  import { type Snippet, tick } from 'svelte';
+  import { twMerge } from 'tailwind-merge';
 
   interface DigitData {
     value: string;
     placeholder: string;
     ref: Digit | null;
   }
-</script>
 
-<script lang="ts">
-  import type { BackspaceEvent, PasteEvent } from './Digit.svelte';
-  import { createEventDispatcher, tick } from 'svelte';
-  import { twMerge } from 'tailwind-merge';
+  type Props = {
+    amount?: number;
+    autofocus?: boolean;
+    class?: string;
+    control?: Snippet<[string]>;
+    disabled?: boolean;
+    emitEventOnPrefill?: boolean;
+    error?: string | undefined;
+    initialValue?: string;
+    name?: string;
+    numeric?: boolean;
+    oninput?: ((value: string) => unknown) | undefined;
+    placeholder?: string;
+    separator?: Snippet | string | true | undefined;
+    value?: string;
+  };
 
-  // region CSS Classes
-  const classList = '';
-  export { classList as class };
-  const className = twMerge('flex flex-col', classList);
-  // endregion
+  let {
+    amount = 6,
+    autofocus = false,
+    class: classList = '',
+    control,
+    disabled = false,
+    emitEventOnPrefill = false,
+    error,
+    initialValue = '',
+    name = 'code',
+    numeric = false,
+    oninput,
+    placeholder = '◦',
+    separator,
+    value = $bindable(''),
+  }: Props = $props();
 
-  // region Props
-  export let value = '';
-  export let amount: number = 6;
-  export let initialValue: string = '';
-  export let name: string = 'code';
-  export let placeholder: string = '◦';
-  export let emitEventOnPrefill: boolean = false;
-  export let disabled: boolean = false;
-  export let autofocus: boolean = false;
-  export let numeric: boolean = false;
-  export let separator: string | true | undefined = undefined;
-  export let error: string | undefined = undefined;
-  // endregion
+  const className = $derived(() => twMerge('flex flex-col', classList));
 
   // region Value Handling
-  let digits: DigitData[] = resetDigits('');
-  $: internalValue = assembleValue(digits);
-  $: tick().then(() => prefill(initialValue));
+  let digits: DigitData[] = $state(resetDigits(''));
+  let internalValue = $derived(assembleValue(digits));
+
+  $effect(() => void tick().then(() => prefill(initialValue)));
 
   // endregion
 
   function resetDigits(value: string) {
     return Array.from(Array(amount).keys()).map((index) => ({
       value: value[index] || '',
-      placeholder: placeholder.length > 1 ? placeholder[index] : placeholder,
+      placeholder: placeholder.length > 1 ? (placeholder[index] ?? placeholder) : placeholder,
       ref: null,
     }));
   }
@@ -77,14 +83,14 @@
     value = internalValue ?? '';
 
     if (emitEventOnPrefill) {
-      dispatch('input', { value });
+      oninput?.(value);
     }
 
-    focusDigit(digits[amount - 1]);
+    const lastDigit = digits[amount - 1];
+    if (lastDigit) focusDigit(lastDigit);
   }
 
   // region Text Input Event Handling
-  const dispatch = createEventDispatcher<{ input: DigitsChange }>();
 
   function handleChange(index: number) {
     return async function handleChange() {
@@ -94,27 +100,25 @@
 
       await tick();
 
-      focusDigit(digits[nextIndex]);
+      const nextDigit = digits[nextIndex];
+      if (nextDigit) focusDigit(nextDigit);
       update();
     };
   }
 
   function handleBackspace(index: number) {
-    return async function handleBackspace({
-      detail: { focusPrevious },
-    }: BackspaceEvent) {
+    return async function handleBackspace({ focusPrevious }: { focusPrevious: boolean }) {
       const focusIndex = focusPrevious ? (index > 0 ? index - 1 : 0) : index;
 
       await tick();
 
-      focusDigit(digits[focusIndex], focusPrevious);
+      const targetDigit = digits[focusIndex];
+      if (targetDigit) focusDigit(targetDigit, focusPrevious);
       update();
     };
   }
 
-  async function handlePaste(event: PasteEvent) {
-    let { value: pastedValue } = event.detail;
-
+  async function handlePaste(pastedValue: string) {
     // Take one character from the pasted value
     pastedValue = pastedValue.slice(0, amount);
 
@@ -123,7 +127,8 @@
     await tick();
 
     // Focus the last digit after pasting
-    focusDigit(digits[Math.min(value.length, amount - 1)]);
+    const targetDigit = digits[Math.min(value.length, amount - 1)];
+    if (targetDigit) focusDigit(targetDigit);
     update();
   }
 
@@ -132,7 +137,8 @@
 
     await tick();
 
-    focusDigit(digits[0]);
+    const firstDigit = digits[0];
+    if (firstDigit) focusDigit(firstDigit);
     update();
   }
 
@@ -144,28 +150,26 @@
     value = internalValue ?? '';
 
     if (value) {
-      dispatch('input', { value });
+      oninput?.(value);
     }
   }
 
   // endregion
 </script>
 
-<section {...$$restProps} class={className}>
+<section class={className}>
   <div class="relative flex flex-col pb-6">
     <ol class="flex items-center justify-between space-x-2">
       {#each digits as digit, index (index)}
-        {#if separator && index === Math.floor(amount / 2)}
+        {#if index === Math.floor(amount / 2)}
           <li class="contents select-none">
-            <slot name="separator">
-              <span class="opacity-25">
-                {#if typeof separator === 'string'}
-                  {separator}
-                {:else}
-                  &mdash;
-                {/if}
-              </span>
-            </slot>
+            {#if typeof separator === 'undefined' || separator === true}
+              <span class="opacity-25">&mdash;</span>
+            {:else if typeof separator === 'string'}
+              <span class="opacity-25">{separator}</span>
+            {:else}
+              {@render separator()}
+            {/if}
           </li>
         {/if}
 
@@ -178,10 +182,10 @@
             autofocus={autofocus && index === 0}
             bind:value={digit.value}
             bind:this={digit.ref}
-            on:backspace={handleBackspace(index)}
-            on:input={handleChange(index)}
-            on:paste={handlePaste}
-            on:clear={handleClear}
+            onbackspace={handleBackspace(index)}
+            oninput={handleChange(index)}
+            onpaste={handlePaste}
+            onclear={handleClear}
           />
         </li>
       {/each}
@@ -198,8 +202,10 @@
   </div>
 
   {#if value}
-    <slot name="input" {value}>
+    {#if !!control}
+      {@render control(value)}
+    {:else}
       <input type="hidden" {value} {name} />
-    </slot>
+    {/if}
   {/if}
 </section>

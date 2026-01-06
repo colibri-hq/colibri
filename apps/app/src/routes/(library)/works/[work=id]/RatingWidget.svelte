@@ -1,13 +1,13 @@
 <script lang="ts">
   import { StarRating } from '@colibri-hq/ui';
   import type { MaybePromise } from '@colibri-hq/shared';
-  import { page } from '$app/stores';
-  import type { Book, Rating } from './+page@(library).svelte';
+  import { page } from '$app/state';
+  import type { Work, Rating } from './+page@(library).svelte';
   import { savable, trpc } from '$lib/trpc/client';
 
   interface Props {
     class?: string;
-    book: Pick<Book, 'id'>;
+    work: Pick<Work, 'id'>;
     ratings: MaybePromise<Rating[]>;
     onView?: () => unknown;
     onRating?: (rating: number) => unknown;
@@ -17,7 +17,7 @@
 
   let {
     class: className = '',
-    book,
+    work,
     ratings,
     onRating,
     onView,
@@ -27,7 +27,7 @@
     Promise.resolve(ratings).then((ratings) => {
       const sum = ratings.reduce((sum, { rating }) => sum + rating, 0);
       const { rating } = ratings.find(
-        ({ user_id }) => user_id === $page.data.user.id,
+        ({ user_id }) => user_id === page.data.user.id,
       ) ?? { rating: undefined };
 
       return {
@@ -43,9 +43,9 @@
     loading = true;
 
     try {
-      await trpc($page).books.updateRating.mutate(
+      await trpc(page).books.updateRating.mutate(
         savable({
-          workId: book.id,
+          workId: work.id,
           rating,
         }),
       );
@@ -62,7 +62,7 @@
 
 {#await internalRating}
   <p>Loading ratings...</p>
-{:then { user, average }}
+{:then {user, average }}
   <div
     class="group mt-2 flex max-w-max items-center
     rounded-full py-1 pr-1 pl-2 transition focus-within:bg-gray-100 hover:bg-gray-100

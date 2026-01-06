@@ -15,7 +15,7 @@ const config = {
       envPrefix: "COLIBRI_",
     }),
     csrf: {
-      checkOrigin: false,
+      trustedOrigins: ["*"],
     },
     prerender: {
       handleHttpError: "warn",

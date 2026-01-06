@@ -29,7 +29,7 @@ export const POST: RequestHandler = async function handler({
   }
 
   try {
-    return oauth(database).handleTokenIntrospection(request);
+    return oauth(database).handleTokenIntrospectionRequest(request);
   } catch (cause) {
     if (cause instanceof OAuthError) {
       const { response } = cause;

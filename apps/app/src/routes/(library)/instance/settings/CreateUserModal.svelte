@@ -1,11 +1,8 @@
 <script lang="ts">
-  import Modal from '$lib/components/Modal.svelte';
-  import ToggleField from '$lib/components/Form/ToggleField.svelte';
-  import { Field } from '@colibri-hq/ui';
-  import { Button } from '@colibri-hq/ui';
+  import { Button, Field, Modal, ToggleField } from '@colibri-hq/ui';
   import { z } from 'zod';
   import { trpc } from '$lib/trpc/client';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import { fly } from 'svelte/transition';
   import HelpLink from '$lib/components/HelpLink.svelte';
@@ -47,11 +44,11 @@
     error = undefined;
 
     try {
-      await trpc($page).users.createUser.mutate({
+      await trpc(page).users.createUser.mutate({
         name,
         emailAddress,
         role: childAccount ? 'adult' : 'child',
-        birthDate: birthDate || (undefined as Date | undefined),
+        birthDate: birthDate ? new Date(birthDate) : undefined,
       });
     } catch (cause) {
       error = cause instanceof Error ? cause.message : String(cause);
@@ -81,19 +78,19 @@
       bind:value={name}
       disabled={loading}
       label="Name"
-      on:submit={createAccount}
+      onsubmit={createAccount}
       required
     />
     <Field
       bind:value={emailAddress}
       disabled={loading}
       label="Email address"
-      on:submit={createAccount}
+      onsubmit={createAccount}
       required
       type="email"
     />
     <ToggleField
-      bind:value={childAccount}
+      bind:checked={childAccount}
       disabled={loading}
       hint="Kids accounts will be restricted access to content."
       label="This is a Kids' Account"
@@ -107,7 +104,7 @@
           label="Birthdate"
           type="date"
           hint="Add a birthdate to only show age-appropriate content."
-          on:submit={createAccount}
+          onsubmit={createAccount}
         />
       </div>
     {/if}
