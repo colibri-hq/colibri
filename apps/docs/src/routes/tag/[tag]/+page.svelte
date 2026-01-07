@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Icon } from '@colibri-hq/ui';
+  import { TagIcon } from '@lucide/svelte';
   import type { PageProps } from './$types.js';
 
   const { data }: PageProps = $props();
@@ -16,7 +16,7 @@
 <article class="w-full max-w-5xl mx-auto px-4 xl:px-0 py-8">
   <header class="mb-8">
     <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-2">
-      <Icon name="sell" class="text-xl" />
+      <TagIcon class="size-5" />
       <span class="text-sm uppercase tracking-wide">Tag</span>
     </div>
     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{data.tag}</h1>
