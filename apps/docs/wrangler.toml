@@ -1,0 +1,14 @@
+# Cloudflare Pages configuration for Colibri documentation
+# Enables Workers for the /mcp endpoint while serving static content
+
+name = "colibri-docs"
+compatibility_date = "2025-01-01"
+main = ".svelte-kit/cloudflare/_worker.js"
+
+[assets]
+binding = "ASSETS"
+directory = ".svelte-kit/cloudflare"
+
+# Environment variables can be added here if needed
+# [vars]
+# API_KEY = "value"
