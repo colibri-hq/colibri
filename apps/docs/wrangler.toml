@@ -10,5 +10,20 @@ binding = "ASSETS"
 directory = ".svelte-kit/cloudflare"
 
 # Environment variables can be added here if needed
-# [vars]
-# API_KEY = "value"
+[vars]
+NODE_VERSION = "24"
+
+[observability]
+enabled = false
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+persist = true
+invocation_logs = true
+
+[observability.traces]
+enabled = true
+persist = true
+head_sampling_rate = 1
