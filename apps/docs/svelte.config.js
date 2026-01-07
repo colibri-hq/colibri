@@ -1,4 +1,5 @@
-import adapter from "@sveltejs/adapter-static";
+import adapterCloudflare from "@sveltejs/adapter-cloudflare";
+import adapterStatic from "@sveltejs/adapter-static";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { escapeSvelte, mdsvex } from "mdsvex";
 import { resolve } from "node:path";
@@ -208,13 +209,23 @@ const config = {
     modernAst: true,
   },
   kit: {
-    adapter: adapter({
-      pages: outputDir,
-      assets: outputDir,
-      precompress: true,
-      strict: true,
-      fallback: "index.html",
-    }),
+    // Use Cloudflare adapter for production (enables Worker for /mcp endpoint)
+    // Use static adapter for local development without Wrangler
+    adapter:
+      process.env.ADAPTER === "static"
+        ? adapterStatic({
+            pages: outputDir,
+            assets: outputDir,
+            precompress: true,
+            strict: true,
+            fallback: "index.html",
+          })
+        : adapterCloudflare({
+            routes: {
+              include: ["/mcp"], // Only /mcp uses Worker
+              exclude: ["<all>"], // Everything else is static
+            },
+          }),
     env: {
       dir: "../..",
     },
