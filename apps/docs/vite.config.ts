@@ -1,10 +1,10 @@
 import { sveltekit } from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, searchForWorkspaceRoot } from "vite";
-import { pagefindPlugin } from "./src/build/vite-plugin-pagefind";
+import { pagefindPlugin } from "./src/build/vite-plugin-pagefind.ts";
 import packageJson from "./package.json" with { type: "json" };
 import { cwd } from "node:process";
-import { resolve } from "path";
+import { resolve } from "node:path";
 
 const {
   bugs,
