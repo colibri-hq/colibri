@@ -69,10 +69,10 @@
     "vite": "catalog:"
   },
   "scripts": {
-    "dev": "vite --configLoader runner dev",
+    "dev": "vite --configLoader native dev",
     "prebuild": "node scripts/generate-git-dates.js",
-    "build": "vite --configLoader runner build && pagefind --site dist",
-    "preview": "vite --configLoader runner preview",
+    "build": "vite --configLoader native build && pagefind --site dist",
+    "preview": "vite --configLoader native preview",
     "prepare": "svelte-kit sync || echo ''",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
