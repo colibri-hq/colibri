@@ -7,6 +7,7 @@
     "erasableSyntaxOnly": true,
     "noUncheckedIndexedAccess": true,
     "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
