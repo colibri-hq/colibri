@@ -19,7 +19,7 @@ type PagefindPluginOptions = {
 };
 
 export function pagefindPlugin({
-  contentDir = "content/",
+  contentDir = resolve(`${import.meta.dirname}/../../content/`),
 }: PagefindPluginOptions = {}): Plugin {
   const indexFiles: Map<string, Uint8Array> = new Map();
   let config: ResolvedConfig;

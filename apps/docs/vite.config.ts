@@ -12,6 +12,7 @@ const {
   homepage,
   repository,
 } = packageJson;
+const contentRoot = resolve(import.meta.dirname, contentDir);
 
 export default defineConfig({
   build: {
@@ -24,14 +25,17 @@ export default defineConfig({
     PACKAGE_REPOSITORY_URL: `"${repository.url}"`,
     PACKAGE_HOMEPAGE_URL: `"${homepage}"`,
     PACKAGE_BUGS_URL: `"${bugs.url}"`,
-    CONTENT_ROOT_DIR: `"${resolve(import.meta.dirname, contentDir).replace(import.meta.dirname, "")}"`,
-    // Site URL from environment variable, with fallback for development
+    CONTENT_ROOT_DIR: `"${contentRoot.replace(import.meta.dirname, "")}"`,
     SITE_URL: `"${process.env.SITE_URL ?? "http://localhost:5174"}"`,
   },
-  plugins: [tailwindcss(), sveltekit(), pagefindPlugin({ contentDir })],
+  plugins: [
+    tailwindcss(),
+    sveltekit(),
+    pagefindPlugin({ contentDir: contentRoot }),
+  ],
   resolve: {
     alias: {
-      $content: resolve(import.meta.dirname, contentDir),
+      $content: contentRoot,
       $components: resolve(import.meta.dirname, "src/lib/components"),
       $root: import.meta.dirname,
     },

@@ -212,19 +212,19 @@ const config = {
     // Use Cloudflare adapter for production (enables Worker for /mcp endpoint)
     // Use static adapter for local development without Wrangler
     adapter:
-      process.env.ADAPTER === "static"
-        ? adapterStatic({
+      process.env.WORKERS_CI === "1"
+        ? adapterCloudflare({
+            routes: {
+              include: ["/mcp"], // Only /mcp uses Worker
+              exclude: ["<all>"], // Everything else is static
+            },
+          })
+        : adapterStatic({
             pages: outputDir,
             assets: outputDir,
             precompress: true,
             strict: true,
             fallback: "index.html",
-          })
-        : adapterCloudflare({
-            routes: {
-              include: ["/mcp"], // Only /mcp uses Worker
-              exclude: ["<all>"], // Everything else is static
-            },
           }),
     env: {
       dir: "../..",
