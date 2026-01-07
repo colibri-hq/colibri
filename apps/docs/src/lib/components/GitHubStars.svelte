@@ -67,10 +67,9 @@
   href="https://github.com/{githubConfig.repo}"
   target="_blank"
   rel="noopener noreferrer"
-  class="inline-flex items-center gap-1.5 px-2.5 py-1 text-sm font-medium rounded-lg
-    bg-slate-800/50 hover:bg-slate-700/70 text-slate-300 hover:text-white
-    border border-slate-700/50 hover:border-slate-600
-    transition-all duration-200 {className}"
+  class="inline-flex items-center gap-1.5 px-2.5 py-1 text-sm font-medium rounded-lg bg-slate-800/50
+  hover:bg-slate-700/70 text-slate-300 hover:text-white border border-slate-700/50 hover:border-slate-600
+  transition-all duration-200 select-none {className}"
   aria-label="Star on GitHub"
 >
   <StarIcon class="size-4" />
