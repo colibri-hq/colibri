@@ -1,0 +1,39 @@
+{
+  "commands": {
+    "Symbol(SINGLE_COMMAND_CLI)": {
+      "aliases": [],
+      "args": {},
+      "description": "Interactive setup wizard for new Colibri instances",
+      "examples": [
+        "<%= config.bin %> <%= command.id %>",
+        "<%= config.bin %> <%= command.id %> --gui",
+        "<%= config.bin %> <%= command.id %> --gui --port 8080"
+      ],
+      "flags": {
+        "gui": {
+          "description": "Launch web-based setup wizard instead of CLI",
+          "name": "gui",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "port": {
+          "description": "Port for web GUI server",
+          "name": "port",
+          "default": 3333,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "Symbol(SINGLE_COMMAND_CLI)",
+      "pluginAlias": "@colibri-hq/setup",
+      "pluginName": "@colibri-hq/setup",
+      "pluginType": "core",
+      "strict": true,
+      "enableJsonFlag": false
+    }
+  },
+  "version": "0.0.1"
+}

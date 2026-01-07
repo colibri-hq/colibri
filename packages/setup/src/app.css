@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans:
+    "Titillium Web", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+@source "../../../packages/ui/src/**/*.{js,ts,svelte}";
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@custom-variant dark {
+  @media (prefers-color-scheme: dark) {
+    &:where(:not([data-color-scheme="light"] *, [data-color-scheme="light"])) {
+      @slot;
+    }
+  }
+
+  &:where([data-color-scheme="dark"] *, [data-color-scheme="dark"]) {
+    @slot;
+  }
+}

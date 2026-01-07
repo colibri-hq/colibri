@@ -1,0 +1,101 @@
+{
+  "name": "@colibri-hq/setup",
+  "version": "0.0.1",
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "description": "Setup wizard for new Colibri ebook library instances",
+  "keywords": [
+    "colibri",
+    "setup",
+    "installer",
+    "wizard",
+    "oclif"
+  ],
+  "homepage": "https://github.com/colibri-hq/colibri",
+  "author": {
+    "name": "Moritz Mazetti",
+    "email": "m@9dev.de",
+    "url": "https://mazetti.me"
+  },
+  "repository": {
+    "url": "git+https://github.com/colibri-hq/colibri.git",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "oclif": {
+    "bin": "colibri-setup",
+    "dirname": "colibri-setup",
+    "commands": {
+      "strategy": "single",
+      "target": "./dist/commands/index.js"
+    }
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc && oclif manifest",
+    "dev": "tsc --watch",
+    "check": "tsc --noEmit",
+    "lint": "eslint --fix --report-unused-disable-directives --cache --cache-location=./.cache/eslint.json .",
+    "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepack": "pnpm run build"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.10.0",
+    "@colibri-hq/sdk": "workspace:*",
+    "@colibri-hq/ui": "workspace:*",
+    "@oclif/core": "^4.8.0",
+    "@sveltejs/kit": "catalog:",
+    "open": "^11.0.0",
+    "svelte": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@eslint/js": "catalog:",
+    "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "@testcontainers/postgresql": "^10.21.0",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-n": "^17.23.1",
+    "eslint-plugin-perfectionist": "^5.1.0",
+    "eslint-plugin-unicorn": "^62.0.0",
+    "globals": "catalog:",
+    "oclif": "^4.22.61",
+    "prettier": "catalog:",
+    "rimraf": "catalog:",
+    "tailwindcss": "catalog:",
+    "testcontainers": "^10.21.0",
+    "pg": "^8.16.0",
+    "@types/pg": "^8.15.4",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "main": "dist/index.js",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "bin",
+    "dist",
+    "oclif.manifest.json"
+  ],
+  "bin": {
+    "colibri-setup": "./bin/run.js"
+  }
+}
