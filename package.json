@@ -38,6 +38,7 @@
     "dev:cli": "turbo dev --filter=@colibri-hq/cli...",
     "build": "turbo build",
     "build:app": "turbo build --filter=@colibri-hq/app...",
+    "build:docs": "turbo build --filter=@colibri-hq/docs...",
     "build:cli": "turbo build --filter=@colibri-hq/cli...",
     "test": "turbo test",
     "test:coverage": "turbo test:coverage",
