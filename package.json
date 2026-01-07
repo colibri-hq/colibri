@@ -57,7 +57,7 @@
       "yarn"
     ]
   },
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "pnpm@10.27.0",
   "devDependencies": {
     "lefthook": "^2.0.13",
     "prettier": "^3.5.3",
