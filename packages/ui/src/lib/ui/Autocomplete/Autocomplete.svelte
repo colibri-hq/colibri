@@ -104,6 +104,7 @@
     onQueryChange,
     onSelect,
   }: Props = $props();
+  const id = $props.id();
 
   let inputElement = $state<HTMLInputElement | null>(null);
   let open = $state(false);
@@ -154,13 +155,15 @@
       highlighted && 'bg-blue-50 dark:bg-blue-900/30',
       selected && 'font-medium',
     );
+
+  const _component = Combobox;
 </script>
 
 <div class={containerClasses}>
   {#if label}
     <div class="flex items-center justify-between px-1">
       {#if typeof label === 'string'}
-        <label class="text-sm text-gray-600 dark:text-gray-400">
+        <label class="text-sm text-gray-600 dark:text-gray-400" for={id}>
           {label}
           {#if required}
             <span class="text-red-500">*</span>
@@ -187,6 +190,7 @@
         class={inputClasses}
         oninput={handleInputChange}
         {placeholder}
+        {id}
         defaultValue={query}
       />
 

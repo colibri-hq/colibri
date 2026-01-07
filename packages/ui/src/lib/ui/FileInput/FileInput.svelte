@@ -51,12 +51,6 @@
     required?: boolean;
 
     /**
-     * Custom placeholder content for the dropzone.
-     * @deprecated Use the default dropzone placeholder instead.
-     */
-    _placeholder?: Snippet;
-
-    /**
      * Icon to display in the placeholder.
      */
     icon?: string;
@@ -87,12 +81,12 @@
     accept,
     disabled = false,
     required = false,
-    _placeholder,
     icon = 'upload_file',
     placeholderText = 'Drag a file here, or click to select',
     onFileSelect,
     onClear,
   }: Props = $props();
+  const id = $props.id();
 
   let inputElement = $state<HTMLInputElement | null>(null);
   let files = $state<File[]>([]);
@@ -140,7 +134,7 @@
   {#if label}
     <div class="flex items-center justify-between px-1">
       {#if typeof label === 'string'}
-        <label class="text-sm text-gray-600 dark:text-gray-400">
+        <label class="text-sm text-gray-600 dark:text-gray-400" for={id}>
           {label}
           {#if required}
             <span class="text-red-500">*</span>
@@ -153,7 +147,7 @@
   {/if}
 
   <div class="relative">
-    <input bind:this={inputElement} {accept} class="hidden" {name} type="file" />
+    <input bind:this={inputElement} {accept} class="hidden" {name} {id} type="file" />
 
     <Dropzone
       bind:files

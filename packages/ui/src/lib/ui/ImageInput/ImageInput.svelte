@@ -82,6 +82,7 @@
     onImageSelect,
     onClear,
   }: Props = $props();
+  const id = $props.id();
 
   let inputElement = $state<HTMLInputElement | null>(null);
   let previewImage = $state<HTMLImageElement | null>(null);
@@ -151,7 +152,7 @@
   {#if label || (showDimensions && dimensions)}
     <div class="flex items-center justify-between px-1">
       {#if typeof label === 'string'}
-        <label class="text-sm text-gray-600 dark:text-gray-400">
+        <label class="text-sm text-gray-600 dark:text-gray-400" for={id}>
           {label}
           {#if required}
             <span class="text-red-500">*</span>
@@ -172,7 +173,7 @@
   {/if}
 
   <div class="relative">
-    <input bind:this={inputElement} {accept} class="hidden" {name} type="file" />
+    <input bind:this={inputElement} {accept} class="hidden" {name} {id} type="file" />
 
     <Dropzone
       bind:files
@@ -187,7 +188,7 @@
           <div class="w-full">
             <img
               bind:this={previewImage}
-              alt="Preview of the selected image"
+              alt="Preview of the selected file"
               class="h-auto w-full rounded-md object-contain"
               src={previewUrl}
             />
