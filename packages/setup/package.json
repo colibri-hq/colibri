@@ -34,6 +34,7 @@
   },
   "scripts": {
     "build": "rimraf dist && tsc && oclif manifest",
+    "build:ci": "pnpm run build",
     "dev": "tsc --watch",
     "check": "tsc --noEmit",
     "lint": "eslint --fix --report-unused-disable-directives --cache --cache-location=./.cache/eslint.json .",

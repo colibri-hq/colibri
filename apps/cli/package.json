@@ -62,6 +62,7 @@
   },
   "scripts": {
     "build": "rimraf dist && tsc && oclif manifest",
+    "build:ci": "pnpm run build",
     "dev": "tsc --watch",
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "pnpm run lint",

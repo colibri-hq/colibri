@@ -24,6 +24,7 @@
   },
   "scripts": {
     "build": "rimraf dist; tsc --project tsconfig.lib.json",
+    "build:ci": "pnpm run build",
     "dev": "tsc --watch",
     "check": "tsc --noEmit --project tsconfig.lib.json && tsc --noEmit --project tsconfig.node.json",
     "coverage": "npx make-coverage-badge --output-path ./badges/coverage.svg",

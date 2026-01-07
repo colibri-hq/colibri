@@ -25,6 +25,7 @@
   },
   "scripts": {
     "build": "rimraf dist; tsc",
+    "build:ci": "pnpm run build",
     "dev": "tsc --watch",
     "check": "tsc --noEmit",
     "download": "tsx scripts/download.ts",

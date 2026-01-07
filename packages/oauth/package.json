@@ -30,6 +30,7 @@
   },
   "scripts": {
     "build": "rimraf dist; tsc",
+    "build:ci": "pnpm run build",
     "dev": "tsc --watch",
     "check": "tsc --noEmit",
     "test": "vitest",

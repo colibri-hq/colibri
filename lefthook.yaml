@@ -18,6 +18,6 @@ pre-push:
   parallel: true
   commands:
     check:
-      run: pnpm turbo run check
+      run: pnpm check
     test:
       run: pnpm test

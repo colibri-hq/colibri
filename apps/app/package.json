@@ -88,6 +88,7 @@
     "dev": "ORIGIN=http://localhost:5173 vite dev",
     "start": "node ./dist/index.js",
     "build": "svelte-kit sync && vite build",
+    "build:ci": "pnpm run build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
