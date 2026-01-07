@@ -17,8 +17,8 @@ Access your personal settings by clicking your avatar in the sidebar and selecti
 
 ### Profile
 
-- **Display Name**: Your name shown to other users
-- **Email**: Your email address (used for notifications)
+- **Display Name**: Your name shown in the interface
+- **Email**: Your email address (used for login)
 - **Avatar**: Upload a profile picture
 
 ### Passkeys
@@ -34,8 +34,6 @@ Manage your passwordless authentication:
 ### Preferences
 
 - **Theme**: Light, dark, or system preference
-- **Language**: Interface language
-- **Notifications**: Email notification preferences
 
 ## Instance Settings (Admin Only)
 
@@ -44,36 +42,13 @@ Administrators can access instance settings at **Settings > Instance**.
 ### General
 
 - **Instance Name**: The name of your Colibri installation
-- **Registration**: Enable or disable new user registration
-- **Default User Role**: Role assigned to new users
+- **Instance Description**: A tagline or description
+
+### Storage
+
+Configure S3-compatible storage for ebook files and covers.
 
 ### Users
 
-- View all registered users
-- Change user roles (admin, adult, child)
-- Disable or delete user accounts
-- Send password reset emails
-
-### Catalogs
-
-Configure external OPDS catalogs for the Discover feature:
-
-- Add catalog URL and credentials
-- Set catalog display name
-- Enable or disable catalogs
-
-### Metadata Providers
-
-Configure API keys for enhanced metadata:
-
-- Google Books API Key
-- ISBNdb API Key
-- Springer API Key
-
-### Moderation
-
-For instances with multiple users:
-
-- Review reported comments
-- Manage moderation queue
-- Set content policies
+- View registered users
+- Change user roles (admin, user)
