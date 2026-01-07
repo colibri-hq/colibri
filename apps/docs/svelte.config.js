@@ -210,7 +210,7 @@ const config = {
   },
   kit: {
     adapter:
-      process.env.WORKERS_CI === "1"
+      process.env.ADAPTER === "cloudflare"
         ? adapterCloudflare({
             routes: {
               include: ["/mcp"],
