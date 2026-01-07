@@ -12,10 +12,10 @@ import {
 } from "@colibri-hq/sdk";
 import { decodeFromBase64 } from "@colibri-hq/shared";
 import {
+  type AuthenticationResponseJSON,
   type VerifiedAuthenticationResponse,
   verifyAuthenticationResponse,
 } from "@simplewebauthn/server";
-import type { AuthenticationResponseJSON } from "@simplewebauthn/types";
 import { type Cookies, error, json, type RequestHandler } from "@sveltejs/kit";
 import jwt from "jsonwebtoken";
 

@@ -1,12 +1,10 @@
 import { goto } from "$app/navigation";
 import {
+  type AuthenticationResponseJSON,
   browserSupportsWebAuthnAutofill,
+  type PublicKeyCredentialRequestOptionsJSON,
   startAuthentication,
 } from "@simplewebauthn/browser";
-import type {
-  AuthenticationResponseJSON,
-  PublicKeyCredentialRequestOptionsJSON,
-} from "@simplewebauthn/types";
 import type { VerificationResponse } from "../assertion/verify/+server";
 
 export async function ceremony(fetch: Fetch) {

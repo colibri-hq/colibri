@@ -7,12 +7,12 @@ import {
   resolveCurrentChallenge,
 } from "@colibri-hq/sdk";
 import { encodeToBase64 } from "@colibri-hq/shared";
-import type {
-  VerifiedRegistrationResponse,
-  VerifyRegistrationResponseOpts,
+import {
+  type RegistrationResponseJSON,
+  type VerifiedRegistrationResponse,
+  verifyRegistrationResponse,
+  type VerifyRegistrationResponseOpts,
 } from "@simplewebauthn/server";
-import { verifyRegistrationResponse } from "@simplewebauthn/server";
-import type { RegistrationResponseJSON } from "@simplewebauthn/types";
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 import { UAParser } from "ua-parser-js";
 

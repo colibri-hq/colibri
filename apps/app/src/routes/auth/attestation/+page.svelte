@@ -2,8 +2,7 @@
   import { goto } from '$app/navigation';
   import { Button } from '@colibri-hq/ui';
   import PageHeader from '$lib/components/Page/PageHeader.svelte';
-  import { browserSupportsWebAuthn, startRegistration } from '@simplewebauthn/browser';
-  import type { RegistrationResponseJSON } from '@simplewebauthn/types';
+  import { browserSupportsWebAuthn, startRegistration, type RegistrationResponseJSON } from '@simplewebauthn/browser';
   import { onMount } from 'svelte';
   import type { VerificationResponse } from './verify/+server';
   import type { PageProps } from './$types';

@@ -1,5 +1,5 @@
 import { browser } from "$app/environment";
-import type { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/types";
+import type { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/browser";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async function load({ fetch, parent }) {
