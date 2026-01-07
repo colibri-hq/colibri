@@ -109,7 +109,8 @@ EXAMPLES
 | ----------------- | -------------- | --------------------------------------------- |
 | Connection String | PostgreSQL DSN | `postgres://user:pass@localhost:5432/colibri` |
 
-The database must have the Colibri schema already applied. The wizard will test the connection and verify the schema exists before proceeding.
+The database must have the Colibri schema already applied. The wizard will test the connection and verify the schema
+exists before proceeding.
 
 ### Admin Account
 
@@ -247,7 +248,8 @@ pnpm test:watch
 
 ### Testing
 
-The package includes E2E tests that use [Testcontainers](https://testcontainers.com/) to spin up a real PostgreSQL database:
+The package includes E2E tests that use [Testcontainers](https://testcontainers.com/) to spin up a real PostgreSQL
+database:
 
 ```bash
 # Run all tests
@@ -274,7 +276,8 @@ node bin/run.js --help
 
 ## Contributing
 
-Contributions are welcome! Please see the [main repository](https://github.com/colibri-hq/colibri) for contribution guidelines.
+Contributions are welcome! Please see the [main repository](https://github.com/colibri-hq/colibri) for contribution
+guidelines.
 
 ### Development Tips
 
