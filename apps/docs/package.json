@@ -41,6 +41,10 @@
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
+    "@vitest/browser": "catalog:",
+    "@vitest/browser-playwright": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "vitest": "catalog:",
     "@cloudflare/workers-types": "^4.20260103.0",
     "@sveltejs/adapter-cloudflare": "^7.2.4",
     "@sveltejs/adapter-static": "^3.0.10",
@@ -81,10 +85,11 @@
     "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
     "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
     "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content .",
-    "test-ct": "playwright test -c playwright-ct.config.ts",
-    "test": "playwright test -c playwright.config.ts",
-    "test:vitest": "vitest",
-    "test:browser": "vitest --project browser"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run --project unit",
+    "test:e2e": "vitest run --project e2e",
+    "test:coverage": "vitest run --coverage"
   },
   "config": {
     "contentDir": "content/",
