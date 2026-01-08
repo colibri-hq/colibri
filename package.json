@@ -59,6 +59,7 @@
   },
   "packageManager": "pnpm@10.27.0",
   "devDependencies": {
+    "@colibri-hq/shared": "workspace:*",
     "lefthook": "^2.0.13",
     "prettier": "^3.7.4",
     "prettier-plugin-organize-imports": "^4.3.0",

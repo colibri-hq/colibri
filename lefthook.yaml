@@ -2,14 +2,9 @@ pre-commit:
   parallel: true
   commands:
     fmt:
-      # Run formatter on changed files only
-      run: |
-        staged=({staged_files})
-        if [ ${#staged[@]} -gt 0 ]; then
-          pnpx prettier --write --ignore-unknown "${staged[@]}"
-        fi
+      run: pnpm exec prettier --write --ignore-unknown {staged_files}
       stage_fixed: true
-      glob: "*.{ts,js,svelte,css,html,json,md}"
+      glob: '*.{ts,js,svelte,css,html,json,md}'
       skip:
         - merge
         - rebase
@@ -19,5 +14,7 @@ pre-push:
   commands:
     check:
       run: pnpm check
+    lint:
+      run: pnpm lint
     test:
       run: pnpm test

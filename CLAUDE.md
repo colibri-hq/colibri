@@ -102,7 +102,35 @@ apps/app, apps/cli
 - Svelte 5 for components
 - Tailwind CSS 4 for styling
 - ESLint + Prettier with shared configs from `@colibri-hq/shared`
-- Pre-commit hooks via lefthook (fmt, lint, check, test)
+
+### Git Hooks (lefthook)
+
+Git hooks are managed by [lefthook](https://github.com/evilmartians/lefthook) and configured in `lefthook.yaml`:
+
+**Pre-commit** (runs on every commit):
+
+- Formats staged files with Prettier
+- Uses `stage_fixed: true` to re-stage formatted files
+- Skips during merge/rebase operations
+
+**Pre-push** (runs before pushing):
+
+- `pnpm check` - TypeScript type checking
+- `pnpm lint` - ESLint
+- `pnpm test` - Test suite
+
+**Key files:**
+
+- `lefthook.yaml` - Hook configuration
+- `prettier.config.js` - Root config importing from `@colibri-hq/shared/prettier.config`
+- `packages/shared/prettier.config.ts` - Shared Prettier config with plugins
+- `packages/shared/eslint.config.ts` - Shared ESLint config
+
+**Troubleshooting:**
+
+- If hooks fail with "Cannot find package", ensure `@colibri-hq/shared` is in root `devDependencies`
+- Run `lefthook install` after modifying `lefthook.yaml`
+- The root `prettier.config.js` must import from `@colibri-hq/shared/prettier.config` (not relative path)
 
 ## CLI Commands
 
@@ -122,7 +150,7 @@ This project has specialized agents in `.claude/agents/` that have deep knowledg
 proactively** for better assistance:
 
 | Agent                       | Use For                                                 |
-|-----------------------------|---------------------------------------------------------|
+| --------------------------- | ------------------------------------------------------- |
 | **sdk-expert**              | Database operations, ebook parsing, storage, Kysely ORM |
 | **cli-expert**              | CLI commands, oclif patterns, terminal output           |
 | **web-app-expert**          | SvelteKit routes, tRPC API, authentication flows        |

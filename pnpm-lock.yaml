@@ -114,6 +114,9 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
     devDependencies:
+      '@colibri-hq/shared':
+        specifier: workspace:*
+        version: link:packages/shared
       lefthook:
         specifier: ^2.0.13
         version: 2.0.13
