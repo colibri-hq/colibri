@@ -1,12 +1,10 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import PageContent from '$lib/components/page/PageContent.svelte';
-  import PageHeader from '$lib/components/page/PageHeader.svelte';
-  import PageFooter from '$lib/components/page/PageFooter.svelte';
+  import { PageContent, PageFooter, PageHeader } from '$lib/components/page';
   import type { PageProps } from './$types.js';
-  import { type PageMetadata, getBreadcrumbs } from '$lib/content/content';
+  import { getBreadcrumbs, type PageMetadata } from '$lib/content/content';
   import ChildPageNavigation from './ChildPageNavigation.svelte';
-  import { siteConfig } from '$root/site.config';
+  import { PUBLIC_SITE_URL } from '$env/static/public';
 
   const { data }: PageProps = $props();
   const IndexContent = $derived(data.indexContent);
@@ -18,27 +16,24 @@
     categories: [],
   });
   const siblings = $derived(data.siblings);
-
-  // Get breadcrumbs for navigation
   const breadcrumbs = $derived(getBreadcrumbs(data.slug));
-
-  // Build breadcrumbs for JSON-LD (with full URLs)
-  const jsonLdBreadcrumbs = $derived.by(() => {
-    const crumbs = breadcrumbs.map((item) => ({
-      name: item.title,
-      url: `${siteConfig.site.url}${item.href}`,
-    }));
-
-    crumbs.push({ name: data.title, url: new URL(page.url.pathname, siteConfig.site.url).toString() });
-
-    return crumbs;
-  });
+  const jsonLdBreadcrumbs = $derived([
+    ...breadcrumbs,
+    { title: data.title, href: page.url.pathname },
+  ].map(({ href, title: name }) => ({
+    url: new URL(href, PUBLIC_SITE_URL).toString(),
+    name,
+  })));
 
   const children = $derived(data.children ?? []);
 </script>
 
 <article class="flex flex-col gap-4">
-  <PageHeader title={metadata.title} description={metadata.description} {breadcrumbs} readingTime={metadata.readingTime} />
+  <PageHeader
+    title={metadata.title}
+    description={metadata.description} {breadcrumbs}
+    readingTime={metadata.readingTime}
+  />
 
   {#if IndexContent}
     <PageContent {metadata} breadcrumbs={jsonLdBreadcrumbs}>
@@ -47,6 +42,5 @@
   {/if}
 
   <ChildPageNavigation {children} />
-
   <PageFooter {metadata} {siblings} />
 </article>

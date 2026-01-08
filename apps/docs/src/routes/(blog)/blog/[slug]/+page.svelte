@@ -2,12 +2,15 @@
   import type { PageProps } from './$types.js';
   import { page } from '$app/state';
   import { BlogJsonLd, BlogSEO, RelatedPosts } from '$lib/components/blog';
-  import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
   import { resolve } from '$app/paths';
-  import LateralNavigation from '$lib/components/LateralNavigation.svelte';
   import PostHeader from './PostHeader.svelte';
   import SeriesNavigation from './SeriesNavigation.svelte';
-  import Giscus from '$lib/components/Giscus.svelte';
+  import { Breadcrumbs, Giscus, LateralNavigation } from '$lib/components/content';
+  import {
+    PUBLIC_GISCUS_CATEGORY_ID,
+    PUBLIC_GISCUS_CATEGORY_NAME,
+    PUBLIC_GISCUS_REPOSITORY_ID,
+  } from '$env/static/public';
 
   const { data }: PageProps = $props();
   const metadata = $derived(data.post.metadata);
@@ -55,5 +58,10 @@
 
   <LateralNavigation {previous} {next} />
   <RelatedPosts posts={data.relatedPosts} />
-  <Giscus />
+  <Giscus
+    repository={PACKAGE_REPOSITORY_URL}
+    repoId={PUBLIC_GISCUS_REPOSITORY_ID}
+    category={PUBLIC_GISCUS_CATEGORY_NAME}
+    categoryId={PUBLIC_GISCUS_CATEGORY_ID}
+  />
 </article>

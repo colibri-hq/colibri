@@ -11,13 +11,10 @@
     UsersIcon,
   } from '@lucide/svelte';
   import { resolve } from '$app/paths';
-  import Github from '$lib/components/icons/Github.svelte';
+  import { Github } from '$lib/components/icons';
 
   const { data }: PageProps = $props();
 
-  // Pre-generated hummingbird data (static, works with SSR)
-  // Each bird: flies in -> hovers at a point -> flies out
-  // Total durations range from 2.5s to 5s
   const hummingbirds = [
     { id: 0, size: 18, delay: 0.0, duration: 4.2 },
     { id: 1, size: 16, delay: 0.2, duration: 3.0 },
@@ -26,11 +23,11 @@
     { id: 4, size: 17, delay: 0.3, duration: 3.8 },
   ];
 
-  function getTitle(item: Page | Directory): string {
+  function getTitle(item: Page | Directory) {
     return item instanceof Page ? item.metadata.title : item.title;
   }
 
-  function getDescription(item: Page | Directory): string | undefined {
+  function getDescription(item: Page | Directory) {
     return item instanceof Page ? item.metadata.description : item.metadata?.description;
   }
 
@@ -90,7 +87,7 @@
     <div class="hummingbirds absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
       {#each hummingbirds as bird (bird.id)}
         <svg
-          class="hummingbird hummingbird-{bird.id}"
+          class="absolute opacity-0 left-0 top-0 blur-[1px] will-change-auto hummingbird-{bird.id}"
           viewBox="0 0 50 28"
           style="
             width: {bird.size * 2.2}px;
@@ -133,8 +130,8 @@
             href={resolve("/getting-started")}
             class="inline-flex items-center justify-center gap-2 px-8 py-3 text-base font-medium rounded-xl text-white
             shadow-md hover:shadow-lg ring-0 transition duration-300 outline-hidden focus-visible:ring-3
-            ring-blue-400 dark:ring-blue-700 dark:ring-offset-2 dark:ring-offset-slate-800 select-none bg-linear-to-br from-blue-500 to-blue-700
-            hover:from-blue-500 hover:to-blue-800 to-80%"
+            ring-blue-400 dark:ring-blue-700 dark:ring-offset-2 dark:ring-offset-slate-800 select-none
+            bg-linear-to-br from-blue-500 to-blue-700 hover:from-blue-500 hover:to-blue-800 to-80%"
           >
             Get Started
             <ArrowRightIcon />
@@ -332,15 +329,6 @@
 
 <style>
     /* Hummingbird cinematic fly-through animation */
-    .hummingbird {
-        position: absolute;
-        opacity: 0;
-        left: 0;
-        top: 0;
-        filter: blur(1px);
-        will-change: transform, opacity;
-    }
-
     .bird-body {
         fill: #4b5563;
     }

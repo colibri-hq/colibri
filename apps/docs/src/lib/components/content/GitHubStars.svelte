@@ -1,36 +1,45 @@
 <script lang="ts">
   import { StarIcon } from '@lucide/svelte';
-  import { githubConfig } from '$root/site.config';
 
   type Props = {
+    repository: string;
     class?: string;
   };
 
-  const { class: className = '' }: Props = $props();
+  const cacheKey = 'github-stars';
+  const cacheTtl = 60 * 60 * 1000;
 
-  const CACHE_KEY = 'github-stars';
-  const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
-
+  const { repository, class: className = '' }: Props = $props();
+  const repositoryName = $derived(repository.split('github.com/').at(1)?.replace(/\.git$/, ''));
   let starCount = $state<number | null>(null);
-
-  // Format large numbers (e.g., 1234 -> 1.2k)
-  function formatCount(count: number): string {
-    if (count >= 1000) {
-      return `${(count / 1000).toFixed(1)}k`;
+  const formattedCount = $derived.by(() => {
+    if (!starCount) {
+      return '';
     }
-    return count.toString();
-  }
+
+    if (starCount >= 1_000_000) {
+      return `${(starCount / 1_000_000).toFixed(1)}m`;
+    }
+
+    if (starCount >= 1000) {
+      return `${(starCount / 1_000).toFixed(1)}k`;
+    }
+
+    return starCount.toString();
+  });
 
   // Fetch and cache star count
   async function fetchStars() {
-    // Check cache first
     if (typeof localStorage !== 'undefined') {
-      const cached = localStorage.getItem(CACHE_KEY);
+      const cached = localStorage.getItem(cacheKey);
+
       if (cached) {
         try {
           const { count, timestamp } = JSON.parse(cached);
-          if (Date.now() - timestamp < CACHE_DURATION) {
+
+          if (Date.now() - timestamp < cacheTtl) {
             starCount = count;
+
             return;
           }
         } catch {
@@ -40,16 +49,16 @@
     }
 
     try {
-      const response = await fetch(`https://api.github.com/repos/${githubConfig.repo}`);
+      const response = await fetch(`https://api.github.com/repos/${repositoryName}`);
+
       if (response.ok) {
         const data = await response.json();
         starCount = data.stargazers_count;
 
-        // Cache the result
         if (typeof localStorage !== 'undefined') {
           localStorage.setItem(
-            CACHE_KEY,
-            JSON.stringify({ count: starCount, timestamp: Date.now() })
+            cacheKey,
+            JSON.stringify({ count: starCount, timestamp: Date.now() }),
           );
         }
       }
@@ -59,12 +68,12 @@
   }
 
   $effect(() => {
-    fetchStars();
+    void fetchStars();
   });
 </script>
 
 <a
-  href="https://github.com/{githubConfig.repo}"
+  href={repository}
   target="_blank"
   rel="noopener noreferrer"
   class="inline-flex items-center gap-1.5 px-2.5 py-1 text-sm font-medium rounded-lg bg-slate-800/50
@@ -73,8 +82,9 @@
   aria-label="Star on GitHub"
 >
   <StarIcon class="size-4" />
+
   {#if starCount !== null}
-    <span>{formatCount(starCount)}</span>
+    <span>{formattedCount}</span>
   {:else}
     <span>Star</span>
   {/if}

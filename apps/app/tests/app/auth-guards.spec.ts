@@ -79,7 +79,7 @@ test.describe("Authentication Guards", () => {
         {
           name: sessionCookieName,
           value: jwt.sign(
-            { name: "Regular User", email: "user@colibri.io" },
+            { name: "Regular User", email: "user@colibri-hq.org" },
             process.env.JWT_SECRET!,
             { subject: TEST_NON_ADMIN_USER_ID },
           ),

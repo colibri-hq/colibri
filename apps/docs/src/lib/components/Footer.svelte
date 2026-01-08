@@ -1,8 +1,8 @@
 <script lang="ts">
   import { Directory, Page } from '$lib/content/content';
-  import { ArrowUpRightIcon, RssIcon, HistoryIcon, MapIcon } from '@lucide/svelte';
-  import Github from '$lib/components/icons/Github.svelte';
-  import NavigationHeading from '$lib/components/blog/NavigationHeading.svelte';
+  import { ArrowUpRightIcon, HistoryIcon, MapIcon, RssIcon } from '@lucide/svelte';
+  import { Github } from '$lib/components/icons';
+  import { NavigationHeading } from '$lib/components/blog';
   import { resolve } from '$app/paths';
 
   type Props = {

@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { getLinkPreviewContext } from '$lib/components/LinkPreview';
+  import { getLinkPreviewContext } from '$lib/components/links';
   import { isInternalDocLink } from '$lib/utils/link-preview';
 
   type Props = {

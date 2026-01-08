@@ -1,9 +1,8 @@
 <script lang="ts">
   import type { PageProps } from './$types.js';
-  import { AuthorCard } from '$lib/components/blog';
-  import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
+  import { AuthorCard, BlogPostList } from '$lib/components/blog';
+  import { Breadcrumbs } from '$lib/components/content';
   import { resolve } from '$app/paths';
-  import BlogPostList from '$lib/components/blog/BlogPostList.svelte';
 
   const { data }: PageProps = $props();
   const posts = $derived(data.posts);

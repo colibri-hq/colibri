@@ -1,11 +1,12 @@
-import type { SiteConfig } from "statue-ssg/cms/content-processor.js";
+import { PUBLIC_SITE_URL } from "$env/static/public";
 
-export const siteConfig: SiteConfig = {
+export const siteConfig = {
   // Site general information
   site: {
     name: "Colibri",
-    description: "Self-hosted ebook library with metadata enrichment and passwordless authentication",
-    url: SITE_URL as `https://${string}` | `http://${string}`,
+    description:
+      "Self-hosted ebook library with metadata enrichment and passwordless authentication",
+    url: PUBLIC_SITE_URL as `https://${string}` | `http://${string}`,
     author: "Colibri Contributors",
   },
 
@@ -50,38 +51,8 @@ export const siteConfig: SiteConfig = {
   },
 };
 
-// Blog configuration
 export const blogConfig = {
   title: "Colibri Development Blog",
-  description: "Development updates, tutorials, and insights from the Colibri team",
-  postsPerPage: 10,
-  showFeaturedSection: true,
-  enableRss: true,
-  rssPath: "/blog/feed.xml",
+  description:
+    "Development updates, tutorials, and insights from the Colibri team",
 };
-
-// GitHub repository configuration for "Edit on GitHub" links
-export const githubConfig = {
-  repo: "colibri-hq/colibri",
-  branch: "v3",
-  contentPath: "apps/docs/content",
-};
-
-// Giscus comments configuration
-// Get these values from https://giscus.app after enabling GitHub Discussions
-export const giscusConfig = {
-  // Repository ID - get from giscus.app configuration
-  repoId: "R_kgDON1LZmw",
-  // Discussion category name
-  category: "Comments",
-  // Category ID - get from giscus.app configuration
-  categoryId: "DIC_kwDON1LZm84ClvPQ",
-  // How to map pages to discussions
-  mapping: "pathname" as const,
-  // Enable reactions on main post
-  reactions: true,
-  // Lazy load comments
-  lazy: true,
-};
-
-export default siteConfig;

@@ -1,10 +1,9 @@
 <script lang="ts">
-  import type { Snippet } from "svelte";
-  import PageActions from "$lib/components/page/PageActions.svelte";
-  import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
-  import ShareButton from "$lib/components/ShareButton.svelte";
-  import type { BreadcrumbItem } from "$lib/content/content";
-  import { ClockIcon } from "@lucide/svelte";
+  import type { Snippet } from 'svelte';
+  import { PageActions } from '$lib/components/page';
+  import type { BreadcrumbItem } from '$lib/content/content';
+  import { ClockIcon } from '@lucide/svelte';
+  import { Breadcrumbs, ShareButton } from '$lib/components/content';
 
   type Props = {
     title: string | Snippet;

@@ -12,7 +12,7 @@
   import NavigationBar from '$lib/components/NavigationBar.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import SearchOverlay from '$lib/components/search/SearchOverlay.svelte';
-  import { LinkPreviewProvider } from '$lib/components/LinkPreview';
+  import { LinkPreviewProvider } from '$lib/components/links';
   import { setSearchContext } from '$lib/components/search';
 
   const { data, children }: LayoutProps = $props();

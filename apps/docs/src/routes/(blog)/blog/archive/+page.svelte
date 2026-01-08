@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { PageProps } from './$types.js';
-  import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
+  import { Breadcrumbs } from '$lib/components/content';
   import { resolve } from '$app/paths';
   import ArchiveYear from './ArchiveYear.svelte';
 

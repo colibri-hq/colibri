@@ -2,8 +2,8 @@
   import { ArrowDownToLineIcon } from '@lucide/svelte';
   import type { BlogPost } from '$lib/content/blog';
   import { onMount } from 'svelte';
-  import EndingLine from '$lib/components/EndingLine.svelte';
-  import BlogPostList from '$lib/components/blog/BlogPostList.svelte';
+  import { EndingLine } from '$lib/components/content';
+  import { BlogPostList } from '$lib/components/blog';
 
   type Props = {
     posts: BlogPost[];

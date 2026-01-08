@@ -1,6 +1,6 @@
-import { getContext, setContext } from 'svelte';
+import { getContext, setContext } from "svelte";
 
-const CONTEXT_KEY = Symbol('link-preview');
+const CONTEXT_KEY = Symbol("link-preview");
 
 export interface LinkPreviewContext {
   showPreview: (href: string, anchor: HTMLElement) => void;

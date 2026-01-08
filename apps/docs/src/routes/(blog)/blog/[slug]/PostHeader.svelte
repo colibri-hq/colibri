@@ -2,8 +2,8 @@
   import type { BlogPostMetadata } from '$lib/content/blog';
   import { formatBlogDate } from '$lib/content/blog';
   import type { AuthorWithGravatar } from '$lib/content/author';
-  import ShareButton from '$lib/components/ShareButton.svelte';
-  import PageActions from '$lib/components/page/PageActions.svelte';
+  import { ShareButton } from '$lib/components/content';
+  import { PageActions } from '$lib/components/page';
   import { CalendarIcon, ClockIcon, TagIcon } from '@lucide/svelte';
   import { AuthorCard, Tag } from '$lib/components/blog';
   import SeriesBanner from './SeriesBanner.svelte';

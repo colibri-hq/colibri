@@ -1,9 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
   import { Divider, OverflowButton } from '@colibri-hq/ui';
-  import Claude from '$lib/components/icons/Claude.svelte';
-  import ChatGpt from '$lib/components/icons/ChatGpt.svelte';
-  import Markdown from '$lib/components/icons/Markdown.svelte';
+  import { ChatGpt, Claude, Markdown } from '$lib/components/icons';
   import { BracesIcon, CheckIcon, CopyIcon } from '@lucide/svelte';
   import { browser } from '$app/environment';
 

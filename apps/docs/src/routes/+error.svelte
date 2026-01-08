@@ -72,28 +72,28 @@
           onclick={openSearch}
           variant="light" placeholder="Search Documentation…" size="large" />
       </div>
-    {/if}
 
-    <nav class="border-t border-gray-200 dark:border-slate-700 pt-8" aria-label="Suggested pages">
-      <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
-        Or try one of these pages:
-      </p>
-      <ul class="flex flex-wrap justify-center gap-3">
-        {#each suggestedLinks as link, index (index)}
-          {@const Icon = link.icon}
-          <li class="contents">
-            <a
-              href={link.href}
-              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg
+      <nav class="border-t border-gray-200 dark:border-slate-700 pt-8" aria-label="Suggested pages">
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          Or try one of these pages:
+        </p>
+        <ul class="flex flex-wrap justify-center gap-3">
+          {#each suggestedLinks as link, index (index)}
+            {@const Icon = link.icon}
+            <li class="contents">
+              <a
+                href={link.href}
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg
               bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700
               text-gray-700 dark:text-gray-300 transition-colors"
-            >
-              <Icon class="size-4" />
-              {link.label}
-            </a>
-          </li>
-        {/each}
-      </ul>
-    </nav>
+              >
+                <Icon class="size-4" />
+                {link.label}
+              </a>
+            </li>
+          {/each}
+        </ul>
+      </nav>
+    {/if}
   </div>
 </div>

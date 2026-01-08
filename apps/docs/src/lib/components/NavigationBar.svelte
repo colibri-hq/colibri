@@ -3,11 +3,9 @@
   import { fade, slide } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
   import { Directory, Page } from '$lib/content/content';
-  import SearchTrigger from '$lib/components/search/SearchTrigger.svelte';
-  import GitHubStars from '$lib/components/GitHubStars.svelte';
-  import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+  import { getSearchContext, SearchTrigger } from '$lib/components/search';
+  import { GitHubStars, ThemeToggle } from '$lib/components/content';
   import { resolve } from '$app/paths';
-  import { getSearchContext } from '$lib/components/search';
 
   type Props = {
     items: (Page | Directory)[];
@@ -88,7 +86,7 @@
 
         <div class="ms-4 flex items-center gap-2">
           <ThemeToggle />
-          <GitHubStars />
+          <GitHubStars repository={PACKAGE_REPOSITORY_URL} />
         </div>
       </nav>
       <!-- endregion -->
@@ -98,8 +96,8 @@
         <!-- Mobile search button -->
         <button
           onclick={openSearch}
-          class="p-2 text-slate-400 hover:text-white focus:outline-none focus-visible:ring-2
-          focus-visible:ring-blue-400 rounded-lg"
+          class="rounded-lg p-2 text-slate-400 hover:text-white focus:outline-none focus-visible:ring-2
+          focus-visible:ring-blue-400"
           aria-label="Search"
         >
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -169,7 +167,7 @@
             in:fade={{ delay: 50 + (items.length + 1) * 30, duration: 150 }}
             out:fade={{ duration: 100 }}
           >
-            <GitHubStars class="w-full justify-center" />
+            <GitHubStars repository={PACKAGE_REPOSITORY_URL} class="w-full justify-center" />
           </li>
 
           <li

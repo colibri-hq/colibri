@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { PageProps } from './$types.js';
-  import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
+  import { Breadcrumbs } from '$lib/components/content';
   import { resolve } from '$app/paths';
   import EmptyState from './EmptyState.svelte';
-  import AuthorList from '$root/src/routes/(blog)/blog/author/AuthorList.svelte';
+  import AuthorList from './AuthorList.svelte';
 
   const { data }: PageProps = $props();
   const authors = $derived(data.authors);

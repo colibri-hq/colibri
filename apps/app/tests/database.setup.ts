@@ -24,7 +24,7 @@ setup("Seed the database", async ({ context }) => {
       .values({
         id: TEST_USER_ID,
         name: "Test User",
-        email: "test@colibri.io",
+        email: "test@colibri-hq.org",
         role: "admin",
       })
       .onConflict((conflict) =>
@@ -39,7 +39,7 @@ setup("Seed the database", async ({ context }) => {
       .values({
         id: TEST_NON_ADMIN_USER_ID,
         name: "Regular User",
-        email: "user@colibri.io",
+        email: "user@colibri-hq.org",
         role: "adult",
       })
       .onConflict((conflict) =>

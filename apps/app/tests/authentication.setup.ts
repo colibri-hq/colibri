@@ -10,7 +10,7 @@ setup("Authenticate the session", async ({ page }) => {
     {
       name: sessionCookieName,
       value: jwt.sign(
-        { name: "Test User", email: "test@colibri.io" },
+        { name: "Test User", email: "test@colibri-hq.org" },
         process.env.JWT_SECRET!,
         {
           subject: "999",

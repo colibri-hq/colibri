@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { PageProps } from './$types.js';
-  import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
+  import { Breadcrumbs } from '$lib/components/content';
   import { resolve } from '$app/paths';
   import TagHeader from './TagHeader.svelte';
-  import BlogPostList from '$lib/components/blog/BlogPostList.svelte';
+  import { BlogPostList } from '$lib/components/blog';
 
   const { data }: PageProps = $props();
   const tag = $derived(data.tag);

@@ -422,17 +422,9 @@ Add to crontab:
 ```json
 [
   {
-    "AllowedOrigins": [
-      "https://library.example.com"
-    ],
-    "AllowedMethods": [
-      "GET",
-      "PUT",
-      "POST"
-    ],
-    "AllowedHeaders": [
-      "*"
-    ],
+    "AllowedOrigins": ["https://library.example.com"],
+    "AllowedMethods": ["GET", "PUT", "POST"],
+    "AllowedHeaders": ["*"],
     "ExposeHeaders": [],
     "MaxAgeSeconds": 3600
   }
@@ -616,7 +608,7 @@ For high-traffic instances:
 Recommended specs by library size:
 
 | Library Size     | RAM  | CPU      | Storage |
-|------------------|------|----------|---------|
+| ---------------- | ---- | -------- | ------- |
 | &lt; 1,000 books | 2GB  | 2 cores  | 50GB    |
 | 1,000-10,000     | 4GB  | 4 cores  | 200GB   |
 | 10,000+          | 8GB+ | 8+ cores | 500GB+  |
@@ -687,6 +679,6 @@ Always backup before running migrations!
 
 For deployment issues:
 
-- Check documentation: [docs.colibri.io](https://docs.colibri.io)
+- Check documentation: [colibri-hq.org](https://colibri-hq.org)
 - GitHub issues: [github.com/colibri-hq/colibri/issues](https://github.com/colibri-hq/colibri/issues)
 - Community forum (if available)

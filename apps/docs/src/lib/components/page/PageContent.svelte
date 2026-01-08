@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import JsonLd from '$lib/components/JsonLd.svelte';
   import SEO from '$lib/components/SEO.svelte';
-  import TableOfContents from '$lib/components/TableOfContents.svelte';
+  import { TableOfContents } from '$lib/components/content';
   import type { PageMetadata } from '$lib/content/content';
   import { page } from '$app/state';
+  import { JsonLd } from '$lib/components/page';
 
   type Breadcrumb = {
     name: string;

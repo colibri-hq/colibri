@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import HeadingAnchor from '$lib/components/HeadingAnchor.svelte';
+  import HeadingAnchor from '$lib/components/content/HeadingAnchor.svelte';
 
   type Props = {
     children: Snippet;

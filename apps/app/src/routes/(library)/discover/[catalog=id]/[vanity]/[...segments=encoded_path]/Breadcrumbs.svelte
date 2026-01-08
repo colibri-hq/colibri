@@ -11,17 +11,16 @@
 <nav class="mt-1">
   {#if items.length > 1}
     <ul class="flex items-center">
-      {#each items as { link, title }, index (index)}
+      {#each items as { link: href, title }, index (index)}
         {#if index > 0}
           <li class="group contents">
             <Icon name="chevron_right" class="leading-none text-gray-500" />
           </li>
         {/if}
+
         <li class="group contents">
-          <a
-            href={link}
-            class="rounded px-2 py-2 leading-none transition hover:bg-gray-50 dark:hover:bg-gray-900"
-          >
+          <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+          <a {href} class="rounded px-2 py-2 leading-none transition hover:bg-gray-50 dark:hover:bg-gray-900">
             <span>{title}</span>
           </a>
         </li>

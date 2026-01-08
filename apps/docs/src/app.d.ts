@@ -22,7 +22,7 @@ declare global {
   declare const PACKAGE_HOMEPAGE_URL: string;
   declare const PACKAGE_BUGS_URL: string;
   declare const CONTENT_ROOT_DIR: string;
-  declare const SITE_URL: string;
+  declare const CONTENT_ROOT_REPOSITORY_PATH: string;
 }
 
 export {};

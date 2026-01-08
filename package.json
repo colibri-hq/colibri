@@ -13,7 +13,7 @@
     "epub",
     "opds"
   ],
-  "homepage": "https://github.com/colibri-hq/colibri",
+  "homepage": "https://colibri-hq.org/",
   "author": {
     "name": "Moritz Mazetti",
     "email": "m@9dev.de",
@@ -50,8 +50,7 @@
     "onlyBuiltDependencies": [
       "esbuild",
       "lefthook",
-      "msw",
-      "statue-ssg"
+      "msw"
     ],
     "ignoredBuiltDependencies": [
       "unrs-resolver",

@@ -2,41 +2,6 @@ import type { Component } from "svelte";
 import { calculateReadingTime } from "$lib/utils/reading-time";
 
 /**
- * Represents a heading extracted from the document for the Table of Contents.
- */
-export type TocHeading = {
-  /** The heading ID (slug) for anchor links */
-  id: string;
-  /** The heading text content */
-  text: string;
-  /** The heading level (1-6) */
-  level: number;
-};
-
-type PageModule = {
-  metadata: PageMetadata;
-  default: Component;
-};
-
-export type PageMetadata = {
-  title: string;
-  slug: string;
-  description: string;
-  image?: string;
-  date: string;
-  categories: string[];
-  draft?: boolean;
-  layout?: "blog" | "docs" | "page";
-  hideFromMenu?: boolean;
-  order?: number;
-  tags?: string[];
-  relevance?: number;
-  readingTime?: number;
-  /** Headings extracted from the document for Table of Contents (populated by remark plugin) */
-  headings?: TocHeading[];
-};
-
-/**
  * Converts a slug segment to a human-readable title.
  */
 function formatTitle(segment: string): string {
@@ -136,16 +101,14 @@ export class Directory {
 const paths = import.meta.glob<PageModule>("$content/**/*.md", {
   eager: true,
 });
-
-// Also load raw markdown content for reading time calculation
 const rawFiles = import.meta.glob<string>("$content/**/*.md", {
   eager: true,
   query: "?raw",
   import: "default",
 });
 
-// Initialize cache synchronously at module load
 const cache: Map<string, Page> = new Map();
+
 for (const [path, item] of Object.entries(paths)) {
   let slug = (
     path.startsWith(CONTENT_ROOT_DIR)
@@ -153,10 +116,8 @@ for (const [path, item] of Object.entries(paths)) {
       : path
   ).replace(".md", "");
 
-  // Check if this is an index page before modifying the slug
   const isIndexPage = slug.endsWith("/index") || slug.endsWith("/overview");
 
-  // Remove /index or /overview from the end of slugs
   if (isIndexPage) {
     slug = slug.replace(/\/(index|overview)$/, "");
   }
@@ -172,7 +133,6 @@ for (const [path, item] of Object.entries(paths)) {
   }
 
   if (!item.metadata?.draft) {
-    // Calculate reading time from raw markdown
     const rawContent = rawFiles[path];
     const readingTime = rawContent
       ? calculateReadingTime(rawContent)
@@ -180,7 +140,7 @@ for (const [path, item] of Object.entries(paths)) {
 
     const metadata: PageMetadata = {
       ...item.metadata,
-      slug, // Ensure slug is always in metadata
+      slug,
       readingTime,
     };
 
@@ -196,15 +156,6 @@ export function getAllPages(): Map<string, Page> {
   return cache;
 }
 
-// Internal mutable structure for building the tree
-type BuilderNode = {
-  name: string;
-  slug: string;
-  indexPage?: Page;
-  pages: Page[];
-  subdirs: Map<string, BuilderNode>;
-};
-
 /**
  * Builds the content tree from the page cache.
  * This is an internal function - use getContentTree() to access the cached result.
@@ -214,12 +165,14 @@ function buildContentTree(): (Page | Directory)[] {
   const root: Map<string, BuilderNode> = new Map();
   const topLevelPages: Page[] = [];
 
-  // Helper to ensure a builder node exists at a given path
-  function ensureNode(segments: string[]): BuilderNode | undefined {
-    if (segments.length === 0) return undefined;
+  function ensureNode(
+    segments: string[] | [string, ...string[]],
+  ): BuilderNode | undefined {
+    if (segments.length === 0) {
+      return undefined;
+    }
 
-    const first = segments[0]!;
-    const rest = segments.slice(1);
+    const [first, ...rest] = segments;
     let node = root.get(first);
 
     if (!node) {
@@ -227,7 +180,7 @@ function buildContentTree(): (Page | Directory)[] {
         name: first,
         slug: `/${first}`,
         pages: [],
-        subdirs: new Map(),
+        subDirectories: new Map(),
       };
       root.set(first, node);
     }
@@ -241,22 +194,23 @@ function buildContentTree(): (Page | Directory)[] {
 
   function ensureChildNode(
     parent: BuilderNode,
-    segments: string[],
+    segments: string[] | [string, ...string[]],
   ): BuilderNode | undefined {
-    if (segments.length === 0) return parent;
+    if (segments.length === 0) {
+      return parent;
+    }
 
-    const first = segments[0]!;
-    const rest = segments.slice(1);
-    let child = parent.subdirs.get(first);
+    const [first, ...rest] = segments;
+    let child = parent.subDirectories.get(first);
 
     if (!child) {
       child = {
         name: first,
         slug: `${parent.slug}/${first}`,
         pages: [],
-        subdirs: new Map(),
+        subDirectories: new Map(),
       };
-      parent.subdirs.set(first, child);
+      parent.subDirectories.set(first, child);
     }
 
     if (rest.length === 0) {
@@ -266,29 +220,31 @@ function buildContentTree(): (Page | Directory)[] {
     return ensureChildNode(child, rest);
   }
 
-  // Process all pages
   for (const page of pages.values()) {
-    if (page.metadata.hideFromMenu) continue;
+    if (page.metadata.hideFromMenu) {
+      continue;
+    }
 
     const segments = page.slug.split("/").filter(Boolean);
-    if (segments.length === 0) continue;
+
+    if (segments.length === 0) {
+      continue;
+    }
 
     if (page.isIndexPage) {
-      // Index pages represent their directory
       const node = ensureNode(segments);
+
       if (node) {
         node.indexPage = page;
       }
     } else {
-      // Regular page in a directory
       const dirSegments = segments.slice(0, -1);
 
       if (dirSegments.length === 0) {
-        // Top-level page (no parent directory) - keep as a Page
         topLevelPages.push(page);
       } else {
-        // Regular page in a directory
         const parentNode = ensureNode(dirSegments);
+
         if (parentNode) {
           parentNode.pages.push(page);
         }
@@ -296,11 +252,11 @@ function buildContentTree(): (Page | Directory)[] {
     }
   }
 
-  // Helper to get order for sorting
   function getOrder(item: Page | Directory): number {
     if (item instanceof Page) {
       return item.metadata.order ?? 999;
     }
+
     return item.metadata?.order ?? 999;
   }
 
@@ -310,41 +266,40 @@ function buildContentTree(): (Page | Directory)[] {
         item.metadata.title ?? formatTitle(item.slug.split("/").pop() ?? "")
       );
     }
+
     return item.title;
   }
 
-  // Convert BuilderNode to Directory, sorting children
   function toDirectory(node: BuilderNode): Directory {
-    // Recursively convert subdirectories
-    const subdirs = Array.from(node.subdirs.values()).map(toDirectory);
-
-    // Combine pages and subdirectories into a single children array
-    const children: (Page | Directory)[] = [...node.pages, ...subdirs];
-
-    // Sort by order, then by title
-    children.sort((a, b) => {
+    const subDirectories = Array.from(node.subDirectories.values()).map(
+      toDirectory,
+    );
+    const children = [...node.pages, ...subDirectories].toSorted((a, b) => {
       const orderA = getOrder(a);
       const orderB = getOrder(b);
-      if (orderA !== orderB) return orderA - orderB;
+
+      if (orderA !== orderB) {
+        return orderA - orderB;
+      }
+
       return getTitle(a).localeCompare(getTitle(b));
     });
 
     return new Directory(node.name, node.slug, node.indexPage, children);
   }
 
-  // Convert root nodes to directories and combine with top-level pages
   const directories = Array.from(root.values()).map(toDirectory);
-  const result: (Page | Directory)[] = [...topLevelPages, ...directories];
 
-  // Sort all top-level items by order, then by title
-  result.sort((a, b) => {
+  return [...topLevelPages, ...directories].toSorted((a, b) => {
     const orderA = getOrder(a);
     const orderB = getOrder(b);
-    if (orderA !== orderB) return orderA - orderB;
+
+    if (orderA !== orderB) {
+      return orderA - orderB;
+    }
+
     return getTitle(a).localeCompare(getTitle(b));
   });
-
-  return result;
 }
 
 // Memoized content tree - built once at module load
@@ -365,7 +320,6 @@ export function getContentTree(maxDepth?: number): (Page | Directory)[] {
     return contentTreeCache;
   }
 
-  // Capture for closure
   const depth = maxDepth;
 
   function filterByDepth(
@@ -381,7 +335,6 @@ export function getContentTree(maxDepth?: number): (Page | Directory)[] {
         return child;
       }
 
-      // Directory: filter its children recursively
       return new Directory(
         child.name,
         child.slug,
@@ -391,7 +344,6 @@ export function getContentTree(maxDepth?: number): (Page | Directory)[] {
     });
   }
 
-  // Filter top-level items
   return filterByDepth(contentTreeCache, 1);
 }
 
@@ -413,6 +365,7 @@ export function getAllDirectorySlugs(): string[] {
   }
 
   collectSlugs(tree);
+
   return slugs;
 }
 
@@ -429,10 +382,15 @@ export function findDirectory(slug: string): Directory | undefined {
         if (item.slug === normalizedSlug) {
           return item;
         }
+
         const found = search(item.children);
-        if (found) return found;
+
+        if (found) {
+          return found;
+        }
       }
     }
+
     return undefined;
   }
 
@@ -444,6 +402,7 @@ export function findDirectory(slug: string): Directory | undefined {
  */
 export function normalizeSlug(slug: string): string {
   slug = slug.endsWith("/") ? slug.slice(0, -1) : slug;
+
   return slug.startsWith("/") ? slug : `/${slug}`;
 }
 
@@ -455,18 +414,6 @@ export function getPage(slug: string): Page | undefined {
   return cache.get(normalizeSlug(slug));
 }
 
-/**
- * Gets the slug for a directory.
- */
-export function getNodeSlug(node: Directory): string {
-  return node.slug;
-}
-
-export type ParentInfo = {
-  title: string;
-  href: string;
-};
-
 // Parent info cache - built lazily on first access
 let parentCache: Map<string, ParentInfo> | null = null;
 
@@ -477,42 +424,37 @@ let parentCache: Map<string, ParentInfo> | null = null;
 function buildParentCache(): Map<string, ParentInfo> {
   const cache = new Map<string, ParentInfo>();
   const contentTree = getContentTree();
-
-  // Build a map from segment path to directory for quick lookup
-  const dirMap = new Map<string, Directory>();
+  const directoryMap = new Map<string, Directory>();
 
   function indexDirs(children: (Page | Directory)[], pathPrefix: string) {
     for (const child of children) {
       if (child instanceof Directory) {
         const dirPath = pathPrefix ? `${pathPrefix}/${child.name}` : child.name;
-        dirMap.set(dirPath, child);
+
+        directoryMap.set(dirPath, child);
         indexDirs(child.children, dirPath);
       }
     }
   }
 
-  // Index top-level directories (skip top-level pages)
   for (const item of contentTree) {
     if (item instanceof Directory) {
-      dirMap.set(item.name, item);
+      directoryMap.set(item.name, item);
       indexDirs(item.children, item.name);
     }
   }
 
-  // For each page, compute parent info
   for (const page of getAllPages().values()) {
     const segments = page.slug.split("/").filter(Boolean);
 
-    // No parent for root-level pages
-    if (segments.length <= 1) continue;
+    if (segments.length <= 1) {
+      continue;
+    }
 
-    // Get parent path
     const parentSegments = segments.slice(0, -1);
     const parentPath = parentSegments.join("/");
     const parentSlug = "/" + parentPath;
-
-    // Look up parent directory
-    const parentDir = dirMap.get(parentPath);
+    const parentDir = directoryMap.get(parentPath);
 
     if (parentDir) {
       cache.set(page.slug, {
@@ -520,8 +462,8 @@ function buildParentCache(): Map<string, ParentInfo> {
         href: parentDir.slug,
       });
     } else {
-      // Fallback: use formatted title from slug
       const lastSegment = parentSegments[parentSegments.length - 1];
+
       cache.set(page.slug, {
         title: lastSegment ? formatTitle(lastSegment) : "",
         href: parentSlug,
@@ -545,16 +487,6 @@ export function getParentInfo(slug: string): ParentInfo | undefined {
   return parentCache.get(normalizeSlug(slug));
 }
 
-export type SiblingInfo = {
-  title: string;
-  href: string;
-};
-
-export type SiblingPages = {
-  previous?: SiblingInfo;
-  next?: SiblingInfo;
-};
-
 // Cache for flattened page order
 let flattenedPagesCache: Page[] | null = null;
 
@@ -575,10 +507,10 @@ function getFlattenedPages(): Page[] {
       if (item instanceof Page) {
         pages.push(item);
       } else {
-        // Directory: add index page first (if exists), then children
         if (item.indexPage) {
           pages.push(item.indexPage);
         }
+
         traverse(item.children);
       }
     }
@@ -586,6 +518,7 @@ function getFlattenedPages(): Page[] {
 
   traverse(contentTree);
   flattenedPagesCache = pages;
+
   return pages;
 }
 
@@ -606,6 +539,7 @@ export function getSiblingPages(slug: string): SiblingPages {
 
   if (currentIndex > 0) {
     const prev = pages[currentIndex - 1]!;
+
     result.previous = {
       title: prev.metadata.title,
       href: prev.slug,
@@ -614,6 +548,7 @@ export function getSiblingPages(slug: string): SiblingPages {
 
   if (currentIndex < pages.length - 1) {
     const next = pages[currentIndex + 1]!;
+
     result.next = {
       title: next.metadata.title,
       href: next.slug,
@@ -633,7 +568,10 @@ export function getSiblingPages(slug: string): SiblingPages {
  */
 export function getContentFilePath(slug: string): string | undefined {
   const page = getPage(slug);
-  if (!page) return undefined;
+
+  if (!page) {
+    return undefined;
+  }
 
   const slugWithoutLeadingSlash = page.slug.replace(/^\//, "");
 
@@ -643,11 +581,6 @@ export function getContentFilePath(slug: string): string | undefined {
 
   return `${slugWithoutLeadingSlash}.md`;
 }
-
-export type BreadcrumbItem = {
-  title: string;
-  href: string;
-};
 
 /**
  * Gets the breadcrumb trail for a given slug.
@@ -663,12 +596,9 @@ export type BreadcrumbItem = {
 export function getBreadcrumbs(slug: string): BreadcrumbItem[] {
   const normalizedSlug = normalizeSlug(slug);
   const segments = normalizedSlug.split("/").filter(Boolean);
-
-  // Start with Home
   const breadcrumbs: BreadcrumbItem[] = [{ title: "Home", href: "/" }];
-
-  // Build breadcrumbs for all parent segments (exclude the last one which is the current page)
   let currentPath = "";
+
   for (let i = 0; i < segments.length - 1; i++) {
     currentPath += `/${segments[i]}`;
     const page = getPage(currentPath);
@@ -681,3 +611,66 @@ export function getBreadcrumbs(slug: string): BreadcrumbItem[] {
 
   return breadcrumbs;
 }
+
+/**
+ * Represents a heading extracted from the document for the Table of Contents.
+ */
+export type TocHeading = {
+  /** The heading ID (slug) for anchor links */
+  id: string;
+  /** The heading text content */
+  text: string;
+  /** The heading level (1-6) */
+  level: number;
+};
+
+type PageModule = {
+  metadata: PageMetadata;
+  default: Component;
+};
+
+export type PageMetadata = {
+  title: string;
+  slug: string;
+  description: string;
+  image?: string;
+  date: string;
+  categories: string[];
+  draft?: boolean;
+  layout?: "blog" | "docs" | "page";
+  hideFromMenu?: boolean;
+  order?: number;
+  tags?: string[];
+  relevance?: number;
+  readingTime?: number;
+  /** Headings extracted from the document for Table of Contents (populated by remark plugin) */
+  headings?: TocHeading[];
+};
+
+export type ParentInfo = {
+  title: string;
+  href: string;
+};
+
+export type SiblingInfo = {
+  title: string;
+  href: string;
+};
+
+export type SiblingPages = {
+  previous?: SiblingInfo;
+  next?: SiblingInfo;
+};
+
+export type BreadcrumbItem = {
+  title: string;
+  href: string;
+};
+
+type BuilderNode = {
+  name: string;
+  slug: string;
+  indexPage?: Page;
+  pages: Page[];
+  subDirectories: Map<string, BuilderNode>;
+};

@@ -1,11 +1,12 @@
 <script lang="ts">
   import type { PageMetadata, SiblingPages } from '$lib/content/content';
   import { getContentFilePath } from '$lib/content/content';
-  import { githubConfig } from '$root/site.config';
   import gitDates from '$lib/data/git-dates.json';
-  import { CalendarClockIcon, CalendarIcon, PencilIcon, TagIcon } from '@lucide/svelte';
-  import LateralNavigation from '$lib/components/LateralNavigation.svelte';
+  import { CalendarClockIcon, CalendarIcon, TagIcon } from '@lucide/svelte';
+  import { LateralNavigation } from '$lib/components/content';
   import { resolve } from '$app/paths';
+  import GithubEditLink from '$lib/components/content/GithubEditLink.svelte';
+  import { PUBLIC_REPOSITORY_BRANCH } from '$env/static/public';
 
   type Props = {
     metadata: PageMetadata;
@@ -36,6 +37,7 @@
     if (metadata.date) {
       const pubDate = new Date(metadata.date);
       const diffDays = Math.abs(date.getTime() - pubDate.getTime()) / (1000 * 60 * 60 * 24);
+
       if (diffDays < 1) {
         return null;
       }
@@ -51,18 +53,12 @@
     };
   });
 
-  const editUrl = $derived.by(() => {
-    const filePath = getContentFilePath(metadata.slug);
-    if (!filePath) {
-      return undefined;
-    }
-    return `https://github.com/${githubConfig.repo}/edit/${githubConfig.branch}/${githubConfig.contentPath}/${filePath}`;
-  });
+  const filePath = $derived(getContentFilePath(metadata.slug));
 </script>
 
 <footer class="w-full max-w-5xl mx-auto px-4 xl:px-0 mt-12 pb-8">
   <!-- region Metadata -->
-  {#if formattedDate || lastUpdated || editUrl || (metadata.tags && metadata.tags.length > 0)}
+  {#if formattedDate || lastUpdated || filePath || (metadata.tags && metadata.tags.length > 0)}
     <div class="flex flex-wrap justify-between items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-8">
       <div class="flex items-center gap-4">
         {#if formattedDate}
@@ -81,17 +77,12 @@
           </div>
         {/if}
 
-        {#if editUrl}
-          <a
-            href={editUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex items-center gap-1.5 hover:text-blue-600 dark:hover:text-blue-400 transition-colors
-            focus-visible:text-blue-600 dark:focus-visible:text-blue-400 outline-hidden"
-          >
-            <PencilIcon class="size-4" />
-            <span>Edit on GitHub</span>
-          </a>
+        {#if filePath}
+          <GithubEditLink
+            slug={filePath}
+            repository={PACKAGE_REPOSITORY_URL}
+            branch={PUBLIC_REPOSITORY_BRANCH}
+          />
         {/if}
       </div>
 

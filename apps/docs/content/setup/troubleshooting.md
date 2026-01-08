@@ -675,7 +675,7 @@ psql $DATABASE_URL -c "SELECT version();"
 
 ### Where to Get Help
 
-1. **Documentation**: [docs.colibri.io](https://docs.colibri.io)
+1. **Documentation**: [colibri-hq.org](https://colibri-hq.org)
 2. **GitHub Issues**: [github.com/colibri-hq/colibri/issues](https://github.com/colibri-hq/colibri/issues)
 3. **Discussions**: GitHub Discussions for questions
 

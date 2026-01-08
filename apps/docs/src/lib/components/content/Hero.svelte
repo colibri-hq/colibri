@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import ContentContainer from '$lib/components/ContentContainer.svelte';
+  import { ContentContainer } from '$lib/components/content';
 
   type Props = {
     title: string | Snippet;

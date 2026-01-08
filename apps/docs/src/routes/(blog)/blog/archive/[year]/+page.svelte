@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { PageProps } from './$types.js';
-  import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
+  import { Breadcrumbs } from '$lib/components/content';
   import { resolve } from '$app/paths';
   import YearHeader from './YearHeader.svelte';
   import EmptyState from './EmptyState.svelte';
-  import BlogPostList from '$lib/components/blog/BlogPostList.svelte';
+  import { BlogPostList } from '$lib/components/blog';
 
   const { data }: PageProps = $props();
   const posts = $derived(data.posts);

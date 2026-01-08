@@ -26,7 +26,7 @@ export default defineConfig({
     PACKAGE_HOMEPAGE_URL: `"${homepage}"`,
     PACKAGE_BUGS_URL: `"${bugs.url}"`,
     CONTENT_ROOT_DIR: `"${contentRoot.replace(import.meta.dirname, "")}"`,
-    SITE_URL: `"${process.env.SITE_URL ?? "http://localhost:5174"}"`,
+    CONTENT_ROOT_REPOSITORY_PATH: `"${contentRoot.replace(resolve(import.meta.dirname, "../../"), "")}"`,
   },
   plugins: [
     tailwindcss(),

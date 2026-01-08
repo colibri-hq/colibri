@@ -224,16 +224,13 @@ const config = {
             strict: true,
             fallback: "index.html",
           }),
-    env: {
-      dir: "../..",
-    },
     alias: {
       $content: resolve(import.meta.dirname, contentDir),
       $lib: resolve(import.meta.dirname, "src/lib"),
       $root: import.meta.dirname,
     },
     prerender: {
-      origin: process.env.PUBLIC_SITE_URL || "https://docs.colibri.io",
+      origin: process.env.PUBLIC_SITE_URL || "https://colibri-hq.org",
       crawl: true,
       handleHttpError: "warn",
       handleMissingId: "warn",
