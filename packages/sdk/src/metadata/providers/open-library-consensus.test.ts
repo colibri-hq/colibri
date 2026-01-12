@@ -5,11 +5,11 @@ import { MetadataType } from "./provider.js";
 // Create a mock for the searchBook function
 const mockSearchBook = vi.fn();
 
-// Mock the OpenLibrary client
+// Mock the OpenLibrary client with a proper class mock
 vi.mock("@colibri-hq/open-library-client", () => ({
-  Client: vi.fn().mockImplementation(() => ({
-    searchBook: mockSearchBook,
-  })),
+  Client: class MockClient {
+    searchBook = mockSearchBook;
+  },
 }));
 
 describe("OpenLibraryMetadataProvider - Consensus-based Aggregation", () => {

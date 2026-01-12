@@ -9,6 +9,7 @@
 import type { Database } from "../database.js";
 import { getSettingValue } from "../settings/index.js";
 import { globalProviderRegistry } from "./registry.js";
+import { globalConfigManager } from "./config.js";
 import type { MetadataProvider } from "./providers/provider.js";
 
 // Import all available providers
@@ -331,8 +332,11 @@ export async function initializeMetadataProviders(
       const provider = await config.factory(database, fetch);
 
       if (provider) {
-        // Register with global registry (enablement controlled by ConfigManager)
+        // Register with global registry
         globalProviderRegistry.register(provider);
+
+        // Enable the provider in ConfigManager
+        globalConfigManager.setProviderEnabled(provider.name, true);
 
         // Initialize the provider if it has an initialize method
         if (provider.initialize) {
@@ -419,8 +423,12 @@ export async function reinitializeProvider(
   try {
     const provider = await config.factory(database, fetch);
     if (provider) {
-      // Register with global registry (enablement controlled by ConfigManager)
+      // Register with global registry
       globalProviderRegistry.register(provider);
+
+      // Enable the provider in ConfigManager
+      globalConfigManager.setProviderEnabled(provider.name, true);
+
       if (provider.initialize) {
         await provider.initialize();
       }

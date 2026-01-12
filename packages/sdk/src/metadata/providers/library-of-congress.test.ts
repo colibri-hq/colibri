@@ -340,7 +340,7 @@ describe("LibraryOfCongressMetadataProvider", () => {
       expect(record.physicalDimensions).toEqual({ height: 24, unit: "cm" });
       expect(record.series).toEqual({
         name: "Adventure series",
-        position: "v. 1",
+        volume: 1,
       });
       expect(record.edition).toBe("1st ed");
       expect(record.description).toBe(

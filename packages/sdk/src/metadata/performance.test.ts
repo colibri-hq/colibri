@@ -4,9 +4,9 @@ import { OpenLibraryMetadataProvider } from "./providers/open-library.js";
 // Mock the OpenLibrary client
 const mockSearchBook = vi.fn();
 vi.mock("@colibri-hq/open-library-client", () => ({
-  Client: vi.fn().mockImplementation(() => ({
-    searchBook: mockSearchBook,
-  })),
+  Client: class MockClient {
+    searchBook = mockSearchBook;
+  },
 }));
 
 describe("OpenLibraryMetadataProvider - Performance Testing", () => {

@@ -1,6 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { WikiDataMetadataProvider } from "./wikidata.js";
 import { OpenLibraryMetadataProvider } from "./open-library.js";
+import { RetryableMetadataProvider } from "./retryable-provider.js";
+
+// Mock the OpenLibrary client
+vi.mock("@colibri-hq/open-library-client", () => ({
+  Client: class MockClient {
+    searchBook = vi.fn();
+  },
+}));
 
 // Mock the rate limiter to avoid delays in tests
 vi.mock("./rate-limiter.js", () => ({
@@ -20,20 +28,30 @@ vi.mock("./timeout-manager.js", () => ({
   },
 }));
 
+// Mock the delay method at the base class prototype level to avoid timer issues
+const originalDelay = RetryableMetadataProvider.prototype["delay"];
+
 describe("WikiData Error Handling Pattern Consistency", () => {
   let wikidataProvider: WikiDataMetadataProvider;
   let openLibraryProvider: OpenLibraryMetadataProvider;
   let mockFetch: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.clearAllMocks();
+    // Mock delay at base class prototype level
+    RetryableMetadataProvider.prototype["delay"] = vi
+      .fn()
+      .mockResolvedValue(undefined);
+
     mockFetch = vi.fn();
     wikidataProvider = new WikiDataMetadataProvider(mockFetch);
     openLibraryProvider = new OpenLibraryMetadataProvider(mockFetch);
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    // Restore original delay method
+    RetryableMetadataProvider.prototype["delay"] = originalDelay;
+    vi.restoreAllMocks();
   });
 
   describe("Error Handling Pattern Consistency", () => {
@@ -78,67 +96,53 @@ describe("WikiData Error Handling Pattern Consistency", () => {
       // Test that both providers handle network errors the same way
       mockFetch.mockRejectedValue(new Error("network error"));
 
-      // Run with timer advancement for retry delays
-      const wikidataPromise = wikidataProvider.searchByTitle({
+      // Delay is mocked to resolve immediately
+      const wikidataResult = await wikidataProvider.searchByTitle({
         title: "Test Book",
       });
-      await vi.runAllTimersAsync();
-      const wikidataResult = await wikidataPromise;
 
-      const openLibraryPromise = openLibraryProvider.searchByTitle({
+      const openLibraryResult = await openLibraryProvider.searchByTitle({
         title: "Test Book",
       });
-      await vi.runAllTimersAsync();
-      const openLibraryResult = await openLibraryPromise;
 
       // Both should return empty arrays on network failure after retries
       expect(wikidataResult).toEqual([]);
       expect(openLibraryResult).toEqual([]);
     });
 
-    it("should handle retryable errors consistently", async () => {
-      const retryableErrors = [
-        "timeout error",
-        "connection refused",
-        "ECONNRESET",
-        "ENOTFOUND",
-        "ETIMEDOUT",
-        "500 Internal Server Error",
-        "502 Bad Gateway",
-        "503 Service Unavailable",
-        "504 Gateway Timeout",
-      ];
+    it.each([
+      "timeout error",
+      "connection refused",
+      "ECONNRESET",
+      "ENOTFOUND",
+      "ETIMEDOUT",
+      "500 Internal Server Error",
+      "502 Bad Gateway",
+      "503 Service Unavailable",
+      "504 Gateway Timeout",
+    ])("should handle retryable error '%s' consistently", async (errorMsg) => {
+      mockFetch.mockRejectedValue(new Error(errorMsg));
 
-      for (const errorMsg of retryableErrors) {
-        mockFetch.mockRejectedValue(new Error(errorMsg));
-        const wikidataPromise = wikidataProvider.searchByTitle({
-          title: "Test",
-        });
-        await vi.runAllTimersAsync();
-        const wikidataResult = await wikidataPromise;
-        expect(wikidataResult).toEqual([]);
+      const wikidataResult = await wikidataProvider.searchByTitle({
+        title: "Test",
+      });
+      expect(wikidataResult).toEqual([]);
 
-        const openLibraryPromise = openLibraryProvider.searchByTitle({
-          title: "Test",
-        });
-        await vi.runAllTimersAsync();
-        const openLibraryResult = await openLibraryPromise;
-        expect(openLibraryResult).toEqual([]);
-
-        mockFetch.mockClear();
-      }
+      const openLibraryResult = await openLibraryProvider.searchByTitle({
+        title: "Test",
+      });
+      expect(openLibraryResult).toEqual([]);
     });
 
-    it("should handle non-retryable errors consistently", async () => {
-      const nonRetryableErrors = [
-        "400 Bad Request",
-        "401 Unauthorized",
-        "403 Forbidden",
-        "404 Not Found",
-        "422 Unprocessable Entity",
-      ];
-
-      for (const errorMsg of nonRetryableErrors) {
+    it.each([
+      "400 Bad Request",
+      "401 Unauthorized",
+      "403 Forbidden",
+      "404 Not Found",
+      "422 Unprocessable Entity",
+    ])(
+      "should handle non-retryable error '%s' consistently",
+      async (errorMsg) => {
         mockFetch.mockRejectedValueOnce(new Error(errorMsg));
         const wikidataResult = await wikidataProvider.searchByTitle({
           title: "Test",
@@ -150,24 +154,17 @@ describe("WikiData Error Handling Pattern Consistency", () => {
           title: "Test",
         });
         expect(openLibraryResult).toEqual([]);
-      }
-    });
+      },
+    );
 
     it("should log errors consistently", async () => {
       const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
       mockFetch.mockRejectedValue(new Error("persistent network error"));
 
-      // Run with timer advancement for retry delays
-      const wikidataPromise = wikidataProvider.searchByTitle({ title: "Test" });
-      await vi.runAllTimersAsync();
-      await wikidataPromise;
-
-      const openLibraryPromise = openLibraryProvider.searchByTitle({
-        title: "Test",
-      });
-      await vi.runAllTimersAsync();
-      await openLibraryPromise;
+      // Delay is mocked to resolve immediately
+      await wikidataProvider.searchByTitle({ title: "Test" });
+      await openLibraryProvider.searchByTitle({ title: "Test" });
 
       // Both should log final failure messages
       const wikidataLogs = consoleSpy.mock.calls.filter(
@@ -183,7 +180,7 @@ describe("WikiData Error Handling Pattern Consistency", () => {
       expect(openLibraryLogs.length).toBeGreaterThan(0);
 
       consoleSpy.mockRestore();
-    }, 15000);
+    });
   });
 
   describe("Rate Limiting Integration Consistency", () => {

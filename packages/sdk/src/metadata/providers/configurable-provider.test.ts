@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ConfigurableMetadataProvider } from "./configurable-provider.js";
-import { MetadataConfigManager } from "./config.js";
+import { MetadataConfigManager } from "../config.js";
 import type {
   CreatorQuery,
   MetadataRecord,

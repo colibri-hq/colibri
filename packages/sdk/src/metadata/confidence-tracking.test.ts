@@ -4,9 +4,9 @@ import type { MetadataRecord } from "./providers/provider.js";
 
 // Mock the OpenLibrary client
 vi.mock("@colibri-hq/open-library-client", () => ({
-  Client: vi.fn().mockImplementation(() => ({
-    searchBook: vi.fn(),
-  })),
+  Client: class MockClient {
+    searchBook = vi.fn();
+  },
 }));
 
 describe("OpenLibraryMetadataProvider - Confidence Factor Tracking", () => {

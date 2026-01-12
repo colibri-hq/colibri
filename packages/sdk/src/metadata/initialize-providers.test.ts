@@ -1,4 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+// Mock the OpenLibrary client before importing initialize-providers
+vi.mock("@colibri-hq/open-library-client", () => ({
+  Client: class MockClient {
+    searchBook = vi.fn();
+  },
+}));
+
 import {
   cleanupMetadataProviders,
   getAvailableProviderNames,

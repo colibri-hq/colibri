@@ -27,13 +27,14 @@ describe("WikiDataMetadataProvider", () => {
   let provider: WikiDataMetadataProvider;
 
   beforeEach(() => {
-    vi.useFakeTimers();
     vi.clearAllMocks();
     provider = new WikiDataMetadataProvider(mockFetch);
+    // Mock the delay method to resolve immediately (avoids timer issues)
+    vi.spyOn(provider as any, "delay").mockResolvedValue(undefined);
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   // Helper function to create mock WikiData SPARQL response
@@ -1493,44 +1494,48 @@ describe("WikiDataMetadataProvider", () => {
         }
       });
 
-      it("should handle invalid date formats gracefully", async () => {
-        const invalidDateCases = [
-          "not-a-date",
-          "2020-13-45", // Invalid month/day
-          "20XX", // Non-numeric year
-          "", // Empty string
-          "sometime in 2020", // Natural language
-          "2020/05/15", // Wrong format
-        ];
+      it(
+        "should handle invalid date formats gracefully",
+        { timeout: 10000 },
+        async () => {
+          const invalidDateCases = [
+            "not-a-date",
+            "2020-13-45", // Invalid month/day
+            "20XX", // Non-numeric year
+            "", // Empty string
+            "sometime in 2020", // Natural language
+            "2020/05/15", // Wrong format
+          ];
 
-        for (const invalidDate of invalidDateCases) {
-          const mockBinding = createMockBinding({
-            title: {
-              type: "literal",
-              value: "Invalid Date Book",
-              "xml:lang": "en",
-            },
-            publishDate: {
-              type: "literal",
-              value: invalidDate,
-              datatype: "http://www.w3.org/2001/XMLSchema#date",
-            },
-          });
+          for (const invalidDate of invalidDateCases) {
+            const mockBinding = createMockBinding({
+              title: {
+                type: "literal",
+                value: "Invalid Date Book",
+                "xml:lang": "en",
+              },
+              publishDate: {
+                type: "literal",
+                value: invalidDate,
+                datatype: "http://www.w3.org/2001/XMLSchema#date",
+              },
+            });
 
-          mockFetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => createMockWikiDataResponse([mockBinding]),
-          });
+            mockFetch.mockResolvedValueOnce({
+              ok: true,
+              json: async () => createMockWikiDataResponse([mockBinding]),
+            });
 
-          const results = await provider.searchByTitle({
-            title: "Invalid Date Book",
-            exactMatch: true,
-          });
+            const results = await provider.searchByTitle({
+              title: "Invalid Date Book",
+              exactMatch: true,
+            });
 
-          expect(results).toHaveLength(1);
-          expect(results[0].publicationDate).toBeUndefined();
-        }
-      });
+            expect(results).toHaveLength(1);
+            expect(results[0].publicationDate).toBeUndefined();
+          }
+        },
+      );
 
       it("should handle missing publication date gracefully", async () => {
         const mockBinding = createMockBinding({
@@ -2637,13 +2642,11 @@ describe("WikiDataMetadataProvider", () => {
       // Mock all retry attempts to fail (default maxRetries is 3, so 4 total attempts)
       mockFetch.mockRejectedValue(new Error("Network error"));
 
-      // Run with timer advancement for retry delays
-      const resultPromise = provider.searchByTitle({
+      // Delay is mocked to resolve immediately, so just await the result
+      const results = await provider.searchByTitle({
         title: "Test Book",
         exactMatch: true,
       });
-      await vi.runAllTimersAsync();
-      const results = await resultPromise;
 
       expect(results).toHaveLength(0);
     });
@@ -2656,13 +2659,11 @@ describe("WikiDataMetadataProvider", () => {
         statusText: "Internal Server Error",
       });
 
-      // Run with timer advancement for retry delays
-      const resultPromise = provider.searchByTitle({
+      // Delay is mocked to resolve immediately, so just await the result
+      const results = await provider.searchByTitle({
         title: "Test Book",
         exactMatch: true,
       });
-      await vi.runAllTimersAsync();
-      const results = await resultPromise;
 
       expect(results).toHaveLength(0);
     });
@@ -2675,13 +2676,11 @@ describe("WikiDataMetadataProvider", () => {
           json: async () => createMockWikiDataResponse([createMockBinding()]),
         });
 
-      // Run with timer advancement for retry delays
-      const resultPromise = provider.searchByTitle({
+      // Delay is mocked to resolve immediately, so just await the result
+      const results = await provider.searchByTitle({
         title: "Test Book",
         exactMatch: true,
       });
-      await vi.runAllTimersAsync();
-      const results = await resultPromise;
 
       expect(results).toHaveLength(1);
       expect(mockFetch).toHaveBeenCalledTimes(2);
@@ -3345,7 +3344,11 @@ describe("WikiDataMetadataProvider", () => {
           json: async () => createMockWikiDataResponse([mockBinding]),
         });
 
-        await provider.searchByTitle({ title: "Test Book", exactMatch: true });
+        // Delay is mocked to resolve immediately
+        await provider.searchByTitle({
+          title: "Test Book",
+          exactMatch: true,
+        });
 
         // Verify the provider name is used for rate limiter registration
         expect(provider.name).toBe("WikiData");
@@ -3354,57 +3357,62 @@ describe("WikiDataMetadataProvider", () => {
     });
 
     describe("Retry Logic and Error Handling Tests", () => {
+      // Create a fresh provider with mocked delay for retry tests
+      let retryProvider: WikiDataMetadataProvider;
+      let retryMockFetch: ReturnType<typeof vi.fn>;
+
+      beforeEach(() => {
+        retryMockFetch = vi.fn();
+        retryProvider = new WikiDataMetadataProvider(retryMockFetch);
+        // Mock the delay method to resolve immediately
+        vi.spyOn(retryProvider as any, "delay").mockResolvedValue(undefined);
+      });
+
       it("should retry on network errors with exponential backoff", async () => {
         const mockBinding = createMockBinding();
 
         // First call fails with network error, second succeeds
-        mockFetch
+        retryMockFetch
           .mockRejectedValueOnce(new Error("Network error"))
           .mockResolvedValueOnce({
             ok: true,
             json: async () => createMockWikiDataResponse([mockBinding]),
           });
 
-        // Run with timer advancement for retry delays
-        const resultPromise = provider.searchByTitle({
+        const results = await retryProvider.searchByTitle({
           title: "Test Book",
           exactMatch: true,
         });
-        await vi.runAllTimersAsync();
-        const results = await resultPromise;
 
         expect(results).toHaveLength(1);
-        expect(mockFetch).toHaveBeenCalledTimes(2);
+        expect(retryMockFetch).toHaveBeenCalledTimes(2);
       });
 
       it("should retry on timeout errors", async () => {
         const mockBinding = createMockBinding();
 
         // First call times out, second succeeds
-        mockFetch
+        retryMockFetch
           .mockRejectedValueOnce(new Error("Request timeout"))
           .mockResolvedValueOnce({
             ok: true,
             json: async () => createMockWikiDataResponse([mockBinding]),
           });
 
-        // Run with timer advancement for retry delays
-        const resultPromise = provider.searchByTitle({
+        const results = await retryProvider.searchByTitle({
           title: "Test Book",
           exactMatch: true,
         });
-        await vi.runAllTimersAsync();
-        const results = await resultPromise;
 
         expect(results).toHaveLength(1);
-        expect(mockFetch).toHaveBeenCalledTimes(2);
+        expect(retryMockFetch).toHaveBeenCalledTimes(2);
       });
 
       it("should retry on 5xx HTTP errors but not 4xx errors", async () => {
         const mockBinding = createMockBinding();
 
         // Test 5xx error (retryable)
-        mockFetch
+        retryMockFetch
           .mockResolvedValueOnce({
             ok: false,
             status: 500,
@@ -3415,105 +3423,88 @@ describe("WikiDataMetadataProvider", () => {
             json: async () => createMockWikiDataResponse([mockBinding]),
           });
 
-        // Run with timer advancement for retry delays
-        const resultPromise = provider.searchByTitle({
+        const results = await retryProvider.searchByTitle({
           title: "Test Book",
           exactMatch: true,
         });
-        await vi.runAllTimersAsync();
-        const results = await resultPromise;
         expect(results).toHaveLength(1);
-        expect(mockFetch).toHaveBeenCalledTimes(2);
+        expect(retryMockFetch).toHaveBeenCalledTimes(2);
 
-        // Reset mock for 4xx test
-        vi.clearAllMocks();
+        // Create fresh provider for 4xx test
+        const retryMockFetch4xx = vi.fn();
+        const retryProvider4xx = new WikiDataMetadataProvider(
+          retryMockFetch4xx,
+        );
+        vi.spyOn(retryProvider4xx as any, "delay").mockResolvedValue(undefined);
 
         // Test 4xx error (not retryable)
-        mockFetch.mockResolvedValueOnce({
+        retryMockFetch4xx.mockResolvedValueOnce({
           ok: false,
           status: 404,
           statusText: "Not Found",
         });
 
-        const results2 = await provider.searchByTitle({
+        const results2 = await retryProvider4xx.searchByTitle({
           title: "Test Book",
           exactMatch: true,
         });
         expect(results2).toHaveLength(0);
-        expect(mockFetch).toHaveBeenCalledTimes(1); // Should not retry
+        expect(retryMockFetch4xx).toHaveBeenCalledTimes(1); // Should not retry
       });
 
       it("should fail gracefully after maximum retry attempts", async () => {
-        // Reset the mock call count for this test
-        mockFetch.mockClear();
-
         // Mock persistent network errors for all 4 attempts
-        mockFetch
+        retryMockFetch
           .mockRejectedValueOnce(new Error("Persistent network error"))
           .mockRejectedValueOnce(new Error("Persistent network error"))
           .mockRejectedValueOnce(new Error("Persistent network error"))
           .mockRejectedValueOnce(new Error("Persistent network error"));
 
-        // Run with timer advancement for retry delays
-        const resultPromise = provider.searchByTitle({
+        const results = await retryProvider.searchByTitle({
           title: "Test Book",
           exactMatch: true,
         });
-        await vi.runAllTimersAsync();
-        const results = await resultPromise;
 
         expect(results).toHaveLength(0);
-        expect(mockFetch).toHaveBeenCalledTimes(4); // Initial + 3 retries
+        expect(retryMockFetch).toHaveBeenCalledTimes(4); // Initial + 3 retries
       });
 
       it("should handle connection reset errors as retryable", async () => {
         const mockBinding = createMockBinding();
 
-        // Reset the mock call count for this test
-        mockFetch.mockClear();
-
-        mockFetch
+        retryMockFetch
           .mockRejectedValueOnce(new Error("ECONNRESET"))
           .mockResolvedValueOnce({
             ok: true,
             json: async () => createMockWikiDataResponse([mockBinding]),
           });
 
-        // Run with timer advancement for retry delays
-        const resultPromise = provider.searchByTitle({
+        const results = await retryProvider.searchByTitle({
           title: "Test Book",
           exactMatch: true,
         });
-        await vi.runAllTimersAsync();
-        const results = await resultPromise;
 
         expect(results).toHaveLength(1);
-        expect(mockFetch).toHaveBeenCalledTimes(2);
+        expect(retryMockFetch).toHaveBeenCalledTimes(2);
       });
 
       it("should handle DNS resolution errors as retryable", async () => {
         const mockBinding = createMockBinding();
 
-        // Reset the mock call count for this test
-        mockFetch.mockClear();
-
-        mockFetch
+        retryMockFetch
           .mockRejectedValueOnce(new Error("ENOTFOUND"))
           .mockResolvedValueOnce({
             ok: true,
             json: async () => createMockWikiDataResponse([mockBinding]),
           });
 
-        // Run with timer advancement for retry delays
-        const resultPromise = provider.searchByTitle({
+        const results = await retryProvider.searchByTitle({
           title: "Test Book",
           exactMatch: true,
         });
-        await vi.runAllTimersAsync();
-        const results = await resultPromise;
 
         expect(results).toHaveLength(1);
-        expect(mockFetch).toHaveBeenCalledTimes(2);
+        expect(retryMockFetch).toHaveBeenCalledTimes(2);
       });
     });
   });

@@ -54,7 +54,6 @@ describe("MetadataConfigManager", () => {
       const updates: Partial<MetadataSystemConfig> = {
         defaultRateLimit: {
           maxRequests: 200,
-          windowMs: 200,
         },
       };
 

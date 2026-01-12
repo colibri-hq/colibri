@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { GoogleBooksMetadataProvider } from "./google-books.js";
 import { MetadataType } from "./provider.js";
-import { globalRateLimiterRegistry } from "./rate-limiter.js";
+import { globalRateLimiterRegistry } from "../rate-limiter.js";
 
 describe("GoogleBooksMetadataProvider", () => {
   let provider: GoogleBooksMetadataProvider;

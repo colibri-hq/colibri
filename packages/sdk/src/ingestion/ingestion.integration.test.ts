@@ -626,22 +626,7 @@ describe.skipIf(!process.env.DATABASE_URL)(
       });
     });
 
-    describe("Batch Import", () => {
-      it.skip("should import multiple files and report results", async () => {
-        // This would need multiple test files
-        // Skipped for now - can be implemented when batchImport is added
-      });
-
-      it.skip("should continue on error when configured", async () => {
-        // This would need multiple test files, some invalid
-        // Skipped for now
-      });
-
-      it.skip("should call progress callback for each file", async () => {
-        // This would need multiple test files
-        // Skipped for now
-      });
-    });
+    // Note: Batch import tests will be added when batchImport functionality is implemented
 
     describe("Edge Cases and Error Handling", () => {
       it("should handle missing required fields for pending ingestion", async () => {
