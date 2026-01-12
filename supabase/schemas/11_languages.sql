@@ -4,14 +4,16 @@ comment on type public.language_type is 'An ISO 639-3 language type, as defined 
 
 create table public.language
 (
-    iso_639_3 character(3)         not null,
-    iso_639_1 character(2),
-    type      public.language_type not null,
-    name      text
+    iso_639_3  character(3)         not null,
+    iso_639_1  character(2),
+    type       public.language_type not null,
+    name       text,
+    fts_config text                 not null default 'simple'
 );
 alter table public.language
     owner to postgres;
 comment on table public.language is 'A representation of all languages contained in ISO 639-3.';
+comment on column public.language.fts_config is 'PostgreSQL full-text search configuration name (e.g., english, german, simple).';
 
 grant all on table public.language to anon;
 grant all on table public.language to authenticated;
