@@ -8,3 +8,4 @@
  */
 
 export * from "./icon-urn.js";
+export * from "./scopes/index.js";

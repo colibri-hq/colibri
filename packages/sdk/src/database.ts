@@ -35,6 +35,8 @@ export function initialize(
   const dialect = new PostgresDialect({
     pool: new Pool({
       application_name: "Colibri",
+      // Include 'extensions' schema in search_path for pg_trgm functions (similarity, etc.)
+      options: "-c search_path=public,extensions",
       ssl: certificate
         ? {
             rejectUnauthorized: false,

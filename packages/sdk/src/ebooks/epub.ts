@@ -9,15 +9,12 @@ import {
   ZipReader,
 } from "@zip.js/zip.js";
 
-export async function isZipFile(file: File): Promise<boolean> {
-  const slices = new Uint8Array(await file.slice(0, 4).arrayBuffer());
+/** ZIP file magic number (PK\x03\x04) */
+const ZIP_MAGIC = [0x50, 0x4b, 0x03, 0x04] as const;
 
-  return (
-    slices[0] === 0x50 &&
-    slices[1] === 0x4b &&
-    slices[2] === 0x03 &&
-    slices[3] === 0x04
-  );
+export async function isZipFile(file: File): Promise<boolean> {
+  const header = new Uint8Array(await file.slice(0, 4).arrayBuffer());
+  return ZIP_MAGIC.every((byte, i) => header[i] === byte);
 }
 
 export async function loadEpubMetadata(
@@ -65,31 +62,24 @@ function loadIdentifiers({
 }: Pick<Awaited<Epub["metadata"]>, "identifier">) {
   return wrapArray(identifier)
     .filter((value) => !!value)
-    .map((value) => {
-      if (!value.includes(":")) {
-        if (value.length === 10 || value.length === 13) {
-          return {
-            type: "isbn" as const,
-            value,
-          };
+    .map((rawValue) => {
+      // Handle plain identifiers without scheme prefix
+      if (!rawValue.includes(":")) {
+        if (rawValue.length === 10 || rawValue.length === 13) {
+          return { type: "isbn" as const, value: rawValue };
         }
-
-        return {
-          type: "other" as const,
-          value,
-        };
+        return { type: "other" as const, value: rawValue };
       }
 
-      if (value.startsWith("urn:")) {
-        value = value.slice(4);
-      }
+      // Strip optional "urn:" prefix
+      const normalizedValue = rawValue.startsWith("urn:")
+        ? rawValue.slice(4)
+        : rawValue;
 
-      const [type, ...rest] = value.split(":");
-      const identifier = rest.join(":");
-
+      const [type, ...rest] = normalizedValue.split(":");
       return {
         type: type.toLowerCase() as Identifier["type"],
-        value: identifier,
+        value: rest.join(":"),
       };
     });
 }
@@ -109,7 +99,7 @@ function loadContributors({
 }
 
 /**
- * Extract and normalize subjects from EPUB metadata
+ * Extract and normalize subjects from EPUB metadata.
  * Handles compound subjects like "Fiction / Fantasy / Epic"
  */
 function loadSubjects(
@@ -119,22 +109,14 @@ function loadSubjects(
     authority?: string | undefined;
   }>,
 ): string[] {
-  const allSubjects: string[] = [];
-
-  for (const subject of subjects) {
+  const allSubjects = subjects.flatMap((subject) => {
     const subjectText = subject.term ?? subject.name;
 
     // Split on " / " for BISAC-style compound subjects
-    if (subjectText.includes(" / ")) {
-      const parts = subjectText
-        .split(" / ")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0);
-      allSubjects.push(...parts);
-    } else {
-      allSubjects.push(subjectText);
-    }
-  }
+    return subjectText.includes(" / ")
+      ? subjectText.split(" / ").map((s) => s.trim())
+      : [subjectText];
+  });
 
   // Deduplicate and filter empty strings
   return [...new Set(allSubjects)].filter((s) => s.length > 0);

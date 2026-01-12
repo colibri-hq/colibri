@@ -2,6 +2,7 @@
 // They are exported separately via @colibri-hq/sdk/server
 export * from "./authentication/index.js";
 export * from "./catalog.js";
+export * from "./chunk.js";
 export * from "./collection.js";
 export * from "./comment.js";
 export * from "./creator.js";

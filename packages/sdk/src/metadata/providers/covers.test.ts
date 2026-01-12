@@ -165,6 +165,7 @@ describe("Cover Image Fetching", () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("books.google.com"),
+        expect.anything(),
       );
       expect(result?.source).toBe("Google Books");
     });
@@ -268,9 +269,11 @@ describe("Cover Image Fetching", () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("covers.librarything.com"),
+        expect.anything(),
       );
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("test-api-key"),
+        expect.anything(),
       );
       expect(result?.source).toBe("LibraryThing");
     });

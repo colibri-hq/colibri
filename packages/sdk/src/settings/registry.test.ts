@@ -128,7 +128,7 @@ describe("settings registry", () => {
       expect(generalSettings).toHaveLength(2);
       expect(securitySettings).toHaveLength(2);
       expect(contentSettings).toHaveLength(3);
-      expect(metadataSettings).toHaveLength(19);
+      expect(metadataSettings).toHaveLength(21);
     });
   });
 

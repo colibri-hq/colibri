@@ -112,7 +112,7 @@ export function loadPublisherForWork(
     .innerJoin("publisher", "publisher.id", "edition.publisher_id")
     .selectAll("publisher")
     .where("work.id", "=", workId.toString())
-    .executeTakeFirstOrThrow();
+    .executeTakeFirst();
 }
 
 export function loadRatings(database: Database, workId: string | number) {

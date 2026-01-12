@@ -2,7 +2,7 @@
 import { XMLParser } from "fast-xml-parser";
 
 // DOM-like wrapper for fast-xml-parser
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 class _XMLNode {
   _node: any;
   _namespaces: Record<string, string>;
@@ -247,7 +247,7 @@ class _XMLNode {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 class _DOMWrapper {
   _parser: XMLParser;
 
@@ -256,7 +256,7 @@ class _DOMWrapper {
       ignoreAttributes: false,
       attributeNamePrefix: "@_",
       textNodeName: "#text",
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+       
       isArray: (name, _jpath, _isLeafNode, _isAttribute) => {
         // Known elements that should always be arrays
         const arrayElements = [
@@ -283,7 +283,7 @@ class _DOMWrapper {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   parseFromString(xmlText: string, _mimeType: string) {
     try {
       const parsed = this._parser.parse(xmlText);

@@ -78,3 +78,4 @@ export type {
   Identifier as IdentifierType,
 } from "./metadata.js";
 export * from "./contributions.js";
+export * from "./extract-text.js";

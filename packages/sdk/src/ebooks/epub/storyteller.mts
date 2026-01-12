@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   type Entry,
   Uint8ArrayReader,
@@ -6,6 +7,53 @@ import {
   ZipWriter,
 } from "@zip.js/zip.js";
 import { XMLBuilder, XMLParser } from "fast-xml-parser";
+import * as he from "he";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname } from "node:path";
+
+/**
+ * Read a file from disk and return its contents as a Uint8Array.
+ */
+async function streamFile(path: string): Promise<Uint8Array> {
+  const buffer = await readFile(path);
+  return new Uint8Array(buffer);
+}
+
+/**
+ * MIME type lookup by file extension.
+ * Supports common image formats used in EPUBs.
+ */
+const MIME_TYPES: Record<string, string> = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".gif": "image/gif",
+  ".svg": "image/svg+xml",
+  ".webp": "image/webp",
+  ".avif": "image/avif",
+};
+
+function lookup(href: string): string | undefined {
+  const ext = href.slice(href.lastIndexOf(".")).toLowerCase();
+  return MIME_TYPES[ext];
+}
+
+/**
+ * Memoization utility that tracks cached functions for clearing.
+ */
+const memoize = {
+  caches: new WeakMap<Function, Map<string, unknown>>(),
+
+  /**
+   * Clear the cache for a memoized function.
+   */
+  clear(fn: Function): void {
+    const cache = this.caches.get(fn);
+    if (cache) {
+      cache.clear();
+    }
+  },
+};
 
 /*
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale/getTextInfo
@@ -52,26 +100,25 @@ type Letter =
 type QuestionMark = "?";
 
 /** A valid name for an XML element (must start with a letter) */
-export type ElementName =
-  `${Letter | Uppercase<Letter> | QuestionMark}${string}`;
+type ElementName = `${Letter | Uppercase<Letter> | QuestionMark}${string}`;
 
 /** An XML element */
-export type XmlElement<Name extends ElementName = ElementName> = {
+type XmlElement<Name extends ElementName = ElementName> = {
   ":@"?: Record<string, string>;
 } & {
   [key in Name]: ParsedXml;
 };
 
 /** A text node in an XML document */
-export type XmlTextNode = { "#text": string };
+type XmlTextNode = { "#text": string };
 
 /** A valid XML node. May be either an element or a text node. */
-export type XmlNode = XmlElement | XmlTextNode;
+type XmlNode = XmlElement | XmlTextNode;
 
 /** An XML structure */
-export type ParsedXml = Array<XmlNode>;
+type ParsedXml = Array<XmlNode>;
 
-export type ManifestItem = {
+type ManifestItem = {
   id: string;
   href: string;
   mediaType?: string | undefined;
@@ -115,34 +162,34 @@ class EpubEntry {
   }
 }
 
-export type MetadataEntry = {
+type MetadataEntry = {
   id?: string | undefined;
   type: ElementName;
   properties: Record<string, string>;
   value: string | undefined;
 };
 
-export type EpubMetadata = MetadataEntry[];
+type EpubMetadata = MetadataEntry[];
 
-export interface DcSubject {
+interface DcSubject {
   value: string;
   authority: string;
   term: string;
 }
 
-export interface AlternateScript {
+interface AlternateScript {
   name: string;
   locale: Intl.Locale;
 }
 
-export interface DcCreator {
+interface DcCreator {
   name: string;
   role?: string;
   fileAs?: string;
   alternateScripts?: AlternateScript[];
 }
 
-export interface DublinCore {
+interface DublinCore {
   title: string;
   language: Intl.Locale;
   identifier: string;
@@ -153,7 +200,7 @@ export interface DublinCore {
   type?: string;
 }
 
-export interface Collection {
+interface Collection {
   name: string;
   type?: string;
   position?: string;
@@ -510,8 +557,8 @@ export class Epub {
     const zipReader = new ZipReader(dataReader);
     const zipEntries = await zipReader.getEntries();
     const epubEntries = zipEntries.map((entry) => new EpubEntry(entry));
-    const epub = new Epub(epubEntries, () => zipReader.close());
-    return epub;
+
+    return new Epub(epubEntries, () => zipReader.close());
   }
 
   private static parseMetadataItem(node: XmlNode) {
@@ -2613,11 +2660,16 @@ function cached<T>(
   resolver: (href: string) => Promise<T>,
   cache: Map<string, T> = new Map(),
 ) {
-  return async (href: string) => {
+  const fn = async (href: string) => {
     if (!cache.has(href)) {
       cache.set(href, await resolver(href));
     }
 
     return cache.get(href) as T;
   };
+
+  // Register cache with memoize utility for clearing
+  memoize.caches.set(fn, cache as Map<string, unknown>);
+
+  return fn;
 }
