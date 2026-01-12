@@ -3,6 +3,7 @@
 import type { Database } from "@colibri-hq/sdk";
 import type { Storage } from "@colibri-hq/sdk/storage";
 import type { CompositionEventHandler } from "svelte/elements";
+import type { ApiAuthResult } from "$lib/server/api-auth";
 
 declare global {
   namespace App {
@@ -15,6 +16,8 @@ declare global {
     interface Locals {
       database: Database;
       storage: Promise<Storage>;
+      /** API authentication result (for /api/* routes) */
+      apiAuth?: ApiAuthResult;
     }
 
     // interface PageData {}

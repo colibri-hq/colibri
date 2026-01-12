@@ -1,4 +1,5 @@
 import { relatorRoles } from "@colibri-hq/sdk/ebooks";
+import { indexAsset } from "@colibri-hq/sdk/jobs";
 import { downloadUrl, uploadUrl, read } from "$lib/server/storage";
 import { emitImportEvent } from "$lib/server/import-events";
 import { procedure, t, unguardedProcedure } from "$lib/trpc/t";
@@ -237,7 +238,20 @@ export const books = t.router({
         }
 
         // Generate a unique S3 key for this upload
-        const s3Key = `uploads/${generateRandomUuid()}-${filename}`;
+        // Sanitize filename for S3 key (remove/replace problematic characters)
+        const extension = filename.includes(".")
+          ? filename.slice(filename.lastIndexOf("."))
+          : "";
+        const sanitizedFilename =
+          filename
+            .slice(0, filename.length - extension.length)
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+            .replace(/[&]/g, "and")
+            .replace(/[^a-zA-Z0-9._-]/g, "_")
+            .replace(/_+/g, "_")
+            .slice(0, 100) + extension;
+        const s3Key = `uploads/${generateRandomUuid()}-${sanitizedFilename}`;
 
         const url = await uploadUrl(
           await storage,
@@ -283,7 +297,12 @@ export const books = t.router({
 
           // Download the file from S3
           const fileBuffer = await read(await storage, s3Key);
-          const file = new File([fileBuffer as unknown as ArrayBuffer], filename);
+          // Convert Uint8Array to ArrayBuffer for File constructor
+          const arrayBuffer = fileBuffer.buffer.slice(
+            fileBuffer.byteOffset,
+            fileBuffer.byteOffset + fileBuffer.byteLength,
+          ) as ArrayBuffer;
+          const file = new File([arrayBuffer], filename);
 
           // Use the SDK ingestion function
           const result = await ingestWork(database, file, {
@@ -313,6 +332,19 @@ export const books = t.router({
               ).catch((err) => {
                 console.warn("Background enrichment failed:", err);
               });
+
+              // Trigger async content indexing for full-text search (fire and forget)
+              // We have the file already loaded, so we can index directly
+              if (result.asset) {
+                indexAsset(
+                  database,
+                  result.asset.id,
+                  file,
+                  result.asset.media_type,
+                ).catch((err) => {
+                  console.warn("Background content indexing failed:", err);
+                });
+              }
               break;
 
             case "skipped":
@@ -368,7 +400,7 @@ export const books = t.router({
     .mutation(
       async ({
         input: { uploadId, pendingId, action },
-        ctx: { userId, database },
+        ctx: { userId, database, storage },
       }) => {
         try {
           const result = await confirmIngestion(
@@ -398,6 +430,19 @@ export const books = t.router({
               ).catch((err) => {
                 console.warn("Background enrichment failed:", err);
               });
+
+              // Trigger async content indexing for full-text search (fire and forget)
+              // Need to fetch file from storage since we don't have it here
+              if (result.asset) {
+                triggerAsyncIndexing(
+                  database,
+                  storage,
+                  result.asset.id,
+                  result.asset.media_type,
+                ).catch((err) => {
+                  console.warn("Background content indexing failed:", err);
+                });
+              }
               break;
 
             case "skipped":
@@ -920,4 +965,47 @@ function calculateImprovements(
   }
 
   return improvements;
+}
+
+/**
+ * Trigger async content indexing for a newly created asset.
+ * This runs in the background and doesn't block the response.
+ * Used when we don't have the file in memory and need to fetch from storage.
+ */
+async function triggerAsyncIndexing(
+  database: Parameters<typeof loadWork>[0],
+  storage: Promise<Parameters<typeof read>[0]>,
+  assetId: string,
+  mediaType: string,
+): Promise<void> {
+  try {
+    // Get the asset's storage reference
+    const asset = await database
+      .selectFrom("asset")
+      .select(["storage_reference", "filename"])
+      .where("id", "=", assetId)
+      .executeTakeFirst();
+
+    if (!asset) {
+      console.warn(`Asset ${assetId} not found for indexing`);
+      return;
+    }
+
+    // Fetch the file from storage
+    const fileBuffer = await read(await storage, asset.storage_reference);
+    // Convert Uint8Array to ArrayBuffer for File constructor
+    const arrayBuffer = fileBuffer.buffer.slice(
+      fileBuffer.byteOffset,
+      fileBuffer.byteOffset + fileBuffer.byteLength,
+    ) as ArrayBuffer;
+    const file = new File([arrayBuffer], asset.filename ?? "ebook", {
+      type: mediaType,
+    });
+
+    // Index the asset
+    await indexAsset(database, assetId, file, mediaType);
+  } catch (error) {
+    // Don't throw - this is background indexing
+    console.error("Async content indexing failed:", error);
+  }
 }

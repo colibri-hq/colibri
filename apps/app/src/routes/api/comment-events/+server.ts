@@ -2,13 +2,17 @@ import {
   subscribeToCommentEvents,
   type CommentEvent,
 } from "$lib/server/comment-events";
-import { resolveUserId } from "$lib/server/auth";
 import type { RequestHandler } from "./$types";
 
 /**
  * SSE endpoint for comment notification events.
  * Clients connect to this endpoint to receive real-time updates about
  * replies, reactions, and mentions on their comments.
+ *
+ * Supports authentication via:
+ * - Session cookie (browser)
+ * - Basic Auth: email:api_key
+ * - Bearer token: OAuth access token
  *
  * Usage:
  * ```typescript
@@ -19,16 +23,31 @@ import type { RequestHandler } from "./$types";
  * };
  * ```
  */
-export const GET: RequestHandler = async ({ request, cookies }) => {
-  const userId = resolveUserId(cookies);
+export const GET: RequestHandler = async ({ request, locals }) => {
+  const auth = locals.apiAuth;
 
-  if (!userId) {
+  if (!auth) {
     return new Response("Unauthorized", { status: 401 });
   }
+
+  const userId = auth.userId;
 
   const stream = new ReadableStream({
     start(controller) {
       const encoder = new TextEncoder();
+      let isClosed = false;
+
+      function cleanup() {
+        if (isClosed) return;
+        isClosed = true;
+        clearInterval(keepaliveInterval);
+        unsubscribe();
+        try {
+          controller.close();
+        } catch {
+          // Controller already closed, ignore
+        }
+      }
 
       // Send initial connection event
       const connectEvent = `data: ${JSON.stringify({ type: "connected" })}\n\n`;
@@ -38,37 +57,31 @@ export const GET: RequestHandler = async ({ request, cookies }) => {
       const unsubscribe = subscribeToCommentEvents(
         userId,
         (event: CommentEvent) => {
+          if (isClosed) return;
           try {
             const sseEvent = `data: ${JSON.stringify(event)}\n\n`;
             controller.enqueue(encoder.encode(sseEvent));
           } catch {
             // Client disconnected, clean up
-            unsubscribe();
-            controller.close();
+            cleanup();
           }
         },
       );
 
-      // Handle client disconnect via abort signal
-      request.signal.addEventListener("abort", () => {
-        unsubscribe();
-        controller.close();
-      });
-
       // Send keepalive every 30 seconds to prevent connection timeout
       const keepaliveInterval = setInterval(() => {
+        if (isClosed) return;
         try {
           const keepalive = `: keepalive\n\n`;
           controller.enqueue(encoder.encode(keepalive));
         } catch {
-          clearInterval(keepaliveInterval);
-          unsubscribe();
+          cleanup();
         }
       }, 30000);
 
-      // Clean up interval on abort
+      // Handle client disconnect via abort signal
       request.signal.addEventListener("abort", () => {
-        clearInterval(keepaliveInterval);
+        cleanup();
       });
     },
   });

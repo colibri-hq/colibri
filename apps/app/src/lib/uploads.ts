@@ -212,16 +212,21 @@ export const activeUploads = derived(queue, ($queue) =>
 
 /**
  * Derived store for upload progress summary
+ * Note: `total` excludes failed items so the progress message is accurate
  */
 export const uploadProgress = derived(queue, ($queue) => {
-  const total = $queue.length;
-  const completed = $queue.filter((item) => item.status === "completed").length;
+  // Exclude failed items from progress calculation - they shouldn't affect the count
+  const relevantQueue = $queue.filter((item) => item.status !== "failed");
+  const total = relevantQueue.length;
+  const completed = relevantQueue.filter(
+    (item) => item.status === "completed",
+  ).length;
   const failed = $queue.filter((item) => item.status === "failed").length;
-  const active = $queue.filter(
+  const active = relevantQueue.filter(
     (item) =>
       !["completed", "failed", "needs-confirmation"].includes(item.status),
   ).length;
-  const needsConfirmation = $queue.filter(
+  const needsConfirmation = relevantQueue.filter(
     (item) => item.status === "needs-confirmation",
   ).length;
 

@@ -1,6 +1,7 @@
 import { dev } from "$app/environment";
 import { env } from "$env/dynamic/private";
 import { log } from "$lib/logging";
+import { authenticateApiRequest } from "$lib/server/api-auth";
 import { createContext } from "$lib/trpc/context";
 import { router } from "$lib/trpc/router";
 import { initialize as database } from "@colibri-hq/sdk";
@@ -30,6 +31,25 @@ const handlers = [
         return storage(event.locals.database);
       },
     });
+
+    return resolve(event);
+  },
+  // endregion
+
+  // region API Authentication (for /api/* routes)
+  async function apiAuth({ event, resolve }) {
+    // Only authenticate API routes
+    if (event.url.pathname.startsWith("/api/")) {
+      const auth = await authenticateApiRequest(
+        event.request,
+        event.locals.database,
+        event.cookies,
+      );
+
+      if (auth) {
+        event.locals.apiAuth = auth;
+      }
+    }
 
     return resolve(event);
   },
