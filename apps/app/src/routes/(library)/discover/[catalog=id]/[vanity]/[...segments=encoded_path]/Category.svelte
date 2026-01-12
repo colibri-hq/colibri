@@ -1,28 +1,25 @@
 <script lang="ts" module>
-  export type NavigateEvent = CustomEvent<{ link: string; title: string }>;
+  export type NavigateEventDetail = { link: string; title: string };
 </script>
 
 <script lang="ts">
   import dayjs from 'dayjs';
   import relativeTime from 'dayjs/plugin/relativeTime.js';
   import type { Category } from './+page.svelte';
-  import { createEventDispatcher } from 'svelte';
 
   dayjs.extend(relativeTime);
-  const dispatch = createEventDispatcher<{
-    navigate: NavigateEvent['detail'];
-  }>();
 
   interface Props {
     entry: Category;
+    onnavigate?: (detail: NavigateEventDetail) => void;
   }
 
-  let { entry }: Props = $props();
+  let { entry, onnavigate }: Props = $props();
   let timestamp = $derived(new Date(entry.lastUpdatedAt).toISOString());
   let timeAgo = $derived(dayjs(entry.lastUpdatedAt).fromNow());
 
   function navigate() {
-    dispatch('navigate', {
+    onnavigate?.({
       link: entry.link,
       title: entry.title,
     });

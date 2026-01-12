@@ -12,7 +12,7 @@
   let amount = $derived(comments.length ?? 0);
   let commenters = $derived(
     uniqueBy(
-      comments.map(({ user }) => user).filter((u): u is NonNullable<typeof u> => u !== null),
+      comments.map(({ user }) => user).filter((u): u is NonNullable<typeof u> => u != null && 'email' in u),
       'email',
     ),
   );

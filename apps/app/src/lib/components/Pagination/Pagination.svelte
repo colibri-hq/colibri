@@ -1,78 +1,101 @@
-<!-- @migration-task Error while migrating Svelte code: Cannot set properties of undefined (setting 'next') -->
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import PaginationButton from '$lib/components/Pagination/PaginationButton.svelte';
   import { Icon } from '@colibri-hq/ui';
-  import { createEventDispatcher } from 'svelte';
+  import type { Snippet } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
 
-  const dispatch = createEventDispatcher<{
-    page: number;
-    first: void;
-    previous: void;
-    next: void;
-    last: void;
-  }>();
+  interface Props extends HTMLAttributes<HTMLElement> {
+    /**
+     * The total number of pages.
+     */
+    total: number | `${number}`;
 
-  let className = '';
-  export { className as class };
+    /**
+     * The current page number.
+     */
+    current?: number | `${number}`;
 
-  /**
-   * The total number of pages.
-   */
-  export let total: number | `${number}`;
+    /**
+     * The maximum number of pages to show in the pagination.
+     */
+    max?: number | `${number}`;
 
-  /**
-   * The current page number.
-   */
-  export let current: number | `${number}` = 1;
-  $: pages = Array.from({ length: +total }, (_, i) => i + 1);
+    /**
+     * Whether to show the first and last buttons.
+     *
+     * Pass `'auto'` to show them only if there are more pages than the `max` prop.
+     */
+    firstLast?: boolean | 'auto';
 
-  /**
-   * The maximum number of pages to show in the pagination.
-   */
-  export let max: number | `${number}` = 5;
+    /**
+     * Whether to show the previous and next buttons.
+     */
+    prevNext?: boolean;
 
-  /**
-   * Whether to show the first and last buttons.
-   *
-   * Pass `'auto'` to show them only if there are more pages than the `max` prop.
-   */
-  export let firstLast: boolean | 'auto' = 'auto';
-  $: showFirstLast = firstLast === 'auto' ? +total > +max : firstLast;
+    // Event callbacks
+    onfirst?: () => void;
+    onlast?: () => void;
+    onprevious?: () => void;
+    onnext?: () => void;
+    onpage?: (page: number) => void;
 
-  /**
-   * Whether to show the previous and next buttons.
-   */
-  export let prevNext: boolean = true;
-  $: showPrevNext = prevNext && +total > 1;
+    // Snippets for custom labels
+    firstLabel?: Snippet;
+    prevLabel?: Snippet;
+    nextLabel?: Snippet;
+    lastLabel?: Snippet;
+  }
+
+  let {
+    class: className = '',
+    total,
+    current = 1,
+    max = 5,
+    firstLast = 'auto',
+    prevNext = true,
+    onfirst,
+    onlast,
+    onprevious,
+    onnext,
+    onpage,
+    firstLabel,
+    prevLabel,
+    nextLabel,
+    lastLabel,
+    ...rest
+  }: Props = $props();
+
+  let pages = $derived(Array.from({ length: +total }, (_, i) => i + 1));
+  let showFirstLast = $derived(firstLast === 'auto' ? +total > +max : firstLast);
+  let showPrevNext = $derived(prevNext && +total > 1);
 
   function isCurrent(page: number) {
     return page === current;
   }
 
-  function first() {
-    return () => dispatch('first');
+  function handleFirst() {
+    onfirst?.();
   }
 
-  function last() {
-    return () => dispatch('last');
+  function handleLast() {
+    onlast?.();
   }
 
-  function previous() {
-    return () => dispatch('previous');
+  function handlePrevious() {
+    onprevious?.();
   }
 
-  function next() {
-    return () => dispatch('next');
+  function handleNext() {
+    onnext?.();
   }
 
-  function toPage(page: number) {
-    return () => dispatch('page', page);
+  function handlePage(page: number) {
+    return () => onpage?.(page);
   }
 </script>
 
 {#if +total > 1}
-  <nav aria-label="Pagination" class="flex {className}" {...$$restProps}>
+  <nav aria-label="Pagination" class="flex {className}" {...rest}>
     <ul
       class="mx-auto flex rounded-full bg-gray-100 p-2 shadow-inner-sm dark:bg-gray-900 dark:shadow-inner"
     >
@@ -81,14 +104,16 @@
           <PaginationButton
             label="First Page"
             disabled={current === 1}
-            onClick={first}
+            onclick={handleFirst}
           >
-            <slot name="first:label">
+            {#if firstLabel}
+              {@render firstLabel()}
+            {:else}
               <Icon
                 name="keyboard_double_arrow_left"
                 class="mr-0.5 text-lg leading-none"
               />
-            </slot>
+            {/if}
           </PaginationButton>
         </li>
       {/if}
@@ -98,14 +123,16 @@
           <PaginationButton
             label="Previous Page"
             disabled={current === 1}
-            onClick={previous}
+            onclick={handlePrevious}
           >
-            <slot name="prev:label">
+            {#if prevLabel}
+              {@render prevLabel()}
+            {:else}
               <Icon
                 name="keyboard_arrow_left"
                 class="mr-px text-lg leading-none"
               />
-            </slot>
+            {/if}
           </PaginationButton>
         </li>
       {/if}
@@ -116,7 +143,7 @@
             label="Page {page}{isCurrent(page) ? ' (current)' : ''}"
             active={isCurrent(page)}
             disabled={isCurrent(page)}
-            onClick={toPage(page)}
+            onclick={handlePage(page)}
           >
             <span>{page}</span>
           </PaginationButton>
@@ -128,14 +155,16 @@
           <PaginationButton
             label="Next Page"
             disabled={current === total}
-            onClick={next}
+            onclick={handleNext}
           >
-            <slot name="next:label">
+            {#if nextLabel}
+              {@render nextLabel()}
+            {:else}
               <Icon
                 name="keyboard_arrow_right"
                 class="ml-px text-lg leading-none"
               />
-            </slot>
+            {/if}
           </PaginationButton>
         </li>
       {/if}
@@ -145,14 +174,16 @@
           <PaginationButton
             label="Last Page"
             disabled={current === total}
-            onClick={last}
+            onclick={handleLast}
           >
-            <slot name="last:label">
+            {#if lastLabel}
+              {@render lastLabel()}
+            {:else}
               <Icon
                 name="keyboard_double_arrow_right"
                 class="ml-0.5 text-lg leading-none"
               />
-            </slot>
+            {/if}
           </PaginationButton>
         </li>
       {/if}

@@ -50,9 +50,4 @@
   }
 </script>
 
-<canvas
-  bind:this={canvas}
-  class={className}
-  height="{size}px"
-  width="{size}px"
-></canvas>
+<canvas bind:this={canvas} class={className} height="{size}px" width="{size}px"></canvas>

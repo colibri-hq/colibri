@@ -20,7 +20,8 @@
   let passcode = $state<string | undefined>();
   let previous = $derived(page.url.searchParams.get('previous') ?? '/');
 
-  async function verifyPasscode() {
+  async function verifyPasscode(value: string) {
+    passcode = value;
 
     // Wait for a moment for the hidden form input to update
     await tick();

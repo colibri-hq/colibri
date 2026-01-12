@@ -1,9 +1,11 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   interface Props {
     class?: string;
     title: string;
-    content?: import('svelte').Snippet;
-    children?: import('svelte').Snippet;
+    content?: Snippet;
+    children?: Snippet;
 
     [key: string]: unknown;
   }
@@ -15,11 +17,9 @@
     children,
     ...rest
   }: Props = $props();
-
-  const classes = `mb-4 w-full ${className}`.trimEnd();
 </script>
 
-<header {...rest} class={classes}>
+<header {...rest} class="mb-4 w-full {className}">
   {#if content}{@render content()}{:else}
     <h1 class="font-serif text-3xl font-medium">
       {#if children}{@render children()}{:else}{title}{/if}

@@ -11,7 +11,6 @@
     ratings: MaybePromise<Rating[]>;
     onView?: () => unknown;
     onRating?: (rating: number) => unknown;
-
     [key: string]: unknown;
   }
 
@@ -23,56 +22,55 @@
     onView,
     ...rest
   }: Props = $props();
-  let internalRating = $derived(
-    Promise.resolve(ratings).then((ratings) => {
-      const sum = ratings.reduce((sum, { rating }) => sum + rating, 0);
-      const { rating } = ratings.find(
-        ({ user_id }) => user_id === page.data.user.id,
-      ) ?? { rating: undefined };
 
-      return {
-        average: sum / ratings.length,
-        user: rating,
-      };
-    }),
-  );
-
+  let resolvedRatings = $state<{ average: number; user: number | undefined } | null>(null);
+  let localUserRating = $state<number | undefined>(undefined);
   let loading = $state(false);
+
+  $effect(() => {
+    Promise.resolve(ratings).then((data) => {
+      const sum = data.reduce((acc, { rating }) => acc + rating, 0);
+      const userRating = data.find(({ user_id }) => user_id === page.data.user.id);
+
+      resolvedRatings = {
+        average: data.length > 0 ? sum / data.length : 0,
+        user: userRating?.rating,
+      };
+    });
+  });
+
+  let displayValue = $derived(
+    localUserRating ?? resolvedRatings?.user ?? resolvedRatings?.average ?? 0,
+  );
 
   async function updateRating(rating: number) {
     loading = true;
+    localUserRating = rating;
 
     try {
-      await trpc(page).books.updateRating.mutate(
-        savable({
-          workId: work.id,
-          rating,
-        }),
-      );
+      await trpc(page).books.updateRating.mutate(savable({ workId: work.id, rating }));
       onRating?.(rating);
+    } catch {
+      localUserRating = undefined;
     } finally {
       loading = false;
     }
   }
-
-  function viewAll() {
-    onView?.();
-  }
 </script>
 
-{#await internalRating}
+{#if resolvedRatings === null}
   <p>Loading ratings...</p>
-{:then {user, average }}
+{:else}
   <div
-    class="group mt-2 flex max-w-max items-center
-    rounded-full py-1 pr-1 pl-2 transition focus-within:bg-gray-100 hover:bg-gray-100
+    class="group mt-2 flex max-w-max items-center rounded-full py-1 pr-1 pl-2 transition
+    focus-within:bg-gray-100 hover:bg-gray-100
     dark:focus-within:bg-gray-900 dark:hover:bg-gray-900 {className}"
     {...rest}
   >
     <StarRating
       disabled={loading}
       class="text-yellow-500 dark:text-yellow-600"
-      value={user ?? average}
+      value={displayValue}
       max="5"
       onChange={updateRating}
     />
@@ -84,9 +82,9 @@
       focus-visible:bg-gray-300 focus-visible:ring focus-visible:ring-gray-500
       dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700/75 dark:hover:text-gray-300
       dark:focus-visible:bg-gray-700 dark:focus-visible:text-gray-300"
-      onclick={viewAll}
+      onclick={() => onView?.()}
     >
       View all
     </button>
   </div>
-{/await}
+{/if}

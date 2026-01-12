@@ -5,6 +5,7 @@
 </script>
 
 <script lang="ts">
+  import ApiKeysSettings from './ApiKeysSettings.svelte';
   import CatalogSettings from './CatalogSettings.svelte';
   import InstanceSettings from './InstanceSettings.svelte';
   import MemberSettings from './MemberSettings.svelte';
@@ -18,6 +19,7 @@
 
   const tabs = {
     personal: 'Personal',
+    apiKeys: 'API Keys',
     instance: 'Instance',
     members: 'Members',
     catalogs: 'Catalogs',
@@ -62,9 +64,14 @@
     {tabs}
     initialValue={initialActive}
     onChange={updateUrl}
+    lazy
   >
     {#snippet personalContent()}
       <PersonalSettings></PersonalSettings>
+    {/snippet}
+
+    {#snippet apiKeysContent()}
+      <ApiKeysSettings></ApiKeysSettings>
     {/snippet}
 
     {#snippet instanceContent()}

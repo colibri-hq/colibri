@@ -1,7 +1,8 @@
 <script lang="ts">
   import { browser } from '$app/environment';
+  import { invalidateAll } from '$app/navigation';
   import { onMount, onDestroy } from 'svelte';
-  import { updateQueueFromSSE, queue } from '$lib/uploads';
+  import { updateQueueFromSSE, queue, removeFromQueue } from '$lib/uploads';
   import { success, error as notifyError } from '$lib/notifications';
   import { toast } from 'svelte-sonner';
   import type { ImportEvent } from '$lib/server/import-events';
@@ -67,6 +68,10 @@
         success('Book imported', {
           message: `"${event.title}" has been added to your library`,
         });
+        // Refresh the page data to show the new book
+        invalidateAll();
+        // Remove the completed item from the queue after a brief delay
+        setTimeout(() => removeFromQueue(event.uploadId), 500);
         break;
       }
 

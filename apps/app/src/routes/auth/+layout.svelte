@@ -11,7 +11,7 @@
 </svelte:head>
 
 <article
-  class="mx-auto w-max px-8 pt-12 pb-0 md:w-full md:max-w-6xl md:pt-32 md:pb-16"
+  class="mx-auto w-max px-8 pt-12 pb-0 md:w-full md:max-w-6xl md:pt-32 md:pb-16 min-h-screen"
 >
   {@render children?.()}
 </article>

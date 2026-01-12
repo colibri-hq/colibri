@@ -5,7 +5,7 @@
   import AddCatalogModal from './AddCatalogModal.svelte';
   import { type PaginationData, trpc } from '$lib/trpc/client';
   import { page } from '$app/state';
-  import CatalogListItem, { type DisableCatalogEvent, type EnableCatalogEvent } from './CatalogListItem.svelte';
+  import CatalogListItem, { type CatalogEventDetail } from './CatalogListItem.svelte';
   import PaginatedList from '$lib/components/Pagination/PaginatedList.svelte';
   import SettingsPane from './SettingsPane.svelte';
 
@@ -16,7 +16,7 @@
   let catalogModalOpen = $state(false);
   let catalogsLoading: Catalog['id'][] = [];
 
-  async function enableCatalog({ detail: { catalog } }: EnableCatalogEvent) {
+  async function enableCatalog({ catalog }: CatalogEventDetail) {
     catalogsLoading.push(catalog.id);
 
     try {
@@ -28,7 +28,7 @@
     }
   }
 
-  async function disableCatalog({ detail: { catalog } }: DisableCatalogEvent) {
+  async function disableCatalog({ catalog }: CatalogEventDetail) {
     catalogsLoading.push(catalog.id);
 
     try {
@@ -63,8 +63,8 @@
           <CatalogListItem
             {catalog}
             disabled={isLoading(catalog)}
-            on:enable={enableCatalog}
-            on:disable={disableCatalog}
+            onenable={enableCatalog}
+            ondisable={disableCatalog}
           />
         {/each}
       </ul>

@@ -1,35 +1,33 @@
 <script lang="ts" module>
   import type { Catalog } from './+page.svelte';
 
-  export type CatalogActivityEvent = CustomEvent<{ catalog: Catalog }>;
-  export type EnableCatalogEvent = CatalogActivityEvent;
-  export type DisableCatalogEvent = CatalogActivityEvent;
+  export type CatalogEventDetail = { catalog: Catalog };
 </script>
 
 <script lang="ts">
   import { Toggle } from '@colibri-hq/ui';
-  import { createEventDispatcher } from 'svelte';
   import { Icon } from '@colibri-hq/ui';
   import { parseCssColor, rgbToCssColor } from '$lib/colors';
 
   interface Props {
     catalog: Catalog;
     disabled?: boolean;
+    onenable?: (detail: CatalogEventDetail) => void;
+    ondisable?: (detail: CatalogEventDetail) => void;
   }
 
-  let { catalog, disabled = false }: Props = $props();
-
-  const dispatch = createEventDispatcher<{
-    enable: EnableCatalogEvent['detail'];
-    disable: DisableCatalogEvent['detail'];
-  }>();
+  let { catalog, disabled = false, onenable, ondisable }: Props = $props();
 
   function toggle(active: boolean) {
     if (disabled || catalog.active === active) {
       return;
     }
 
-    dispatch(active ? 'enable' : 'disable', { catalog });
+    if (active) {
+      onenable?.({ catalog });
+    } else {
+      ondisable?.({ catalog });
+    }
   }
 
   let backgroundColor = $derived(

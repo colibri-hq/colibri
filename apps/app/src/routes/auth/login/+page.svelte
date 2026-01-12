@@ -6,7 +6,7 @@
   import PasscodeForm from './PasscodeForm.svelte';
   import type { ZodIssue } from 'zod';
   import PageHeader from '$lib/components/Page/PageHeader.svelte';
-	import type { PageProps } from './$types';
+  import type { PageProps } from './$types';
 
   let { form }: PageProps = $props();
 
@@ -15,7 +15,8 @@
   let email = $derived(form?.email ?? '');
 
   async function webauthn() {
-    if (!browserSupportsWebAuthn()) {
+    console.log({ form });
+    if (form?.sent || !browserSupportsWebAuthn()) {
       webauthnAvailable = false;
 
       return;

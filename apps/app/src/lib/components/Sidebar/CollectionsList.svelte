@@ -21,9 +21,7 @@
     adding = true;
   }
 
-  async function handleAdded(event: CustomEvent<{ created: boolean }>) {
-    const { created } = event.detail;
-
+  async function handleAdded({ created }: { created: boolean }) {
     adding = false;
 
     if (created) {
@@ -119,7 +117,7 @@
 
     {#if adding}
       <li>
-        <AddCollectionForm on:done={handleAdded} />
+        <AddCollectionForm ondone={handleAdded} />
       </li>
     {:else}
       <NavigationLink icon="add" onClick={handleAdd} title="New collection" />

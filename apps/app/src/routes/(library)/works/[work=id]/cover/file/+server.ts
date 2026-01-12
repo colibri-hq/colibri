@@ -1,4 +1,4 @@
-import { stream } from "$lib/server/storage";
+import { read } from "$lib/server/storage";
 import { error, redirect, type RequestHandler } from "@sveltejs/kit";
 
 export const GET = async function ({
@@ -15,15 +15,15 @@ export const GET = async function ({
   }
 
   const cover = await database
-    .selectFrom("book")
-    .where("book.id", "=", id)
+    .selectFrom("work")
+    .where("work.id", "=", id)
     .innerJoin("edition", (join) =>
       edition
         ? join.on((eb) => eb("edition.id", "=", eb.val(edition)))
-        : join.onRef("edition.id", "=", "book.main_edition_id"),
+        : join.onRef("edition.id", "=", "work.main_edition_id"),
     )
-    .innerJoin("cover", "cover.id", "edition.cover_id")
-    .selectAll("cover")
+    .innerJoin("image", "image.id", "edition.cover_image_id")
+    .selectAll("image")
     .executeTakeFirst();
 
   if (!cover) {
@@ -51,9 +51,13 @@ export const GET = async function ({
     }
   }
 
-  const body = await stream(await storage, cover.storage_reference);
+  // Parse the s3:// URI to extract just the key path
+  // e.g., s3://colibri/images/abc/file.jpg -> images/abc/file.jpg
+  const storageUrl = new URL(cover.storage_reference);
+  const key = storageUrl.pathname.slice(1); // Remove leading /
+  const body = await read(await storage, key);
 
-  return new Response(body as BodyInit, {
+  return new Response(body, {
     status: 200,
     headers: {
       "Content-Type": cover.media_type,

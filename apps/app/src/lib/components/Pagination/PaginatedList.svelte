@@ -55,9 +55,8 @@
         {
           items: T[];
           pagination: PaginationData;
-          updatePage: (
-            to?: number,
-          ) => (event: CustomEvent<number | void>) => unknown;
+          updatePage: (to: number) => () => void;
+          handlePageChange: (page: number) => void;
           max: number | `${number}`;
           firstLast: boolean | 'auto';
           prevNext: boolean;
@@ -84,10 +83,9 @@
 
   const transition = $derived.by(() => ({ duration: transitionDuration }));
 
-  function updatePage(to?: number) {
-    return ({ detail }: CustomEvent<number | void>) => {
-      const target = detail ?? to ?? 1;
-      onChange?.({ page: target });
+  function updatePage(to: number) {
+    return () => {
+      onChange?.({ page: to });
 
       if (!queryParam) {
         return;
@@ -95,14 +93,32 @@
 
       const url = new URL(page.url);
 
-      if (target === 1) {
+      if (to === 1) {
         url.searchParams.delete(queryParam);
       } else {
-        url.searchParams.set(queryParam, target.toString());
+        url.searchParams.set(queryParam, to.toString());
       }
 
       goto(url);
     };
+  }
+
+  function handlePageChange(pageNum: number) {
+    onChange?.({ page: pageNum });
+
+    if (!queryParam) {
+      return;
+    }
+
+    const url = new URL(page.url);
+
+    if (pageNum === 1) {
+      url.searchParams.delete(queryParam);
+    } else {
+      url.searchParams.set(queryParam, pageNum.toString());
+    }
+
+    goto(url);
   }
 </script>
 
@@ -134,6 +150,7 @@
           items,
           pagination,
           updatePage,
+          handlePageChange,
           max,
           firstLast,
           prevNext,
@@ -146,11 +163,11 @@
           {prevNext}
           total={Number(pagination.last_page)}
           current={Number(pagination.page)}
-          on:page={updatePage()}
-          on:first={updatePage(1)}
-          on:last={updatePage(Number(pagination.last_page))}
-          on:previous={updatePage(Number(pagination.page) - 1)}
-          on:next={updatePage(Number(pagination.page) + 1)}
+          onpage={handlePageChange}
+          onfirst={updatePage(1)}
+          onlast={updatePage(Number(pagination.last_page))}
+          onprevious={updatePage(Number(pagination.page) - 1)}
+          onnext={updatePage(Number(pagination.page) + 1)}
         />
       {/if}
     </div>

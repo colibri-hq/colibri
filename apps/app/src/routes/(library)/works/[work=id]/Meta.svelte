@@ -1,6 +1,7 @@
 <script lang="ts">
   import MetaItem from './MetaItem.svelte';
-  import type { Work, Publisher } from './+page@(library).svelte';
+  import type { Publisher, Work } from './+page@(library).svelte';
+  import { resolve } from '$app/paths';
 
   interface Props {
     class?: string;
@@ -9,10 +10,9 @@
   }
 
   let { class: className = '', work, publisher }: Props = $props();
-
-  let publishingYear: number | undefined = work.published_at
+  const publishingYear = $derived<number | undefined>(work.published_at
     ? new Date(work.published_at).getUTCFullYear()
-    : undefined;
+    : undefined);
 </script>
 
 <div class={className}>
@@ -29,7 +29,9 @@
     {:then publisher}
       {#if publisher}
         <MetaItem name="Publisher">
-          <a href="/publishers/{publisher.id}">{publisher.name}</a>
+          <a href={resolve('/(library)/publishers/[publisher]', { publisher: publisher.id })}>
+            {publisher.name}
+          </a>
         </MetaItem>
       {/if}
     {/await}
@@ -37,7 +39,9 @@
     {#if work.language}
       <MetaItem name="Language" value={work.language.toUpperCase()}>
         {#snippet secondary()}
-          <span>{work.language_name}</span>
+          <span>
+            {work.language_name}
+          </span>
         {/snippet}
       </MetaItem>
     {/if}

@@ -1,9 +1,11 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   interface Props {
     class?: string;
     padding?: boolean;
     narrow?: boolean;
-    children?: import('svelte').Snippet;
+    children?: Snippet;
 
     [key: string]: unknown;
   }

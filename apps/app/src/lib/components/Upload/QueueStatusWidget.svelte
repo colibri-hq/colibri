@@ -20,7 +20,7 @@
     }
 
     if (remaining === 1) {
-      return 'Uploading 1 book–';
+      return 'Uploading 1 book…';
     }
 
     if (completed > 0) {

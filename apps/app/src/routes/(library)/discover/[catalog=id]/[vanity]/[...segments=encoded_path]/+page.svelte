@@ -7,7 +7,7 @@
 </script>
 
 <script lang="ts">
-  import CategoryItem, { type NavigateEvent } from './Category.svelte';
+  import CategoryItem, { type NavigateEventDetail } from './Category.svelte';
   import LoadingSpinner from '$lib/LoadingSpinner.svelte';
   import { fade } from 'svelte/transition';
   import { goto } from '$app/navigation';
@@ -28,7 +28,7 @@
   let feed = $derived(data.feed);
   let breadcrumbs = $derived(data.breadcrumbs);
 
-  function showCategory({ detail: { link, title } }: NavigateEvent) {
+  function showCategory({ link, title }: NavigateEventDetail) {
     const encoded = encodeBreadcrumbs([link, title ?? '']);
     // @ts-expect-error page.url is always defined in a page component
     const newUrl = resolve(`${page.url.pathname}/${encoded}`);
@@ -59,7 +59,7 @@
         <ul class="grid grid-cols-2 gap-4">
           {#each feed.categories as entry, index (index)}
             <li>
-              <CategoryItem {entry} on:navigate={showCategory} />
+              <CategoryItem {entry} onnavigate={showCategory} />
             </li>
           {/each}
         </ul>

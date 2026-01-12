@@ -193,7 +193,7 @@
 
     {#if error}
       <span
-        class="absolute -bottom-0 left-0 w-full max-w-full overflow-hidden text-sm overflow-ellipsis
+        class="absolute bottom-0 left-0 w-full max-w-full overflow-hidden text-sm overflow-ellipsis
         whitespace-nowrap text-red-600"
       >
         {error}

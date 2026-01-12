@@ -3,14 +3,17 @@
   import { savable, trpc } from '$lib/trpc/client';
   import { clickOutside } from '$lib/utilities';
   import { success, error as notifyError } from '$lib/notifications';
-  import { createEventDispatcher } from 'svelte';
   import { createMdiIconUrn } from '@colibri-hq/sdk/client';
   import { page } from '$app/state';
 
+  interface Props {
+    ondone?: (detail: { created: boolean }) => void;
+  }
+
+  let { ondone }: Props = $props();
+
   let loading: boolean = $state(false);
   let name: string = $state('');
-
-  const dispatch = createEventDispatcher<{ done: { created: boolean } }>();
 
   async function create() {
     loading = true;
@@ -30,12 +33,12 @@
       loading = false;
     }
 
-    dispatch('done', { created: true });
+    ondone?.({ created: true });
     name = '';
   }
 
   function cancel() {
-    dispatch('done', { created: false });
+    ondone?.({ created: false });
     name = '';
   }
 </script>

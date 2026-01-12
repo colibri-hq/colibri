@@ -17,6 +17,8 @@
     disabled?: boolean;
     noLoop?: boolean;
     onChange?: (value: keyof T) => unknown;
+    /** When true, only render active tab content (prevents eager data loading) */
+    lazy?: boolean;
   }
 
   let {
@@ -28,6 +30,7 @@
     disabled,
     onChange,
     noLoop,
+    lazy = false,
     ...rest
   }: Props<L> = $props();
 
@@ -71,7 +74,7 @@
 
   {#each Object.keys(tabs) as key (key)}
     <TabContent value={key.toString()}>
-      {#if typeof contentSnippets[`${key}Content`] === 'function'}
+      {#if typeof contentSnippets[`${key}Content`] === 'function' && (!lazy || value === key)}
         {@render (contentSnippets[`${key}Content`] as Snippet<[string]>)(key.toString())}
       {/if}
     </TabContent>

@@ -13,6 +13,7 @@
   import 'bytemd/dist/index.css';
   import { onMount } from 'svelte';
   import { page } from '$app/state';
+  import { resolve } from '$app/paths';
   import { writable } from 'svelte/store';
   import CollectionModal from './CollectionModal.svelte';
   import Meta from './Meta.svelte';
@@ -67,47 +68,57 @@
   async function checkEnrichment() {
     try {
       const result = await trpc(page).books.hasEnrichment.query({ workId: page.params.work! });
+
       if (result.hasEnrichment) {
+
         // Type narrowing: when hasEnrichment is true, these properties exist
         const { improvementCount, sources } = result as {
           hasEnrichment: true;
           improvementCount: number;
           sources: string[];
         };
+
         if (improvementCount > 0) {
           markEnrichmentAvailable(page.params.work!, improvementCount, sources ?? []);
         }
       }
-    } catch (err) {
-      console.warn('Failed to check enrichment:', err);
+    } catch (error) {
+      console.warn('Failed to check enrichment:', error);
     }
   }
 
   async function openEnrichmentModal() {
     if (enrichmentStatus === 'none') {
+
       // Trigger manual enrichment
       markEnriching(page.params.work!);
+
       try {
         await trpc(page).books.triggerEnrichment.mutate({ workId: page.params.work! });
         await checkEnrichment();
+
         // Re-check the current status after checkEnrichment updates the store
         const currentStatus = $enrichmentStore.status;
+
         if (currentStatus === 'available') {
           await loadEnrichmentPreview();
           enrichmentModalOpen = true;
         }
-      } catch (err) {
-        console.error('Failed to trigger enrichment:', err);
+      } catch (error) {
+        console.error('Failed to trigger enrichment:', error);
+
         clearEnrichmentStatus(page.params.work!);
       }
     } else if (enrichmentStatus === 'available') {
       await loadEnrichmentPreview();
+
       enrichmentModalOpen = true;
     }
   }
 
   async function loadEnrichmentPreview() {
     enrichmentLoading = true;
+
     try {
       enrichmentData = await trpc(page).books.getEnrichmentPreview.query({ workId: page.params.work! });
     } finally {
@@ -119,18 +130,22 @@
     if (!enrichmentData) {
       return;
     }
+
     enrichmentLoading = true;
+
     try {
       await trpc(page).books.applyEnrichment.mutate({
         enrichmentId: enrichmentData.id,
         selectedFields,
       });
+
       enrichmentModalOpen = false;
       clearEnrichmentStatus(page.params.work!);
+
       // Refresh the page to show updated data
       window.location.reload();
-    } catch (err) {
-      console.error('Failed to apply enrichment:', err);
+    } catch (error) {
+      console.error('Failed to apply enrichment:', error);
     } finally {
       enrichmentLoading = false;
     }
@@ -140,11 +155,14 @@
     if (!enrichmentData) {
       return;
     }
+
     enrichmentLoading = true;
+
     try {
       await trpc(page).books.dismissEnrichment.mutate({
         enrichmentId: enrichmentData.id,
       });
+
       enrichmentModalOpen = false;
       clearEnrichmentStatus(page.params.work!);
       enrichmentData = null;
@@ -161,16 +179,14 @@
         entityType: 'work',
         entityId: page.params.work!,
       });
+
       comments.set(result);
     } finally {
       commentsLoading = false;
     }
   }
 
-  async function addComment({
-                              content,
-                              reset,
-                            }: {
+  async function addComment({ content, reset }: {
     content: string;
     reset: () => void;
   }) {
@@ -182,17 +198,16 @@
         entityId: page.params.work!,
         content,
       });
+
       await refreshComments();
+
       reset();
     } finally {
       commentsLoading = false;
     }
   }
 
-  async function addReaction({
-                               commentId,
-                               emoji,
-                             }: {
+  async function addReaction({ commentId, emoji }: {
     commentId: string;
     emoji: string;
   }) {
@@ -200,10 +215,7 @@
     await refreshComments();
   }
 
-  async function removeReaction({
-                                  commentId,
-                                  emoji,
-                                }: {
+  async function removeReaction({ commentId, emoji }: {
     commentId: string;
     emoji: string;
   }) {
@@ -215,51 +227,53 @@
 <article>
   <HeaderBackground
     blurhash={work.cover_blurhash}
-    class="sticky top-0 h-72 border-b shadow transition dark:border-gray-800"
+    class="sticky top-0 h-72 border-b shadow transition border-gray-200 dark:border-gray-800"
     data-animatable="blur"
   />
 
-  <header class="sticky top-0 mb-10 flex flex-col">
+  <header class="sticky top-0 z-10 mb-10 flex flex-col">
     <ContentSection
       class="-mt-24 grid grid-cols-[max-content_auto] grid-rows-[auto_1fr] gap-x-12 gap-y-10 transition will-change-auto"
       data-animatable="header"
     >
-      <!-- region Work Cover -->
-      <div class="row-span-2" data-animatable="cover">
-        <BookCover
-          blurhash={work.cover_blurhash}
-          book={work.id}
-          class="max-h-80 max-w-xs rounded-md shadow-lg"
-          edition={work.edition_id}
-          imageClasses="aspect-[50/81]"
-          title={work.title}
-        />
+      <!-- region Work Cover + Back Button -->
+      <div class="relative row-span-2 w-48">
+        <div data-animatable="cover">
+          <BookCover
+            blurhash={work.cover_blurhash}
+            book={work.id}
+            class="max-h-80 w-48 rounded-md shadow-lg"
+            edition={work.edition_id}
+            imageClasses="aspect-[50/81]"
+            title={work.title}
+          />
+        </div>
+
+        <!-- Back button appears in cover area when scrolled -->
+        <div class="absolute top-0 left-0" data-animatable="back-button">
+          <HeaderButton class="-ms-1" href="." tag="a">
+            <Icon name="chevron_left" />
+            <span class="ms-1">Back</span>
+          </HeaderButton>
+        </div>
       </div>
       <!-- endregion -->
 
-      <!-- region Header Actions -->
-      <nav
-        class="-mt-px flex h-24 grow items-center space-x-2"
-        data-animatable="header-links"
-      >
-        <HeaderButton class="mr-auto -ml-1" href="." tag="a">
-          <Icon name="chevron_left" />
-          <span class="ml-1">Back</span>
-        </HeaderButton>
-
-        <HeaderButton class="ml-auto" onclick={() => (collectionModalOpen = true)}>
+      <!-- region Header Actions - stays visible when scrolled -->
+      <nav class="-mt-px flex h-24 grow items-center justify-end gap-2" data-animatable="actions">
+        <HeaderButton onclick={() => (collectionModalOpen = true)}>
           <Icon name="library_add" />
-          <span class="ml-2">Add to collection</span>
+          <span class="ms-2">Add to collection</span>
         </HeaderButton>
 
         <HeaderButton href="/works/{work.id}/edit" tag="a">
           <Icon name="edit" />
-          <span class="ml-2">Edit</span>
+          <span class="ms-2">Edit</span>
         </HeaderButton>
 
         <HeaderButton download="{work.title}.epub" href="{work.id}/download" tag="a">
           <Icon name="download" />
-          <span class="ml-2">Download</span>
+          <span class="ms-2">Download</span>
         </HeaderButton>
       </nav>
       <!-- endregion -->
@@ -268,7 +282,7 @@
       <div class="flex items-start justify-between md:flex-wrap">
         <div class="flex flex-col">
           <div class="flex items-center gap-2">
-            <h1 class="font-serif text-4xl font-bold" data-animatable="title">
+            <h1 class="font-serif text-4xl font-bold text-gray-900 dark:text-gray-100" data-animatable="title">
               {work.title}
             </h1>
             <EnrichmentBadge
@@ -285,15 +299,18 @@
           {:then creators}
             {@const essentialCreators = creators.filter((creator) => creator.essential)}
 
-            <span class="mt-2 text-xl text-gray-600 dark:text-gray-300" data-animatable="creators">
-              by
-              {#each essentialCreators as creator, index (index)}
-                <a href="/creators/{creator.id}" class="hover:underline">
-                  {creator.name}
-                </a>
-                <span>{index < essentialCreators.length - 1 ? ' & ' : ''}</span>
-              {/each}
-            </span>
+            {#if essentialCreators.length > 0}
+              <span class="mt-2 text-xl text-gray-600 dark:text-gray-300" data-animatable="creators">
+                by
+                {#each essentialCreators as creator, index (index)}
+                  <a href={resolve('/(library)/creators/[creator=id]', {creator: creator.id})} class="hover:underline">
+                    {creator.name}
+                  </a>
+
+                  <span>{index < essentialCreators.length - 1 ? ' & ' : ''}</span>
+                {/each}
+              </span>
+            {/if}
           {/await}
 
           {#await series then seriesList}
@@ -340,24 +357,24 @@
     {/if}
 
     <footer
-      class="sticky bottom-10 mt-12 bg-white py-8 shadow-[0_-8px_24px_16px_transparent] shadow-white
-      dark:bg-gray-950 dark:shadow-gray-950"
+      class="sticky bottom-0 mt-12 flex flex-col gap-8 bg-white py-8 shadow-[0_-8px_24px_16px_transparent]
+      shadow-white dark:bg-gray-950 dark:shadow-gray-950"
     >
       <Meta {work} {publisher} />
+
+      <CommentsPanel
+        comments={$comments}
+        loading={commentsLoading}
+        entityType="work"
+        entityId={page.params.work ?? ''}
+        moderationEnabled={page.data.moderationEnabled}
+        onReaction={addReaction}
+        onReactionRemoved={removeReaction}
+        onSubmit={addComment}
+        onRefresh={refreshComments}
+      />
     </footer>
   </ContentSection>
-
-  <CommentsPanel
-    comments={$comments}
-    loading={commentsLoading}
-    entityType="work"
-    entityId={page.params.work!}
-    moderationEnabled={page.data.moderationEnabled}
-    onReaction={addReaction}
-    onReactionRemoved={removeReaction}
-    onSubmit={addComment}
-    onRefresh={refreshComments}
-  />
 </article>
 
 <CollectionModal bind:open={collectionModalOpen} {work} />
@@ -390,12 +407,12 @@
         transform-origin: top center;
     }
 
-    article :global([data-animatable='header']) {
-        animation-name: squeeze-header;
+    article :global([data-animatable='back-button']) {
+        animation-name: appear-back-button;
     }
 
-    article :global([data-animatable='header-links']) {
-        animation-name: squeeze-header-links;
+    article :global([data-animatable='header']) {
+        animation-name: squeeze-header;
     }
 
     article :global([data-animatable='title']) {
@@ -410,6 +427,10 @@
 
     article :global([data-animatable='ratings']) {
         animation-name: squeeze-ratings;
+    }
+
+    article :global([data-animatable='actions']) {
+        animation-name: stay-visible;
     }
 
     @keyframes squeeze-blur {
@@ -438,6 +459,21 @@
         }
     }
 
+    @keyframes appear-back-button {
+        0%, 40% {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(0);
+        }
+
+        60%, 100% {
+            opacity: 1;
+            pointer-events: auto;
+            /* Move down to center in visible blurhash area */
+            transform: translateY(9rem);
+        }
+    }
+
     @keyframes squeeze-header {
         0%,
         40% {
@@ -446,50 +482,68 @@
 
         100% {
             transform: translateY(-1.5rem);
-        }
-    }
-
-    @keyframes squeeze-header-links {
-        0% {
-            opacity: 1;
-        }
-
-        40%,
-        100% {
-            opacity: 0;
         }
     }
 
     @keyframes squeeze-title {
         0% {
             transform: scale(1);
+            color: rgb(17 24 39); /* gray-900 */
+            text-shadow: none;
         }
 
         40%,
         100% {
             transform: scale(0.8);
+            color: white;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
         }
     }
 
-    @keyframes squeeze-header {
-        0%,
-        40% {
-            transform: translateY(0);
-        }
+    @media (prefers-color-scheme: dark) {
+        @keyframes squeeze-title {
+            0% {
+                transform: scale(1);
+                color: rgb(243 244 246); /* gray-100 */
+                text-shadow: none;
+            }
 
-        100% {
-            transform: translateY(-1.5rem);
+            40%,
+            100% {
+                transform: scale(0.8);
+                color: white;
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+            }
         }
     }
 
     @keyframes squeeze-creators {
         0% {
             transform: translateY(0);
+            color: rgb(75 85 99); /* gray-600 */
         }
 
         60%,
         100% {
             transform: translateY(-0.5rem);
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+    }
+
+    @media (prefers-color-scheme: dark) {
+        @keyframes squeeze-creators {
+            0% {
+                transform: translateY(0);
+                color: rgb(209 213 219); /* gray-300 */
+            }
+
+            60%,
+            100% {
+                transform: translateY(-0.5rem);
+                color: rgba(255, 255, 255, 0.9);
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            }
         }
     }
 
@@ -502,6 +556,19 @@
         100% {
             opacity: 0;
             visibility: hidden;
+        }
+    }
+
+    @keyframes stay-visible {
+        0% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        40%, 100% {
+            opacity: 1;
+            /* Move down to center in visible blurhash area */
+            transform: translateY(7rem);
         }
     }
 </style>
