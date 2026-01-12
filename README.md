@@ -6,7 +6,7 @@
 
 Self-hosted ebook library with a gorgeous web interface, book collections, and metadata editing.
 
-<img width="1723" alt="Screenshot of Colibri" src="https://user-images.githubusercontent.com/6115429/214013069-f1f578e7-8e6a-4404-8b16-74b2f93c3f0e.png">
+<img width="1728" height="996" alt="Screenshot of Colibri" src="https://github.com/user-attachments/assets/c2161298-13c0-4f2b-8738-b3187ef92fce" />
 
 Colibri allows you to manage your books, sort them into collections, and to read and download them. It is built on
 [SvelteKit](https://kit.svelte.dev) and can run in serverless environments. Colibri also employs password-less
@@ -14,14 +14,13 @@ authentication via [Passkeys](https://www.passkeys.io).
 
 > **Hey there!** 👋
 > Colibri is **still under active development** and not ready for prime-time yet. I'm also looking for contributors and
-> co-maintainers on the project: There is *a lot* left to do, and I have big plans for the app (none of them involve
+> co-maintainers on the project: There is _a lot_ left to do, and I have big plans for the app (none of them involve
 > making it a paid product, by the way).
 >
 > If you'd like to be a part of this effort and contribute something—code, design-wise, or anything else really—please
 > contact me!
 
-Features
---------
+## Features
 
 - Simple library management: Import your ebooks, update their metadata, and get a neat library accessible from all your
   devices.
@@ -38,8 +37,8 @@ Features
   not
   send your data to third parties.
 
-Project Goals
--------------
+## Project Goals
+
 Colibri tries to enable you to:
 
 - Self-host a delightful, secure, and capable bookshelf for yourself and your family
@@ -55,16 +54,16 @@ Colibri does not aim to:
 - Make it easy to pirate books
 - Be a community for exchanging books with lots of people
 
-Licensing
----------
+## Licensing
+
 Colibri is licensed under the [GNU AGPL v3](LICENSE). This means you can use, modify, and distribute it freely, but if
 you run a modified version of Colibri that is accessible to others, you must also make your modifications available
 under the same license.  
-Considering Colibri is expressly *not* intended to be run as a commercial service, this license should be a good fit.
+Considering Colibri is expressly _not_ intended to be run as a commercial service, this license should be a good fit.
 
 **This license applies to all packages in this monorepo, unless otherwise noted.**
 
-Contributing
-------------
+## Contributing
+
 If you'd like to contribute to Colibri, please read the [contributing guidelines](CONTRIBUTING.md) first.  
 All contributions are welcome, be it code, documentation, design, or anything else!
