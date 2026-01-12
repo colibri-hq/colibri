@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#175](https://github.com/colibri-hq/colibri/issues/175)
+
 # OAuth 2.1 Core Server
 
 ## Description
@@ -65,22 +67,22 @@ packages/oauth/
 ### Phase 1: Core Improvements
 
 1. Add configurable response modes:
-    - `query` (implemented)
-    - `fragment` (implemented)
-    - `form_post` (RFC 9207)
+   - `query` (implemented)
+   - `fragment` (implemented)
+   - `form_post` (RFC 9207)
 
 2. Improve error handling:
-    - Structured error logging
-    - Error event hooks for monitoring
-    - Custom error message localization
+   - Structured error logging
+   - Error event hooks for monitoring
+   - Custom error message localization
 
 ### Phase 2: Key Management
 
 1. JWKS endpoint improvements:
-    - Asymmetric key pair generation
-    - Key rotation support
-    - Multiple key algorithms (RS256, ES256, PS256)
-    - Key ID (kid) management
+   - Asymmetric key pair generation
+   - Key rotation support
+   - Multiple key algorithms (RS256, ES256, PS256)
+   - Key ID (kid) management
 
 2. Key storage abstraction:
    ```typescript
@@ -94,6 +96,7 @@ packages/oauth/
 ### Phase 3: Security Enhancements
 
 1. Rate limiting framework:
+
    ```typescript
    interface RateLimiter {
      check(key: string, limit: number, window: number): Promise<boolean>;
@@ -102,17 +105,18 @@ packages/oauth/
    ```
 
 2. DPoP support (RFC 9449):
-    - Proof-of-Possession token binding
-    - DPoP header validation
-    - Access token binding to client key
+   - Proof-of-Possession token binding
+   - DPoP header validation
+   - Access token binding to client key
 
 3. Mutual TLS (RFC 8705):
-    - Certificate-bound access tokens
-    - Client certificate validation
+   - Certificate-bound access tokens
+   - Client certificate validation
 
 ### Phase 4: Extensibility
 
 1. Event system for hooks:
+
    ```typescript
    server.on('token:issued', (token, client, user) => {});
    server.on('token:revoked', (token) => {});
@@ -121,6 +125,7 @@ packages/oauth/
    ```
 
 2. Middleware pipeline:
+
    ```typescript
    server.use(async (ctx, next) => {
      // Pre-processing
@@ -132,7 +137,7 @@ packages/oauth/
 3. Custom claim providers:
    ```typescript
    server.registerClaimProvider('custom', async (user, scopes) => ({
-     custom_claim: 'value'
+     custom_claim: 'value',
    }));
    ```
 
@@ -163,7 +168,11 @@ interface AuthorizationServerConfig {
   security: {
     requirePkce: boolean;
     allowedCodeChallengeMethods: ('S256' | 'plain')[];
-    tokenEndpointAuthMethods: ('client_secret_basic' | 'client_secret_post' | 'private_key_jwt')[];
+    tokenEndpointAuthMethods: (
+      | 'client_secret_basic'
+      | 'client_secret_post'
+      | 'private_key_jwt'
+    )[];
   };
 
   // Features

@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#133](https://github.com/colibri-hq/colibri/issues/133)
+
 # Identifier Management
 
 ## Description
@@ -23,6 +25,7 @@ platform-specific IDs.
 ### Phase 1: Flexible Identifier Schema
 
 1. Create identifier table for editions:
+
    ```sql
    CREATE TABLE edition_identifier (
      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -87,15 +90,16 @@ platform-specific IDs.
 ### Phase 4: External Links UI
 
 1. "This book on other platforms" section:
-    - Show icons/logos for each platform
-    - Link to external page
-    - Copy identifier button
+   - Show icons/logos for each platform
+   - Link to external page
+   - Copy identifier button
 
 2. "This author elsewhere" section on creator pages
 
 ### Phase 5: URN Link Component
 
 1. Create component for rendering URN links:
+
    ```svelte
    <IdentifierLink urn="urn:isbn:9780141439518" />
    <!-- Renders: ISBN logo + clickable link -->
@@ -118,7 +122,7 @@ platform-specific IDs.
 ## External Platform Links
 
 | Identifier  | URL Template                              |
-|-------------|-------------------------------------------|
+| ----------- | ----------------------------------------- |
 | isbn        | `https://openlibrary.org/isbn/{value}`    |
 | asin        | `https://amazon.com/dp/{value}`           |
 | goodreads   | `https://goodreads.com/book/show/{value}` |

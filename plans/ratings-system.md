@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#152](https://github.com/colibri-hq/colibri/issues/152)
+
 # Ratings System
 
 ## Description
@@ -28,6 +30,7 @@ aggregated for display. The system exists partially but needs complete implement
 ### Phase 1: Aggregated Ratings
 
 1. Add computed columns or view:
+
    ```sql
    -- Option A: Materialized view
    CREATE MATERIALIZED VIEW work_rating_aggregate AS
@@ -63,6 +66,7 @@ aggregated for display. The system exists partially but needs complete implement
 ### Phase 3: Rating Display Components
 
 1. AverageRating component:
+
    ```svelte
    <AverageRating value={4.2} count={156} />
    <!-- Displays: ★★★★☆ 4.2 (156 ratings) -->
@@ -70,17 +74,17 @@ aggregated for display. The system exists partially but needs complete implement
 
 2. RatingDistribution component:
    ```svelte
-   <RatingDistribution distribution={distribution} />
+   <RatingDistribution {distribution} />
    <!-- Horizontal bar chart showing 5→1 star distribution -->
    ```
 
 ### Phase 4: Interactive Rating
 
 1. Enhance StarRating for input:
-    - Hover preview
-    - Click to set
-    - Click again to remove
-    - Half-star support (optional)
+   - Hover preview
+   - Click to set
+   - Click again to remove
+   - Half-star support (optional)
 
 2. "Rate this book" prompt after finishing
 
@@ -117,7 +121,7 @@ aggregated for display. The system exists partially but needs complete implement
 ## Display Formats
 
 | Context | Format                       |
-|---------|------------------------------|
+| ------- | ---------------------------- |
 | Card    | ★ 4.2                        |
 | Detail  | ★★★★☆ 4.2 (156 ratings)      |
 | Full    | Distribution chart + average |

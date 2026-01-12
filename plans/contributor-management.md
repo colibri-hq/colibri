@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#122](https://github.com/colibri-hq/colibri/issues/122)
+
 # Contributor & Creator Management
 
 ## Description
@@ -30,66 +32,63 @@ discovering creators.
 ### Phase 1: Creator Browse UI
 
 1. Create `/creators` route:
-    - Alphabetical listing
-    - Search by name
-    - Filter by role (authors, illustrators, etc.)
-    - Popular creators section
+   - Alphabetical listing
+   - Search by name
+   - Filter by role (authors, illustrators, etc.)
+   - Popular creators section
 
 2. Creator card component:
-    - Photo
-    - Name
-    - Work count
-    - Primary role
+   - Photo
+   - Name
+   - Work count
+   - Primary role
 
 ### Phase 2: Creator Detail Page Enhancement
 
 1. Improve `/creators/[id]` page:
-    - Full biography
-    - Photo gallery
-    - External links
-    - All works by this creator
-    - Works grouped by role
-    - Series by this creator
+   - Full biography
+   - Photo gallery
+   - External links
+   - All works by this creator
+   - Works grouped by role
+   - Series by this creator
 
 ### Phase 3: Contribution Editor
 
 1. Create contribution editing UI:
-    - Add/remove contributors to edition
-    - MARC role selector with search
-    - "Essential" contributor toggle
-    - Reorder contributors
+   - Add/remove contributors to edition
+   - MARC role selector with search
+   - "Essential" contributor toggle
+   - Reorder contributors
 
 2. Role picker component:
    ```svelte
-   <RolePicker
-     selected={contribution.role}
-     onSelect={handleRoleSelect}
-   />
+   <RolePicker selected={contribution.role} onSelect={handleRoleSelect} />
    <!-- Searchable list of 300+ MARC codes with descriptions -->
    ```
 
 ### Phase 4: Creator Editor
 
 1. Create/edit creator form:
-    - Name and sort name
-    - Biography (rich text)
-    - Photo upload
-    - Birth/death dates and places
-    - External identifiers
-    - Website and Wikipedia links
+   - Name and sort name
+   - Biography (rich text)
+   - Photo upload
+   - Birth/death dates and places
+   - External identifiers
+   - Website and Wikipedia links
 
 ### Phase 5: Creator Merge & Deduplication
 
 1. Detect potential duplicates:
-    - Similar names
-    - Same external IDs
-    - Works overlap
+   - Similar names
+   - Same external IDs
+   - Works overlap
 
 2. Merge UI:
-    - Side-by-side comparison
-    - Select primary record
-    - Combine works and contributions
-    - Redirect merged ID
+   - Side-by-side comparison
+   - Select primary record
+   - Combine works and contributions
+   - Redirect merged ID
 
 ### Phase 6: Creator Discovery
 
@@ -108,7 +107,7 @@ discovering creators.
 ## MARC Relator Codes (Common)
 
 | Code | Role                   | Description          |
-|------|------------------------|----------------------|
+| ---- | ---------------------- | -------------------- |
 | aut  | Author                 | Primary writer       |
 | edt  | Editor                 | Editorial work       |
 | ill  | Illustrator            | Visual art           |
@@ -121,7 +120,7 @@ discovering creators.
 ## Creator External IDs
 
 | Platform    | Field          | Use Case          |
-|-------------|----------------|-------------------|
+| ----------- | -------------- | ----------------- |
 | OpenLibrary | openlibrary_id | Metadata linking  |
 | Goodreads   | goodreads_id   | Reviews/ratings   |
 | Amazon      | amazon_id      | Purchase links    |

@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#137](https://github.com/colibri-hq/colibri/issues/137)
+
 # Instance Settings
 
 ## Description
@@ -22,6 +24,7 @@ features, configure integrations, and set defaults for the entire installation.
 ### Phase 1: Settings Schema Enhancement
 
 1. Define settings categories:
+
    ```typescript
    type SettingCategory =
      | 'general'
@@ -91,6 +94,7 @@ const instanceSettings = {
 ### Phase 4: User Default Settings
 
 1. Per-user preference overrides:
+
    ```sql
    CREATE TABLE user_preference (
      user_id UUID REFERENCES authentication.user(id),
@@ -105,13 +109,14 @@ const instanceSettings = {
 ### Phase 5: Settings API
 
 1. tRPC procedures:
+
    ```typescript
-   settings.get(key)
-   settings.getAll()
-   settings.set(key, value)        // admin
-   settings.reset(key)             // admin
-   settings.getUserPreference(key)
-   settings.setUserPreference(key, value)
+   settings.get(key);
+   settings.getAll();
+   settings.set(key, value); // admin
+   settings.reset(key); // admin
+   settings.getUserPreference(key);
+   settings.setUserPreference(key, value);
    ```
 
 2. SDK helper functions:
@@ -128,7 +133,7 @@ const instanceSettings = {
 ## Settings Categories
 
 | Category      | Examples                          |
-|---------------|-----------------------------------|
+| ------------- | --------------------------------- |
 | General       | Instance name, branding, timezone |
 | Security      | Registration, sessions, 2FA       |
 | Content       | Visibility, age restrictions      |

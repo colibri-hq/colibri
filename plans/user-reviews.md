@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#163](https://github.com/colibri-hq/colibri/issues/163)
+
 # User Reviews
 
 ## Description
@@ -23,26 +25,26 @@ can be shared publicly or kept private, allowing users to express their thoughts
 ### Phase 1: Backend API
 
 1. Create tRPC router for reviews (`apps/app/src/lib/trpc/routes/reviews.ts`)
-    - `create` - Create new review
-    - `update` - Edit existing review
-    - `delete` - Remove review
-    - `getByEdition` - Get reviews for a book
-    - `getByUser` - Get user's reviews
-    - `publish`/`unpublish` - Toggle visibility
+   - `create` - Create new review
+   - `update` - Edit existing review
+   - `delete` - Remove review
+   - `getByEdition` - Get reviews for a book
+   - `getByUser` - Get user's reviews
+   - `publish`/`unpublish` - Toggle visibility
 
 2. Add SDK resource functions (`packages/sdk/src/resources/review.ts`)
-    - `createReview(database, { editionId, authorId, content })`
-    - `updateReview(database, id, { content })`
-    - `deleteReview(database, id)`
-    - `loadReviewsForEdition(database, editionId)`
-    - `loadReviewsByUser(database, userId)`
+   - `createReview(database, { editionId, authorId, content })`
+   - `updateReview(database, id, { content })`
+   - `deleteReview(database, id)`
+   - `loadReviewsForEdition(database, editionId)`
+   - `loadReviewsByUser(database, userId)`
 
 ### Phase 2: Schema Updates
 
 1. Add columns to `review` table:
-    - `published` (boolean) - Whether review is publicly visible
-    - `rating_id` (foreign key) - Link to associated rating
-    - `title` (varchar) - Optional review title
+   - `published` (boolean) - Whether review is publicly visible
+   - `rating_id` (foreign key) - Link to associated rating
+   - `title` (varchar) - Optional review title
 
 ### Phase 3: Frontend UI
 

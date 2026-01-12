@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#154](https://github.com/colibri-hq/colibri/issues/154)
+
 # Reading Statistics & Analytics
 
 ## Description
@@ -24,9 +26,9 @@ reading progress tracking to be implemented first.
 ### Phase 1: Data Collection
 
 1. Aggregate from reading progress:
-    - Books started/finished
-    - Pages/time read
-    - Reading sessions
+   - Books started/finished
+   - Pages/time read
+   - Reading sessions
 
 2. Create statistics views:
    ```sql
@@ -55,19 +57,20 @@ reading progress tracking to be implemented first.
 ### Phase 3: Statistics Dashboard
 
 1. Overview cards:
-    - Books read this year
-    - Pages read
-    - Reading time
-    - Current streak
+   - Books read this year
+   - Pages read
+   - Reading time
+   - Current streak
 
 2. Charts:
-    - Books per month
-    - Reading by genre/tag
-    - Rating distribution
+   - Books per month
+   - Reading by genre/tag
+   - Rating distribution
 
 ### Phase 4: Reading Goals
 
 1. Goal setting:
+
    ```typescript
    type ReadingGoal = {
      userId: string;
@@ -96,7 +99,7 @@ reading progress tracking to be implemented first.
 ## Statistics Views
 
 | Metric              | Period   | Visualization      |
-|---------------------|----------|--------------------|
+| ------------------- | -------- | ------------------ |
 | Books completed     | Year     | Number + bar chart |
 | Pages read          | Month    | Line chart         |
 | Time spent          | Week     | Stacked bar        |

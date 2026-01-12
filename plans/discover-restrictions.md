@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#125](https://github.com/colibri-hq/colibri/issues/125)
+
 # Discover Restrictions for Children
 
 ## Description
@@ -24,18 +26,19 @@ of allowed books/collections, ensuring children only see curated content rather 
 ### Phase 1: Discover Feature Foundation
 
 1. Create Discover page/section:
-    - Browse all accessible books
-    - Filter by subject, author, age
-    - Search within Discover
+   - Browse all accessible books
+   - Filter by subject, author, age
+   - Search within Discover
 
 2. Understand what "Discover" shows:
-    - Family shared library
-    - External catalog previews
-    - Recommendations
+   - Family shared library
+   - External catalog previews
+   - Recommendations
 
 ### Phase 2: Restriction System Schema
 
 1. Create restriction configuration:
+
    ```sql
    CREATE TABLE discover_restriction (
      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -69,6 +72,7 @@ of allowed books/collections, ensuring children only see curated content rather 
 ### Phase 5: Discover Filtering
 
 1. Apply restrictions in queries:
+
    ```typescript
    function applyDiscoverRestrictions(query, userId) {
      const restriction = await getRestriction(userId);
@@ -96,17 +100,17 @@ of allowed books/collections, ensuring children only see curated content rather 
 ### Phase 7: Templates & Presets
 
 1. Pre-configured restriction profiles:
-    - "Picture Books Only"
-    - "Chapter Books"
-    - "School Library"
-    - Custom
+   - "Picture Books Only"
+   - "Chapter Books"
+   - "School Library"
+   - Custom
 
 2. Share restriction profiles between families
 
 ## Restriction Modes Comparison
 
 | Mode      | Shows               | Use Case                 |
-|-----------|---------------------|--------------------------|
+| --------- | ------------------- | ------------------------ |
 | None      | All age-appropriate | Older children           |
 | Whitelist | Only allowed items  | Young children           |
 | Blacklist | All except blocked  | Mature content filtering |
@@ -114,7 +118,7 @@ of allowed books/collections, ensuring children only see curated content rather 
 ## Content Restriction Types
 
 | Type       | Granularity   | Example                            |
-|------------|---------------|------------------------------------|
+| ---------- | ------------- | ---------------------------------- |
 | Work       | Single book   | Allow "Harry Potter"               |
 | Collection | Group         | Allow "Bedtime Stories" collection |
 | Creator    | All by author | Allow all Dr. Seuss                |

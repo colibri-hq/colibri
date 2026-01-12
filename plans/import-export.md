@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#135](https://github.com/colibri-hq/colibri/issues/135)
+
 # Import & Export Framework
 
 ## Description
@@ -25,6 +27,7 @@ the general framework.
 ### Phase 1: Export Formats
 
 1. Define export format handlers:
+
    ```typescript
    interface ExportHandler {
      format: string;
@@ -35,14 +38,15 @@ the general framework.
    ```
 
 2. Supported formats:
-    - JSON (complete data)
-    - CSV (tabular data)
-    - OPDS 2.0 (catalog)
-    - BibTeX (citations)
+   - JSON (complete data)
+   - CSV (tabular data)
+   - OPDS 2.0 (catalog)
+   - BibTeX (citations)
 
 ### Phase 2: Export API
 
 1. tRPC procedures:
+
    ```typescript
    export.works({ format, workIds?, collectionId? })
    export.collections({ format, collectionIds? })
@@ -53,26 +57,27 @@ the general framework.
    ```
 
 2. Export options:
-    - Include/exclude fields
-    - Include related data
-    - Date range filter
+   - Include/exclude fields
+   - Include related data
+   - Date range filter
 
 ### Phase 3: Export UI
 
 1. Export dialog:
-    - Format selector
-    - Scope selector (all, selected, collection)
-    - Options checkboxes
-    - Download button
+   - Format selector
+   - Scope selector (all, selected, collection)
+   - Options checkboxes
+   - Download button
 
 2. Bulk export:
-    - Progress indicator
-    - Background processing for large exports
-    - Email link when ready
+   - Progress indicator
+   - Background processing for large exports
+   - Email link when ready
 
 ### Phase 4: Import Framework
 
 1. Define import handler interface:
+
    ```typescript
    interface ImportHandler {
      format: string;
@@ -85,12 +90,12 @@ the general framework.
    ```
 
 2. Import pipeline:
-    - File upload
-    - Format detection
-    - Validation
-    - Preview
-    - Conflict resolution
-    - Import execution
+   - File upload
+   - Format detection
+   - Validation
+   - Preview
+   - Conflict resolution
+   - Import execution
 
 ### Phase 5: Import Formats
 
@@ -103,30 +108,30 @@ the general framework.
 ### Phase 6: Import UI
 
 1. Import wizard:
-    - File upload step
-    - Preview step (show detected data)
-    - Mapping step (for CSV)
-    - Conflict resolution step
-    - Progress step
-    - Summary step
+   - File upload step
+   - Preview step (show detected data)
+   - Mapping step (for CSV)
+   - Conflict resolution step
+   - Progress step
+   - Summary step
 
 2. Field mapping for CSV:
-    - Source column → Target field
-    - Custom transformations
-    - Skip unmapped columns
+   - Source column → Target field
+   - Custom transformations
+   - Skip unmapped columns
 
 ### Phase 7: Conflict Resolution
 
 1. Duplicate detection:
-    - By ISBN
-    - By title + author
-    - By external ID
+   - By ISBN
+   - By title + author
+   - By external ID
 
 2. Resolution options:
-    - Skip duplicate
-    - Overwrite existing
-    - Merge data
-    - Create duplicate
+   - Skip duplicate
+   - Overwrite existing
+   - Merge data
+   - Create duplicate
 
 ### Phase 8: Background Processing
 
@@ -162,7 +167,7 @@ type ExportData = {
 ## Import Sources
 
 | Source       | Format    | Data                    |
-|--------------|-----------|-------------------------|
+| ------------ | --------- | ----------------------- |
 | Colibri      | JSON      | Full                    |
 | Goodreads    | CSV       | Books, ratings, reviews |
 | LibraryThing | TSV       | Books, tags, reviews    |
@@ -173,7 +178,7 @@ type ExportData = {
 ## CSV Field Mapping
 
 | CSV Column | Maps To                       |
-|------------|-------------------------------|
+| ---------- | ----------------------------- |
 | Title      | work.title                    |
 | Author     | creator.name                  |
 | ISBN       | edition.isbn                  |

@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#144](https://github.com/colibri-hq/colibri/issues/144)
+
 # Comment Moderation Enhancements
 
 Enhance the existing comment moderation system with improved filtering, search, statistics, and workflow features.
@@ -88,10 +90,10 @@ Enhance the existing comment moderation system with improved filtering, search, 
 - Individual checkboxes on each pending report card
 - Visual highlight (blue ring) on selected reports
 - Bulk action bar appears when items selected showing:
-    - Selected count with "Clear selection" link
-    - "Dismiss All" button
-    - "Hide All" button (yellow icon)
-    - "Delete All" button (red, destructive)
+  - Selected count with "Clear selection" link
+  - "Dismiss All" button
+  - "Hide All" button (yellow icon)
+  - "Delete All" button (red, destructive)
 - Confirmation modal with count and action description
 - Warning message for destructive delete action
 - Bulk actions logged to activity log with details
@@ -109,15 +111,15 @@ Enhance the existing comment moderation system with improved filtering, search, 
 - ✅ Tab state preserved in URL
 - ✅ Page size selector (10, 20, 50 items per page) with URL persistence
 - ✅ Keyboard shortcuts:
-    - `j/k`: Navigate up/down through reports
-    - `Space`: Toggle selection of focused report
-    - `Ctrl+A`: Select all pending reports
-    - `Enter`: Open action modal for focused report
-    - `d`: Dismiss focused or selected reports
-    - `h`: Hide focused or selected reports
-    - `x`: Delete focused or selected reports
-    - `Escape`: Clear selection/focus
-    - `Shift+?`: Show keyboard shortcuts help
+  - `j/k`: Navigate up/down through reports
+  - `Space`: Toggle selection of focused report
+  - `Ctrl+A`: Select all pending reports
+  - `Enter`: Open action modal for focused report
+  - `d`: Dismiss focused or selected reports
+  - `h`: Hide focused or selected reports
+  - `x`: Delete focused or selected reports
+  - `Escape`: Clear selection/focus
+  - `Shift+?`: Show keyboard shortcuts help
 - ✅ Keyboard focus indicator on report cards (blue border + shadow)
 - ✅ Loading skeletons for all sections (stats, reports, hidden, activity)
 - ✅ Responsive layout for pagination and bulk action bar
@@ -170,7 +172,7 @@ create table moderation_log
 ### tRPC Routes (`comments.*`)
 
 | Endpoint             | Method   | Description                             |
-|----------------------|----------|-----------------------------------------|
+| -------------------- | -------- | --------------------------------------- |
 | `getReports`         | query    | List reports with filtering, pagination |
 | `getHidden`          | query    | List hidden comments                    |
 | `getModerationStats` | query    | Get moderation statistics               |
@@ -185,7 +187,7 @@ create table moderation_log
 ## File Summary
 
 | Package        | Files Modified                                              |
-|----------------|-------------------------------------------------------------|
+| -------------- | ----------------------------------------------------------- |
 | `packages/sdk` | `src/resources/comment.ts`, `src/types.ts`                  |
 | `apps/app`     | `src/lib/trpc/routes/comments.ts`                           |
 | `apps/app`     | `src/routes/(library)/instance/moderation/+page.svelte`     |

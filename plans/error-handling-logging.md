@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#129](https://github.com/colibri-hq/colibri/issues/129)
+
 # Error Handling & Logging Infrastructure
 
 ## Description
@@ -27,11 +29,12 @@ basic console-based with no production-ready infrastructure.
 ### Phase 1: Logging Library
 
 1. Select and integrate logging library:
-    - **pino** (recommended for Node.js performance)
-    - **winston** (more features)
-    - **console** wrapper (minimal)
+   - **pino** (recommended for Node.js performance)
+   - **winston** (more features)
+   - **console** wrapper (minimal)
 
 2. Create shared logger (`packages/shared/src/logging.ts`):
+
    ```typescript
    export const logger = createLogger({
      level: process.env.LOG_LEVEL || 'info',
@@ -46,6 +49,7 @@ basic console-based with no production-ready infrastructure.
 ### Phase 2: Structured Logging Format
 
 1. Define log format:
+
    ```json
    {
      "timestamp": "2024-01-15T10:30:00.000Z",
@@ -70,6 +74,7 @@ basic console-based with no production-ready infrastructure.
 ### Phase 3: Error Types
 
 1. Define application error hierarchy:
+
    ```typescript
    class AppError extends Error {
      constructor(
@@ -94,6 +99,7 @@ basic console-based with no production-ready infrastructure.
 ### Phase 4: Error Handling Middleware
 
 1. Global error handler for tRPC:
+
    ```typescript
    const errorHandler = t.middleware(async ({ next }) => {
      try {
@@ -116,20 +122,20 @@ basic console-based with no production-ready infrastructure.
 ### Phase 6: Error Tracking Integration
 
 1. Integrate with error tracking service:
-    - **Sentry** (popular, full-featured)
-    - **Highlight.io** (open-source friendly)
-    - **Self-hosted** (Glitchtip)
+   - **Sentry** (popular, full-featured)
+   - **Highlight.io** (open-source friendly)
+   - **Self-hosted** (Glitchtip)
 
 2. Capture:
-    - Unhandled exceptions
-    - Rejected promises
-    - Custom error events
+   - Unhandled exceptions
+   - Rejected promises
+   - Custom error events
 
 ### Phase 7: Log Aggregation
 
 1. Configure log shipping:
-    - stdout → container logs → aggregator
-    - Direct integration (Loki, Elasticsearch)
+   - stdout → container logs → aggregator
+   - Direct integration (Loki, Elasticsearch)
 
 2. Dashboard for log search and analysis
 
@@ -142,7 +148,7 @@ basic console-based with no production-ready infrastructure.
 ## Log Levels
 
 | Level | Use Case                     |
-|-------|------------------------------|
+| ----- | ---------------------------- |
 | debug | Development details          |
 | info  | Normal operations            |
 | warn  | Recoverable issues           |

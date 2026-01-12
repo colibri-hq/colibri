@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#139](https://github.com/colibri-hq/colibri/issues/139)
+
 # Internationalization (i18n) with PO Files
 
 ## Description
@@ -24,18 +26,19 @@ into multiple languages. This is the industry standard for localization and has 
 ### Phase 1: i18n Library Selection
 
 1. Evaluate options for SvelteKit:
-    - **sveltekit-i18n** - Native SvelteKit integration
-    - **typesafe-i18n** - Type-safe, compile-time
-    - **svelte-i18n** - Popular, format-js based
-    - **Paraglide** - Inlang ecosystem, tree-shakeable
+   - **sveltekit-i18n** - Native SvelteKit integration
+   - **typesafe-i18n** - Type-safe, compile-time
+   - **svelte-i18n** - Popular, format-js based
+   - **Paraglide** - Inlang ecosystem, tree-shakeable
 
 2. PO file integration:
-    - Use `@inlang/paraglide-js` with PO support
-    - Or custom PO parser with chosen library
+   - Use `@inlang/paraglide-js` with PO support
+   - Or custom PO parser with chosen library
 
 ### Phase 2: Project Structure
 
 1. Create locale files:
+
    ```
    locales/
    ├── en/
@@ -53,6 +56,7 @@ into multiple languages. This is the industry standard for localization and has 
 ### Phase 3: String Extraction
 
 1. Mark strings for translation:
+
    ```svelte
    <script>
      import { t } from '$lib/i18n';
@@ -71,15 +75,16 @@ into multiple languages. This is the industry standard for localization and has 
 ### Phase 4: Translation Workflow
 
 1. Initialize new locale:
+
    ```bash
    pnpm run i18n:init de
    # Creates locales/de/messages.po
    ```
 
 2. Translation tools:
-    - Poedit (desktop)
-    - Weblate (web-based, self-hosted)
-    - Crowdin (cloud service)
+   - Poedit (desktop)
+   - Weblate (web-based, self-hosted)
+   - Crowdin (cloud service)
 
 3. Compile PO to JSON/JS:
    ```bash
@@ -89,10 +94,10 @@ into multiple languages. This is the industry standard for localization and has 
 ### Phase 5: Locale Detection & Switching
 
 1. Detection order:
-    - User preference (database)
-    - Cookie
-    - Accept-Language header
-    - Default (English)
+   - User preference (database)
+   - Cookie
+   - Accept-Language header
+   - Default (English)
 
 2. Locale switcher component
 3. Persist preference to user profile
@@ -100,6 +105,7 @@ into multiple languages. This is the industry standard for localization and has 
 ### Phase 6: Pluralization & Formatting
 
 1. Plural rules per locale:
+
    ```
    msgid "book"
    msgid_plural "books"
@@ -156,7 +162,7 @@ msgstr "{count, plural, =0 {Keine Bücher} one {Ein Buch} other {# Bücher}}"
 ## Initial Locales
 
 | Locale | Language | Priority              |
-|--------|----------|-----------------------|
+| ------ | -------- | --------------------- |
 | en     | English  | Source                |
 | de     | German   | High (project origin) |
 | fr     | French   | Medium                |

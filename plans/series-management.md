@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#159](https://github.com/colibri-hq/colibri/issues/159)
+
 # Series Management
 
 ## Description
@@ -59,19 +61,19 @@ and UI.
 
 1. Create `/series` route for browsing all series
 2. Series card component with:
-    - Cover montage (first 3-4 books)
-    - Series name
-    - Entry count
-    - Completion progress (if user has read any)
+   - Cover montage (first 3-4 books)
+   - Series name
+   - Entry count
+   - Completion progress (if user has read any)
 
 ### Phase 4: Series Detail Page
 
 1. Create `/series/[id]` route showing:
-    - Series metadata (name, description, image)
-    - All entries in order
-    - Reading progress through series
-    - "Start series" / "Continue series" action
-    - Series comments
+   - Series metadata (name, description, image)
+   - All entries in order
+   - Reading progress through series
+   - "Start series" / "Continue series" action
+   - Series comments
 
 ### Phase 5: Work Integration
 
@@ -123,7 +125,7 @@ type Series = {
 
 type SeriesEntry = {
   work: Work;
-  position: number;  // Can be decimal for insertions: 1.5
+  position: number; // Can be decimal for insertions: 1.5
 };
 ```
 

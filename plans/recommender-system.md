@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#155](https://github.com/colibri-hq/colibri/issues/155)
+
 # Recommender System
 
 ## Description
@@ -42,12 +44,12 @@ enjoyed. Help users discover new books in their library and suggest additions fr
 ### Phase 2: Similarity Calculation
 
 1. Content-based filtering factors:
-    - Same author(s)
-    - Same series
-    - Overlapping tags/subjects
-    - Same publisher
-    - Publication year proximity
-    - Similar page count/length
+   - Same author(s)
+   - Same series
+   - Overlapping tags/subjects
+   - Same publisher
+   - Publication year proximity
+   - Similar page count/length
 
 2. Calculate similarity scores:
    ```typescript
@@ -79,11 +81,11 @@ enjoyed. Help users discover new books in their library and suggest additions fr
 
 1. tRPC procedures:
    ```typescript
-   recommendations.forBook(workId, limit)
-   recommendations.forUser(userId, limit)
-   recommendations.bySeries(seriesId)
-   recommendations.byAuthor(creatorId)
-   recommendations.trending()
+   recommendations.forBook(workId, limit);
+   recommendations.forUser(userId, limit);
+   recommendations.bySeries(seriesId);
+   recommendations.byAuthor(creatorId);
+   recommendations.trending();
    ```
 
 ### Phase 6: UI Integration
@@ -102,7 +104,7 @@ enjoyed. Help users discover new books in their library and suggest additions fr
 ## Recommendation Algorithms
 
 | Algorithm     | Data Needed   | Cold Start   | Scalability |
-|---------------|---------------|--------------|-------------|
+| ------------- | ------------- | ------------ | ----------- |
 | Content-based | Book metadata | Handles well | Good        |
 | Collaborative | User ratings  | Struggles    | Moderate    |
 | Hybrid        | Both          | Better       | Moderate    |
@@ -111,7 +113,7 @@ enjoyed. Help users discover new books in their library and suggest additions fr
 ## Scoring Factors
 
 | Factor             | Weight | Description              |
-|--------------------|--------|--------------------------|
+| ------------------ | ------ | ------------------------ |
 | Author match       | 0.40   | Same author(s)           |
 | Series match       | 0.30   | Same series              |
 | Subject overlap    | 0.20   | Shared tags/subjects     |

@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#113](https://github.com/colibri-hq/colibri/issues/113)
+
 # Adaptive UI for Children
 
 ## Description
@@ -23,6 +25,7 @@ information-dense with subtler colors and smaller fonts, matching their developi
 ### Phase 1: Define Age Tiers
 
 1. Create age tier configuration:
+
    ```typescript
    type AgeTier = {
      minAge: number;
@@ -33,17 +36,18 @@ information-dense with subtler colors and smaller fonts, matching their developi
    ```
 
 2. Define UI configurations per tier:
-    - **Toddler (3-5)**: Extra large touch targets, bright primary colors, minimal text, icon-heavy
-    - **Early Reader (6-8)**: Large fonts, colorful but less saturated, simple navigation
-    - **Child (9-11)**: Medium fonts, balanced colors, more information visible
-    - **Tween (12-14)**: Standard fonts, subtle colors, full feature set
-    - **Teen/Adult (15+)**: Full information density, professional aesthetic
+   - **Toddler (3-5)**: Extra large touch targets, bright primary colors, minimal text, icon-heavy
+   - **Early Reader (6-8)**: Large fonts, colorful but less saturated, simple navigation
+   - **Child (9-11)**: Medium fonts, balanced colors, more information visible
+   - **Tween (12-14)**: Standard fonts, subtle colors, full feature set
+   - **Teen/Adult (15+)**: Full information density, professional aesthetic
 
 ### Phase 2: Theming System
 
 1. Create CSS custom properties for each tier:
+
    ```css
-   [data-age-tier="toddler"] {
+   [data-age-tier='toddler'] {
      --font-size-base: 1.5rem;
      --spacing-base: 1.5rem;
      --color-primary: oklch(70% 0.25 150);
@@ -57,15 +61,15 @@ information-dense with subtler colors and smaller fonts, matching their developi
 ### Phase 3: Component Adaptations
 
 1. Create adaptive component variants:
-    - Book cards (size, information shown)
-    - Navigation (icons vs. text, complexity)
-    - Forms (input sizes, labels)
-    - Buttons (size, colors)
+   - Book cards (size, information shown)
+   - Navigation (icons vs. text, complexity)
+   - Forms (input sizes, labels)
+   - Buttons (size, colors)
 
 2. Conditional content display:
-    - Hide complex metadata for younger tiers
-    - Simplify synopses
-    - Larger cover images
+   - Hide complex metadata for younger tiers
+   - Simplify synopses
+   - Larger cover images
 
 ### Phase 4: Animation & Feedback
 

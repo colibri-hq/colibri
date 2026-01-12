@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#179](https://github.com/colibri-hq/colibri/issues/179)
+
 # OAuth Documentation & Developer Experience
 
 ## Description
@@ -32,6 +34,7 @@ with the OAuth server and those deploying the standalone package in their own pr
 ### Phase 1: API Reference
 
 1. Generate API documentation from TypeScript:
+
    ```
    docs/api/
    ├── server/
@@ -66,20 +69,23 @@ with the OAuth server and those deploying the standalone package in their own pr
 # Quick Start
 
 ## Installation
+
 npm install @colibri-hq/oauth
 
 ## Basic Setup
+
 import { AuthorizationServer } from '@colibri-hq/oauth';
 
 const server = new AuthorizationServer({
-  issuer: 'https://auth.example.com',
-  // ... configuration
+issuer: 'https://auth.example.com',
+// ... configuration
 });
 
 ## Handle Authorization Request
+
 app.get('/authorize', (req, res) => {
-  const response = await server.handleAuthorization(req);
-  // ... handle response
+const response = await server.handleAuthorization(req);
+// ... handle response
 });
 ```
 
@@ -109,13 +115,16 @@ docs/guides/
 ### Phase 3: Grant Type Tutorials
 
 1. Authorization Code Flow tutorial:
-   ```markdown
+
+   ````markdown
    # Authorization Code Flow with PKCE
 
    ## Overview
+
    The Authorization Code Flow is the recommended OAuth flow for...
 
    ## Prerequisites
+
    - Registered client application
    - User authentication system
    - Secure session management
@@ -123,28 +132,35 @@ docs/guides/
    ## Step-by-Step Implementation
 
    ### 1. Generate PKCE Challenge
+
    ```typescript
    const codeVerifier = generateCodeVerifier();
    const codeChallenge = await generateCodeChallenge(codeVerifier);
    ```
+   ````
 
    ### 2. Build Authorization URL
+
    ...
 
    ## Complete Example
+
    [Link to runnable example]
 
    ## Common Pitfalls
-    - Forgetting to store code_verifier
-    - Missing state parameter validation
-    - Incorrect redirect_uri matching
+   - Forgetting to store code_verifier
+   - Missing state parameter validation
+   - Incorrect redirect_uri matching
+
+   ```
+
    ```
 
 2. Similar tutorials for:
-    - Client Credentials Flow
-    - Device Authorization Flow
-    - Refresh Token handling
-    - OpenID Connect integration
+   - Client Credentials Flow
+   - Device Authorization Flow
+   - Refresh Token handling
+   - OpenID Connect integration
 
 ### Phase 4: Security Documentation
 
@@ -162,23 +178,23 @@ docs/security/
 Content areas:
 
 1. Security best practices:
-    - Always use PKCE
-    - Validate redirect URIs strictly
-    - Use short-lived access tokens
-    - Implement token rotation
-    - Secure client secrets
+   - Always use PKCE
+   - Validate redirect URIs strictly
+   - Use short-lived access tokens
+   - Implement token rotation
+   - Secure client secrets
 
 2. Common vulnerabilities:
-    - Authorization code injection
-    - CSRF attacks
-    - Open redirector attacks
-    - Token leakage
-    - Clickjacking
+   - Authorization code injection
+   - CSRF attacks
+   - Open redirector attacks
+   - Token leakage
+   - Clickjacking
 
 3. Compliance guidance:
-    - OAuth 2.1 requirements
-    - OpenID Connect requirements
-    - GDPR considerations
+   - OAuth 2.1 requirements
+   - OpenID Connect requirements
+   - GDPR considerations
 
 ### Phase 5: Example Applications
 
@@ -215,6 +231,7 @@ Each example should include:
 ### Phase 6: Interactive Documentation
 
 1. API Explorer (Swagger/OpenAPI):
+
    ```yaml
    openapi: 3.0.0
    info:
@@ -242,10 +259,10 @@ Each example should include:
    ```
 
 2. Interactive playground:
-    - Test authorization flows
-    - Generate PKCE challenges
-    - Decode/validate tokens
-    - Try API calls
+   - Test authorization flows
+   - Generate PKCE challenges
+   - Decode/validate tokens
+   - Try API calls
 
 ### Phase 7: Deployment Documentation
 
@@ -266,48 +283,52 @@ docs/deployment/
 Content areas:
 
 1. Production checklist:
-    - Environment variables
-    - Secret management
-    - HTTPS configuration
-    - Database setup
-    - Key rotation
+   - Environment variables
+   - Secret management
+   - HTTPS configuration
+   - Database setup
+   - Key rotation
 
 2. Scaling considerations:
-    - Stateless design
-    - Database connection pooling
-    - Caching strategies
-    - Rate limiting
+   - Stateless design
+   - Database connection pooling
+   - Caching strategies
+   - Rate limiting
 
 3. Monitoring:
-    - Health checks
-    - Metrics to track
-    - Alerting thresholds
-    - Log analysis
+   - Health checks
+   - Metrics to track
+   - Alerting thresholds
+   - Log analysis
 
 ### Phase 8: Troubleshooting Guide
 
-```markdown
+````markdown
 # Troubleshooting
 
 ## Common Errors
 
 ### invalid_grant
+
 **Cause:** Authorization code expired or already used
 **Solution:** Ensure code is exchanged within 5 minutes...
 
 ### invalid_client
+
 **Cause:** Client authentication failed
 **Solution:** Check client_id and client_secret...
 
 ## Debug Mode
 
 Enable debug logging:
+
 ```typescript
 const server = new AuthorizationServer({
   debug: true,
-  logger: customLogger
+  logger: customLogger,
 });
 ```
+````
 
 ## FAQ
 
@@ -393,3 +414,4 @@ docs/
 6. **Video Content**: Include video tutorials?
 7. **Certification Prep**: Include OIDC certification guidance?
 8. **Changelog Format**: Keep a Changelog or conventional commits?
+```

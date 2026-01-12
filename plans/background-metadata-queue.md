@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#118](https://github.com/colibri-hq/colibri/issues/118)
+
 # Background Metadata Queue via Service Workers
 
 ## Description
@@ -43,6 +45,7 @@ report results back.
 ### Phase 2: Worker Registration
 
 1. Service worker announces availability:
+
    ```typescript
    // In service worker
    async function registerAsWorker() {
@@ -63,6 +66,7 @@ report results back.
 ### Phase 3: Job Distribution
 
 1. Workers poll for available jobs:
+
    ```typescript
    async function pollForJobs(workerId: string) {
      const job = await fetch(`/api/workers/${workerId}/jobs`);
@@ -78,6 +82,7 @@ report results back.
 ### Phase 4: Job Processing
 
 1. Worker processes job client-side:
+
    ```typescript
    async function processJob(job: MetadataJob) {
      switch (job.type) {
@@ -105,9 +110,9 @@ report results back.
 ### Phase 6: Privacy Controls
 
 1. Workers only process accessible content:
-    - Public books: any worker
-    - Shared books: family members only
-    - Private books: owner only
+   - Public books: any worker
+   - Shared books: family members only
+   - Private books: owner only
 
 2. Job filtering based on worker's user permissions
 
@@ -127,7 +132,7 @@ report results back.
 ## Job Types
 
 | Type              | Description               | Priority |
-|-------------------|---------------------------|----------|
+| ----------------- | ------------------------- | -------- |
 | enrich_metadata   | Fill missing metadata     | 5        |
 | find_cover        | Find better cover image   | 4        |
 | verify_isbn       | Validate ISBN checksums   | 3        |

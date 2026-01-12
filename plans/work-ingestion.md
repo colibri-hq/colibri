@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#164](https://github.com/colibri-hq/colibri/issues/164)
+
 # Work Ingestion & Duplicate Detection
 
 ## Description
@@ -58,7 +60,7 @@ CLI, webapp, API, and extensions.
 ### ⚠️ Partial Implementation
 
 | Feature             | Status                               | Notes                                                      |
-|---------------------|--------------------------------------|------------------------------------------------------------|
+| ------------------- | ------------------------------------ | ---------------------------------------------------------- |
 | Metadata enrichment | Providers exist, not wired to import | `--enrich` flag exists but doesn't trigger enrichment      |
 | Web app import      | Basic upload works                   | Missing enrichment UI, duplicate review modal improvements |
 
@@ -67,7 +69,7 @@ CLI, webapp, API, and extensions.
 ### ❌ Not Yet Implemented
 
 | Feature                         | Priority | Description                                                              |
-|---------------------------------|----------|--------------------------------------------------------------------------|
+| ------------------------------- | -------- | ------------------------------------------------------------------------ |
 | Metadata enrichment integration | High     | Wire up OpenLibrary/WikiData providers to import flow                    |
 | Enrichment UI                   | Medium   | Modal to review/accept enriched metadata after import                    |
 | External identifier linking     | Medium   | Connect creators/publishers to VIAF/ISNI during enrichment               |
@@ -82,7 +84,7 @@ CLI, webapp, API, and extensions.
 ### SDK Ingestion (`packages/sdk/src/ingestion/`)
 
 | File                            | Description                                                          |
-|---------------------------------|----------------------------------------------------------------------|
+| ------------------------------- | -------------------------------------------------------------------- |
 | `index.ts`                      | Main service: `ingestWork()`, `confirmIngestion()`, `batchImport()`  |
 | `detect-duplicates.ts`          | 5-level duplicate detection (checksum → ISBN → ASIN → title → fuzzy) |
 | `normalize.ts`                  | Name normalization for creators/publishers                           |
@@ -92,7 +94,7 @@ CLI, webapp, API, and extensions.
 ### SDK Resources (`packages/sdk/src/resources/`)
 
 | File                   | Key Functions                                                                   |
-|------------------------|---------------------------------------------------------------------------------|
+| ---------------------- | ------------------------------------------------------------------------------- |
 | `pending-ingestion.ts` | `createPendingIngestion()`, `getPendingIngestion()`, `deletePendingIngestion()` |
 | `creator.ts`           | `findSimilarCreators()` with pg_trgm fuzzy matching                             |
 | `publisher.ts`         | `findSimilarPublishers()` with pg_trgm fuzzy matching                           |
@@ -102,14 +104,14 @@ CLI, webapp, API, and extensions.
 ### CLI Commands (`apps/cli/src/commands/works/`)
 
 | File        | Command                  | Description                                 |
-|-------------|--------------------------|---------------------------------------------|
+| ----------- | ------------------------ | ------------------------------------------- |
 | `add.ts`    | `works add <file>`       | Single file import with interactive prompts |
 | `import.ts` | `works import <pattern>` | Batch import with glob support              |
 
 ### Database Schema
 
 | File                                        | Table                                                        |
-|---------------------------------------------|--------------------------------------------------------------|
+| ------------------------------------------- | ------------------------------------------------------------ |
 | `supabase/schemas/20_pending_ingestion.sql` | `pending_ingestion` - Stores pending duplicate confirmations |
 
 ---
@@ -117,7 +119,7 @@ CLI, webapp, API, and extensions.
 ## Test Coverage
 
 | Test File                            | Tests | Coverage                      |
-|--------------------------------------|-------|-------------------------------|
+| ------------------------------------ | ----- | ----------------------------- |
 | `ingestion.integration.test.ts`      | 22    | End-to-end ingestion workflow |
 | `normalize.test.ts`                  | 37    | Name normalization            |
 | `fuzzy-matching-integration.test.ts` | 22    | Fuzzy matching logic          |
@@ -154,6 +156,7 @@ colibri works inspect ./book.epub
 Before using the CLI import commands:
 
 1. **Enable pg_trgm extension** (required for fuzzy matching):
+
    ```bash
    PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres \
      -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
@@ -174,7 +177,7 @@ Before using the CLI import commands:
 ## Design Decisions
 
 | Decision                  | Choice            | Rationale                                        |
-|---------------------------|-------------------|--------------------------------------------------|
+| ------------------------- | ----------------- | ------------------------------------------------ |
 | Fuzzy matching algorithm  | pg_trgm (trigram) | Native PostgreSQL, fast, good for names          |
 | Auto-merge threshold      | 70% similarity    | Balances catching duplicates vs. false positives |
 | Batch processing          | Sequential        | Simpler, predictable, lower memory               |
@@ -195,7 +198,7 @@ Wire up the existing metadata providers to the import flow:
 if (options.enrich) {
   const enriched = await enrichWorkMetadata(work, {
     providers: ['open-library', 'wikidata'],
-    fillMissing: true,  // Only fill missing fields
+    fillMissing: true, // Only fill missing fields
   });
   await updateWork(database, work.id, enriched);
 }

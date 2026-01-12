@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#165](https://github.com/colibri-hq/colibri/issues/165)
+
 # OAuth Authorization Code Grant
 
 ## Description
@@ -81,6 +83,7 @@ OAuth 2.1, preventing authorization code interception attacks.
 ### Phase 1: Prompt Parameter Support
 
 1. Implement prompt parameter handling:
+
    ```typescript
    type PromptValue = 'none' | 'login' | 'consent' | 'select_account';
 
@@ -91,25 +94,26 @@ OAuth 2.1, preventing authorization code interception attacks.
    ```
 
 2. Session management for prompt handling:
-    - Track authentication time for `max_age`
-    - Track consent grants per client/scope combination
+   - Track authentication time for `max_age`
+   - Track consent grants per client/scope combination
 
 ### Phase 2: Enhanced Consent UI
 
 1. Consent screen improvements:
-    - Display requested scopes with descriptions
-    - Show client application details (name, logo, URL)
-    - Remember consent option
-    - Granular scope selection (optional)
+   - Display requested scopes with descriptions
+   - Show client application details (name, logo, URL)
+   - Remember consent option
+   - Granular scope selection (optional)
 
 2. Consent management page:
-    - List all granted consents
-    - Revoke individual consents
-    - View consent history
+   - List all granted consents
+   - Revoke individual consents
+   - View consent history
 
 ### Phase 3: Claims Support
 
 1. Claims parameter for specific claim requests:
+
    ```typescript
    interface ClaimsRequest {
      userinfo?: Record<string, ClaimConfig>;
@@ -128,12 +132,15 @@ OAuth 2.1, preventing authorization code interception attacks.
 ### Phase 4: Response Mode Extensions
 
 1. Implement `form_post` response mode:
+
    ```html
    <form method="post" action="{redirect_uri}">
-     <input type="hidden" name="code" value="{code}">
-     <input type="hidden" name="state" value="{state}">
+     <input type="hidden" name="code" value="{code}" />
+     <input type="hidden" name="state" value="{state}" />
    </form>
-   <script>document.forms[0].submit();</script>
+   <script>
+     document.forms[0].submit();
+   </script>
    ```
 
 2. Benefits: Avoids URL length limits, hides code from browser history
@@ -141,28 +148,29 @@ OAuth 2.1, preventing authorization code interception attacks.
 ### Phase 5: Security Enhancements
 
 1. ACR (Authentication Context Class Reference):
+
    ```typescript
    // Request specific authentication levels
-   acr_values: 'urn:mace:incommon:iap:silver urn:mace:incommon:iap:bronze'
+   acr_values: 'urn:mace:incommon:iap:silver urn:mace:incommon:iap:bronze';
    ```
 
 2. AMR (Authentication Methods References):
-    - Track how user authenticated (password, passkey, mfa)
-    - Include in ID token
+   - Track how user authenticated (password, passkey, mfa)
+   - Include in ID token
 
 3. Authentication time tracking:
-    - `auth_time` claim in ID token
-    - `max_age` parameter validation
+   - `auth_time` claim in ID token
+   - `max_age` parameter validation
 
 ### Phase 6: Internationalization
 
 1. UI localization:
-    - `ui_locales` parameter support
-    - Translated consent screens
-    - Translated error messages
+   - `ui_locales` parameter support
+   - Translated consent screens
+   - Translated error messages
 
 2. Claims localization:
-    - Localized claim values where applicable
+   - Localized claim values where applicable
 
 ## Database Schema
 
@@ -207,28 +215,28 @@ CREATE TABLE oauth_user_consent (
 ```typescript
 interface AuthorizationCodeGrantConfig {
   // Code settings
-  codeTtl: number;              // Default: 300 (5 minutes)
-  codeLength: number;           // Default: 32 bytes
+  codeTtl: number; // Default: 300 (5 minutes)
+  codeLength: number; // Default: 32 bytes
 
   // PKCE
-  requirePkce: boolean;         // Default: true (OAuth 2.1)
-  allowedMethods: ('S256' | 'plain')[];  // Default: ['S256']
+  requirePkce: boolean; // Default: true (OAuth 2.1)
+  allowedMethods: ('S256' | 'plain')[]; // Default: ['S256']
 
   // Consent
-  requireConsent: boolean;      // Default: true
-  rememberConsent: boolean;     // Default: true
-  consentTtl: number;           // Default: 0 (forever)
+  requireConsent: boolean; // Default: true
+  rememberConsent: boolean; // Default: true
+  consentTtl: number; // Default: 0 (forever)
 
   // Response modes
   allowedResponseModes: ('query' | 'fragment' | 'form_post')[];
-  defaultResponseMode: string;  // Default: 'query'
+  defaultResponseMode: string; // Default: 'query'
 
   // Prompts
   allowedPrompts: PromptValue[];
 
   // OpenID Connect
-  enableOidc: boolean;          // Default: true
-  idTokenTtl: number;           // Default: 3600
+  enableOidc: boolean; // Default: true
+  idTokenTtl: number; // Default: 3600
 }
 ```
 

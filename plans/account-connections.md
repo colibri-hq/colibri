@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#112](https://github.com/colibri-hq/colibri/issues/112)
+
 # Account Connections
 
 ## Description
@@ -24,6 +26,7 @@ cover images.
 ### Phase 1: Account Connection Framework
 
 1. Create connected accounts table:
+
    ```sql
    CREATE TABLE authentication.connected_account (
      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -46,6 +49,7 @@ cover images.
 ### Phase 2: Provider Implementations
 
 1. Define provider interface:
+
    ```typescript
    interface AccountProvider {
      id: string;
@@ -101,7 +105,7 @@ cover images.
 ## Supported Providers
 
 | Provider            | Auth    | Capabilities                    |
-|---------------------|---------|---------------------------------|
+| ------------------- | ------- | ------------------------------- |
 | Amazon Kindle       | OAuth   | Books, Purchases                |
 | LibraryThing        | API Key | Books, Ratings, Reviews, Covers |
 | Goodreads           | OAuth   | Ratings, Reviews, Shelves       |
@@ -113,11 +117,11 @@ cover images.
 ## Data Types Per Provider
 
 | Provider     | Books | Ratings | Reviews | Covers | Metadata |
-|--------------|-------|---------|---------|--------|----------|
-| Amazon       | ✅     | ❌       | ❌       | ✅      | ✅        |
-| LibraryThing | ✅     | ✅       | ✅       | ✅      | ✅        |
-| Goodreads    | ❌     | ✅       | ✅       | ❌      | Limited  |
-| Google Play  | ✅     | ❌       | ❌       | ✅      | ✅        |
+| ------------ | ----- | ------- | ------- | ------ | -------- |
+| Amazon       | ✅    | ❌      | ❌      | ✅     | ✅       |
+| LibraryThing | ✅    | ✅      | ✅      | ✅     | ✅       |
+| Goodreads    | ❌    | ✅      | ✅      | ❌     | Limited  |
+| Google Play  | ✅    | ❌      | ❌      | ✅     | ✅       |
 
 ## Open Questions
 

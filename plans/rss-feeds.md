@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#156](https://github.com/colibri-hq/colibri/issues/156)
+
 # RSS Feeds
 
 ## Description
@@ -28,6 +30,7 @@ feed handling and event sourcing.
 ### Phase 1: Activity Event Model
 
 1. Create activity event table:
+
    ```sql
    create type activity_type as enum (
      'book_added',
@@ -72,6 +75,7 @@ feed handling and event sourcing.
 ### Phase 2: RSS Feed Generation
 
 1. Create RSS 2.0 serialization:
+
    ```typescript
    interface RssItem {
      title: string;
@@ -101,6 +105,7 @@ feed handling and event sourcing.
 ### Phase 3: Feed Routes
 
 1. Create route group for RSS endpoints:
+
    ```
    /~[handle]/rss              → All activity feed
    /~[handle]/rss/books        → New books only
@@ -110,6 +115,7 @@ feed handling and event sourcing.
    ```
 
 2. Instance-wide feeds (if enabled):
+
    ```
    /feeds/recent              → Recently added (public)
    /feeds/activity            → All public activity
@@ -117,13 +123,18 @@ feed handling and event sourcing.
 
 3. Support standard feed discovery:
    ```html
-   <link rel="alternate" type="application/rss+xml"
-         title="Moritz's Library" href="/~moritz/rss" />
+   <link
+     rel="alternate"
+     type="application/rss+xml"
+     title="Moritz's Library"
+     href="/~moritz/rss"
+   />
    ```
 
 ### Phase 4: Feed Customization
 
 1. Query parameters for filtering:
+
    ```
    /~[handle]/rss?type=book_added,reading_finished
    /~[handle]/rss?collection=fiction

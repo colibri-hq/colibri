@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#147](https://github.com/colibri-hq/colibri/issues/147)
+
 # OPDS Feed
 
 ## Description
@@ -13,8 +15,8 @@ collections.
 
 **If requested without credentials, only books and collections marked as public may be included.**  
 If authenticated via any means supported by Colibri (Cookies, API Keys, OAuth), the feed must include everything visible
-to that user in that scope; that will be all books and collections from themselves, and those of other users *not marked
-as private*, or explicitly shared with them.
+to that user in that scope; that will be all books and collections from themselves, and those of other users _not marked
+as private_, or explicitly shared with them.
 
 ## Endpoints
 
@@ -22,8 +24,7 @@ Assuming we'll have user shelfs at `/~{{ userHandle }}`, two new endpoints shoul
 
 1. `/~/{{ userHandle }}/opds.xml`:  
    The feed document itself. If requested with an `Accept` header that doesn't prioritise `application/atom+xml` the
-   highest, it should redirect to the documentation route described in 2.
-   2.`/~/{{ userHandle }}/opds`:  
+   highest, it should redirect to the documentation route described in 2. 2.`/~/{{ userHandle }}/opds`:  
    A documentation page that describes what OPDS is, how it can be used, how it can be used with Colibri (including the
    credential details outlined above), and links to the docs and the instance home.
 
@@ -56,6 +57,7 @@ Users should be able to:
 ### Phase 1: OPDS Feed Generation
 
 1. Create OPDS serialization utilities:
+
    ```typescript
    interface OpdsEntry {
      id: string;
@@ -99,6 +101,7 @@ Users should be able to:
 ### Phase 2: Feed Routes
 
 1. Create route group for OPDS endpoints:
+
    ```
    /~[handle]/opds.xml    → Main catalog feed
    /~[handle]/opds        → Documentation page
@@ -108,6 +111,7 @@ Users should be able to:
    ```
 
 2. Content negotiation middleware:
+
    ```typescript
    // If Accept header prefers text/html, redirect to docs
    // If Accept header prefers application/atom+xml, serve feed
@@ -127,6 +131,7 @@ Users should be able to:
 ### Phase 3: Authentication Integration
 
 1. Support multiple auth methods for feeds:
+
    ```typescript
    async function authenticateFeedRequest(request: Request) {
      // 1. Check for session cookie
@@ -157,6 +162,7 @@ Users should be able to:
 ### Phase 4: Download Links
 
 1. Generate acquisition links based on available formats:
+
    ```xml
    <link rel="http://opds-spec.org/acquisition"
          href="/~moritz/opds/download/[assetId]"

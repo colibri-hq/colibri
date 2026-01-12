@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#130](https://github.com/colibri-hq/colibri/issues/130)
+
 # External Catalog Integration
 
 ## Description
@@ -24,6 +26,7 @@ different authentication and have different capabilities.
 ### Phase 1: Catalog Type System
 
 1. Define catalog types:
+
    ```sql
    CREATE TYPE catalog_type AS ENUM (
      'free',        -- Project Gutenberg, Standard Ebooks
@@ -41,9 +44,9 @@ different authentication and have different capabilities.
 ### Phase 2: Free Catalogs
 
 1. Expand Project Gutenberg integration:
-    - Browse by category/author
-    - One-click add to library
-    - Automatic format selection
+   - Browse by category/author
+   - One-click add to library
+   - Automatic format selection
 
 2. Add Standard Ebooks support
 3. Add Internet Archive support
@@ -53,19 +56,19 @@ different authentication and have different capabilities.
 
 1. Library card authentication flow
 2. OverDrive/Libby integration:
-    - OAuth authentication
-    - Browse available titles
-    - Borrow books (temporary access)
-    - Track loan status and due dates
+   - OAuth authentication
+   - Browse available titles
+   - Borrow books (temporary access)
+   - Track loan status and due dates
 
 3. Generic library catalog support (SIP2/NCIP)
 
 ### Phase 4: Store Catalogs
 
 1. Amazon Kindle integration:
-    - OAuth for account access
-    - List purchased books
-    - Download owned books
+   - OAuth for account access
+   - List purchased books
+   - Download owned books
 
 2. Other stores (Kobo, Google Play Books)
 3. Purchase workflow (redirect to store)
@@ -80,6 +83,7 @@ different authentication and have different capabilities.
 ### Phase 6: Child Account Restrictions
 
 1. Per-catalog child access settings:
+
    ```sql
    CREATE TABLE catalog_access (
      catalog_id UUID REFERENCES catalog(id),
@@ -95,6 +99,7 @@ different authentication and have different capabilities.
 ### Phase 7: Plugin System
 
 1. Define catalog provider interface:
+
    ```typescript
    interface CatalogProvider {
      id: string;
@@ -115,7 +120,7 @@ different authentication and have different capabilities.
 ## Catalog Types Comparison
 
 | Type       | Auth         | Download | Ownership | Examples              |
-|------------|--------------|----------|-----------|-----------------------|
+| ---------- | ------------ | -------- | --------- | --------------------- |
 | Free       | None         | Direct   | Permanent | Gutenberg, Std Ebooks |
 | Authorized | Library Card | DRM      | Borrowed  | OverDrive, Hoopla     |
 | Store      | Account      | DRM      | Purchased | Kindle, Kobo          |

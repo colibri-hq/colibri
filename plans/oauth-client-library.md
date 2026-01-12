@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#176](https://github.com/colibri-hq/colibri/issues/176)
+
 # OAuth Client Library
 
 ## Description
@@ -28,6 +30,7 @@ by the server and provide utilities for common OAuth flows.
 ### Phase 1: Core Client
 
 1. Create base OAuth client class:
+
    ```typescript
    interface OAuthClientConfig {
      issuer: string;
@@ -62,7 +65,9 @@ by the server and provide utilities for common OAuth flows.
 2. Server metadata discovery (RFC 8414):
    ```typescript
    async function discoverServer(issuer: string): Promise<ServerMetadata> {
-     const response = await fetch(`${issuer}/.well-known/oauth-authorization-server`);
+     const response = await fetch(
+       `${issuer}/.well-known/oauth-authorization-server`,
+     );
      return response.json();
    }
    ```
@@ -70,6 +75,7 @@ by the server and provide utilities for common OAuth flows.
 ### Phase 2: Authorization Code Flow Client
 
 1. Authorization URL generation:
+
    ```typescript
    class AuthorizationCodeClient extends OAuthClient {
      // Generate authorization URL with PKCE
@@ -81,7 +87,10 @@ by the server and provide utilities for common OAuth flows.
      }): { url: string; codeVerifier: string; state: string };
 
      // Exchange code for tokens
-     async exchangeCode(code: string, codeVerifier: string): Promise<TokenResponse>;
+     async exchangeCode(
+       code: string,
+       codeVerifier: string,
+     ): Promise<TokenResponse>;
 
      // Handle callback
      async handleCallback(url: string | URL): Promise<TokenResponse>;
@@ -89,9 +98,13 @@ by the server and provide utilities for common OAuth flows.
    ```
 
 2. PKCE utilities:
+
    ```typescript
    function generateCodeVerifier(): string;
-   function generateCodeChallenge(verifier: string, method?: 'S256' | 'plain'): string;
+   function generateCodeChallenge(
+     verifier: string,
+     method?: 'S256' | 'plain',
+   ): string;
    function generateState(): string;
    function generateNonce(): string;
    ```
@@ -107,6 +120,7 @@ by the server and provide utilities for common OAuth flows.
 ### Phase 3: Client Credentials Flow Client
 
 1. Machine-to-machine client:
+
    ```typescript
    class ClientCredentialsClient extends OAuthClient {
      async getToken(scopes?: string[]): Promise<TokenResponse>;
@@ -128,6 +142,7 @@ by the server and provide utilities for common OAuth flows.
 ### Phase 4: Device Authorization Flow Client
 
 1. Device flow client:
+
    ```typescript
    class DeviceAuthorizationClient extends OAuthClient {
      // Start device authorization
@@ -141,17 +156,21 @@ by the server and provide utilities for common OAuth flows.
      }>;
 
      // Poll for token (with automatic interval handling)
-     async pollForToken(deviceCode: string, options?: {
-       interval?: number;
-       timeout?: number;
-       onPending?: () => void;
-     }): Promise<TokenResponse>;
+     async pollForToken(
+       deviceCode: string,
+       options?: {
+         interval?: number;
+         timeout?: number;
+         onPending?: () => void;
+       },
+     ): Promise<TokenResponse>;
    }
    ```
 
 ### Phase 5: Token Storage
 
 1. Token store interface:
+
    ```typescript
    interface TokenStore {
      getTokens(clientId: string): Promise<StoredTokens | null>;
@@ -168,14 +187,15 @@ by the server and provide utilities for common OAuth flows.
    ```
 
 2. Built-in implementations:
-    - `MemoryTokenStore` - In-memory (development)
-    - `LocalStorageTokenStore` - Browser localStorage
-    - `SecureTokenStore` - Encrypted storage
-    - `DatabaseTokenStore` - Database persistence
+   - `MemoryTokenStore` - In-memory (development)
+   - `LocalStorageTokenStore` - Browser localStorage
+   - `SecureTokenStore` - Encrypted storage
+   - `DatabaseTokenStore` - Database persistence
 
 ### Phase 6: Fetch Wrapper
 
 1. Authenticated fetch utility:
+
    ```typescript
    class AuthenticatedFetch {
      constructor(client: OAuthClient);
@@ -190,6 +210,7 @@ by the server and provide utilities for common OAuth flows.
    ```
 
 2. Error handling:
+
    ```typescript
    class OAuthClientError extends Error {
      code: string;
@@ -205,6 +226,7 @@ by the server and provide utilities for common OAuth flows.
 ### Phase 7: Framework Integrations
 
 1. React hooks:
+
    ```typescript
    function useOAuth(config: OAuthClientConfig): {
      isAuthenticated: boolean;

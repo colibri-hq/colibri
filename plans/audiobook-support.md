@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#117](https://github.com/colibri-hq/colibri/issues/117)
+
 # Audiobook Support
 
 ## Description
@@ -26,6 +28,7 @@ narrator), different playback (audio player vs. reader), and different storage c
 ### Phase 1: Edition Type Extension
 
 1. Add edition format enum:
+
    ```sql
    CREATE TYPE edition_format AS ENUM (
      'ebook',
@@ -40,6 +43,7 @@ narrator), different playback (audio player vs. reader), and different storage c
 ### Phase 2: Audiobook Metadata Schema
 
 1. Extend edition metadata:
+
    ```sql
    ALTER TABLE edition ADD COLUMN
      duration_seconds INTEGER,      -- Total runtime
@@ -65,18 +69,18 @@ narrator), different playback (audio player vs. reader), and different storage c
 ### Phase 3: Audio File Parsing
 
 1. Support M4B format (primary):
-    - Parse MP4 container
-    - Extract chapter markers
-    - Extract cover image
-    - Read metadata atoms
+   - Parse MP4 container
+   - Extract chapter markers
+   - Extract cover image
+   - Read metadata atoms
 
 2. Support MP3 with chapters:
-    - ID3 tags
-    - Chapter frames
+   - ID3 tags
+   - Chapter frames
 
 3. Multi-file audiobooks:
-    - One file per chapter
-    - Folder structure detection
+   - One file per chapter
+   - Folder structure detection
 
 ### Phase 4: Narrator Contributions
 
@@ -87,17 +91,18 @@ narrator), different playback (audio player vs. reader), and different storage c
 ### Phase 5: Audio Player
 
 1. Web audio player component:
-    - Play/pause, seek
-    - Speed control (0.5x - 3x)
-    - Sleep timer
-    - Chapter navigation
-    - Bookmark support
+   - Play/pause, seek
+   - Speed control (0.5x - 3x)
+   - Sleep timer
+   - Chapter navigation
+   - Bookmark support
 
 2. Responsive design for mobile
 
 ### Phase 6: Playback Progress
 
 1. Track listening position:
+
    ```sql
    CREATE TABLE listening_progress (
      user_id UUID REFERENCES authentication.user(id),
@@ -128,7 +133,7 @@ narrator), different playback (audio player vs. reader), and different storage c
 ## Audiobook-Specific Metadata
 
 | Field            | Type         | Description          |
-|------------------|--------------|----------------------|
+| ---------------- | ------------ | -------------------- |
 | duration_seconds | integer      | Total runtime        |
 | narrator         | contribution | Narrator(s)          |
 | audio_codec      | string       | mp3, aac, m4a        |
@@ -138,13 +143,13 @@ narrator), different playback (audio player vs. reader), and different storage c
 
 ## Supported Formats
 
-| Format    | Extension | Container | Chapters |
-|-----------|-----------|-----------|----------|
+| Format    | Extension | Container | Chapters  |
+| --------- | --------- | --------- | --------- |
 | M4B       | .m4b      | MP4       | ✅ Native |
 | M4A       | .m4a      | MP4       | ✅ Native |
-| MP3       | .mp3      | None      | Partial  |
-| FLAC      | .flac     | None      | Via cue  |
-| Multi-MP3 | folder    | N/A       | By file  |
+| MP3       | .mp3      | None      | Partial   |
+| FLAC      | .flac     | None      | Via cue   |
+| Multi-MP3 | folder    | N/A       | By file   |
 
 ## Open Questions
 

@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#143](https://github.com/colibri-hq/colibri/issues/143)
+
 # Metadata Search
 
 ## Description
@@ -32,6 +34,7 @@ books by the name of their author).
 ### Phase 1: Search Index Schema
 
 1. Add tsvector columns to searchable entities:
+
    ```sql
    -- Works (books)
    alter table work
@@ -81,6 +84,7 @@ books by the name of their author).
 ### Phase 2: Unified Search API
 
 1. Create search tRPC procedure:
+
    ```typescript
    search.metadata({
      query: string;
@@ -95,6 +99,7 @@ books by the name of their author).
    ```
 
 2. Return unified results with type discrimination:
+
    ```typescript
    type SearchResult =
      | { type: 'work'; data: WorkSummary; rank: number }
@@ -126,6 +131,7 @@ books by the name of their author).
 ### Phase 3: Fuzzy Matching
 
 1. Add trigram extension for typo tolerance:
+
    ```sql
    create extension if not exists pg_trgm;
 
@@ -134,13 +140,14 @@ books by the name of their author).
    ```
 
 2. Implement fallback search when FTS yields no results:
+
    ```typescript
    // If exact FTS matches < threshold, try fuzzy
    if (ftsResults.length < 3) {
      const fuzzyResults = await db
        .selectFrom('work')
-       .where(sql`title % ${query}`)  // Trigram similarity
-       .orderBy(sql`title <-> ${query}`)  // Distance operator
+       .where(sql`title % ${query}`) // Trigram similarity
+       .orderBy(sql`title <-> ${query}`) // Distance operator
        .limit(10)
        .execute();
    }
@@ -151,6 +158,7 @@ books by the name of their author).
 ### Phase 4: Related Entity Search
 
 1. Find books by author name:
+
    ```typescript
    // Search for "Brandon Sanderson" should find his books
    const authorMatches = await db
@@ -162,7 +170,11 @@ books by the name of their author).
    const booksByAuthor = await db
      .selectFrom('work')
      .innerJoin('work_creator', 'work.id', 'work_creator.work_id')
-     .where('work_creator.creator_id', 'in', authorMatches.map(a => a.id))
+     .where(
+       'work_creator.creator_id',
+       'in',
+       authorMatches.map((a) => a.id),
+     )
      .execute();
    ```
 
@@ -173,6 +185,7 @@ books by the name of their author).
 ### Phase 5: Search Suggestions
 
 1. Create suggestion endpoint:
+
    ```typescript
    search.suggest({
      query: string;  // Partial input
@@ -217,6 +230,7 @@ books by the name of their author).
    - Field prefix: `author:sanderson`
 
 2. Parse search query into structured form:
+
    ```typescript
    type ParsedQuery = {
      terms: string[];

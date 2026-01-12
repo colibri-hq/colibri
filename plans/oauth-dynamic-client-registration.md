@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#178](https://github.com/colibri-hq/colibri/issues/178)
+
 # OAuth Dynamic Client Registration
 
 ## Description
@@ -31,6 +33,7 @@ registrations.
 ### Phase 1: Basic Registration
 
 1. Client registration endpoint:
+
    ```typescript
    POST /auth/oauth/register
 
@@ -57,6 +60,7 @@ registrations.
    ```
 
 2. Client metadata validation:
+
    ```typescript
    const clientMetadataSchema = z.object({
      // Required
@@ -70,22 +74,28 @@ registrations.
      policy_uri: z.string().url().optional(),
 
      // OAuth
-     grant_types: z.array(z.enum([
-       'authorization_code',
-       'client_credentials',
-       'refresh_token',
-       'urn:ietf:params:oauth:grant-type:device_code'
-     ])).optional(),
+     grant_types: z
+       .array(
+         z.enum([
+           'authorization_code',
+           'client_credentials',
+           'refresh_token',
+           'urn:ietf:params:oauth:grant-type:device_code',
+         ]),
+       )
+       .optional(),
      response_types: z.array(z.enum(['code'])).optional(),
      scope: z.string().optional(),
 
      // Authentication
-     token_endpoint_auth_method: z.enum([
-       'none',
-       'client_secret_basic',
-       'client_secret_post',
-       'private_key_jwt'
-     ]).optional(),
+     token_endpoint_auth_method: z
+       .enum([
+         'none',
+         'client_secret_basic',
+         'client_secret_post',
+         'private_key_jwt',
+       ])
+       .optional(),
 
      // JWKS for private_key_jwt
      jwks_uri: z.string().url().optional(),
@@ -104,6 +114,7 @@ registrations.
 ### Phase 2: Client Types
 
 1. Public clients (no secret):
+
    ```typescript
    // For SPAs and native apps
    {
@@ -114,6 +125,7 @@ registrations.
    ```
 
 2. Confidential clients (with secret):
+
    ```typescript
    // For server-side apps
    {
@@ -127,6 +139,7 @@ registrations.
 ### Phase 3: Software Statements
 
 1. Software statement JWT validation:
+
    ```typescript
    interface SoftwareStatement {
      software_id: string;
@@ -135,25 +148,26 @@ registrations.
      client_uri?: string;
      redirect_uris: string[];
      // ... other metadata
-     iss: string;  // Software publisher
+     iss: string; // Software publisher
      iat: number;
      exp?: number;
    }
    ```
 
 2. Trusted software publishers:
-    - Maintain list of trusted issuers
-    - Validate software statement signatures
-    - Auto-approve registrations from trusted publishers
+   - Maintain list of trusted issuers
+   - Validate software statement signatures
+   - Auto-approve registrations from trusted publishers
 
 3. Software statement benefits:
-    - Pre-validated redirect URIs
-    - Publisher accountability
-    - Simplified approval workflow
+   - Pre-validated redirect URIs
+   - Publisher accountability
+   - Simplified approval workflow
 
 ### Phase 4: Client Management (RFC 7592)
 
 1. Read client configuration:
+
    ```typescript
    GET /auth/oauth/register/{client_id}
    Authorization: Bearer {registration_access_token}
@@ -162,6 +176,7 @@ registrations.
    ```
 
 2. Update client configuration:
+
    ```typescript
    PUT /auth/oauth/register/{client_id}
    Authorization: Bearer {registration_access_token}
@@ -171,6 +186,7 @@ registrations.
    ```
 
 3. Delete client:
+
    ```typescript
    DELETE /auth/oauth/register/{client_id}
    Authorization: Bearer {registration_access_token}
@@ -179,6 +195,7 @@ registrations.
    ```
 
 4. Rotate client secret:
+
    ```typescript
    POST /auth/oauth/register/{client_id}/rotate-secret
    Authorization: Bearer {registration_access_token}
@@ -189,6 +206,7 @@ registrations.
 ### Phase 5: Registration Policies
 
 1. Policy engine:
+
    ```typescript
    interface RegistrationPolicy {
      // Who can register
@@ -210,29 +228,29 @@ registrations.
    ```
 
 2. Approval workflow:
-    - Pending registrations queue
-    - Admin review interface
-    - Email notifications
-    - Auto-approve for trusted domains
+   - Pending registrations queue
+   - Admin review interface
+   - Email notifications
+   - Auto-approve for trusted domains
 
 ### Phase 6: Admin Interface
 
 1. Client management UI:
-    - List all registered clients
-    - View client details
-    - Enable/disable clients
-    - Revoke client access
-    - View client usage statistics
+   - List all registered clients
+   - View client details
+   - Enable/disable clients
+   - Revoke client access
+   - View client usage statistics
 
 2. Bulk operations:
-    - Export client list
-    - Import clients from JSON
-    - Bulk enable/disable
+   - Export client list
+   - Import clients from JSON
+   - Bulk enable/disable
 
 3. Audit log:
-    - Registration events
-    - Configuration changes
-    - Access patterns
+   - Registration events
+   - Configuration changes
+   - Access patterns
 
 ## Database Schema
 
@@ -304,12 +322,12 @@ CREATE TABLE oauth_client_stats (
 ```typescript
 interface DynamicRegistrationConfig {
   // Enable/disable
-  enabled: boolean;                    // Default: false
+  enabled: boolean; // Default: false
 
   // Access control
   allowAnonymousRegistration: boolean; // Default: false
-  requireApproval: boolean;            // Default: true
-  trustedSoftwareIssuers: string[];    // Default: []
+  requireApproval: boolean; // Default: true
+  trustedSoftwareIssuers: string[]; // Default: []
 
   // Defaults
   defaultGrantTypes: string[];
@@ -319,18 +337,18 @@ interface DynamicRegistrationConfig {
   // Restrictions
   allowedGrantTypes: string[];
   allowedScopes: string[];
-  allowedRedirectUriPatterns: string[];  // Regex patterns
-  requireHttpsRedirectUris: boolean;     // Default: true
-  allowLocalhostRedirectUris: boolean;   // Default: true (dev)
+  allowedRedirectUriPatterns: string[]; // Regex patterns
+  requireHttpsRedirectUris: boolean; // Default: true
+  allowLocalhostRedirectUris: boolean; // Default: true (dev)
 
   // Limits
-  maxClientsPerUser: number;             // Default: 10
-  maxRedirectUris: number;               // Default: 10
+  maxClientsPerUser: number; // Default: 10
+  maxRedirectUris: number; // Default: 10
 
   // Secrets
-  clientSecretLength: number;            // Default: 32
-  clientSecretExpiration: number;        // Default: 0 (never)
-  registrationTokenExpiration: number;   // Default: 0 (never)
+  clientSecretLength: number; // Default: 32
+  clientSecretExpiration: number; // Default: 0 (never)
+  registrationTokenExpiration: number; // Default: 0 (never)
 }
 ```
 

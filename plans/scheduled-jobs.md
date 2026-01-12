@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#157](https://github.com/colibri-hq/colibri/issues/157)
+
 # Scheduled Jobs (Cron)
 
 ## Description
@@ -24,17 +26,18 @@ delivery, and report generation. Support both recurring schedules and one-time d
 ### Phase 1: Job Scheduler Selection
 
 1. Evaluate options:
-    - **pg_cron** - PostgreSQL extension
-    - **Supabase Edge Functions** - Serverless cron
-    - **BullMQ** - Redis-based queue
-    - **Agenda** - MongoDB-based (not ideal)
-    - **node-cron** - In-process scheduler
+   - **pg_cron** - PostgreSQL extension
+   - **Supabase Edge Functions** - Serverless cron
+   - **BullMQ** - Redis-based queue
+   - **Agenda** - MongoDB-based (not ideal)
+   - **node-cron** - In-process scheduler
 
 2. Recommended: Supabase Edge Functions + pg_cron hybrid
 
 ### Phase 2: Job Definition Schema
 
 1. Create scheduled job table:
+
    ```sql
    CREATE TABLE scheduled_job (
      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -65,27 +68,28 @@ delivery, and report generation. Support both recurring schedules and one-time d
 ### Phase 3: Core Scheduled Jobs
 
 1. **Metadata Refresh** (daily):
-    - Update stale metadata
-    - Fill missing fields
-    - Refresh cover images
+   - Update stale metadata
+   - Fill missing fields
+   - Refresh cover images
 
 2. **Cleanup** (weekly):
-    - Remove orphaned assets
-    - Clean expired sessions
-    - Purge old job logs
+   - Remove orphaned assets
+   - Clean expired sessions
+   - Purge old job logs
 
 3. **Statistics** (hourly):
-    - Update reading statistics
-    - Calculate popular books
-    - Aggregate ratings
+   - Update reading statistics
+   - Calculate popular books
+   - Aggregate ratings
 
 4. **Notifications** (every 5 min):
-    - Send pending emails
-    - Process notification queue
+   - Send pending emails
+   - Process notification queue
 
 ### Phase 4: Job Runner
 
 1. Edge Function approach:
+
    ```typescript
    // supabase/functions/job-runner/index.ts
    Deno.serve(async (req) => {
@@ -113,15 +117,15 @@ delivery, and report generation. Support both recurring schedules and one-time d
 ### Phase 5: Job Management UI
 
 1. Admin dashboard for jobs:
-    - List scheduled jobs
-    - Enable/disable jobs
-    - View execution history
-    - Manual trigger button
+   - List scheduled jobs
+   - Enable/disable jobs
+   - View execution history
+   - Manual trigger button
 
 2. Job detail view:
-    - Execution logs
-    - Error details
-    - Performance metrics
+   - Execution logs
+   - Error details
+   - Performance metrics
 
 ### Phase 6: Alert System
 
@@ -138,16 +142,16 @@ delivery, and report generation. Support both recurring schedules and one-time d
 
 ## Scheduled Jobs List
 
-| Job                | Schedule     | Description                |
-|--------------------|--------------|----------------------------|
-| refresh_metadata   | 0 3 * * *    | Update book metadata       |
-| cleanup_orphans    | 0 4 * * 0    | Remove orphaned files      |
-| expire_sessions    | */15 * * * * | Clean expired sessions     |
-| send_notifications | */5 * * * *  | Process notification queue |
-| generate_stats     | 0 * * * *    | Update statistics          |
-| backup_database    | 0 2 * * *    | Database backup            |
-| refresh_tokens     | 0 */6 * * *  | Refresh OAuth tokens       |
-| loan_reminders     | 0 9 * * *    | Library loan due reminders |
+| Job                | Schedule        | Description                |
+| ------------------ | --------------- | -------------------------- |
+| refresh_metadata   | 0 3 \* \* \*    | Update book metadata       |
+| cleanup_orphans    | 0 4 \* \* 0     | Remove orphaned files      |
+| expire_sessions    | _/15 _ \* \* \* | Clean expired sessions     |
+| send_notifications | _/5 _ \* \* \*  | Process notification queue |
+| generate_stats     | 0 \* \* \* \*   | Update statistics          |
+| backup_database    | 0 2 \* \* \*    | Database backup            |
+| refresh_tokens     | 0 _/6 _ \* \*   | Refresh OAuth tokens       |
+| loan_reminders     | 0 9 \* \* \*    | Library loan due reminders |
 
 ## Cron Expression Reference
 

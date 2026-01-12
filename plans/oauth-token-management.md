@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#174](https://github.com/colibri-hq/colibri/issues/174)
+
 # OAuth Token Management
 
 ## Description
@@ -90,49 +92,52 @@ signature
 ### Phase 1: JWT Access Tokens
 
 1. JWT structure:
+
    ```typescript
    interface JwtAccessToken {
      // Header
      alg: 'RS256' | 'ES256';
-     typ: 'at+jwt';  // RFC 9068
+     typ: 'at+jwt'; // RFC 9068
      kid: string;
 
      // Payload
-     iss: string;        // Issuer
-     sub: string;        // Subject (user ID)
-     aud: string | string[];  // Audience (resource server)
-     exp: number;        // Expiration
-     iat: number;        // Issued at
-     nbf?: number;       // Not before
-     jti: string;        // Token ID (for revocation)
-     client_id: string;  // Client that requested token
-     scope: string;      // Space-separated scopes
+     iss: string; // Issuer
+     sub: string; // Subject (user ID)
+     aud: string | string[]; // Audience (resource server)
+     exp: number; // Expiration
+     iat: number; // Issued at
+     nbf?: number; // Not before
+     jti: string; // Token ID (for revocation)
+     client_id: string; // Client that requested token
+     scope: string; // Space-separated scopes
      auth_time?: number; // Authentication time
    }
    ```
 
 2. Configuration toggle:
+
    ```typescript
    interface TokenConfig {
-     useJwtAccessTokens: boolean;  // Default: false
+     useJwtAccessTokens: boolean; // Default: false
      jwtSigningAlgorithm: 'RS256' | 'ES256' | 'HS256';
-     includeUserClaims: boolean;   // Include profile claims in JWT
+     includeUserClaims: boolean; // Include profile claims in JWT
    }
    ```
 
 3. Hybrid approach:
-    - Issue JWT access tokens when configured
-    - Keep opaque refresh tokens (always require DB)
-    - Store JWT ID (jti) for revocation checking
+   - Issue JWT access tokens when configured
+   - Keep opaque refresh tokens (always require DB)
+   - Store JWT ID (jti) for revocation checking
 
 ### Phase 2: Enhanced Introspection
 
 1. Production-ready introspection:
-    - Remove dev-only restriction
-    - Add proper authorization (require specific scope or client)
-    - Rate limiting
+   - Remove dev-only restriction
+   - Add proper authorization (require specific scope or client)
+   - Rate limiting
 
 2. Additional response fields:
+
    ```typescript
    interface IntrospectionResponse {
      active: boolean;
@@ -165,13 +170,14 @@ signature
      exposeUserClaims: boolean;
      exposedClaims: string[];
      requireClientAuth: boolean;
-     allowedClients: string[];  // Empty = all clients
+     allowedClients: string[]; // Empty = all clients
    }
    ```
 
 ### Phase 3: Token Binding
 
 1. DPoP (Demonstration of Proof-of-Possession) support:
+
    ```typescript
    // Client generates key pair and sends DPoP proof
    POST /auth/oauth/token
@@ -182,16 +188,17 @@ signature
    ```
 
 2. DPoP validation:
+
    ```typescript
    interface DPoPProof {
      typ: 'dpop+jwt';
      alg: 'ES256' | 'RS256';
-     jwk: JsonWebKey;  // Public key
-     jti: string;      // Unique identifier
-     htm: string;      // HTTP method
-     htu: string;      // HTTP URI
-     iat: number;      // Issued at
-     ath?: string;     // Access token hash (for resource requests)
+     jwk: JsonWebKey; // Public key
+     jti: string; // Unique identifier
+     htm: string; // HTTP method
+     htu: string; // HTTP URI
+     iat: number; // Issued at
+     ath?: string; // Access token hash (for resource requests)
    }
    ```
 
@@ -207,6 +214,7 @@ signature
 ### Phase 4: Token Exchange (RFC 8693)
 
 1. Token exchange endpoint:
+
    ```typescript
    POST /auth/oauth/token
    grant_type=urn:ietf:params:oauth:grant-type:token-exchange
@@ -218,9 +226,9 @@ signature
    ```
 
 2. Use cases:
-    - Delegation: Service A requests token to call Service B on behalf of user
-    - Impersonation: Admin requests token as another user
-    - Token type conversion: Exchange refresh token for access token
+   - Delegation: Service A requests token to call Service B on behalf of user
+   - Impersonation: Admin requests token as another user
+   - Token type conversion: Exchange refresh token for access token
 
 3. Token types:
    ```typescript
@@ -237,6 +245,7 @@ signature
 ### Phase 5: Batch Operations
 
 1. Batch revocation:
+
    ```typescript
    POST /auth/oauth/token/revoke-batch
    {
@@ -253,12 +262,13 @@ signature
    ```
 
 2. User-initiated revocation:
-    - "Sign out everywhere" functionality
-    - Revoke all tokens for current user
+   - "Sign out everywhere" functionality
+   - Revoke all tokens for current user
 
 ### Phase 6: Token Analytics
 
 1. Token activity tracking:
+
    ```typescript
    interface TokenActivity {
      tokenId: string;
@@ -275,15 +285,15 @@ signature
    ```
 
 2. Analytics dashboard:
-    - Token issuance rate
-    - Active tokens by client
-    - Revocation patterns
-    - Token lifetime distribution
+   - Token issuance rate
+   - Active tokens by client
+   - Revocation patterns
+   - Token lifetime distribution
 
 3. Anomaly detection:
-    - Unusual token refresh patterns
-    - Geographic anomalies
-    - Concurrent usage detection
+   - Unusual token refresh patterns
+   - Geographic anomalies
+   - Concurrent usage detection
 
 ## Database Schema
 
@@ -348,8 +358,8 @@ CREATE INDEX idx_revoked_jwt_expires ON oauth_revoked_jwt(expires_at);
 interface TokenManagementConfig {
   // Token format
   accessTokenFormat: 'opaque' | 'jwt';
-  accessTokenTtl: number;           // Default: 3600
-  refreshTokenTtl: number;          // Default: 604800
+  accessTokenTtl: number; // Default: 3600
+  refreshTokenTtl: number; // Default: 604800
 
   // JWT settings
   jwt: {
@@ -369,7 +379,7 @@ interface TokenManagementConfig {
   // Revocation
   revocation: {
     enabled: boolean;
-    cascadeRefreshToken: boolean;  // Revoke access tokens when refresh is revoked
+    cascadeRefreshToken: boolean; // Revoke access tokens when refresh is revoked
     allowBatchRevocation: boolean;
   };
 

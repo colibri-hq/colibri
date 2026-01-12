@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#170](https://github.com/colibri-hq/colibri/issues/170)
+
 # OpenID Connect 1.0 Support
 
 ## Description
@@ -45,6 +47,7 @@ semantics. Full OIDC compliance enables Colibri to serve as a single sign-on (SS
 ### Phase 1: OIDC Discovery
 
 1. Create `.well-known/openid-configuration` endpoint:
+
    ```typescript
    {
      "issuer": "https://auth.example.com",
@@ -84,13 +87,25 @@ semantics. Full OIDC compliance enables Colibri to serve as a single sign-on (SS
 ### Phase 2: Complete Claims Support
 
 1. Standard OIDC scopes and claims:
+
    ```typescript
    const scopeClaims = {
      openid: ['sub'],
      profile: [
-       'name', 'family_name', 'given_name', 'middle_name', 'nickname',
-       'preferred_username', 'profile', 'picture', 'website',
-       'gender', 'birthdate', 'zoneinfo', 'locale', 'updated_at'
+       'name',
+       'family_name',
+       'given_name',
+       'middle_name',
+       'nickname',
+       'preferred_username',
+       'profile',
+       'picture',
+       'website',
+       'gender',
+       'birthdate',
+       'zoneinfo',
+       'locale',
+       'updated_at',
      ],
      email: ['email', 'email_verified'],
      address: ['address'],
@@ -99,6 +114,7 @@ semantics. Full OIDC compliance enables Colibri to serve as a single sign-on (SS
    ```
 
 2. Address claim structure:
+
    ```typescript
    interface AddressClaim {
      formatted?: string;
@@ -132,20 +148,21 @@ semantics. Full OIDC compliance enables Colibri to serve as a single sign-on (SS
 ### Phase 3: ID Token Enhancements
 
 1. Asymmetric signing (RS256):
+
    ```typescript
    interface IdToken {
      // Required
-     iss: string;        // Issuer
-     sub: string;        // Subject (user ID)
-     aud: string;        // Audience (client ID)
-     exp: number;        // Expiration
-     iat: number;        // Issued at
+     iss: string; // Issuer
+     sub: string; // Subject (user ID)
+     aud: string; // Audience (client ID)
+     exp: number; // Expiration
+     iat: number; // Issued at
 
      // Recommended
      auth_time?: number; // Time of authentication
-     nonce?: string;     // Replay attack prevention
-     acr?: string;       // Authentication Context Class
-     amr?: string[];     // Authentication Methods
+     nonce?: string; // Replay attack prevention
+     acr?: string; // Authentication Context Class
+     amr?: string[]; // Authentication Methods
 
      // Optional standard claims
      name?: string;
@@ -155,10 +172,11 @@ semantics. Full OIDC compliance enables Colibri to serve as a single sign-on (SS
    ```
 
 2. `auth_time` tracking:
-    - Record authentication timestamp in session
-    - Include in ID token when requested
+   - Record authentication timestamp in session
+   - Include in ID token when requested
 
 3. ACR/AMR support:
+
    ```typescript
    const authenticationMethods = {
      pwd: 'Password',
@@ -177,6 +195,7 @@ semantics. Full OIDC compliance enables Colibri to serve as a single sign-on (SS
 ### Phase 4: JWKS Endpoint
 
 1. Create JWKS endpoint:
+
    ```typescript
    GET /.well-known/jwks.json
 
@@ -195,27 +214,29 @@ semantics. Full OIDC compliance enables Colibri to serve as a single sign-on (SS
    ```
 
 2. Key rotation strategy:
-    - Generate new key pair periodically
-    - Keep old keys for token verification (grace period)
-    - Automatic key ID assignment
-    - Secure private key storage
+   - Generate new key pair periodically
+   - Keep old keys for token verification (grace period)
+   - Automatic key ID assignment
+   - Secure private key storage
 
 ### Phase 5: Session Management
 
 1. Session state tracking:
+
    ```typescript
    interface OidcSession {
      sessionId: string;
      userId: string;
-     clientIds: string[];  // Clients with active sessions
+     clientIds: string[]; // Clients with active sessions
      authTime: Date;
      lastActivity: Date;
    }
    ```
 
 2. Check session iframe:
+
    ```typescript
-   GET /auth/oauth/checksession
+   GET / auth / oauth / checksession;
 
    // Returns HTML page with postMessage-based session checking
    ```
@@ -225,6 +246,7 @@ semantics. Full OIDC compliance enables Colibri to serve as a single sign-on (SS
 ### Phase 6: Logout
 
 1. RP-Initiated Logout (End Session Endpoint):
+
    ```typescript
    GET /auth/oauth/logout
    ?id_token_hint={id_token}
@@ -236,6 +258,7 @@ semantics. Full OIDC compliance enables Colibri to serve as a single sign-on (SS
    ```
 
 2. Front-channel logout:
+
    ```typescript
    // Register frontchannel_logout_uri in client metadata
    // Server renders iframes to all registered URIs
@@ -244,6 +267,7 @@ semantics. Full OIDC compliance enables Colibri to serve as a single sign-on (SS
    ```
 
 3. Back-channel logout:
+
    ```typescript
    // Register backchannel_logout_uri in client metadata
    // Server POSTs logout token to all registered URIs
@@ -263,7 +287,7 @@ semantics. Full OIDC compliance enables Colibri to serve as a single sign-on (SS
      iat: number;
      jti: string;
      events: {
-       'http://schemas.openid.net/event/backchannel-logout': {}
+       'http://schemas.openid.net/event/backchannel-logout': {};
      };
      sid?: string;
    }
@@ -272,6 +296,7 @@ semantics. Full OIDC compliance enables Colibri to serve as a single sign-on (SS
 ### Phase 7: Claims Request Parameter
 
 1. Support `claims` parameter in authorization:
+
    ```typescript
    {
      "userinfo": {
@@ -294,29 +319,29 @@ semantics. Full OIDC compliance enables Colibri to serve as a single sign-on (SS
 ```typescript
 interface OpenIdConnectConfig {
   // Basic
-  enabled: boolean;                    // Default: true
+  enabled: boolean; // Default: true
 
   // ID Tokens
-  idTokenTtl: number;                  // Default: 3600
-  idTokenSigningAlg: 'RS256' | 'HS256';  // Default: RS256
+  idTokenTtl: number; // Default: 3600
+  idTokenSigningAlg: 'RS256' | 'HS256'; // Default: RS256
 
   // Claims
-  supportedScopes: string[];           // Default: ['openid', 'profile', 'email']
-  supportedClaims: string[];           // Auto-derived from scopes
-  claimsParameterSupported: boolean;   // Default: true
+  supportedScopes: string[]; // Default: ['openid', 'profile', 'email']
+  supportedClaims: string[]; // Auto-derived from scopes
+  claimsParameterSupported: boolean; // Default: true
 
   // Session
-  sessionManagement: boolean;          // Default: false
-  checkSessionIframe: boolean;         // Default: false
+  sessionManagement: boolean; // Default: false
+  checkSessionIframe: boolean; // Default: false
 
   // Logout
-  frontChannelLogout: boolean;         // Default: false
-  backChannelLogout: boolean;          // Default: false
-  rpInitiatedLogout: boolean;          // Default: true
+  frontChannelLogout: boolean; // Default: false
+  backChannelLogout: boolean; // Default: false
+  rpInitiatedLogout: boolean; // Default: true
 
   // Keys
-  keyRotationInterval: number;         // Default: 86400 (1 day)
-  keyRetentionPeriod: number;          // Default: 604800 (7 days)
+  keyRotationInterval: number; // Default: 86400 (1 day)
+  keyRetentionPeriod: number; // Default: 604800 (7 days)
 }
 ```
 

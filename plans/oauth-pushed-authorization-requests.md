@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#171](https://github.com/colibri-hq/colibri/issues/171)
+
 # OAuth Pushed Authorization Requests (PAR)
 
 ## Description
@@ -62,6 +64,7 @@ confidential and enables complex requests that might exceed URL length limits.
 ### Phase 1: Enhanced Request Validation
 
 1. Comprehensive parameter validation:
+
    ```typescript
    const parRequestSchema = z.object({
      // Required
@@ -83,21 +86,22 @@ confidential and enables complex requests that might exceed URL length limits.
      max_age: z.number().optional(),
      ui_locales: z.string().optional(),
      acr_values: z.string().optional(),
-     claims: z.string().optional(),  // JSON
+     claims: z.string().optional(), // JSON
 
      // PAR-specific
-     request: z.string().optional(),  // JWT request object
+     request: z.string().optional(), // JWT request object
    });
    ```
 
 2. Pre-flight validation:
-    - Validate all parameters before storing
-    - Return errors immediately (not at authorization)
-    - Prevents user confusion from invalid requests
+   - Validate all parameters before storing
+   - Return errors immediately (not at authorization)
+   - Prevents user confusion from invalid requests
 
 ### Phase 2: Request Object Support (RFC 9101)
 
 1. Signed request objects:
+
    ```typescript
    // Client sends signed JWT
    POST /auth/oauth/par
@@ -118,6 +122,7 @@ confidential and enables complex requests that might exceed URL length limits.
    ```
 
 2. Request object validation:
+
    ```typescript
    interface RequestObjectConfig {
      requireSignedRequests: boolean;
@@ -128,12 +133,13 @@ confidential and enables complex requests that might exceed URL length limits.
    ```
 
 3. Encrypted request objects:
-    - Nested JWT (signed then encrypted)
-    - Key management via JWKS
+   - Nested JWT (signed then encrypted)
+   - Key management via JWKS
 
 ### Phase 3: Request URI Management
 
 1. Improved request URI format:
+
    ```typescript
    // Current: Simple random string
    urn:ietf:params:oauth:request_uri:abc123
@@ -143,6 +149,7 @@ confidential and enables complex requests that might exceed URL length limits.
    ```
 
 2. Request URI caching:
+
    ```typescript
    interface StoredAuthorizationRequest {
      identifier: string;
@@ -158,14 +165,15 @@ confidential and enables complex requests that might exceed URL length limits.
 3. Configurable expiration:
    ```typescript
    interface ParConfig {
-     requestUriTtl: number;      // Default: 60 seconds
-     allowReuse: boolean;        // Default: false (one-time use)
+     requestUriTtl: number; // Default: 60 seconds
+     allowReuse: boolean; // Default: false (one-time use)
    }
    ```
 
 ### Phase 4: Require PAR Mode
 
 1. Per-client PAR requirement:
+
    ```typescript
    interface OAuthClient {
      // ...
@@ -174,10 +182,11 @@ confidential and enables complex requests that might exceed URL length limits.
    ```
 
 2. Server-wide PAR enforcement:
+
    ```typescript
    interface ParConfig {
-     requirePar: boolean;        // Default: false
-     requireParForPublicClients: boolean;  // Default: false
+     requirePar: boolean; // Default: false
+     requireParForPublicClients: boolean; // Default: false
    }
    ```
 
@@ -193,27 +202,27 @@ confidential and enables complex requests that might exceed URL length limits.
 ### Phase 5: Security Enhancements
 
 1. Request binding:
-    - Bind request URI to client certificate (mTLS)
-    - Bind to DPoP proof
+   - Bind request URI to client certificate (mTLS)
+   - Bind to DPoP proof
 
 2. Request object integrity:
-    - Hash verification on consumption
-    - Signature timestamp validation
+   - Hash verification on consumption
+   - Signature timestamp validation
 
 3. Replay prevention:
-    - One-time request URI usage
-    - Unique request object `jti` claim
+   - One-time request URI usage
+   - Unique request object `jti` claim
 
 ### Phase 6: Performance Optimization
 
 1. Request caching:
-    - In-memory cache for active requests
-    - Database for persistence
-    - Cleanup job for expired requests
+   - In-memory cache for active requests
+   - Database for persistence
+   - Cleanup job for expired requests
 
 2. Request compression:
-    - Compress large request objects
-    - Efficient storage
+   - Compress large request objects
+   - Efficient storage
 
 ## Database Schema
 
@@ -266,50 +275,50 @@ CREATE INDEX idx_par_client ON oauth_authorization_request(client_id);
 ```typescript
 interface PushedAuthorizationRequestsConfig {
   // Enable/disable
-  enabled: boolean;                     // Default: true
+  enabled: boolean; // Default: true
 
   // Request URI
-  requestUriTtl: number;               // Default: 60 seconds
-  requestUriPrefix: string;            // Default: 'urn:ietf:params:oauth:request_uri:'
-  allowRequestUriReuse: boolean;       // Default: false
+  requestUriTtl: number; // Default: 60 seconds
+  requestUriPrefix: string; // Default: 'urn:ietf:params:oauth:request_uri:'
+  allowRequestUriReuse: boolean; // Default: false
 
   // Enforcement
-  requirePar: boolean;                  // Default: false
-  requireParForPublicClients: boolean;  // Default: false
+  requirePar: boolean; // Default: false
+  requireParForPublicClients: boolean; // Default: false
 
   // Request objects
-  supportRequestObject: boolean;        // Default: true
-  requireSignedRequestObject: boolean;  // Default: false
-  allowedRequestObjectAlgs: string[];   // Default: ['RS256', 'ES256']
-  requireEncryptedRequestObject: boolean;  // Default: false
+  supportRequestObject: boolean; // Default: true
+  requireSignedRequestObject: boolean; // Default: false
+  allowedRequestObjectAlgs: string[]; // Default: ['RS256', 'ES256']
+  requireEncryptedRequestObject: boolean; // Default: false
   allowedRequestObjectEncAlgs: string[];
 
   // Security
   requireClientAuthentication: boolean; // Default: true
-  bindToClientCert: boolean;           // Default: false
-  bindToDPoP: boolean;                 // Default: false
+  bindToClientCert: boolean; // Default: false
+  bindToDPoP: boolean; // Default: false
 }
 ```
 
 ## Benefits of PAR
 
 1. **Security**:
-    - Request parameters not exposed in URL/browser history
-    - Pre-validation prevents user-facing errors
-    - Enables request object signing/encryption
+   - Request parameters not exposed in URL/browser history
+   - Pre-validation prevents user-facing errors
+   - Enables request object signing/encryption
 
 2. **Privacy**:
-    - Sensitive parameters (claims, scopes) hidden from user agent
-    - Request URI doesn't leak information
+   - Sensitive parameters (claims, scopes) hidden from user agent
+   - Request URI doesn't leak information
 
 3. **Reliability**:
-    - No URL length limits
-    - Complex requests supported
-    - Rich error responses at PAR time
+   - No URL length limits
+   - Complex requests supported
+   - Rich error responses at PAR time
 
 4. **Compliance**:
-    - Required for some high-security profiles (FAPI)
-    - Recommended for financial-grade APIs
+   - Required for some high-security profiles (FAPI)
+   - Recommended for financial-grade APIs
 
 ## Open Questions
 

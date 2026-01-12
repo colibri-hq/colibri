@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#140](https://github.com/colibri-hq/colibri/issues/140)
+
 # Local-First Sync with ElectricSQL
 
 ## Description
@@ -26,10 +28,10 @@ issues.
 ### Phase 1: Research & Evaluation
 
 1. Evaluate ElectricSQL vs alternatives:
-    - ElectricSQL (Postgres sync)
-    - PowerSync
-    - Triplit
-    - Custom CRDT implementation
+   - ElectricSQL (Postgres sync)
+   - PowerSync
+   - Triplit
+   - Custom CRDT implementation
 2. Assess compatibility with Supabase
 3. Determine sync scope (which tables to sync)
 
@@ -45,9 +47,9 @@ issues.
 1. Add Electric client to web app
 2. Create local SQLite database schema
 3. Implement shape subscriptions:
-    - User's collections
-    - User's reading progress
-    - Accessible works/editions
+   - User's collections
+   - User's reading progress
+   - Accessible works/editions
 4. Handle conflict resolution
 
 ### Phase 4: UI Adaptation

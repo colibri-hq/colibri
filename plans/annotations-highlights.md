@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#114](https://github.com/colibri-hq/colibri/issues/114)
+
 # Annotations & Highlights
 
 ## Description
@@ -25,6 +27,7 @@ across devices and optionally be exportable.
 ### Phase 1: Database Schema
 
 1. Create annotation tables:
+
    ```sql
    CREATE TYPE annotation_type AS ENUM ('highlight', 'note', 'bookmark');
 
@@ -114,23 +117,23 @@ across devices and optionally be exportable.
 ### Phase 8: Export & Import
 
 1. Export formats:
-    - Markdown
-    - JSON
-    - PDF with highlights
-    - Kindle-compatible format
+   - Markdown
+   - JSON
+   - PDF with highlights
+   - Kindle-compatible format
 
 2. Import from:
-    - Kindle highlights
-    - Apple Books
-    - Readwise
+   - Kindle highlights
+   - Apple Books
+   - Readwise
 
 ## Annotation Types
 
 | Type      | Has Range | Has Note | Use Case                |
-|-----------|-----------|----------|-------------------------|
-| Highlight | ✅         | Optional | Mark important passages |
-| Note      | ✅ or ❌    | ✅        | Add thoughts            |
-| Bookmark  | ❌         | Optional | Mark position           |
+| --------- | --------- | -------- | ----------------------- |
+| Highlight | ✅        | Optional | Mark important passages |
+| Note      | ✅ or ❌  | ✅       | Add thoughts            |
+| Bookmark  | ❌        | Optional | Mark position           |
 
 ## Highlight Colors
 

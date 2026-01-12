@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#149](https://github.com/colibri-hq/colibri/issues/149)
+
 # Peer-Verified Login
 
 ## Description
@@ -25,26 +27,26 @@ addresses or devices capable of Passkey authentication.
 ### Phase 1: Database Schema
 
 1. Create `login_approval_request` table:
-    - `id` (uuid)
-    - `requester_id` (user requesting login)
-    - `approver_id` (user who can approve, nullable for any adult)
-    - `status` (pending, approved, rejected, expired)
-    - `device_info` (JSON with browser/device details)
-    - `created_at`, `expires_at`
-    - `approved_at`, `approved_by`
+   - `id` (uuid)
+   - `requester_id` (user requesting login)
+   - `approver_id` (user who can approve, nullable for any adult)
+   - `status` (pending, approved, rejected, expired)
+   - `device_info` (JSON with browser/device details)
+   - `created_at`, `expires_at`
+   - `approved_at`, `approved_by`
 
 2. Create `trusted_approver` table (optional):
-    - `user_id` (the user who can be approved)
-    - `approver_id` (the trusted approver)
-    - Define who can approve whom
+   - `user_id` (the user who can be approved)
+   - `approver_id` (the trusted approver)
+   - Define who can approve whom
 
 ### Phase 2: Backend API
 
 1. tRPC endpoints:
-    - `requestLoginApproval` - Child initiates login request
-    - `getPendingApprovals` - Adult sees pending requests
-    - `approveLogin` - Adult confirms identity
-    - `rejectLogin` - Adult denies request
+   - `requestLoginApproval` - Child initiates login request
+   - `getPendingApprovals` - Adult sees pending requests
+   - `approveLogin` - Adult confirms identity
+   - `rejectLogin` - Adult denies request
 
 2. Token generation upon approval
 3. Real-time notification to requesting device

@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#131](https://github.com/colibri-hq/colibri/issues/131)
+
 # Favorites & Bookmarks System
 
 ## Description
@@ -25,6 +27,7 @@ resources and UI for managing favorites.
 ### Phase 1: SDK Resource Functions
 
 1. Create `packages/sdk/src/resources/favorite.ts`:
+
    ```typescript
    // Collection favorites
    export async function addCollectionFavorite(db, userId, collectionId);
@@ -45,21 +48,23 @@ resources and UI for managing favorites.
 ### Phase 2: tRPC Routes
 
 1. Add to existing routes or create `favorites.ts`:
+
    ```typescript
-   favorites.collections.add({ collectionId })
-   favorites.collections.remove({ collectionId })
-   favorites.collections.list()
+   favorites.collections.add({ collectionId });
+   favorites.collections.remove({ collectionId });
+   favorites.collections.list();
 
-   favorites.creators.add({ creatorId })
-   favorites.creators.remove({ creatorId })
-   favorites.creators.list()
+   favorites.creators.add({ creatorId });
+   favorites.creators.remove({ creatorId });
+   favorites.creators.list();
 
-   favorites.all()
+   favorites.all();
    ```
 
 ### Phase 3: Favorite Toggle Component
 
 1. Create FavoriteButton component:
+
    ```svelte
    <FavoriteButton
      type="collection"
@@ -76,10 +81,10 @@ resources and UI for managing favorites.
 ### Phase 4: UI Integration
 
 1. Add favorite button to:
-    - Collection cards
-    - Collection detail header
-    - Creator cards
-    - Creator detail header
+   - Collection cards
+   - Collection detail header
+   - Creator cards
+   - Creator detail header
 
 2. Show favorite indicator badge
 
@@ -87,9 +92,9 @@ resources and UI for managing favorites.
 
 1. Add "Favorites" section to sidebar/navigation
 2. Create favorites page with:
-    - Favorite collections grid
-    - Favorite creators list
-    - Quick access cards
+   - Favorite collections grid
+   - Favorite creators list
+   - Quick access cards
 
 ### Phase 6: Quick Access
 
@@ -100,13 +105,13 @@ resources and UI for managing favorites.
 ## Favorite Types
 
 | Entity     | Use Case                              |
-|------------|---------------------------------------|
+| ---------- | ------------------------------------- |
 | Collection | Quick access to reading lists, genres |
 | Creator    | Follow favorite authors               |
-| Work*      | Bookmark specific books (future)      |
-| Series*    | Track series progress (future)        |
+| Work\*     | Bookmark specific books (future)      |
+| Series\*   | Track series progress (future)        |
 
-*Not in current schema but could be added
+\*Not in current schema but could be added
 
 ## UI States
 

@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#132](https://github.com/colibri-hq/colibri/issues/132)
+
 # Full-Text Search
 
 ## Description
@@ -13,7 +15,7 @@ Searching for books by their synopsis and title is good, but searching for parti
 - Allow jumping directly into the book at the correct location
 
 Searching for a book in Colibri should obviously allow for fuzzy matching a book by its title, synopsis, author, tags,
-and so on; but much more importantly, we also want to allow searching for a word or a sentence *within the book!*
+and so on; but much more importantly, we also want to allow searching for a word or a sentence _within the book!_
 Sometimes you remember only a few words, or a particularly elegant phrase, an aphorism. I explicitly want Colibri to be
 able to help you find it.
 
@@ -35,12 +37,12 @@ be fairly scalable for our use case.
 ### Concept
 
 - **Create a table for book chunks:** This table will hold
-    - a bigint ID (we'll have *lots* of records),
-    - a foreign key to a book asset (and through that, an edition),
-    - a `tsvector` representation of the chunk content (in the edition's language, if known),
-    - a `vector` embedding for the chunk content, and
-    - a source pointer to map the chunk back to its location in the source asset.
-      It also needs a GIN index (for FTS) and a HNSW (or IVFFlat?) index for kNN.
+  - a bigint ID (we'll have _lots_ of records),
+  - a foreign key to a book asset (and through that, an edition),
+  - a `tsvector` representation of the chunk content (in the edition's language, if known),
+  - a `vector` embedding for the chunk content, and
+  - a source pointer to map the chunk back to its location in the source asset.
+    It also needs a GIN index (for FTS) and a HNSW (or IVFFlat?) index for kNN.
 - **Extract chunks during book import:** When importing books, we'll need to extract the source into individual chunks,
   precompute lexemes and embeddings, and create entries in the chunk table. What qualifies as a chunk probably varies by
   format, and depends on what is uniquely identifyable. Paragraphs are probably a good assumption; only fall back on
@@ -57,23 +59,39 @@ be fairly scalable for our use case.
 
 ## Current Implementation Status
 
-**Not Implemented:**
+**Implemented:**
 
-- ❌ No content extraction pipeline
-- ❌ No full-text index
-- ❌ No content search API
+- ✅ `book_chunk` table schema with FTS (`supabase/schemas/23_book_chunks.sql`)
+- ✅ Asset indexing status columns (`search_indexed_at`, `search_index_error`)
+- ✅ Content extraction pipeline for EPUB and PDF (`packages/sdk/src/ebooks/extract-text.ts`)
+- ✅ Chunk CRUD operations (`packages/sdk/src/resources/chunk.ts`)
+- ✅ FTS search function `searchContent()` with `ts_headline` highlights (`packages/sdk/src/resources/search.ts`)
+- ✅ tRPC route `search.content` (`apps/app/src/lib/trpc/routes/search.ts`)
+- ✅ Search UI with titles/content toggle (`apps/app/src/routes/(library)/works/+page.svelte`)
+- ✅ Content search results component (`apps/app/src/lib/components/Search/ContentSearchResults.svelte`)
+- ✅ Background indexing job (`packages/sdk/src/jobs/index-chunks.ts`)
+- ✅ Auto-indexing on book import (`apps/app/src/lib/trpc/routes/books.ts`)
+
+**Not Yet Implemented (Deferred):**
+
+- ❌ Vector embeddings for semantic search (pgvector)
+- ❌ MOBI text extraction (only metadata currently parsed)
+- ❌ Reader deep linking (no reader route exists yet)
+- ❌ Synopsis search column
+- ❌ Multi-language stemming (using 'simple' config)
 
 **Existing Infrastructure:**
 
-- ✅ EPUB/MOBI/PDF parsing extracts text content
-- ✅ PostgreSQL available (supports full-text search)
-- ✅ Synopsis field exists and could be searched
+- ✅ EPUB/PDF parsing extracts text content
+- ✅ PostgreSQL with GIN indexes for FTS
+- ✅ Background job pattern established
 
 ## Implementation Plan
 
 ### Phase 1: Schema Setup
 
 1. Create chunk table for searchable content:
+
    ```sql
    create table book_chunk (
      id bigint generated always as identity primary key,
@@ -109,6 +127,7 @@ be fairly scalable for our use case.
 ### Phase 2: Content Extraction Pipeline
 
 1. Implement chunk extraction per format:
+
    ```typescript
    type BookChunk = {
      content: string;
@@ -140,6 +159,7 @@ be fairly scalable for our use case.
 ### Phase 3: Embedding Generation
 
 1. Implement embedding provider abstraction:
+
    ```typescript
    interface EmbeddingProvider {
      embed(text: string): Promise<number[]>;
@@ -158,6 +178,7 @@ be fairly scalable for our use case.
 ### Phase 4: Hybrid Search Implementation
 
 1. Search flow:
+
    ```typescript
    async function searchContent(query: string, options: SearchOptions) {
      // Step 1: Full-text search for exact/lexeme matches
@@ -185,6 +206,7 @@ be fairly scalable for our use case.
    ```
 
 2. tRPC procedures:
+
    ```typescript
    search.content({
      query: string;
@@ -220,6 +242,7 @@ be fairly scalable for our use case.
 ### Phase 6: Deep Linking to Reader
 
 1. Extend reader route to accept position parameter:
+
    ```
    /read/[assetId]?position=[encodedPointer]
    ```
@@ -234,6 +257,7 @@ be fairly scalable for our use case.
 ### Phase 7: Synopsis Search (Quick Win)
 
 1. Add tsvector column to work table for synopsis:
+
    ```sql
    alter table work
      add column synopsis_search tsvector

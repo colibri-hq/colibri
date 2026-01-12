@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#177](https://github.com/colibri-hq/colibri/issues/177)
+
 # OAuth Additional Grant Types
 
 ## Description
@@ -58,20 +60,21 @@ grant_type = client_credentials
 ### Enhancements Planned
 
 1. **Refresh token support** (configurable):
+
    ```typescript
    interface ClientCredentialsConfig {
-     issueRefreshToken: boolean;  // Default: false (per OAuth 2.1)
+     issueRefreshToken: boolean; // Default: false (per OAuth 2.1)
      refreshTokenTtl?: number;
    }
    ```
 
 2. **Scope restrictions per client**:
-    - Define maximum scopes per client
-    - Automatic scope intersection
+   - Define maximum scopes per client
+   - Automatic scope intersection
 
 3. **IP whitelist**:
-    - Restrict client credentials to specific IPs
-    - Useful for server-to-server auth
+   - Restrict client credentials to specific IPs
+   - Useful for server-to-server auth
 
 ## Refresh Token Grant
 
@@ -118,17 +121,18 @@ grant_type = refresh_token
 ### Enhancements Planned
 
 1. **Configurable rotation**:
+
    ```typescript
    interface RefreshTokenConfig {
-     rotateOnUse: boolean;      // Default: true
-     reuseInterval?: number;    // Grace period for race conditions
-     absoluteExpiry?: number;   // Max lifetime regardless of rotation
+     rotateOnUse: boolean; // Default: true
+     reuseInterval?: number; // Grace period for race conditions
+     absoluteExpiry?: number; // Max lifetime regardless of rotation
    }
    ```
 
 2. **Token families**:
-    - Track refresh token lineage
-    - Detect token theft via replay detection
+   - Track refresh token lineage
+   - Detect token theft via replay detection
 
 ## Token Exchange Grant (RFC 8693)
 
@@ -143,6 +147,7 @@ Token Exchange allows a client to exchange one token for another, enabling:
 ### Implementation Plan
 
 1. **Grant type registration**:
+
    ```typescript
    server.enableGrantType(TokenExchangeGrant, {
      allowImpersonation: false,
@@ -152,6 +157,7 @@ Token Exchange allows a client to exchange one token for another, enabling:
    ```
 
 2. **Request format**:
+
    ```typescript
    POST /auth/oauth/token
    Content-Type: application/x-www-form-urlencoded
@@ -167,6 +173,7 @@ Token Exchange allows a client to exchange one token for another, enabling:
    ```
 
 3. **Response**:
+
    ```typescript
    {
      "access_token": "...",
@@ -178,6 +185,7 @@ Token Exchange allows a client to exchange one token for another, enabling:
    ```
 
 4. **Token types supported**:
+
    ```typescript
    const tokenTypes = {
      'urn:ietf:params:oauth:token-type:access_token': validateAccessToken,
@@ -192,9 +200,9 @@ Token Exchange allows a client to exchange one token for another, enabling:
    // Issued token includes delegation info
    interface DelegatedToken {
      act: {
-       sub: string;         // Actor subject
-       client_id: string;   // Actor client
-       act?: ActorClaim;    // Nested for chained delegation
+       sub: string; // Actor subject
+       client_id: string; // Actor client
+       act?: ActorClaim; // Nested for chained delegation
      };
    }
    ```
@@ -219,6 +227,7 @@ Allows clients to authenticate using a JWT assertion instead of client credentia
 ### Implementation Plan
 
 1. **Grant request**:
+
    ```typescript
    POST /auth/oauth/token
    Content-Type: application/x-www-form-urlencoded
@@ -229,6 +238,7 @@ Allows clients to authenticate using a JWT assertion instead of client credentia
    ```
 
 2. **JWT assertion format**:
+
    ```typescript
    interface JwtBearerAssertion {
      // Header
@@ -236,28 +246,28 @@ Allows clients to authenticate using a JWT assertion instead of client credentia
      typ: 'JWT';
 
      // Payload
-     iss: string;        // Client ID or trusted issuer
-     sub: string;        // Subject (client or user)
-     aud: string;        // Token endpoint URL
-     exp: number;        // Expiration (short-lived)
-     iat: number;        // Issued at
-     jti?: string;       // JWT ID (for replay detection)
+     iss: string; // Client ID or trusted issuer
+     sub: string; // Subject (client or user)
+     aud: string; // Token endpoint URL
+     exp: number; // Expiration (short-lived)
+     iat: number; // Issued at
+     jti?: string; // JWT ID (for replay detection)
    }
    ```
 
 3. **Validation**:
-    - Verify signature against client's registered JWKS
-    - Check audience matches token endpoint
-    - Validate expiration (typically < 5 minutes)
-    - Check for replay (optional jti tracking)
+   - Verify signature against client's registered JWKS
+   - Check audience matches token endpoint
+   - Validate expiration (typically < 5 minutes)
+   - Check for replay (optional jti tracking)
 
 4. **Configuration**:
    ```typescript
    interface JwtBearerConfig {
      trustedIssuers: string[];
-     maxAssertionAge: number;   // Default: 300 seconds
-     requireJti: boolean;       // Default: false
-     clockSkew: number;         // Default: 30 seconds
+     maxAssertionAge: number; // Default: 300 seconds
+     requireJti: boolean; // Default: false
+     clockSkew: number; // Default: 30 seconds
    }
    ```
 
@@ -281,16 +291,10 @@ interface GrantType<TInput, TConfig> {
   schema: ZodSchema<TInput>;
 
   // Additional validation
-  validate?(
-    input: TInput,
-    context: GrantContext
-  ): Promise<void>;
+  validate?(input: TInput, context: GrantContext): Promise<void>;
 
   // Token generation
-  handle(
-    input: TInput,
-    context: GrantContext
-  ): Promise<TokenResponse>;
+  handle(input: TInput, context: GrantContext): Promise<TokenResponse>;
 
   // Configuration processing
   configure?(config: TConfig): void;
@@ -325,7 +329,9 @@ const customGrant = defineGrantType({
   },
 });
 
-server.enableGrantType(customGrant, { /* config */ });
+server.enableGrantType(customGrant, {
+  /* config */
+});
 ```
 
 ## Deprecated Grants

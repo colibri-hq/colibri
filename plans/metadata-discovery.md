@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#142](https://github.com/colibri-hq/colibri/issues/142)
+
 # Metadata Discovery from Open Sources
 
 ## Description
@@ -48,6 +50,7 @@ integration.
 Consolidated duplicated logic across providers into shared modules in `packages/sdk/src/metadata/utils/`:
 
 ### Normalization Utilities (`normalization.ts`)
+
 - `normalizeLanguageCode()` - ISO 639-2/3 to ISO 639-1 conversion (e.g., "ger" → "de")
 - `cleanIsbn()`, `isValidIsbn10()`, `isValidIsbn13()`, `isbn10To13()`, `normalizeIsbn()` - ISBN validation and normalization
 - `normalizeAuthorName()`, `parseAuthorName()`, `formatAuthorName()` - Author name parsing and normalization
@@ -56,17 +59,20 @@ Consolidated duplicated logic across providers into shared modules in `packages/
 - `normalizeDoi()` - DOI URL cleanup
 
 ### Date Parsing Utilities (`date-parsing.ts`)
+
 - `parsePublicationDate()` - Handles YYYY, YYYY-MM, YYYY-MM-DD, written formats, circa dates
 - `extractYear()` - Extract year from various date formats
 - `formatParsedDate()` - Format parsed dates for output
 
 ### MARC Parser Utilities (`marc-parser.ts`)
+
 - `parseMarcXmlRecords()` - Parse MARC21 XML from SRU responses
 - `extractBibliographicData()` - Extract structured data from MARC records
 - `extractSruRecordCount()` - Extract result count from SRU responses
 - Helper functions for field/subfield extraction
 
 ### Providers Updated to Use Shared Utilities
+
 - ✅ Library of Congress - Uses shared MARC parser, language normalization
 - ✅ DNB (Deutsche Nationalbibliothek) - Uses shared MARC parser, language normalization
 - ✅ Cache key generation - Uses shared normalization for consistent cache keys
@@ -116,6 +122,7 @@ normalization utilities from `packages/sdk/src/metadata/utils/normalization.ts`.
 ### Key Components
 
 #### ReconciliationCoordinator
+
 Main entry point for reconciling metadata from SDK providers:
 
 ```typescript
@@ -135,6 +142,7 @@ const result = await reconcileMetadata(records);
 ```
 
 Returns `ReconciledMetadata` with:
+
 - `publication` - Publisher, date, place
 - `subjects` - Subjects and genres
 - `identifiers` - ISBNs, DOIs, etc.
@@ -145,6 +153,7 @@ Returns `ReconciledMetadata` with:
 - `stats` - Processing statistics (sources, fields, conflicts, timing)
 
 #### MetadataCoordinator
+
 Orchestrates multi-provider queries with timeout and concurrency management:
 
 ```typescript
@@ -156,6 +165,7 @@ const result = await coordinator.query({ title: 'The Great Gatsby' });
 ```
 
 #### PreviewGenerator
+
 Generates a unified metadata preview from multiple provider results:
 
 ```typescript
@@ -165,12 +175,14 @@ const preview = generator.generatePreview(metadataRecords);
 ```
 
 Each field in the preview includes:
+
 - `value` - The reconciled value
 - `confidence` - Confidence score (0-1)
 - `sources` - Array of contributing providers
 - `conflicts` - Any conflicting values from sources
 
 #### DuplicateDetector
+
 Identifies potential duplicates when adding books to a library:
 
 ```typescript
@@ -179,6 +191,7 @@ const matches = detector.detectDuplicates(proposedEntry, existingLibrary);
 ```
 
 Returns matches with:
+
 - `similarity` - Overall similarity score (weighted by field importance)
 - `matchType` - 'exact' | 'likely' | 'possible' | 'different_edition' | 'related_work'
 - `matchingFields` - Which fields matched and how strongly
@@ -187,6 +200,7 @@ Returns matches with:
 - `explanation` - Human-readable explanation of the match
 
 Match type thresholds:
+
 - `exact`: similarity >= 0.9
 - `likely`: similarity >= 0.7
 - `possible`: similarity >= 0.5
@@ -194,6 +208,7 @@ Match type thresholds:
 - `related_work`: some similarity but distinct entries
 
 #### EditionSelector
+
 Chooses the best edition from available metadata:
 
 ```typescript
@@ -202,6 +217,7 @@ const selection = selector.selectBestEdition(preview, rawMetadata);
 ```
 
 Scoring factors:
+
 - ISBN presence (+0.1)
 - Publication date (+0.1)
 - Publisher information (+0.1)
@@ -210,47 +226,70 @@ Scoring factors:
 - Language match with preview
 
 #### SeriesAnalyzer
+
 Detects series relationships with existing library entries:
 
 ```typescript
 const analyzer = new SeriesAnalyzer();
-const relationships = analyzer.detectSeriesRelationships(preview, existingLibrary);
+const relationships = analyzer.detectSeriesRelationships(
+  preview,
+  existingLibrary,
+);
 ```
 
 Identifies:
+
 - Previous/next works in series
 - Related works in same series
 - Missing volumes
 - Series completion status
 
 #### Similarity Functions
+
 Shared algorithms in `similarity.ts`:
 
-| Function | Description |
-|----------|-------------|
-| `levenshteinDistance()` | Edit distance between strings |
-| `calculateStringSimilarity()` | Normalized string similarity (0-1) |
-| `calculateArraySimilarity()` | Jaccard coefficient for arrays |
-| `calculateIsbnSimilarity()` | ISBN matching with normalization |
-| `calculateDateSimilarity()` | Publication date comparison |
-| `calculatePublisherSimilarity()` | Publisher name matching |
-| `calculateSeriesSimilarity()` | Series name and volume matching |
+| Function                         | Description                        |
+| -------------------------------- | ---------------------------------- |
+| `levenshteinDistance()`          | Edit distance between strings      |
+| `calculateStringSimilarity()`    | Normalized string similarity (0-1) |
+| `calculateArraySimilarity()`     | Jaccard coefficient for arrays     |
+| `calculateIsbnSimilarity()`      | ISBN matching with normalization   |
+| `calculateDateSimilarity()`      | Publication date comparison        |
+| `calculatePublisherSimilarity()` | Publisher name matching            |
+| `calculateSeriesSimilarity()`    | Series name and volume matching    |
 
 #### Field Constants
+
 Centralized in `fields.ts`:
 
 ```typescript
 export const METADATA_FIELDS = [
-  'title', 'authors', 'isbn', 'publicationDate', 'subjects',
-  'description', 'language', 'publisher', 'series', 'identifiers',
-  'physicalDescription', 'coverImage', 'work', 'edition', 'relatedWorks',
+  'title',
+  'authors',
+  'isbn',
+  'publicationDate',
+  'subjects',
+  'description',
+  'language',
+  'publisher',
+  'series',
+  'identifiers',
+  'physicalDescription',
+  'coverImage',
+  'work',
+  'edition',
+  'relatedWorks',
 ] as const;
 
 export const CORE_FIELDS = ['title', 'authors', 'isbn', 'publicationDate'];
 
 export const DUPLICATE_FIELD_WEIGHTS = {
-  title: 0.3, authors: 0.25, isbn: 0.2,
-  publicationDate: 0.1, publisher: 0.05, series: 0.1,
+  title: 0.3,
+  authors: 0.25,
+  isbn: 0.2,
+  publicationDate: 0.1,
+  publisher: 0.05,
+  series: 0.1,
 };
 ```
 
@@ -258,18 +297,18 @@ export const DUPLICATE_FIELD_WEIGHTS = {
 
 Each reconciler handles a specific metadata domain with specialized logic:
 
-| Reconciler | File | Purpose | Key Features |
-|------------|------|---------|--------------|
-| `DateReconciler` | dates.ts | Publication dates | Handles partial dates, circa dates, date ranges |
-| `PublisherReconciler` | publishers.ts | Publisher names | Normalizes imprints, corporate suffixes (~25 major publishers) |
-| `PlaceReconciler` | places.ts | Publication places | City/country normalization |
-| `PublicationReconciler` | publication.ts | Combined pub info | Orchestrates date, publisher, place reconciliation |
-| `SubjectReconciler` | subjects.ts | Subjects/genres | Dewey mapping (80 classifications), deduplication |
-| `IdentifierReconciler` | identifiers.ts | ISBNs, DOIs, etc. | Validates ISBN/OCLC/LCCN/DOI/Goodreads/Amazon/Google |
-| `PhysicalReconciler` | physical.ts | Physical description | Page count, dimensions, format, language codes |
-| `ContentReconciler` | content.ts | Description, TOC | Quality scoring, description merging, cover selection |
-| `SeriesReconciler` | series.ts | Series information | Pattern matching, volume normalization |
-| `WorkReconciler` | works.ts | Work/edition clustering | Groups editions under works |
+| Reconciler              | File           | Purpose                 | Key Features                                                   |
+| ----------------------- | -------------- | ----------------------- | -------------------------------------------------------------- |
+| `DateReconciler`        | dates.ts       | Publication dates       | Handles partial dates, circa dates, date ranges                |
+| `PublisherReconciler`   | publishers.ts  | Publisher names         | Normalizes imprints, corporate suffixes (~25 major publishers) |
+| `PlaceReconciler`       | places.ts      | Publication places      | City/country normalization                                     |
+| `PublicationReconciler` | publication.ts | Combined pub info       | Orchestrates date, publisher, place reconciliation             |
+| `SubjectReconciler`     | subjects.ts    | Subjects/genres         | Dewey mapping (80 classifications), deduplication              |
+| `IdentifierReconciler`  | identifiers.ts | ISBNs, DOIs, etc.       | Validates ISBN/OCLC/LCCN/DOI/Goodreads/Amazon/Google           |
+| `PhysicalReconciler`    | physical.ts    | Physical description    | Page count, dimensions, format, language codes                 |
+| `ContentReconciler`     | content.ts     | Description, TOC        | Quality scoring, description merging, cover selection          |
+| `SeriesReconciler`      | series.ts      | Series information      | Pattern matching, volume normalization                         |
+| `WorkReconciler`        | works.ts       | Work/edition clustering | Groups editions under works                                    |
 
 ### Conflict Detection
 
@@ -283,6 +322,7 @@ const result = detector.detectConflicts(preview);
 ```
 
 Conflict types (8 total):
+
 - `value_mismatch` - Different values for same field
 - `format_difference` - Same data, different format
 - `precision_difference` - Different levels of detail
@@ -293,12 +333,14 @@ Conflict types (8 total):
 - `normalization_conflict` - Normalization produces different results
 
 Severity levels (4 total):
+
 - `critical` - Core fields (title, authors, ISBN)
 - `major` - Important fields needing attention
 - `minor` - Less important discrepancies
 - `informational` - FYI-level differences
 
 Each conflict includes:
+
 - Impact assessment with affected areas
 - Auto-resolvable vs manual review categorization
 - Grouping by severity, type, and field
@@ -314,6 +356,7 @@ const strategies = builder.buildStrategies(originalQuery);
 ```
 
 Fallback rules (8 total, applied sequentially):
+
 1. Enable fuzzy matching
 2. Remove language constraint
 3. Broaden author search (keep primary only)
@@ -341,16 +384,16 @@ Fallback rules (8 total, applied sequentially):
 ### Phase 1: Search Integration UI
 
 1. Add metadata search to edition create/edit:
-    - Search by title + author
-    - Search by ISBN
-    - Display results from all providers
-    - Show confidence scores per result
+   - Search by title + author
+   - Search by ISBN
+   - Display results from all providers
+   - Show confidence scores per result
 
 2. Result preview card showing:
-    - Title, authors, publisher
-    - Cover image
-    - Source provider
-    - Confidence indicator
+   - Title, authors, publisher
+   - Cover image
+   - Source provider
+   - Confidence indicator
 
 ### Phase 2: Manual Selection Interface
 
@@ -362,6 +405,7 @@ Fallback rules (8 total, applied sequentially):
 ### Phase 3: Tiered Search Phases
 
 1. Implement sequential search strategy:
+
    ```typescript
    const searchPhases = [
      { fields: ['isbn'], minResults: 1 },
@@ -377,23 +421,23 @@ Fallback rules (8 total, applied sequentially):
 ### Phase 4: Instance Configuration
 
 1. Admin UI for provider settings:
-    - Enable/disable providers
-    - Adjust priority order
-    - Configure rate limits
-    - API key management (if needed)
+   - Enable/disable providers
+   - Adjust priority order
+   - Configure rate limits
+   - API key management (if needed)
 
 2. Per-user provider preferences (optional)
 
 ### Phase 5: Quality Feedback System
 
 1. Allow users to rate result quality:
-    - Correct / Mostly correct / Incorrect
-    - Flag specific field errors
+   - Correct / Mostly correct / Incorrect
+   - Flag specific field errors
 
 2. Collect anonymized telemetry:
-    - Provider accuracy per field type
-    - Search success rates
-    - Common failure patterns
+   - Provider accuracy per field type
+   - Search success rates
+   - Common failure patterns
 
 3. Use feedback to adjust confidence weights
 
@@ -406,22 +450,22 @@ Fallback rules (8 total, applied sequentially):
 
 ## Provider Priority Defaults
 
-| Provider            | Priority | Strength                    | Weakness                  | Auth Required |
-|---------------------|----------|-----------------------------|---------------------------|---------------|
-| Library of Congress | 85       | Authority data, MARC        | Older books               | No            |
-| WikiData            | 85       | Structured data, linked     | Coverage varies           | No            |
-| DNB                 | 80       | German publications         | German-focused            | No            |
-| BNB                 | 80       | British publications        | UK-focused                | No            |
-| OpenLibrary         | 80       | Coverage, covers            | Data quality varies       | No            |
-| Google Books        | 75       | Coverage, previews          | Rate limits               | Optional      |
-| Internet Archive    | 75       | Public domain, historical   | Limited modern books      | No            |
-| CrossRef            | 70       | Academic works, DOIs        | Non-academic limited      | No            |
-| DOAB                | 70       | Open access academic        | Academic only             | No            |
-| ISNI                | 70       | Author identification       | No book metadata          | No            |
-| VIAF                | 60       | Author clustering           | No book data              | No            |
-| Springer Nature     | 60       | Academic, scientific        | Academic only             | Yes           |
-| ISBNdb              | 50       | ISBN coverage               | Subscription required     | Yes           |
-| Amazon PAAPI        | 50       | Commercial data             | Strict rate limits        | Yes           |
+| Provider            | Priority | Strength                  | Weakness              | Auth Required |
+| ------------------- | -------- | ------------------------- | --------------------- | ------------- |
+| Library of Congress | 85       | Authority data, MARC      | Older books           | No            |
+| WikiData            | 85       | Structured data, linked   | Coverage varies       | No            |
+| DNB                 | 80       | German publications       | German-focused        | No            |
+| BNB                 | 80       | British publications      | UK-focused            | No            |
+| OpenLibrary         | 80       | Coverage, covers          | Data quality varies   | No            |
+| Google Books        | 75       | Coverage, previews        | Rate limits           | Optional      |
+| Internet Archive    | 75       | Public domain, historical | Limited modern books  | No            |
+| CrossRef            | 70       | Academic works, DOIs      | Non-academic limited  | No            |
+| DOAB                | 70       | Open access academic      | Academic only         | No            |
+| ISNI                | 70       | Author identification     | No book metadata      | No            |
+| VIAF                | 60       | Author clustering         | No book data          | No            |
+| Springer Nature     | 60       | Academic, scientific      | Academic only         | Yes           |
+| ISBNdb              | 50       | ISBN coverage             | Subscription required | Yes           |
+| Amazon PAAPI        | 50       | Commercial data           | Strict rate limits    | Yes           |
 
 ## Open Questions
 

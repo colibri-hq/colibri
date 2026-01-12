@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#151](https://github.com/colibri-hq/colibri/issues/151)
+
 # Publisher Management
 
 ## Description
@@ -27,28 +29,28 @@ exist in the schema but have minimal UI exposure.
 ### Phase 1: Publisher Browse UI
 
 1. Create `/publishers` route:
-    - Alphabetical listing
-    - Search by name
-    - Work count display
-    - Popular publishers section
+   - Alphabetical listing
+   - Search by name
+   - Work count display
+   - Popular publishers section
 
 ### Phase 2: Publisher Detail Page
 
 1. Enhance `/publishers/[id]`:
-    - Publisher logo/image
-    - Description
-    - Website and Wikipedia links
-    - All works by this publisher
-    - Recent releases
+   - Publisher logo/image
+   - Description
+   - Website and Wikipedia links
+   - All works by this publisher
+   - Recent releases
 
 ### Phase 3: Publisher CRUD UI
 
 1. Create publisher form:
-    - Name
-    - Description
-    - Logo upload
-    - Website URL
-    - Wikipedia link
+   - Name
+   - Description
+   - Logo upload
+   - Website URL
+   - Wikipedia link
 
 2. Edit existing publisher
 

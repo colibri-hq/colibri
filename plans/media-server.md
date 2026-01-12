@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#141](https://github.com/colibri-hq/colibri/issues/141)
+
 # Media Server (OPDS & DLNA)
 
 ## Description
@@ -21,23 +23,23 @@ e-readers (via OPDS), media players (via DLNA/UPnP), and other compatible applic
 ### Phase 1: Enhanced OPDS Server
 
 1. Complete OPDS 1.2 implementation:
-    - Navigation feeds
-    - Acquisition feeds
-    - Search feeds (OpenSearch)
-    - Faceted navigation
+   - Navigation feeds
+   - Acquisition feeds
+   - Search feeds (OpenSearch)
+   - Faceted navigation
 
 2. OPDS 2.0 support:
-    - JSON-based format
-    - Better metadata
-    - Publication manifests
+   - JSON-based format
+   - Better metadata
+   - Publication manifests
 
 3. Feed types:
-    - `/opds` - Root catalog
-    - `/opds/new` - Recently added
-    - `/opds/popular` - Most read
-    - `/opds/authors` - Browse by author
-    - `/opds/series` - Browse by series
-    - `/opds/search` - Search endpoint
+   - `/opds` - Root catalog
+   - `/opds/new` - Recently added
+   - `/opds/popular` - Most read
+   - `/opds/authors` - Browse by author
+   - `/opds/series` - Browse by series
+   - `/opds/search` - Search endpoint
 
 ### Phase 2: OPDS Authentication
 
@@ -50,32 +52,32 @@ e-readers (via OPDS), media players (via DLNA/UPnP), and other compatible applic
 
 1. Implement UPnP device description
 2. Content Directory Service (CDS):
-    - Browse/search media
-    - Return metadata
-    - Provide streaming URLs
+   - Browse/search media
+   - Return metadata
+   - Provide streaming URLs
 
 3. Audio streaming for audiobooks:
-    - Support range requests
-    - DLNA-compliant transcoding (optional)
+   - Support range requests
+   - DLNA-compliant transcoding (optional)
 
 ### Phase 4: Protocol Selection
 
 1. Auto-discovery:
-    - SSDP for DLNA
-    - DNS-SD for OPDS
+   - SSDP for DLNA
+   - DNS-SD for OPDS
 
 2. Configuration options:
-    - Enable/disable each protocol
-    - Port configuration
-    - Network interface binding
+   - Enable/disable each protocol
+   - Port configuration
+   - Network interface binding
 
 ### Phase 5: E-Reader Compatibility
 
 1. Test with popular devices:
-    - Kindle (may need Calibre-style workarounds)
-    - Kobo
-    - PocketBook
-    - Tolino
+   - Kindle (may need Calibre-style workarounds)
+   - Kobo
+   - PocketBook
+   - Tolino
 
 2. Device-specific quirks handling
 
@@ -110,9 +112,9 @@ e-readers (via OPDS), media players (via DLNA/UPnP), and other compatible applic
 ## Protocol Comparison
 
 | Feature    | OPDS            | DLNA/UPnP     |
-|------------|-----------------|---------------|
-| Ebooks     | ✅ Primary       | ❌             |
-| Audiobooks | ⚠️ Limited      | ✅ Primary     |
+| ---------- | --------------- | ------------- |
+| Ebooks     | ✅ Primary      | ❌            |
+| Audiobooks | ⚠️ Limited      | ✅ Primary    |
 | Discovery  | Manual URL      | Auto (SSDP)   |
 | Auth       | Basic/OAuth     | None/Custom   |
 | Clients    | E-readers, apps | Media players |
@@ -120,14 +122,14 @@ e-readers (via OPDS), media players (via DLNA/UPnP), and other compatible applic
 ## Compatibility Matrix
 
 | Device/App   | OPDS | DLNA |
-|--------------|------|------|
-| Kobo         | ✅    | ❌    |
-| PocketBook   | ✅    | ❌    |
-| Moon+ Reader | ✅    | ❌    |
-| KOReader     | ✅    | ❌    |
-| VLC          | ❌    | ✅    |
-| Kodi         | ❌    | ✅    |
-| Sonos        | ❌    | ✅    |
+| ------------ | ---- | ---- |
+| Kobo         | ✅   | ❌   |
+| PocketBook   | ✅   | ❌   |
+| Moon+ Reader | ✅   | ❌   |
+| KOReader     | ✅   | ❌   |
+| VLC          | ❌   | ✅   |
+| Kodi         | ❌   | ✅   |
+| Sonos        | ❌   | ✅   |
 
 ## Open Questions
 

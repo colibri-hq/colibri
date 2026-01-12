@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#111](https://github.com/colibri-hq/colibri/issues/111)
+
 # Accessibility Settings
 
 ## Description
@@ -34,22 +36,23 @@ settings.
 ### Phase 2: CSS Custom Properties
 
 1. Create accessibility CSS layer:
+
    ```css
-   :root[data-reduced-motion="reduce"] {
+   :root[data-reduced-motion='reduce'] {
      --transition-duration: 0.01ms;
      --animation-duration: 0.01ms;
    }
 
-   :root[data-contrast="more"] {
+   :root[data-contrast='more'] {
      --color-contrast-multiplier: 1.5;
      --border-width: 2px;
    }
 
-   :root[data-font-size-adjust="2"] {
+   :root[data-font-size-adjust='2'] {
      --font-size-base: 1.25rem;
    }
 
-   :root[data-dyslexia-font="true"] {
+   :root[data-dyslexia-font='true'] {
      --font-family-body: 'OpenDyslexic', sans-serif;
    }
    ```
@@ -59,11 +62,11 @@ settings.
 ### Phase 3: Settings UI
 
 1. Create accessibility settings panel:
-    - Motion preference toggle
-    - Contrast mode selector
-    - Font size slider
-    - Dyslexia-friendly font toggle
-    - Preview of changes
+   - Motion preference toggle
+   - Contrast mode selector
+   - Font size slider
+   - Dyslexia-friendly font toggle
+   - Preview of changes
 
 2. "Use system settings" option for each
 
@@ -92,7 +95,7 @@ settings.
 ## Accessibility Preferences
 
 | Setting       | Values                            | CSS Target             |
-|---------------|-----------------------------------|------------------------|
+| ------------- | --------------------------------- | ---------------------- |
 | Motion        | system, reduce, no-preference     | prefers-reduced-motion |
 | Contrast      | system, more, less, no-preference | prefers-contrast       |
 | Color Scheme  | system, light, dark               | prefers-color-scheme   |

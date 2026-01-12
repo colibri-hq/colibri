@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#134](https://github.com/colibri-hq/colibri/issues/134)
+
 # Import Flow Completion
 
 ## Description
@@ -83,6 +85,7 @@ gaps between the existing upload infrastructure and the metadata/normalization s
 Store pending duplicate confirmations in the database instead of memory.
 
 1. Add `pending_ingestion` table:
+
    ```sql
    CREATE TABLE pending_ingestion (
      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -102,6 +105,7 @@ Store pending duplicate confirmations in the database instead of memory.
 4. Add cleanup job for expired pending ingestions
 
 **Files:**
+
 - `supabase/schemas/XX_pending_ingestion.sql` - NEW
 - `packages/sdk/src/ingestion/index.ts` - Modify
 - `packages/sdk/src/resources/pending-ingestion.ts` - NEW
@@ -111,6 +115,7 @@ Store pending duplicate confirmations in the database instead of memory.
 Prevent duplicate creator records through fuzzy matching.
 
 1. Add name normalization function:
+
    ```typescript
    function normalizeCreatorName(name: string): string {
      // "Rowling, J.K." → "jk rowling"
@@ -120,12 +125,13 @@ Prevent duplicate creator records through fuzzy matching.
    ```
 
 2. Add creator matching function using `pg_trgm`:
+
    ```typescript
    async function findSimilarCreators(
      database: Database,
      name: string,
-     threshold: number = 0.7
-   ): Promise<Array<{ creator: Creator; similarity: number }>>
+     threshold: number = 0.7,
+   ): Promise<Array<{ creator: Creator; similarity: number }>>;
    ```
 
 3. Update `findOrCreateCreator()` to:
@@ -138,6 +144,7 @@ Prevent duplicate creator records through fuzzy matching.
 4. Add `alias_of` column to creators table for linking alternate spellings
 
 **Files:**
+
 - `packages/sdk/src/resources/creator.ts` - Modify
 - `packages/sdk/src/ingestion/normalize.ts` - NEW
 - `supabase/schemas/09_creators.sql` - Add `alias_of` column
@@ -154,6 +161,7 @@ Similar to creator normalization.
 3. Add `parent_publisher_id` for imprint hierarchy
 
 **Files:**
+
 - `packages/sdk/src/resources/publisher.ts` - Modify
 - `packages/sdk/src/ingestion/normalize.ts` - Extend
 - `supabase/schemas/12_publishers.sql` - Add `parent_publisher_id`
@@ -163,6 +171,7 @@ Similar to creator normalization.
 Extract and link series information from EPUB metadata.
 
 1. Parse series metadata from EPUB:
+
    ```typescript
    // Calibre-style: calibre:series, calibre:series_index
    // EPUB 3: belongs-to-collection with collection-type="series"
@@ -174,6 +183,7 @@ Extract and link series information from EPUB metadata.
 4. Handle series position (support decimals for novellas)
 
 **Files:**
+
 - `packages/sdk/src/ebooks/epub.ts` - Add series extraction
 - `packages/sdk/src/resources/series.ts` - NEW (basic CRUD)
 - `packages/sdk/src/ingestion/index.ts` - Add series linking
@@ -192,6 +202,7 @@ Parse and normalize subject headings from ebook metadata.
 4. Handle BISAC and LCSH subject headings
 
 **Files:**
+
 - `packages/sdk/src/ebooks/epub.ts` - Add subject extraction
 - `packages/sdk/src/resources/tag.ts` - Add `findOrCreateTag()`
 - `packages/sdk/src/ingestion/index.ts` - Add tag linking
@@ -201,12 +212,13 @@ Parse and normalize subject headings from ebook metadata.
 Connect metadata providers to the import flow.
 
 1. After basic ingestion, trigger background enrichment:
+
    ```typescript
    async function enrichWorkMetadata(
      database: Database,
      workId: string,
-     options: EnrichmentOptions
-   ): Promise<EnrichmentResult>
+     options: EnrichmentOptions,
+   ): Promise<EnrichmentResult>;
    ```
 
 2. Search providers using ISBN/title/author
@@ -218,6 +230,7 @@ Connect metadata providers to the import flow.
 4. Update SSE to emit enrichment progress
 
 **Files:**
+
 - `packages/sdk/src/ingestion/enrich.ts` - NEW
 - `apps/app/src/lib/trpc/routes/books.ts` - Add enrichment trigger
 - `apps/app/src/lib/server/import-events.ts` - Add enrichment events
@@ -228,6 +241,7 @@ Connect creators/publishers to authority databases.
 
 1. During enrichment, lookup creator in VIAF/ISNI
 2. Store external IDs in `creator_identifiers` table:
+
    ```sql
    CREATE TABLE creator_identifiers (
      creator_id UUID REFERENCES creators(id),
@@ -240,6 +254,7 @@ Connect creators/publishers to authority databases.
 3. Similarly for publishers with Wikidata IDs
 
 **Files:**
+
 - `supabase/schemas/XX_external_identifiers.sql` - NEW
 - `packages/sdk/src/resources/creator.ts` - Add identifier methods
 - `packages/sdk/src/ingestion/enrich.ts` - Add identifier lookup
@@ -258,6 +273,7 @@ Add user-facing interface for reviewing enriched metadata.
 3. Batch enrichment for multiple works
 
 **Files:**
+
 - `apps/app/src/lib/components/Upload/EnrichmentModal.svelte` - NEW
 - `apps/app/src/lib/components/Upload/ImportSubscription.svelte` - Handle enrichment events
 - `apps/app/src/routes/(library)/works/[work=id]/+page.svelte` - Add "Enhance" button
@@ -279,6 +295,7 @@ Enhance cover image acquisition.
 3. User option to select from multiple sources
 
 **Files:**
+
 - `packages/sdk/src/ingestion/covers.ts` - NEW
 - `packages/sdk/src/metadata/open-library.ts` - Add cover fetch
 - `apps/app/src/lib/components/Upload/CoverSelector.svelte` - NEW
@@ -288,6 +305,7 @@ Enhance cover image acquisition.
 Proper language detection and normalization.
 
 1. Populate language reference table:
+
    ```sql
    INSERT INTO languages (code, name, native_name) VALUES
      ('eng', 'English', 'English'),
@@ -303,6 +321,7 @@ Proper language detection and normalization.
 3. ISO 639-1 to 639-3 conversion
 
 **Files:**
+
 - `supabase/seeds/languages.sql` - NEW
 - `packages/sdk/src/ingestion/language.ts` - NEW
 - `packages/shared/src/languages.ts` - Add conversion utilities
@@ -400,23 +419,23 @@ User drops file
 
 ## Files to Create/Modify
 
-| File | Action | Phase |
-|------|--------|-------|
-| `supabase/schemas/XX_pending_ingestion.sql` | NEW | 1 |
-| `packages/sdk/src/resources/pending-ingestion.ts` | NEW | 1 |
-| `packages/sdk/src/ingestion/normalize.ts` | NEW | 2-3 |
-| `packages/sdk/src/resources/creator.ts` | Modify | 2 |
-| `packages/sdk/src/resources/publisher.ts` | Modify | 3 |
-| `packages/sdk/src/resources/series.ts` | NEW | 4 |
-| `packages/sdk/src/ebooks/epub.ts` | Modify | 4-5 |
-| `packages/sdk/src/resources/tag.ts` | Modify | 5 |
-| `packages/sdk/src/ingestion/enrich.ts` | NEW | 6 |
-| `supabase/schemas/XX_external_identifiers.sql` | NEW | 7 |
-| `apps/app/src/lib/components/Upload/EnrichmentModal.svelte` | NEW | 8 |
-| `packages/sdk/src/ingestion/covers.ts` | NEW | 9 |
-| `apps/app/src/lib/components/Upload/CoverSelector.svelte` | NEW | 9 |
-| `packages/sdk/src/ingestion/language.ts` | NEW | 10 |
-| `supabase/seeds/languages.sql` | NEW | 10 |
+| File                                                        | Action | Phase |
+| ----------------------------------------------------------- | ------ | ----- |
+| `supabase/schemas/XX_pending_ingestion.sql`                 | NEW    | 1     |
+| `packages/sdk/src/resources/pending-ingestion.ts`           | NEW    | 1     |
+| `packages/sdk/src/ingestion/normalize.ts`                   | NEW    | 2-3   |
+| `packages/sdk/src/resources/creator.ts`                     | Modify | 2     |
+| `packages/sdk/src/resources/publisher.ts`                   | Modify | 3     |
+| `packages/sdk/src/resources/series.ts`                      | NEW    | 4     |
+| `packages/sdk/src/ebooks/epub.ts`                           | Modify | 4-5   |
+| `packages/sdk/src/resources/tag.ts`                         | Modify | 5     |
+| `packages/sdk/src/ingestion/enrich.ts`                      | NEW    | 6     |
+| `supabase/schemas/XX_external_identifiers.sql`              | NEW    | 7     |
+| `apps/app/src/lib/components/Upload/EnrichmentModal.svelte` | NEW    | 8     |
+| `packages/sdk/src/ingestion/covers.ts`                      | NEW    | 9     |
+| `apps/app/src/lib/components/Upload/CoverSelector.svelte`   | NEW    | 9     |
+| `packages/sdk/src/ingestion/language.ts`                    | NEW    | 10    |
+| `supabase/seeds/languages.sql`                              | NEW    | 10    |
 
 ## Testing Requirements
 

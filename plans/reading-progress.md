@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#153](https://github.com/colibri-hq/colibri/issues/153)
+
 # Reading Progress & Position Tracking
 
 ## Description
@@ -27,6 +29,7 @@ enables features like "Continue Reading" and cross-device sync.
 ### Phase 1: Database Schema
 
 1. Create reading progress tables:
+
    ```sql
    create table reading_progress (
      id uuid primary key default gen_random_uuid(),
@@ -81,12 +84,12 @@ enables features like "Continue Reading" and cross-device sync.
 
 1. Create `apps/app/src/lib/trpc/routes/progress.ts`:
    ```typescript
-   progress.get({ editionId })
-   progress.update({ editionId, position, percentage })
-   progress.startSession({ editionId })
-   progress.endSession({ sessionId, endPosition })
-   progress.getRecent({ limit })
-   progress.setStatus({ editionId, status })
+   progress.get({ editionId });
+   progress.update({ editionId, position, percentage });
+   progress.startSession({ editionId });
+   progress.endSession({ sessionId, endPosition });
+   progress.getRecent({ limit });
+   progress.setStatus({ editionId, status });
    ```
 
 ### Phase 4: Reader Integration
@@ -112,7 +115,7 @@ enables features like "Continue Reading" and cross-device sync.
 ## Position Types
 
 | Format    | Position Type | Example                 |
-|-----------|---------------|-------------------------|
+| --------- | ------------- | ----------------------- |
 | EPUB      | CFI           | `/6/4[chap01]!/4/2/1:0` |
 | PDF       | Page          | `42`                    |
 | MOBI      | Location      | `1234`                  |

@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#128](https://github.com/colibri-hq/colibri/issues/128)
+
 # Ebook Reader Application
 
 ## Description
@@ -43,33 +45,34 @@ of the application, enabling users to read their books directly in Colibri.
 ### Phase 2: EPUB Reader
 
 1. Integrate epub.js or build custom:
-    - Chapter loading and caching
-    - CFI-based navigation
-    - Page simulation or scroll mode
-    - Image and media handling
+   - Chapter loading and caching
+   - CFI-based navigation
+   - Page simulation or scroll mode
+   - Image and media handling
 
 2. Rendering options:
-    - Paginated (book-like)
-    - Scrolling (continuous)
-    - Responsive reflow
+   - Paginated (book-like)
+   - Scrolling (continuous)
+   - Responsive reflow
 
 ### Phase 3: PDF Reader
 
 1. PDF.js integration:
-    - Page rendering to canvas
-    - Zoom controls
-    - Page navigation
-    - Text selection
+   - Page rendering to canvas
+   - Zoom controls
+   - Page navigation
+   - Text selection
 
 ### Phase 4: Reader Settings
 
 1. Reading preferences:
+
    ```typescript
    type ReaderSettings = {
      theme: 'light' | 'sepia' | 'dark';
      fontFamily: string;
-     fontSize: number;        // 12-32
-     lineHeight: number;      // 1.2-2.0
+     fontSize: number; // 12-32
+     lineHeight: number; // 1.2-2.0
      margins: 'narrow' | 'medium' | 'wide';
      textAlign: 'left' | 'justify';
      displayMode: 'paginated' | 'scroll';
@@ -134,7 +137,7 @@ of the application, enabling users to read their books directly in Colibri.
 ## Keyboard Shortcuts
 
 | Key      | Action             |
-|----------|--------------------|
+| -------- | ------------------ |
 | ← / →    | Previous/next page |
 | Space    | Next page          |
 | Home/End | First/last page    |
@@ -146,7 +149,7 @@ of the application, enabling users to read their books directly in Colibri.
 ## Format Support
 
 | Format | Renderer         | Features |
-|--------|------------------|----------|
+| ------ | ---------------- | -------- |
 | EPUB 2 | Custom/epub.js   | Full     |
 | EPUB 3 | Custom/epub.js   | Full     |
 | PDF    | PDF.js           | Good     |

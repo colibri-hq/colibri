@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#161](https://github.com/colibri-hq/colibri/issues/161)
+
 # Testing Infrastructure
 
 ## Description
@@ -45,6 +47,7 @@ exist (452 test files), there's no unified strategy, coverage reporting, or E2E 
 ### Phase 2: Test Categories ✅ COMPLETED
 
 Test structure established:
+
 ```
 packages/sdk/src/
 ├── **/*.test.ts           # Unit tests (colocated with source)
@@ -59,30 +62,34 @@ apps/app/tests/
 ```
 
 Naming conventions:
+
 - `*.test.ts` - Unit tests (Vitest)
 - `*.spec.ts` - E2E/integration tests (Playwright)
 
 ### Phase 3: Unit Test Patterns ✅ COMPLETED
 
 Example: SDK resource function testing (`packages/sdk/src/resources/search.test.ts`):
-```typescript
-import { describe, it, expect } from "vitest";
-import { toTsQuery } from "./search";
 
-describe("toTsQuery", () => {
-  describe("basic functionality", () => {
-    it("converts single word to prefix search", () => {
-      expect(toTsQuery("hello")).toBe("hello:*");
+```typescript
+import { describe, it, expect } from 'vitest';
+import { toTsQuery } from './search';
+
+describe('toTsQuery', () => {
+  describe('basic functionality', () => {
+    it('converts single word to prefix search', () => {
+      expect(toTsQuery('hello')).toBe('hello:*');
     });
 
-    it("converts multiple words to AND prefix search", () => {
-      expect(toTsQuery("hello world")).toBe("hello:* & world:*");
+    it('converts multiple words to AND prefix search', () => {
+      expect(toTsQuery('hello world')).toBe('hello:* & world:*');
     });
   });
 
-  describe("edge cases", () => {
-    it("handles SQL injection attempts", () => {
-      expect(toTsQuery("'; DROP TABLE users;--")).toBe("DROP:* & TABLE:* & users:*");
+  describe('edge cases', () => {
+    it('handles SQL injection attempts', () => {
+      expect(toTsQuery("'; DROP TABLE users;--")).toBe(
+        'DROP:* & TABLE:* & users:*',
+      );
     });
   });
 });
@@ -91,9 +98,10 @@ describe("toTsQuery", () => {
 ### Phase 4: Integration Test Patterns ✅ COMPLETED
 
 Database test fixtures (`apps/app/tests/base.ts`):
+
 ```typescript
-import { type Database, initialize } from "@colibri-hq/sdk";
-import { test as base } from "@playwright/test";
+import { type Database, initialize } from '@colibri-hq/sdk';
+import { test as base } from '@playwright/test';
 
 export const test = base.extend<{ database: Database }>({
   async database(_context, use) {
@@ -106,19 +114,23 @@ export const test = base.extend<{ database: Database }>({
 ```
 
 Test data seeding (`apps/app/tests/database.setup.ts`):
+
 ```typescript
 // Export test IDs for cleanup
-export const TEST_WORK_IDS = ["900", "901", "902"];
-export const TEST_CREATOR_IDS = ["910", "911"];
+export const TEST_WORK_IDS = ['900', '901', '902'];
+export const TEST_CREATOR_IDS = ['910', '911'];
 
-setup("Seed the database", async () => {
+setup('Seed the database', async () => {
   await database.transaction().execute(async (trx) => {
     // Insert test data with onConflict for idempotency
-    await trx.insertInto("creator").values({
-      id: BigInt(TEST_CREATOR_IDS[0]),
-      name: "Brandon Sanderson",
-    }).onConflict((c) => c.column("id").doUpdateSet({ updated_at: new Date() }))
-    .execute();
+    await trx
+      .insertInto('creator')
+      .values({
+        id: BigInt(TEST_CREATOR_IDS[0]),
+        name: 'Brandon Sanderson',
+      })
+      .onConflict((c) => c.column('id').doUpdateSet({ updated_at: new Date() }))
+      .execute();
   });
 });
 ```
@@ -126,21 +138,25 @@ setup("Seed the database", async () => {
 ### Phase 5: E2E Test Strategy ✅ COMPLETED
 
 E2E API test pattern (`apps/app/tests/app/search.spec.ts`):
+
 ```typescript
-import { expect, type APIRequestContext } from "@playwright/test";
-import { test } from "../base";
+import { expect, type APIRequestContext } from '@playwright/test';
+import { test } from '../base';
 
 // Helper to call tRPC endpoint
-async function searchQuery(request: APIRequestContext, input: { query: string }) {
-  return request.post("/trpc/search.query", {
+async function searchQuery(
+  request: APIRequestContext,
+  input: { query: string },
+) {
+  return request.post('/trpc/search.query', {
     data: { json: input },
-    headers: { "Content-Type": "application/json" },
+    headers: { 'Content-Type': 'application/json' },
   });
 }
 
-test.describe("Search API - Basic Functionality", () => {
-  test("returns matching editions by title", async ({ request }) => {
-    const response = await searchQuery(request, { query: "Fantasy Quest" });
+test.describe('Search API - Basic Functionality', () => {
+  test('returns matching editions by title', async ({ request }) => {
+    const response = await searchQuery(request, { query: 'Fantasy Quest' });
     expect(response.ok()).toBe(true);
 
     const json = await response.json();
@@ -149,16 +165,17 @@ test.describe("Search API - Basic Functionality", () => {
   });
 });
 
-test.describe("Search API - Performance", () => {
-  test("responds within acceptable time", async ({ request }) => {
+test.describe('Search API - Performance', () => {
+  test('responds within acceptable time', async ({ request }) => {
     const start = Date.now();
-    await searchQuery(request, { query: "fantasy", limit: 20 });
+    await searchQuery(request, { query: 'fantasy', limit: 20 });
     expect(Date.now() - start).toBeLessThan(500);
   });
 });
 ```
 
 Test categories implemented:
+
 - Basic functionality (title, synopsis, entity type searches)
 - Filtering (type filters, limit)
 - Ranking (relevance ordering)
@@ -197,6 +214,7 @@ jobs:
 ```
 
 Required checks configured:
+
 - ✅ Lint (ESLint + Prettier)
 - ✅ Unit tests with coverage
 - ✅ E2E tests with PostgreSQL service
@@ -206,6 +224,7 @@ Required checks configured:
 ### Phase 7: Performance Testing
 
 1. Load testing with k6 or Artillery:
+
    ```javascript
    // k6 script
    export default function () {
@@ -215,13 +234,14 @@ Required checks configured:
    ```
 
 2. Performance budgets:
-    - API response time < 200ms
-    - Page load < 3s
-    - Bundle size limits
+   - API response time < 200ms
+   - Page load < 3s
+   - Bundle size limits
 
 ### Phase 8: Visual Regression
 
 1. Playwright visual comparisons:
+
    ```typescript
    test('book card matches snapshot', async ({ page }) => {
      await page.goto('/works');
@@ -234,7 +254,7 @@ Required checks configured:
 ## Coverage Goals
 
 | Package | Target |
-|---------|--------|
+| ------- | ------ |
 | SDK     | 80%    |
 | Shared  | 90%    |
 | OAuth   | 85%    |

@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#124](https://github.com/colibri-hq/colibri/issues/124)
+
 # Deployment & DevOps
 
 ## Description
@@ -28,20 +30,21 @@ running Colibri in production.
 ### Phase 1: Deployment Documentation
 
 1. Create deployment guide:
-    - Prerequisites
-    - Environment setup
-    - Database initialization
-    - S3/storage configuration
-    - First-run setup
+   - Prerequisites
+   - Environment setup
+   - Database initialization
+   - S3/storage configuration
+   - First-run setup
 
 2. Deployment options:
-    - Docker Compose (self-hosted)
-    - Kubernetes (scalable)
-    - Vercel/Netlify + Supabase (managed)
+   - Docker Compose (self-hosted)
+   - Kubernetes (scalable)
+   - Vercel/Netlify + Supabase (managed)
 
 ### Phase 2: Docker Production Configuration
 
 1. Multi-stage Dockerfiles:
+
    ```dockerfile
    # Build stage
    FROM node:20-alpine AS builder
@@ -59,15 +62,16 @@ running Colibri in production.
    ```
 
 2. Docker Compose production:
-    - App service
-    - PostgreSQL (or external Supabase)
-    - S3-compatible storage (MinIO)
-    - Redis (for caching/sessions)
-    - Caddy/Traefik for reverse proxy
+   - App service
+   - PostgreSQL (or external Supabase)
+   - S3-compatible storage (MinIO)
+   - Redis (for caching/sessions)
+   - Caddy/Traefik for reverse proxy
 
 ### Phase 3: CI/CD Pipeline
 
 1. GitHub Actions workflows:
+
    ```yaml
    # .github/workflows/deploy.yml
    name: Deploy
@@ -93,13 +97,14 @@ running Colibri in production.
    ```
 
 2. Environments:
-    - Development (PR previews)
-    - Staging (main branch)
-    - Production (tags/releases)
+   - Development (PR previews)
+   - Staging (main branch)
+   - Production (tags/releases)
 
 ### Phase 4: Database Management
 
 1. Migration strategy:
+
    ```bash
    # Apply migrations
    pnpm supabase db push
@@ -109,63 +114,63 @@ running Colibri in production.
    ```
 
 2. Backup procedures:
-    - Automated daily backups
-    - Point-in-time recovery
-    - Backup verification
-    - Restoration procedures
+   - Automated daily backups
+   - Point-in-time recovery
+   - Backup verification
+   - Restoration procedures
 
 ### Phase 5: Storage Configuration
 
 1. S3 bucket setup:
-    - Assets bucket (ebooks, covers)
-    - Backups bucket
-    - Lifecycle rules
-    - Access policies
+   - Assets bucket (ebooks, covers)
+   - Backups bucket
+   - Lifecycle rules
+   - Access policies
 
 2. CDN configuration (optional):
-    - CloudFront/Cloudflare
-    - Cache rules
-    - Custom domain
+   - CloudFront/Cloudflare
+   - Cache rules
+   - Custom domain
 
 ### Phase 6: Monitoring Setup
 
 1. Application monitoring:
-    - Uptime checks
-    - Error rate tracking
-    - Performance metrics
+   - Uptime checks
+   - Error rate tracking
+   - Performance metrics
 
 2. Infrastructure monitoring:
-    - Resource usage
-    - Database performance
-    - Storage capacity
+   - Resource usage
+   - Database performance
+   - Storage capacity
 
 3. Alerting:
-    - Service down alerts
-    - Error spike alerts
-    - Resource threshold alerts
+   - Service down alerts
+   - Error spike alerts
+   - Resource threshold alerts
 
 ### Phase 7: Scaling Strategy
 
 1. Horizontal scaling:
-    - Stateless app containers
-    - Load balancer configuration
-    - Session management (Redis)
+   - Stateless app containers
+   - Load balancer configuration
+   - Session management (Redis)
 
 2. Database scaling:
-    - Read replicas
-    - Connection pooling
-    - Query optimization
+   - Read replicas
+   - Connection pooling
+   - Query optimization
 
 ### Phase 8: Disaster Recovery
 
 1. Recovery procedures:
-    - Database restoration
-    - Storage recovery
-    - Configuration recovery
+   - Database restoration
+   - Storage recovery
+   - Configuration recovery
 
 2. Recovery time objectives:
-    - RTO: 4 hours
-    - RPO: 1 hour
+   - RTO: 4 hours
+   - RPO: 1 hour
 
 ## Infrastructure Diagram
 

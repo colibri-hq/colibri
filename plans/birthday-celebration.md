@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#119](https://github.com/colibri-hq/colibri/issues/119)
+
 # Birthday Celebration Animation
 
 ## Description
@@ -24,11 +26,14 @@ to the application, especially for children who would enjoy the surprise.
 ### Phase 1: Birthday Detection
 
 1. Create utility function to check if today is user's birthday:
+
    ```typescript
    function isBirthday(birthdate: Date): boolean {
      const today = new Date();
-     return birthdate.getMonth() === today.getMonth()
-         && birthdate.getDate() === today.getDate();
+     return (
+       birthdate.getMonth() === today.getMonth() &&
+       birthdate.getDate() === today.getDate()
+     );
    }
    ```
 
@@ -38,23 +43,23 @@ to the application, especially for children who would enjoy the surprise.
 ### Phase 2: Fireworks Animation
 
 1. Evaluate animation approaches:
-    - CSS-only animations
-    - Canvas-based (tsParticles, fireworks-js)
-    - Lottie animations
-    - SVG animations
+   - CSS-only animations
+   - Canvas-based (tsParticles, fireworks-js)
+   - Lottie animations
+   - SVG animations
 
 2. Implement fireworks component:
-    - Multiple burst points
-    - Colorful particle effects
-    - Sound effects (optional, respecting user preferences)
-    - Duration: 3-5 seconds
+   - Multiple burst points
+   - Colorful particle effects
+   - Sound effects (optional, respecting user preferences)
+   - Duration: 3-5 seconds
 
 ### Phase 3: Birthday Message
 
 1. Personalized greeting modal/toast:
-    - "Happy Birthday, [Name]! 🎂"
-    - Age display (optional, if birthdate includes year)
-    - Custom message based on age tier
+   - "Happy Birthday, [Name]! 🎂"
+   - Age display (optional, if birthdate includes year)
+   - Custom message based on age tier
 
 2. Birthday badge/indicator in UI for the day
 
@@ -67,7 +72,7 @@ to the application, especially for children who would enjoy the surprise.
 ## Animation Options Comparison
 
 | Option        | Pros                         | Cons                 |
-|---------------|------------------------------|----------------------|
+| ------------- | ---------------------------- | -------------------- |
 | CSS-only      | No dependencies, lightweight | Limited effects      |
 | tsParticles   | Feature-rich, customizable   | Bundle size (~50KB)  |
 | Lottie        | Designer-friendly, smooth    | Requires JSON assets |

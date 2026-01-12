@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#123](https://github.com/colibri-hq/colibri/issues/123)
+
 # Custom Fields Support
 
 ## Description
@@ -25,6 +27,7 @@ reading level, condition, purchase date, location).
 ### Phase 1: Schema Design
 
 1. Create custom field definitions table:
+
    ```sql
    CREATE TABLE custom_field (
      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -57,6 +60,7 @@ reading level, condition, purchase date, location).
 ### Phase 2: Field Type System
 
 1. Implement field types:
+
    ```typescript
    type FieldType =
      | { type: 'text'; maxLength?: number }
@@ -101,7 +105,7 @@ reading level, condition, purchase date, location).
 ## Field Type Examples
 
 | Type    | Use Case                 | Storage    |
-|---------|--------------------------|------------|
+| ------- | ------------------------ | ---------- |
 | text    | Notes, location          | string     |
 | number  | Rating, price            | number     |
 | date    | Purchase date, read date | ISO string |

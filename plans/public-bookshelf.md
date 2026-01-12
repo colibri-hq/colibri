@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#150](https://github.com/colibri-hq/colibri/issues/150)
+
 # Public Bookshelf & Visibility Controls
 
 ## Description
@@ -57,6 +59,7 @@ publishing and modifying their shelf. In the shelf settings, they can also disab
 ### Phase 1: Schema Updates
 
 1. Add `handle` column to user table for public URLs:
+
    ```sql
    alter table "user"
      add column handle text unique;
@@ -67,6 +70,7 @@ publishing and modifying their shelf. In the shelf settings, they can also disab
    ```
 
 2. Add `visibility` enum to work table:
+
    ```sql
    create type visibility as enum ('private', 'default', 'public');
 
@@ -75,6 +79,7 @@ publishing and modifying their shelf. In the shelf settings, they can also disab
    ```
 
 3. Add instance and user settings:
+
    ```sql
    -- Instance-level toggle
    insert into setting (key, value)
@@ -88,6 +93,7 @@ publishing and modifying their shelf. In the shelf settings, they can also disab
 ### Phase 2: Access Control Updates
 
 1. Update Kysely query helpers:
+
    ```typescript
    function applyVisibility(query, viewerId, ownerId, isPublicRequest) {
      if (isPublicRequest) {
@@ -96,13 +102,15 @@ publishing and modifying their shelf. In the shelf settings, they can also disab
          .where('visibility', '=', 'public')
          .where('owner.public_shelf_enabled', '=', true);
      }
-     return query.where(eb => eb.or([
-       eb('created_by', '=', viewerId), // Owner sees all
-       eb.and([
-         eb('visibility', '!=', 'private'),
-         eb('created_by', 'in', familyUserIds) // Family sees default + public
-       ])
-     ]));
+     return query.where((eb) =>
+       eb.or([
+         eb('created_by', '=', viewerId), // Owner sees all
+         eb.and([
+           eb('visibility', '!=', 'private'),
+           eb('created_by', 'in', familyUserIds), // Family sees default + public
+         ]),
+       ]),
+     );
    }
    ```
 
@@ -119,6 +127,7 @@ publishing and modifying their shelf. In the shelf settings, they can also disab
 ### Phase 4: Public Shelf Routes
 
 1. Create route group for `/~[handle]`:
+
    ```
    /~[handle]              → Public shelf landing page
    /~[handle]/[work]       → Public book detail page
@@ -161,13 +170,13 @@ publishing and modifying their shelf. In the shelf settings, they can also disab
 
 ## Visibility Matrix
 
-| Visibility | Owner  | Family   | Anonymous         |
-|------------|--------|----------|-------------------|
-| Private    | ✅ Full | ❌ Hidden | ❌ Hidden          |
-| Default    | ✅ Full | ✅ View   | ❌ Hidden          |
-| Public     | ✅ Full | ✅ View   | ✅ View*           |
+| Visibility | Owner   | Family    | Anonymous |
+| ---------- | ------- | --------- | --------- |
+| Private    | ✅ Full | ❌ Hidden | ❌ Hidden |
+| Default    | ✅ Full | ✅ View   | ❌ Hidden |
+| Public     | ✅ Full | ✅ View   | ✅ View\* |
 
-*Requires: instance `public_shelves_enabled` = true AND user `public_shelf_enabled` = true
+\*Requires: instance `public_shelves_enabled` = true AND user `public_shelf_enabled` = true
 
 ## Open Questions
 

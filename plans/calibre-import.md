@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#120](https://github.com/colibri-hq/colibri/issues/120)
+
 # Calibre Library Import
 
 ## Description
@@ -26,6 +28,7 @@ drag-and-drop of Calibre book folders.
 ### Phase 1: Calibre Database Parser
 
 1. Create Calibre SQLite schema parser:
+
    ```typescript
    // packages/sdk/src/import/calibre.ts
    type CalibreBook = {
@@ -45,13 +48,13 @@ drag-and-drop of Calibre book folders.
    ```
 
 2. Map Calibre schema to Colibri entities:
-    - `books` → `work` + `edition`
-    - `authors` → `creator`
-    - `publishers` → `publisher`
-    - `series` → `series`
-    - `tags` → `tag`
-    - `identifiers` → edition identifiers
-    - `data` (formats) → `asset`
+   - `books` → `work` + `edition`
+   - `authors` → `creator`
+   - `publishers` → `publisher`
+   - `series` → `series`
+   - `tags` → `tag`
+   - `identifiers` → edition identifiers
+   - `data` (formats) → `asset`
 
 ### Phase 2: Web UI Import Wizard
 
@@ -86,6 +89,7 @@ drag-and-drop of Calibre book folders.
 ### Phase 5: CLI Import Command
 
 1. Add CLI command:
+
    ```bash
    colibri import calibre --database /path/to/metadata.db
    colibri import calibre --folder /path/to/Calibre\ Library
@@ -93,10 +97,10 @@ drag-and-drop of Calibre book folders.
    ```
 
 2. Options:
-    - `--dry-run` - Preview without importing
-    - `--skip-duplicates` - Skip books already in library
-    - `--collection` - Import into specific collection
-    - `--user` - Assign to specific user
+   - `--dry-run` - Preview without importing
+   - `--skip-duplicates` - Skip books already in library
+   - `--collection` - Import into specific collection
+   - `--user` - Assign to specific user
 
 ### Phase 6: Calibre Plugin (Optional)
 

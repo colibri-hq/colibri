@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#160](https://github.com/colibri-hq/colibri/issues/160)
+
 # Tags & Taxonomy System
 
 ## Description
@@ -60,25 +62,25 @@ user-defined labels. The database schema exists but lacks SDK resources, API, an
 ### Phase 3: Tag Input Component
 
 1. Create TagInput component:
-    - Autocomplete with existing tags
-    - Create new tags inline
-    - Display as removable chips
-    - Keyboard navigation
+   - Autocomplete with existing tags
+   - Create new tags inline
+   - Display as removable chips
+   - Keyboard navigation
 
 2. Integrate into work edit form
 
 ### Phase 4: Tag Browse UI
 
 1. Create `/tags` route:
-    - Tag cloud visualization
-    - Alphabetical listing
-    - Popular tags section
-    - Tag search
+   - Tag cloud visualization
+   - Alphabetical listing
+   - Popular tags section
+   - Tag search
 
 2. Create `/tags/[tag]` route:
-    - Tag description
-    - All works with this tag
-    - Related tags
+   - Tag description
+   - All works with this tag
+   - Related tags
 
 ### Phase 5: Tag Filtering
 
@@ -103,7 +105,7 @@ user-defined labels. The database schema exists but lacks SDK resources, API, an
 ## Tag Types
 
 | Type    | Examples                     | Source        |
-|---------|------------------------------|---------------|
+| ------- | ---------------------------- | ------------- |
 | Genre   | Fiction, Mystery, Romance    | User/Metadata |
 | Subject | History, Science, Philosophy | Metadata      |
 | Theme   | Coming of age, Revenge       | User          |

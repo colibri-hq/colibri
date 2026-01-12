@@ -1,18 +1,26 @@
+> **GitHub Issue:** [#115](https://github.com/colibri-hq/colibri/issues/115)
+
 # API Keys / App Passwords
 
 ## Description
 
 Allow users to create API keys (app passwords) for authenticating devices and applications that don't support OAuth or
-Passkey authentication. These keys can be used with Basic Auth for programmatic access to the API, e-readers, and other
-integrations.
+Passkey authentication. These keys can be used with Basic or Bearer Auth for programmatic access to the API, e-readers,
+and other integrations.
 
 ## Current Implementation Status
 
-**Not Implemented:**
+**Implemented:**
 
-- ❌ No API key generation
-- ❌ No app password storage
-- ❌ No Basic Auth support in API
+- ✅ API key database schema with expiration, scopes, rotation tracking
+- ✅ Secure key generation (SHA-256 hashing, cryptographically secure random)
+- ✅ Key management SDK functions (create, list, revoke, rotate, validate)
+- ✅ Scope system with hierarchical inheritance (`admin` → all, `write` → `read`)
+- ✅ tRPC routes for key management
+- ✅ Settings UI with key creation modal
+- ✅ Key rotation with 15-minute grace period
+- ✅ Unified API authentication (Basic Auth + Bearer Token + Session)
+- ✅ RLS policies for api_key table
 
 **Existing Infrastructure:**
 
@@ -20,130 +28,151 @@ integrations.
 - ✅ Access token and refresh token tables
 - ✅ WebAuthn for interactive authentication
 
-## Implementation Plan
+**Future Enhancements:**
 
-### Phase 1: API Key Schema
+- ⚠️ Rate limiting (removed for now, can be re-added when needed)
+- ⚠️ Background job for cleanup (expired keys, grace periods)
 
-1. Create api_key table:
-   ```sql
-   CREATE TABLE authentication.api_key (
-     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-     user_id UUID NOT NULL REFERENCES authentication.user(id),
-     name VARCHAR(100) NOT NULL,
-     key_hash VARCHAR(255) NOT NULL, -- bcrypt or argon2
-     key_prefix VARCHAR(8) NOT NULL, -- For identification: "col_xxxx"
-     scopes TEXT[], -- Optional scope restrictions
-     last_used_at TIMESTAMPTZ,
-     last_used_ip INET,
-     expires_at TIMESTAMPTZ, -- Optional expiration
-     created_at TIMESTAMPTZ DEFAULT now(),
-     revoked_at TIMESTAMPTZ
-   );
-   ```
+## Implementation Phases
 
-### Phase 2: Key Generation
+### Phase 1: API Key Schema ✅ COMPLETE
 
-1. Generate secure random key:
-   ```typescript
-   function generateApiKey(): { key: string; hash: string; prefix: string } {
-     const key = `col_${generateRandomString(32)}`;
-     const hash = await hashPassword(key);
-     const prefix = key.substring(0, 8);
-     return { key, hash, prefix };
-   }
-   ```
+Database table created in `supabase/migrations/20260108120000_api_keys.sql`:
 
-2. Show key only once at creation
-3. Store only the hash
+- `id` (bigint, auto-increment primary key)
+- `user_id` (foreign key to user, cascade delete)
+- `name` (varchar 100, user-provided identifier)
+- `key_hash` (SHA-256 hash, plain text never stored)
+- `key_prefix` (first 12 chars for identification)
+- `scopes` (text array, empty = all scopes)
+- `last_used_at`, `last_used_ip` (usage tracking)
+- `expires_at`, `revoked_at` (lifecycle management)
+- `rotated_from_id`, `rotated_at` (rotation tracking)
 
-### Phase 3: Basic Auth Support
+### Phase 2: Key Generation ✅ COMPLETE
 
-1. Add Basic Auth middleware:
-   ```typescript
-   function authenticateBasicAuth(request: Request) {
-     const auth = request.headers.get('Authorization');
-     if (!auth?.startsWith('Basic ')) return null;
+Implemented in `packages/sdk/src/resources/authentication/api-key.ts`:
 
-     const [username, password] = decode(auth.slice(6)).split(':');
-     // username = user email or ID
-     // password = API key
+- Format: `col_` + 28 random alphanumeric characters (32 total)
+- SHA-256 hashing with timing-safe comparison
+- Plain text shown only once at creation
+- Prefix stored for UI identification
 
-     return validateApiKey(username, password);
-   }
-   ```
+### Phase 3: Basic Auth Support ✅ COMPLETE
 
-2. Apply to relevant API routes
-3. Rate limiting per API key
+Implemented in `apps/app/src/lib/server/api-auth.ts`:
 
-### Phase 4: Key Management UI
+- Unified authentication supporting Basic Auth, Bearer tokens, and session cookies
+- Username = user email, Password = API key
+- IP extraction for logging (`x-forwarded-for`, `x-real-ip`, `cf-connecting-ip`)
+- Integrated into all `/api/*` routes via hooks.server.ts
 
-1. Settings page for API keys
-2. Create new key flow:
-    - Enter name/description
-    - Select scopes (optional)
-    - Set expiration (optional)
-    - Display key once (with copy button)
+### Phase 4: Key Management UI ✅ COMPLETE
 
-3. List existing keys:
-    - Name, prefix, created date
-    - Last used date/IP
-    - Revoke button
+Settings page components in `apps/app/src/routes/(library)/instance/settings/`:
 
-### Phase 5: Scope Restrictions
+- `ApiKeysSettings.svelte` - List, rotate, revoke keys
+- `CreateApiKeyModal.svelte` - Create with name, scopes, expiration
+- Copy button with one-time key display
+- Usage instructions with curl example
 
-1. Define available scopes:
-    - `read:library` - Read book metadata
-    - `write:library` - Add/edit books
-    - `read:progress` - Read reading progress
-    - `write:progress` - Update reading progress
-    - `download` - Download ebook files
-    - `admin` - Admin operations
+### Phase 5: Scope Restrictions ✅ COMPLETE
 
-2. Enforce scopes in API middleware
+Scope registry in `packages/sdk/src/scopes/`:
 
-### Phase 6: Device Registration
+| Scope              | Description              | Category | Implies          |
+| ------------------ | ------------------------ | -------- | ---------------- |
+| `library:read`     | Read library books       | library  | -                |
+| `library:write`    | Add/edit/delete books    | library  | `library:read`   |
+| `library:download` | Download book files      | library  | `library:read`   |
+| `progress:read`    | Read reading progress    | progress | -                |
+| `progress:write`   | Update reading progress  | progress | `progress:read`  |
+| `instance:read`    | Read instance settings   | system   | (OAuth only)     |
+| `instance:write`   | Modify instance settings | system   | (OAuth only)     |
+| `admin`            | Full admin access        | admin    | All of the above |
 
-1. Optional: Link API key to device:
-   ```sql
-   ALTER TABLE authentication.api_key ADD COLUMN
-     device_name VARCHAR(100),
-     device_type VARCHAR(50), -- ereader, app, script
-     device_id VARCHAR(255);
-   ```
+Scope checking available via `hasRequiredScope()` in api-auth.ts. Individual routes can enforce scopes as needed.
 
-2. Show device info in management UI
+### Phase 6: Device Registration ❌ NOT IMPLEMENTED (DEFERRED)
 
-### Phase 7: Security Features
+Originally planned device tracking columns have been deferred. Can be added later if needed for OPDS e-reader
+integration.
 
-1. IP allowlist per key (optional)
-2. Key rotation support
-3. Automatic expiration reminders
-4. Usage analytics per key
+### Phase 7: Security Features ✅ MOSTLY COMPLETE
+
+**Completed:**
+
+- ✅ Key rotation with 15-minute grace period
+- ✅ RLS policies for api_key table (migration `20260110120000_api_keys_rls.sql`)
+- ✅ Removed overly permissive database grants (anon no longer has access)
+
+**Future Enhancements:**
+
+- IP allowlist per key (optional)
+- Background cleanup job for expired/rotated keys
+- Audit logging for key operations
+- Rate limiting (removed for now, can be re-added with Redis for multi-instance)
 
 ## API Key Format
 
 ```
 col_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-│   └── 32 random characters (alphanumeric)
+│   └── 28 random alphanumeric characters
 └── Prefix for identification
 ```
 
 ## Authentication Methods Summary
 
-| Method    | Use Case           | Supported        |
-|-----------|--------------------|------------------|
-| Passkey   | Browser, apps      | ✅                |
-| OAuth 2.0 | Third-party apps   | ✅                |
-| API Key   | Scripts, e-readers | ❌ (this feature) |
-| Session   | Browser (internal) | ✅                |
+| Method    | Use Case           | Supported |
+| --------- | ------------------ | --------- |
+| Passkey   | Browser, apps      | ✅        |
+| OAuth 2.0 | Third-party apps   | ✅        |
+| API Key   | Scripts, e-readers | ✅        |
+| Session   | Browser (internal) | ✅        |
 
-## Open Questions
+## Resolved Questions
 
-1. **Key Display**: Show key once, or allow re-display with password?
-2. **Rotation**: Support key rotation with grace period?
-3. **Default Scopes**: All scopes by default, or explicit selection?
-4. **Rate Limits**: Different limits per scope or key?
-5. **Expiration**: Require expiration, or allow permanent keys?
-6. **Revocation**: Immediate revocation, or grace period?
-7. **Username Format**: Email, user ID, or both for Basic Auth?
-8. **OPDS Integration**: Use API keys for OPDS feed authentication?
+1. **Key Display**: Show once, allow rotating to get a new key
+2. **Rotation**: 15-minute grace period for old key
+3. **Default Scopes**: All API-allowed scopes selected by default
+4. **Rate Limits**: Per-key (100 requests/minute default)
+5. **Expiration**: Optional, permanent keys allowed
+6. **Revocation**: Immediate (no grace period)
+7. **Username Format**: Email for Basic Auth
+8. **OPDS Integration**: API keys will work for OPDS access
+
+## Remaining Work
+
+### Future Enhancements
+
+1. **Background cleanup job** - Clean expired grace periods and auto-revoke expired keys
+2. **Audit logging** - Log create/rotate/revoke operations
+3. **Device registration** - Track which device uses which key
+4. **IP allowlist** - Restrict key usage to specific IPs
+5. **Rate limiting** - Re-add with Redis for multi-instance deployments
+6. **Scope editing** - Allow modifying scopes without rotation
+
+## File Locations
+
+```
+packages/sdk/src/
+├── resources/authentication/api-key.ts  # Core CRUD operations
+├── scopes/
+│   ├── index.ts                         # Public exports
+│   ├── registry.ts                      # Scope definitions
+│   └── service.ts                       # Scope utilities
+
+apps/app/src/
+├── lib/server/
+│   └── api-auth.ts                      # Unified API auth (Basic + Bearer + Session)
+├── lib/trpc/routes/api-keys.ts          # tRPC routes
+├── hooks.server.ts                      # API auth hook
+└── routes/(library)/instance/settings/
+    ├── ApiKeysSettings.svelte           # Settings UI
+    └── CreateApiKeyModal.svelte         # Creation modal
+
+supabase/migrations/
+├── 20260108120000_api_keys.sql          # Schema
+├── 20260109120000_rename_scopes.sql     # Scope name migration
+└── 20260110120000_api_keys_rls.sql      # RLS policies
+```

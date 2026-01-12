@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#116](https://github.com/colibri-hq/colibri/issues/116)
+
 # Asset Schema for Uploaded Book Files
 
 ## Description
@@ -23,6 +25,7 @@ PDF, etc.) with associated metadata like file size, checksums, format informatio
 ### Phase 1: Schema Enhancement
 
 1. Add columns to `asset` table:
+
    ```sql
    ALTER TABLE asset ADD COLUMN
      format VARCHAR(20),           -- epub, mobi, pdf, azw3, etc.
@@ -34,6 +37,7 @@ PDF, etc.) with associated metadata like file size, checksums, format informatio
    ```
 
 2. Create `asset_metadata` JSON schema:
+
    ```typescript
    type AssetMetadata = {
      // Common
@@ -72,10 +76,10 @@ PDF, etc.) with associated metadata like file size, checksums, format informatio
 ### Phase 4: Processing Pipeline
 
 1. Create asset processing queue:
-    - Extract metadata
-    - Generate cover if missing
-    - Calculate checksum
-    - Validate DRM status
+   - Extract metadata
+   - Generate cover if missing
+   - Calculate checksum
+   - Validate DRM status
 
 2. Background job handling
 3. Progress tracking and status updates
@@ -89,7 +93,7 @@ PDF, etc.) with associated metadata like file size, checksums, format informatio
 ## Format Support Matrix
 
 | Format    | Extension | MIME Type                      | Metadata            |
-|-----------|-----------|--------------------------------|---------------------|
+| --------- | --------- | ------------------------------ | ------------------- |
 | EPUB      | .epub     | application/epub+zip           | Version, layout     |
 | MOBI      | .mobi     | application/x-mobipocket-ebook | Compression         |
 | AZW3      | .azw3     | application/x-mobi8-ebook      | KF8 features        |

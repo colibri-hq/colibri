@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#136](https://github.com/colibri-hq/colibri/issues/136)
+
 # Individual Library Per User
 
 ## Description
@@ -21,6 +23,7 @@ lists work but as the primary library view.
 ### Phase 1: User Library Concept
 
 1. Create user_library junction table:
+
    ```sql
    CREATE TABLE user_library (
      user_id UUID NOT NULL REFERENCES authentication.user(id),
@@ -32,9 +35,9 @@ lists work but as the primary library view.
    ```
 
 2. Define library relationship:
-    - Personal Library = books user has explicitly added
-    - Family Shelf = all books in the instance
-    - Reading List = subset of Personal Library, ordered
+   - Personal Library = books user has explicitly added
+   - Family Shelf = all books in the instance
+   - Reading List = subset of Personal Library, ordered
 
 ### Phase 2: Add/Remove from Library
 
@@ -46,23 +49,24 @@ lists work but as the primary library view.
 ### Phase 3: Library Views
 
 1. **My Library** (default view):
-    - Only books user has added
-    - Personal organization
-    - Primary navigation destination
+   - Only books user has added
+   - Personal organization
+   - Primary navigation destination
 
 2. **Family Bookshelf**:
-    - All shared books
-    - Browse and add to personal library
-    - Secondary navigation
+   - All shared books
+   - Browse and add to personal library
+   - Secondary navigation
 
 3. **Discover**:
-    - Books not in personal library
-    - Recommendations
-    - External catalogs
+   - Books not in personal library
+   - Recommendations
+   - External catalogs
 
 ### Phase 4: UI Navigation
 
 1. Sidebar structure:
+
    ```
    📚 My Library (primary)
    📖 Currently Reading
@@ -75,8 +79,8 @@ lists work but as the primary library view.
    ```
 
 2. Book card indicators:
-    - "In your library" badge
-    - "Add to library" button
+   - "In your library" badge
+   - "Add to library" button
 
 ### Phase 5: Library Sync
 

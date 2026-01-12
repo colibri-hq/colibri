@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#158](https://github.com/colibri-hq/colibri/issues/158)
+
 # Security Hardening
 
 ## Description
@@ -30,11 +32,15 @@ protections.
 ### Phase 1: Input Validation Framework
 
 1. Create validation schemas with Zod:
+
    ```typescript
    // packages/shared/src/validation/schemas.ts
    export const workSchema = z.object({
      title: z.string().min(1).max(500),
-     isbn: z.string().regex(/^\d{10}|\d{13}$/).optional(),
+     isbn: z
+       .string()
+       .regex(/^\d{10}|\d{13}$/)
+       .optional(),
      // ...
    });
 
@@ -51,6 +57,7 @@ protections.
 ### Phase 2: CSRF Protection
 
 1. Implement CSRF tokens for state-changing operations:
+
    ```typescript
    // Generate token
    const csrfToken = generateCsrfToken(sessionId);
@@ -67,10 +74,11 @@ protections.
 ### Phase 3: API Rate Limiting
 
 1. Implement rate limiter middleware:
+
    ```typescript
    const rateLimiter = createRateLimiter({
-     windowMs: 60 * 1000,  // 1 minute
-     max: 100,              // requests per window
+     windowMs: 60 * 1000, // 1 minute
+     max: 100, // requests per window
      keyGenerator: (req) => req.user?.id || req.ip,
    });
    ```
@@ -102,6 +110,7 @@ protections.
 ### Phase 5: Audit Logging
 
 1. Create audit log table:
+
    ```sql
    CREATE TABLE audit_log (
      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -118,14 +127,15 @@ protections.
    ```
 
 2. Log sensitive operations:
-    - User authentication events
-    - Permission changes
-    - Data modifications
-    - Admin actions
+   - User authentication events
+   - Permission changes
+   - Data modifications
+   - Admin actions
 
 ### Phase 6: Brute Force Protection
 
 1. Account lockout after failed attempts:
+
    ```sql
    ALTER TABLE authentication.user ADD COLUMN
      failed_login_attempts INTEGER DEFAULT 0,
@@ -150,11 +160,11 @@ protections.
 
 ## Security Checklist
 
-| Category  | Item                   | Status       |
-|-----------|------------------------|--------------|
+| Category  | Item                   | Status        |
+| --------- | ---------------------- | ------------- |
 | Auth      | Passkeys               | ✅            |
 | Auth      | OAuth PKCE             | ✅            |
-| Auth      | Session management     | Partial      |
+| Auth      | Session management     | Partial       |
 | Input     | Validation             | ❌            |
 | Input     | Sanitization           | ❌            |
 | Transport | HTTPS only             | ✅            |

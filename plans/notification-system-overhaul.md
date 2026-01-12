@@ -1,8 +1,11 @@
+> **GitHub Issue:** [#146](https://github.com/colibri-hq/colibri/issues/146)
+
 # Notification System Overhaul Plan
 
 ## Current State (MVP Implementation)
 
 The current notification system is intentionally simple for the MVP:
+
 - Single notification table with basic fields
 - Simple preferences table per user
 - SSE-based real-time delivery
@@ -27,6 +30,7 @@ Event Producer → Message Queue → Event Processor → Storage + Delivery
 ```
 
 **Components:**
+
 - **Event Table**: Append-only log of notification-triggering events
 - **Message Queue**: Postgres NOTIFY/LISTEN or external queue (Redis, etc.)
 - **Event Processor**: Aggregates events, applies rules, generates notifications
@@ -121,16 +125,19 @@ CREATE TABLE notification_template (
 ### 4. Delivery Channels
 
 **In-App (SSE)**:
+
 - Keep existing SSE infrastructure
 - Add connection tracking
 - Send immediately for online users
 
 **Email**:
+
 - Queue for digest processing
 - Render HTML templates
 - Track opens/clicks
 
 **Push Notifications**:
+
 - Web Push API integration
 - Native app support via FCM/APNS
 - Subscription management
@@ -138,6 +145,7 @@ CREATE TABLE notification_template (
 ### 5. Performance Optimizations
 
 **Indexes**:
+
 ```sql
 -- For unread counts (covering index)
 CREATE INDEX idx_notification_user_unread_count
@@ -155,38 +163,45 @@ WHERE expires_at IS NOT NULL;
 ```
 
 **Caching**:
+
 - Cache unread counts in Redis
 - Invalidate on read/new notification
 - TTL-based expiration
 
 **Partitioning**:
+
 - Consider time-based partitioning for notification_event
 - Archive old notifications
 
 ### 6. Implementation Phases
 
 #### Phase 1: Core Infrastructure (1-2 weeks)
+
 - [ ] Redesign database schema
 - [ ] Implement event producer interface
 - [ ] Create notification service abstraction
 - [ ] Migrate existing notifications
 
 #### Phase 2: Aggregation & Templates (1 week)
+
 - [ ] Implement aggregation logic
 - [ ] Create template system with i18n
 - [ ] Add template management UI
 
 #### Phase 3: Email Delivery (1 week)
+
 - [ ] Integrate email provider
 - [ ] Create digest scheduling
 - [ ] Design email templates
 
 #### Phase 4: Push Notifications (1 week)
+
 - [ ] Implement Web Push
 - [ ] Add subscription management
 - [ ] Handle mobile app integration
 
 #### Phase 5: Advanced Preferences (1 week)
+
 - [ ] Quiet hours implementation
 - [ ] Per-notification-type preferences
 - [ ] Channel preferences
@@ -203,6 +218,7 @@ WHERE expires_at IS NOT NULL;
 ## Timeline
 
 This overhaul should be planned for post-MVP, when:
+
 - User base has grown enough to warrant optimization
 - Email notification requirements are confirmed
 - Push notification requirements are defined

@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#162](https://github.com/colibri-hq/colibri/issues/162)
+
 # User Invitations
 
 ## Description
@@ -41,23 +43,24 @@ different invitation flows for adults (email verification) and children (parent-
 ### Phase 2: Invitation Types
 
 1. **Email Invitation**:
-    - Send email with unique link
-    - Recipient creates account
-    - Email verification included
+   - Send email with unique link
+   - Recipient creates account
+   - Email verification included
 
 2. **QR Code Invitation**:
-    - Generate QR code with invite URL
-    - Scan to access signup
-    - Useful for in-person invites
+   - Generate QR code with invite URL
+   - Scan to access signup
+   - Useful for in-person invites
 
 3. **Parent Setup Link**:
-    - Parent receives setup URL
-    - Parent creates child account
-    - Sets up Passkey on child's device
+   - Parent receives setup URL
+   - Parent creates child account
+   - Sets up Passkey on child's device
 
 ### Phase 3: Invitation API
 
 1. tRPC procedures:
+
    ```typescript
    invitations.create({
      email?: string;
@@ -102,9 +105,9 @@ different invitation flows for adults (email verification) and children (parent-
 ### Phase 7: Admin Controls
 
 1. Instance setting: who can invite
-    - Admin only
-    - Adults only
-    - Anyone
+   - Admin only
+   - Adults only
+   - Anyone
 2. Maximum active invitations per user
 3. Default invitation expiration
 

@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#121](https://github.com/colibri-hq/colibri/issues/121)
+
 # Comments & Discussions System
 
 ## Description
@@ -59,15 +61,15 @@ schema is complete with support for threaded replies and emoji reactions, but ne
 ### Phase 3: Threaded Comments UI
 
 1. Comment thread component:
-    - Nested replies (max depth: 3-5)
-    - Collapse/expand threads
-    - Reply button per comment
-    - Indentation styling
+   - Nested replies (max depth: 3-5)
+   - Collapse/expand threads
+   - Reply button per comment
+   - Indentation styling
 
 2. Comment composer:
-    - Textarea with character limit
-    - Reply-to indicator
-    - Cancel/Submit buttons
+   - Textarea with character limit
+   - Reply-to indicator
+   - Cancel/Submit buttons
 
 ### Phase 4: Reactions Enhancement
 
@@ -99,7 +101,7 @@ schema is complete with support for threaded replies and emoji reactions, but ne
 ## Comment Entity Types
 
 | Entity     | Use Case               |
-|------------|------------------------|
+| ---------- | ---------------------- |
 | Work       | Discuss specific books |
 | Collection | Discuss reading lists  |
 | Creator    | Discuss authors        |

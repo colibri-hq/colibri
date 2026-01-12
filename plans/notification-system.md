@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#145](https://github.com/colibri-hq/colibri/issues/145)
+
 # Notification System
 
 ## Description
@@ -25,6 +27,7 @@ notifications. Currently only email is partially configured (Mailjet API key exi
 ### Phase 1: Database Schema
 
 1. Create notification tables:
+
    ```sql
    CREATE TYPE notification_channel AS ENUM ('email', 'push', 'in_app');
    CREATE TYPE notification_type AS ENUM (
@@ -65,23 +68,25 @@ notifications. Currently only email is partially configured (Mailjet API key exi
 ### Phase 2: Email Service
 
 1. Create email service (`packages/sdk/src/notifications/email.ts`):
+
    ```typescript
    export async function sendEmail(to, subject, template, data);
    export async function sendTransactional(type, to, data);
    ```
 
 2. Email templates:
-    - Welcome email
-    - Password reset
-    - Invitation
-    - Comment reply
-    - Reading reminder
+   - Welcome email
+   - Password reset
+   - Invitation
+   - Comment reply
+   - Reading reminder
 
 3. Mailjet integration or alternative (Resend, Postmark)
 
 ### Phase 3: In-App Notifications
 
 1. Create notification service:
+
    ```typescript
    export async function createNotification(userId, type, data);
    export async function markAsRead(notificationId);
@@ -125,22 +130,22 @@ notifications. Currently only email is partially configured (Mailjet API key exi
 ### Phase 7: Notification Triggers
 
 1. Create notification on:
-    - Comment reply
-    - Comment reaction
-    - Approval request/response
-    - New book in followed series
-    - Library loan due soon
-    - System announcements
+   - Comment reply
+   - Comment reaction
+   - Approval request/response
+   - New book in followed series
+   - Library loan due soon
+   - System announcements
 
 ## Notification Types
 
 | Type             | Email | Push | In-App |
-|------------------|-------|------|--------|
-| Comment reply    | ✅     | ✅    | ✅      |
-| Invitation       | ✅     | ❌    | ✅      |
-| Approval request | ✅     | ✅    | ✅      |
-| Reading reminder | ✅     | ✅    | ✅      |
-| System alert     | ✅     | ✅    | ✅      |
+| ---------------- | ----- | ---- | ------ |
+| Comment reply    | ✅    | ✅   | ✅     |
+| Invitation       | ✅    | ❌   | ✅     |
+| Approval request | ✅    | ✅   | ✅     |
+| Reading reminder | ✅    | ✅   | ✅     |
+| System alert     | ✅    | ✅   | ✅     |
 
 ## Email Templates
 

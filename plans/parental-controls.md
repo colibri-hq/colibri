@@ -1,3 +1,5 @@
+> **GitHub Issue:** [#148](https://github.com/colibri-hq/colibri/issues/148)
+
 # Parental Controls & Age Management
 
 ## Description
@@ -38,6 +40,7 @@ restrictions, reading maturity offsets, content approval workflows, and account 
 ### Phase 2: Age Offset System
 
 1. Add maturity offset to user:
+
    ```sql
    ALTER TABLE authentication.user ADD COLUMN
      age_offset INTEGER DEFAULT 0 CHECK (age_offset BETWEEN -5 AND 5),
@@ -45,6 +48,7 @@ restrictions, reading maturity offsets, content approval workflows, and account 
    ```
 
 2. Effective age calculation:
+
    ```typescript
    function getEffectiveAge(user: User): number {
      const actualAge = calculateAge(user.birthdate);
@@ -57,6 +61,7 @@ restrictions, reading maturity offsets, content approval workflows, and account 
 ### Phase 3: Content Approval Workflow
 
 1. Create approval request table:
+
    ```sql
    CREATE TABLE content_approval (
      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -80,6 +85,7 @@ restrictions, reading maturity offsets, content approval workflows, and account 
 ### Phase 4: Parental Settings Controls
 
 1. Create controlled settings definition:
+
    ```typescript
    type ParentalControl = {
      canModifyProfile: boolean;
@@ -97,6 +103,7 @@ restrictions, reading maturity offsets, content approval workflows, and account 
 ### Phase 5: Dual Visibility System
 
 1. Implement `visible_from_age` and `readable_from_age`:
+
    ```sql
    ALTER TABLE work ADD COLUMN
      visible_from_age SMALLINT,   -- Age to see in library
@@ -104,9 +111,9 @@ restrictions, reading maturity offsets, content approval workflows, and account 
    ```
 
 2. Display states:
-    - Fully accessible: visible and readable
-    - Visible but locked: shown grayed out, cannot read
-    - Hidden: not shown at all
+   - Fully accessible: visible and readable
+   - Visible but locked: shown grayed out, cannot read
+   - Hidden: not shown at all
 
 ### Phase 6: UI Implementation
 
@@ -119,7 +126,7 @@ restrictions, reading maturity offsets, content approval workflows, and account 
 ## Access Control Matrix
 
 | Content State      | Child View | Child Action       |
-|--------------------|------------|--------------------|
+| ------------------ | ---------- | ------------------ |
 | No restrictions    | Full       | Read/Download      |
 | Above visible age  | Hidden     | None               |
 | Above readable age | Grayed     | View metadata only |
