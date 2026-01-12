@@ -370,6 +370,14 @@ export interface Asset {
   id: Generated<Int8>;
   media_type: string;
   metadata: Generated<Json>;
+  /**
+   * Error message if search indexing failed for this asset.
+   */
+  search_index_error: string | null;
+  /**
+   * Timestamp when the asset was last indexed for full-text search.
+   */
+  search_indexed_at: Timestamp | null;
   size: number;
   storage_reference: string;
   updated_at: Timestamp | null;
@@ -385,6 +393,55 @@ export interface AuthenticationAccessToken {
   scopes: string[];
   token: string;
   user_id: Int8 | null;
+}
+
+export interface AuthenticationApiKey {
+  created_at: Generated<Timestamp>;
+  /**
+   * Optional expiration timestamp. NULL means the key never expires.
+   */
+  expires_at: Timestamp | null;
+  id: Generated<Int8>;
+  /**
+   * SHA-256 hash of the API key. The plain text key is never stored.
+   */
+  key_hash: string;
+  /**
+   * First 12 characters of the key (col_ + 8 chars) for identification in logs and UI.
+   */
+  key_prefix: string;
+  /**
+   * Timestamp of last successful authentication with this key.
+   */
+  last_used_at: Timestamp | null;
+  /**
+   * IP address from which the key was last used.
+   */
+  last_used_ip: string | null;
+  /**
+   * User-provided name to identify this key (e.g., "Kindle", "Reading Script").
+   */
+  name: string;
+  /**
+   * Timestamp when the key was revoked. NULL means the key is active.
+   */
+  revoked_at: Timestamp | null;
+  /**
+   * Timestamp when this key was rotated. Used for 15-minute grace period.
+   */
+  rotated_at: Timestamp | null;
+  /**
+   * Reference to the previous key if this was created by rotation.
+   */
+  rotated_from_id: Int8 | null;
+  /**
+   * Permission scopes granted to this key. Empty array means all scopes.
+   */
+  scopes: Generated<string[]>;
+  /**
+   * User who owns this API key.
+   */
+  user_id: Int8;
 }
 
 export interface AuthenticationAuthenticator {
@@ -521,6 +578,35 @@ export interface AuthenticationUserConsent {
   user_id: Generated<Int8>;
 }
 
+export interface BookChunk {
+  /**
+   * Reference to the source asset file this chunk was extracted from.
+   */
+  asset_id: Int8;
+  /**
+   * Sequential index of this chunk within the asset, used for ordering.
+   */
+  chunk_index: number;
+  /**
+   * Plain text content of this chunk.
+   */
+  content: string;
+  created_at: Generated<Timestamp>;
+  /**
+   * PostgreSQL full-text search configuration name (e.g., english, german, simple). Denormalized from edition language.
+   */
+  fts_config: Generated<string>;
+  id: Generated<Int8>;
+  /**
+   * Language-aware full-text search vector for content search queries.
+   */
+  search_vector: Generated<string | null>;
+  /**
+   * Location pointer for deep linking to the chunk position in the source file.
+   */
+  source_pointer: Json;
+}
+
 export interface Catalog {
   active: Generated<boolean>;
   age_requirement: Generated<number>;
@@ -636,19 +722,6 @@ export interface CreatorComment {
   creator_id: Generated<Int8>;
 }
 
-export interface EnrichmentResult {
-  id: Generated<string>;
-  work_id: Int8;
-  user_id: Int8;
-  created_at: Generated<Timestamp>;
-  status: Generated<string>;
-  preview: JsonValue;
-  improvements: JsonValue;
-  sources: Generated<ArrayType<string>>;
-  applied_at: Timestamp | null;
-  dismissed_at: Timestamp | null;
-}
-
 export interface Edition {
   asin: string | null;
   binding: string | null;
@@ -699,6 +772,10 @@ export interface ImageCreator {
 }
 
 export interface Language {
+  /**
+   * PostgreSQL full-text search configuration name (e.g., english, german, simple).
+   */
+  fts_config: Generated<string>;
   iso_639_1: string | null;
   iso_639_3: string;
   name: string | null;
@@ -899,6 +976,7 @@ export interface WorkTag {
 export interface DB {
   asset: Asset;
   "authentication.access_token": AuthenticationAccessToken;
+  "authentication.api_key": AuthenticationApiKey;
   "authentication.authenticator": AuthenticationAuthenticator;
   "authentication.authorization_code": AuthenticationAuthorizationCode;
   "authentication.authorization_request": AuthenticationAuthorizationRequest;
@@ -911,6 +989,7 @@ export interface DB {
   "authentication.scope": AuthenticationScope;
   "authentication.user": AuthenticationUser;
   "authentication.user_consent": AuthenticationUserConsent;
+  book_chunk: BookChunk;
   catalog: Catalog;
   collection: Collection;
   collection_comment: CollectionComment;
@@ -923,7 +1002,6 @@ export interface DB {
   creator: Creator;
   creator_comment: CreatorComment;
   edition: Edition;
-  enrichment_result: EnrichmentResult;
   image: Image;
   image_creator: ImageCreator;
   language: Language;

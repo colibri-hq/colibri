@@ -2,7 +2,7 @@ create extension if not exists "isn" with schema "extensions";
 
 create schema if not exists "authentication";
 
-create extension if not exists "unaccent" with schema "public";
+create extension if not exists "unaccent" with schema "extensions";
 
 create type "authentication"."color_scheme" as enum ('system', 'light', 'dark');
 
