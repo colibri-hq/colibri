@@ -23,6 +23,8 @@
     tr,
     ul,
   } from '../markdown/index.js';
+  // Make GlossaryTerm globally available in all markdown files
+  export { GlossaryTerm } from '../glossary/index.js';
 </script>
 
 <script lang="ts">

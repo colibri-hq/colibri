@@ -14,6 +14,7 @@ import { calloutsPreprocessor } from "./src/lib/preprocessors/callouts.js";
 import { footnotesPreprocessor } from "./src/lib/preprocessors/footnotes.js";
 import remarkExtractHeadings from "./src/lib/remark/remark-extract-headings.js";
 import remarkRemoveDuplicateTitle from "./src/lib/remark/remark-remove-duplicate-title.js";
+import { remarkGlossaryLinks } from "./src/lib/remark/remark-glossary-links.js";
 import caddyfileLang from "./src/lib/shiki/caddyfile.tmLanguage.json" with { type: "json" };
 
 const {
@@ -183,6 +184,7 @@ const config = {
       remarkPlugins: [
         remarkRemoveDuplicateTitle,
         remarkExtractHeadings,
+        remarkGlossaryLinks, // Transform [text](glossary:term) links
         remarkGitHubFlavoredMarkdown,
         // @ts-expect-error -- Plugin types are broken
         [remarkToc, { tight: true, maxDepth: 3 }],

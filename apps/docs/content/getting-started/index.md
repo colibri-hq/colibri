@@ -9,15 +9,15 @@ relevance: 90
 
 # Introduction to Colibri
 
-Welcome to Colibri, a comprehensive self-hosted ebook library application designed for readers who value both privacy and control over their digital book collections. Built with modern web technologies and a focus on user experience, Colibri provides a seamless, feature-rich platform for organizing, discovering, and managing ebooks across multiple formats including EPUB, MOBI, and PDF.
+Welcome to Colibri, a comprehensive self-hosted ebook library application designed for readers who value both privacy and control over their digital book collections. Built with modern web technologies and a focus on user experience, Colibri provides a seamless, feature-rich platform for organizing, discovering, and managing ebooks across multiple formats including [EPUB](glossary:epub), [MOBI](glossary:mobi), and [PDF](glossary:pdf).
 
-At its core, Colibri addresses a fundamental challenge faced by digital book enthusiasts: how to maintain a well-organized, richly catalogued library without relying on proprietary cloud services or surrendering control of personal data. By hosting your own instance, you gain complete ownership of your library metadata, reading history, and personal annotations while enjoying the convenience of modern web-based book management.
+At its core, Colibri addresses a fundamental challenge faced by digital book enthusiasts: how to maintain a well-organized, richly catalogued library without relying on proprietary cloud services or surrendering control of personal data. By hosting your own instance, you gain complete ownership of your library [metadata](glossary:metadata), reading history, and personal annotations while enjoying the convenience of modern web-based book management.
 
 ## What Makes Colibri Different
 
-Colibri distinguishes itself through its commitment to metadata excellence and intelligent automation. Unlike simple file storage solutions, Colibri actively enhances your library by connecting to over fourteen authoritative metadata providers—including Open Library, WikiData, the Library of Congress, and Google Books—to automatically enrich your collection with professional-grade bibliographic information. This automated enrichment transforms a basic collection of files into a professionally curated library with accurate author information, publication details, cover artwork, and subject classifications.
+Colibri distinguishes itself through its commitment to metadata excellence and intelligent automation. Unlike simple file storage solutions, Colibri actively enhances your library by connecting to over fourteen authoritative metadata providers—including Open Library, WikiData, the Library of Congress, and Google Books—to automatically enrich your collection with professional-grade bibliographic information. This automated [enrichment](glossary:enrichment) transforms a basic collection of files into a professionally curated library with accurate author information, publication details, cover artwork, and subject classifications.
 
-The application employs sophisticated reconciliation algorithms with confidence scoring to ensure that metadata suggestions are accurate and relevant. When multiple sources provide conflicting information, Colibri's intelligent system weighs the reliability of each source and presents you with the most trustworthy data. You remain in control, however, with the ability to review, accept, or reject any suggested changes to your library's metadata.
+The application employs sophisticated reconciliation algorithms with [confidence scoring](glossary:confidence-score) to ensure that metadata suggestions are accurate and relevant. When multiple sources provide conflicting information, Colibri's intelligent system weighs the reliability of each source and presents you with the most trustworthy data. You remain in control, however, with the ability to review, accept, or reject any suggested changes to your library's metadata.
 
 ## Who Colibri Is For
 
@@ -29,13 +29,13 @@ Colibri is designed for a diverse range of users, from individual readers managi
 
 **Families and Households** benefit from Colibri's role-based access control, which supports admin, adult, and child user roles. This allows parents to manage a shared family library while maintaining appropriate content boundaries and providing age-appropriate access to younger readers.
 
-**Technology Enthusiasts and Tinkerers** will find Colibri's open architecture and comprehensive CLI tools perfect for automation, scripting, and integration with other home server applications. The monorepo structure and well-documented codebase make customization and extension straightforward for those with development skills.
+**Technology Enthusiasts and Tinkerers** will find Colibri's open architecture and comprehensive [CLI](glossary:cli) tools perfect for automation, scripting, and integration with other home server applications. The monorepo structure and well-documented codebase make customization and extension straightforward for those with development skills.
 
 ## Core Capabilities
 
 ### Comprehensive Ebook Management
 
-Colibri provides full-featured management for the three most common ebook formats: EPUB, MOBI, and PDF. The application automatically extracts embedded metadata during upload, including title, author, publication date, ISBN, cover images, and other bibliographic information. This initial extraction serves as the foundation for further enrichment, ensuring that even books from sources without rich metadata start with accurate basic information.
+Colibri provides full-featured management for the three most common ebook formats: [EPUB](glossary:epub), [MOBI](glossary:mobi), and [PDF](glossary:pdf). The application automatically extracts embedded metadata during upload, including title, author, publication date, [ISBN](glossary:isbn), cover images, and other bibliographic information. This initial extraction serves as the foundation for further enrichment, ensuring that even books from sources without rich metadata start with accurate basic information.
 
 Cover image processing receives special attention in Colibri. The system automatically extracts cover artwork from uploaded files, optimizes images for web display, and generates responsive thumbnails for grid and list views. When enriching metadata, Colibri can also fetch higher-quality cover images from external sources, replacing low-resolution embedded covers with professional artwork suitable for large displays.
 
@@ -51,7 +51,7 @@ The reconciliation engine evaluates responses from all providers, assigning conf
 
 ### Organizational Tools
 
-Colibri provides flexible organizational tools to help you structure your library according to your preferences. The **collections** feature allows you to create custom groupings for reading lists, genre classifications, or any other categorization scheme you prefer. Collections can be public or private, and books can belong to multiple collections simultaneously, providing the flexibility to organize the same content in multiple ways.
+Colibri provides flexible organizational tools to help you structure your library according to your preferences. The [**collections**](glossary:collection) feature allows you to create custom groupings for reading lists, genre classifications, or any other categorization scheme you prefer. Collections can be public or private, and books can belong to multiple collections simultaneously, providing the flexibility to organize the same content in multiple ways.
 
 **Series support** recognizes and preserves the relationships between books in multi-volume works. The system automatically detects series information during metadata enrichment and maintains proper ordering, making it easy to track your progress through long-running series and discover new installments.
 
@@ -61,7 +61,7 @@ A comprehensive **tagging system** supplements collections with lightweight, ad-
 
 ### Security and Privacy
 
-Security architecture in Colibri emphasizes both strong authentication and user privacy. The application implements **passwordless authentication** using Passkeys (WebAuthn), a modern standard that provides security superior to traditional passwords while offering improved usability. Passkeys use public-key cryptography and biometric verification, making them resistant to phishing, credential stuffing, and other common attack vectors.
+Security architecture in Colibri emphasizes both strong authentication and user privacy. The application implements **passwordless authentication** using [Passkeys](glossary:passkeys) ([WebAuthn](glossary:webauthn)), a modern standard that provides security superior to traditional passwords while offering improved usability. Passkeys use public-key cryptography and biometric verification, making them resistant to phishing, credential stuffing, and other common attack vectors.
 
 The **self-hosted deployment model** ensures complete data sovereignty. Your library metadata, user information, reading history, and all other data resides exclusively on infrastructure you control. This architecture eliminates third-party tracking, prevents unauthorized data mining, and gives you full authority over backup, retention, and privacy policies.
 
@@ -69,9 +69,9 @@ The **self-hosted deployment model** ensures complete data sovereignty. Your lib
 
 ## Technical Foundation
 
-Colibri's architecture reflects modern web development best practices, built as a monorepo containing multiple interconnected components. The **web application**, constructed with SvelteKit, provides a responsive, fast interface that works seamlessly across desktop and mobile devices. The **tRPC API** layer ensures type-safe communication between client and server, catching potential integration errors at compile time rather than runtime.
+Colibri's architecture reflects modern web development best practices, built as a monorepo containing multiple interconnected components. The **web application**, constructed with SvelteKit, provides a responsive, fast interface that works seamlessly across desktop and mobile devices. The **tRPC [API](glossary:api)** layer ensures type-safe communication between client and server, catching potential integration errors at compile time rather than runtime.
 
-The **CLI tool** offers power users and system administrators a scriptable interface for automation, bulk operations, and integration with other tools. Whether you need to import hundreds of books programmatically, automate metadata enrichment on a schedule, or integrate Colibri with existing digital asset management workflows, the CLI provides the necessary capabilities.
+The [**CLI**](glossary:cli) tool offers power users and system administrators a scriptable interface for automation, bulk operations, and integration with other tools. Whether you need to import hundreds of books programmatically, automate metadata enrichment on a schedule, or integrate Colibri with existing digital asset management workflows, the CLI provides the necessary capabilities.
 
 The **SDK package** contains core functionality including database operations, ebook parsing, storage management, and metadata provider integrations. This modular design allows developers to extend Colibri or integrate its capabilities into other applications while maintaining clean separation of concerns.
 
