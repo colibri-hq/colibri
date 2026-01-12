@@ -1,4 +1,5 @@
 import { accounts } from "$lib/trpc/routes/acounts";
+import { apiKeys } from "$lib/trpc/routes/api-keys";
 import { books } from "$lib/trpc/routes/books";
 import { catalogs } from "$lib/trpc/routes/catalogs";
 import { collections } from "$lib/trpc/routes/collections";
@@ -20,6 +21,7 @@ import {
 
 export const router = t.router({
   accounts,
+  apiKeys,
   books,
   catalogs,
   collections,

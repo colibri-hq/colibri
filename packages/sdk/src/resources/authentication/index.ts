@@ -1,3 +1,4 @@
+export * from "./api-key.js";
 export * from "./authenticator.js";
 export * from "./challenge.js";
 export * from "./oauth.js";
