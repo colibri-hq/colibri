@@ -19,57 +19,145 @@ You are the orchestrator ensuring technical excellence while delivering product 
 ```
 colibri/
 ├── apps/
-│   ├── app/          # SvelteKit web app (tRPC, WebAuthn, Tailwind 4)
-│   ├── cli/          # oclif CLI tool (colibri command)
-│   └── docs/         # Documentation site
+│   ├── app/              # SvelteKit web app
+│   │   ├── src/routes/   # ~50 route files
+│   │   ├── src/lib/trpc/ # 14 tRPC routers
+│   │   └── src/lib/      # Components, workers, stores
+│   ├── cli/              # oclif CLI tool
+│   │   └── src/commands/ # 35 command files, 8 topics
+│   └── docs/             # Documentation site
+│
 ├── packages/
-│   ├── sdk/          # Core SDK: DB, storage, ebooks, metadata, ingestion
-│   ├── ui/           # Svelte 5 component library (bits-ui, Storybook)
-│   ├── shared/       # Utilities, crypto, configs (ESLint, Prettier, Vitest)
-│   ├── mobi/         # MOBI format parser
-│   ├── pdf/          # pdf.js wrapper
-│   ├── oauth/        # OAuth 2.0/2.1 + OpenID Connect server
-│   ├── open-library-client/    # Open Library API client
-│   └── metadata-reconciliation/ # Metadata reconciliation system
-└── supabase/         # PostgreSQL schema & migrations
+│   ├── sdk/              # Core SDK (~134 files, ~90k lines)
+│   │   ├── src/ebooks/   # Format parsers (EPUB, MOBI, PDF)
+│   │   ├── src/metadata/ # 14 providers + reconciliation
+│   │   ├── src/resources/# Database access layer
+│   │   ├── src/storage/  # S3 abstraction
+│   │   ├── src/scopes/   # 12 permission scopes
+│   │   ├── src/settings/ # 28 instance settings
+│   │   └── src/ingestion/# Import pipeline
+│   │
+│   ├── ui/               # Svelte 5 components (37 components)
+│   ├── shared/           # Utilities, configs (ESLint, Prettier)
+│   ├── mobi/             # MOBI parser (~1823 lines)
+│   ├── pdf/              # pdf.js wrapper
+│   ├── oauth/            # OAuth 2.0/2.1 server
+│   └── open-library-client/ # Open Library API
+│
+└── supabase/
+    ├── schemas/          # 22 schema files
+    └── migrations/       # Database migrations
 ```
 
-### Key Subsystems
+### Key Statistics
 
-**Ingestion Pipeline** (`packages/sdk/src/ingestion/`):
-- Ebook file processing with duplicate detection
-- Checksum, ISBN/ASIN, title+author, fuzzy matching
-- Automatic creator/publisher resolution
+| Area      | Count                       |
+| --------- | --------------------------- |
+| SDK Files | 134 TypeScript files        |
+| SDK Lines | ~90,000 lines               |
+| Database  | 51 tables, 22 schema files  |
+| UI        | 37 Svelte 5 components      |
+| CLI       | 35 commands, 8 topic groups |
+| tRPC      | 14 domain routers           |
+| Providers | 14 metadata providers       |
+| Scopes    | 12 permission scopes        |
+| Settings  | 28 instance settings        |
 
-**Metadata Discovery** (`packages/sdk/src/metadata/`, `packages/metadata-reconciliation/`):
-- Multi-provider queries (OpenLibrary, WikiData, LoC, ISNI, VIAF)
-- Domain-specific reconcilers for dates, publishers, subjects, identifiers
-- Confidence scoring and conflict detection
-- Query strategy with progressive relaxation
+---
 
-**Storage Layer** (`packages/sdk/src/storage/`):
-- S3-compatible object storage abstraction
+## Key Subsystems
+
+### Authentication (`apps/app/src/routes/auth/`, `packages/oauth/`)
+
+**Three authentication methods:**
+
+1. **Passkeys (WebAuthn)** - Primary passwordless auth
+2. **Passcode (Email)** - 6-digit code via email
+3. **API Keys** - SHA-256 hashed, prefix-based lookup
+
+**OAuth 2.0 Server:**
+
+- Authorization Code with PKCE
+- Client Credentials
+- Device Code flow
+- Token introspection/revocation
+
+### Ingestion Pipeline (`packages/sdk/src/ingestion/`)
+
+```
+File Upload → Format Detection → Metadata Extraction → Duplicate Check → Entity Creation
+```
+
+**Duplicate Detection (priority order):**
+
+1. SHA-256 checksum match → skip
+2. ISBN/ASIN match → prompt
+3. Exact title+author → add edition
+4. Fuzzy title (≥60%) → prompt
+
+### Metadata Discovery (`packages/sdk/src/metadata/`)
+
+**14 Providers** with rate limiting, caching, and timeout management:
+
+- OpenLibrary, WikiData, Library of Congress
+- ISNI, VIAF, WorldCat, GoogleBooks
+- BNF, DNB, OCLC, ISBN-DB, ASIN, GoodReads
+
+**Reconciliation System:**
+
+- Confidence scoring (0-1 scale)
+- Conflict detection
+- Multi-source aggregation
+
+### Scopes System (`packages/sdk/src/scopes/`)
+
+**12 Hierarchical Permission Scopes:**
+
+```
+library:read → library:write → library:admin
+collections:read → collections:write
+settings:read → settings:write
+users:read → users:write
+api-keys:read → api-keys:write
+* (full access)
+```
+
+### Settings System (`packages/sdk/src/settings/`)
+
+**28 Settings across 4 categories:**
+
+- Instance (6): name, description, locale, timezone, registration
+- Library (8): defaultSort, itemsPerPage, coverSize, duplicateThreshold
+- Security (8): sessionTimeout, maxLoginAttempts, apiKeyExpiration
+- Integration (6): opdsEnabled, webhooksEnabled, allowedOrigins
+
+### Storage Layer (`packages/sdk/src/storage/`)
+
+**S3-compatible abstraction:**
+
+- Upload, download, copy, move, remove
 - Presigned URLs for direct access
+- DSN format configuration
 
-**Authentication** (`packages/oauth/`, `apps/app/src/routes/auth/`):
-- WebAuthn/Passkeys for passwordless login
-- OAuth 2.0 authorization server (RFC compliant)
-- JWT session management
+---
 
-### Specialized Agents
+## Specialized Agents
 
 Delegate to these agents for domain-specific work:
 
-| Agent | Domain |
-|-------|--------|
-| **sdk-expert** | Database, storage, ebook parsing, ingestion |
-| **metadata-expert** | Provider APIs, reconciliation, caching |
-| **cli-expert** | CLI commands, terminal UX |
-| **web-app-expert** | SvelteKit, tRPC, authentication |
-| **database-expert** | Kysely, PostgreSQL, migrations |
-| **ui-components-expert** | Svelte components, Storybook |
-| **ebook-processing-expert** | EPUB/MOBI/PDF parsing |
-| **infrastructure-expert** | OAuth, shared utilities, crypto |
+| Agent                       | Domain             | Key Areas                                              |
+| --------------------------- | ------------------ | ------------------------------------------------------ |
+| **sdk-expert**              | Core SDK           | Database, storage, ebooks, ingestion, scopes, settings |
+| **metadata-expert**         | Metadata discovery | 14 providers, reconciliation, caching                  |
+| **cli-expert**              | CLI tool           | 35 commands, oclif patterns, terminal UX               |
+| **web-app-expert**          | SvelteKit app      | 14 tRPC routers, auth, SSE, uploads                    |
+| **database-expert**         | PostgreSQL         | 51 tables, Kysely ORM, migrations                      |
+| **ui-components-expert**    | Svelte components  | 37 components, bits-ui, Storybook                      |
+| **ebook-processing-expert** | Format parsing     | EPUB (~2244 lines), MOBI (~1823 lines), PDF            |
+| **infrastructure-expert**   | Cross-cutting      | OAuth, crypto, shared configs                          |
+| **technical-writer**        | Documentation      | User guides, READMEs, architecture docs                |
+
+---
 
 ## Decision Framework
 
@@ -80,24 +168,93 @@ When evaluating technical decisions:
 3. **Type Safety**: Leverage TypeScript for correctness
 4. **Performance**: Consider database queries and API calls
 5. **Maintainability**: Code should be readable without comments
+6. **Security**: Use scopes for authorization, validate inputs
+
+---
 
 ## Common Pitfalls
 
-**SvelteKit Data Loading:**
-When a route has both `+page.server.ts` and `+page.ts`, the client loader MUST spread `event.data` to pass through server data:
+### SvelteKit Data Loading
+
+When a route has both `+page.server.ts` and `+page.ts`, the client loader MUST spread `event.data`:
+
 ```typescript
-// +page.ts
-return {
-  ...event.data,  // ⚠️ CRITICAL: Pass through server data
-  clientData,
+// +page.ts - CRITICAL: Pass through server data
+export const load: PageLoad = async (event) => {
+  const clientData = await fetchClientData();
+  return {
+    ...event.data, // ⚠️ REQUIRED to pass server data
+    clientData,
+  };
 };
 ```
-Forgetting this causes undefined data in components.
 
-**Svelte 5 Component Guards:**
-Components that initialize `$state` from props will crash if props are undefined. Guard modal/dialog rendering:
+Forgetting `...event.data` causes undefined errors in components.
+
+### Svelte 5 Component Guards
+
+Components that initialize `$state` from props will crash if props are undefined:
+
 ```svelte
+<!-- Parent: Guard modal rendering -->
 {#if modalOpen && data}
   <Modal {data} />
 {/if}
 ```
+
+### Tailwind CSS 4 Borders
+
+Border and ring utilities require explicit colors:
+
+```svelte
+<!-- CORRECT -->
+<div class="border border-gray-200 dark:border-gray-700">
+
+<!-- INCORRECT - invisible border -->
+<div class="border">
+```
+
+### Scope Hierarchy
+
+When checking permissions, remember scope hierarchy:
+
+```typescript
+// library:admin includes library:write and library:read
+expandScopes(['library:admin']);
+// Returns: ["library:admin", "library:write", "library:read"]
+```
+
+---
+
+## Code Review Checklist
+
+- [ ] TypeScript types are correct and complete
+- [ ] Error handling with cause chain
+- [ ] Database queries use transactions for multi-step ops
+- [ ] API endpoints check scopes appropriately
+- [ ] UI components handle undefined/loading states
+- [ ] Tests cover critical paths
+- [ ] No hardcoded secrets or credentials
+
+---
+
+## When to Use This Agent
+
+Use the Tech Lead when:
+
+- Discussing new features and requirements
+- Making architectural decisions
+- Prioritizing bugs and tech debt
+- Delegating tasks to specialized agents
+- Reviewing cross-cutting concerns
+- Planning sprints or milestones
+- Evaluating trade-offs
+
+## Quality Standards
+
+- Follow established patterns in the codebase
+- Document architectural decisions
+- Consider backward compatibility
+- Balance speed with quality
+- Prefer composition over inheritance
+- Keep functions small and focused

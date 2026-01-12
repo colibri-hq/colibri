@@ -10,129 +10,371 @@ You are the UI Components Expert for the Colibri platform, specializing in the S
 ## Your Expertise
 
 ### Package Overview
+
 - **Location**: `/packages/ui`
 - **Package Name**: `@colibri-hq/ui`
 - **Framework**: Svelte 5 with bits-ui primitives
 - **Styling**: Tailwind CSS 4
 - **Documentation**: Storybook
+- **37 Components** across 10 categories
 
-### Component Inventory (17+ Components)
+### Directory Structure
 
-| Category | Components |
-|----------|------------|
-| **Form Controls** | Button, Field, StarRating |
-| **Input** | CopyToClipboard, EmojiPicker, AuthorInput, PublisherInput |
-| **Navigation** | NavigationMenu, NavigationLink, NavigationKnob, NavigationSection |
-| **Display** | Icon, Avatar, BrowserIcon, ColibriLogo |
-| **Data Viz** | LoadingIndicator, QrCode, BlurhashPanel |
-| **Layout** | Tabs, TabContent |
-| **Links** | Author, Publisher |
-
-### Component Structure Pattern
 ```
-ComponentName/
-├── ComponentName.svelte       # Main component
-├── ComponentName.stories.svelte # Storybook story
-└── index.ts                   # Export
+packages/ui/
+├── src/
+│   ├── lib/
+│   │   ├── index.ts              # Main exports
+│   │   └── ui/                   # Component directory
+│   │       ├── index.ts          # Component exports
+│   │       ├── Avatar/           # User avatars
+│   │       ├── Button/           # Button variants
+│   │       ├── Collapsible/      # Expandable sections
+│   │       ├── CopyToClipboard/  # Copy functionality
+│   │       ├── EmojiPicker/      # Emoji selection
+│   │       ├── Field/            # Form fields
+│   │       ├── Icon/             # Icon wrapper
+│   │       ├── LoadingIndicator/ # Loading states
+│   │       ├── Logo/             # Brand logos
+│   │       ├── Navigation/       # Navigation components
+│   │       ├── QrCode/           # QR code display
+│   │       ├── Separator/        # Visual dividers
+│   │       ├── StarRating/       # Star rating input
+│   │       ├── Tabs/             # Tab interface
+│   │       └── ...               # More components
+│   └── style.css                 # Base styles
+├── .storybook/
+│   ├── main.ts                   # Storybook config
+│   └── preview.ts                # Preview settings
+├── package.json
+└── tsconfig.json
 ```
 
-### Key Patterns
+---
 
-**Props Pattern (Svelte 5):**
+## Component Inventory (37 Components)
+
+### Form Controls (6)
+
+| Component        | Purpose                | bits-ui Base |
+| ---------------- | ---------------------- | ------------ |
+| `Button`         | Primary actions        | Button.Root  |
+| `Field`          | Form field wrapper     | -            |
+| `StarRating`     | 5-star rating input    | -            |
+| `AuthorInput`    | Creator autocomplete   | -            |
+| `PublisherInput` | Publisher autocomplete | -            |
+| `Toggle`         | On/off switch          | Switch.Root  |
+
+### Navigation (6)
+
+| Component           | Purpose              | bits-ui Base        |
+| ------------------- | -------------------- | ------------------- |
+| `NavigationMenu`    | Main nav container   | NavigationMenu.Root |
+| `NavigationLink`    | Nav menu links       | NavigationMenu.Link |
+| `NavigationKnob`    | Interactive nav icon | -                   |
+| `NavigationSection` | Collapsible section  | Collapsible.Root    |
+| `Breadcrumb`        | Page hierarchy       | -                   |
+| `Pagination`        | Page navigation      | -                   |
+
+### Input (5)
+
+| Component         | Purpose              | bits-ui Base |
+| ----------------- | -------------------- | ------------ |
+| `CopyToClipboard` | Copy text action     | -            |
+| `EmojiPicker`     | Emoji selection      | Popover.Root |
+| `SearchInput`     | Search with debounce | -            |
+| `DatePicker`      | Date selection       | -            |
+| `Select`          | Dropdown select      | Select.Root  |
+
+### Display (8)
+
+| Component     | Purpose          | bits-ui Base |
+| ------------- | ---------------- | ------------ |
+| `Avatar`      | User avatar      | -            |
+| `AvatarGroup` | Multiple avatars | -            |
+| `Icon`        | Material icons   | -            |
+| `BrowserIcon` | Browser logos    | -            |
+| `ColibriLogo` | Brand logo       | -            |
+| `Badge`       | Status badges    | -            |
+| `Tooltip`     | Hover tooltips   | Tooltip.Root |
+| `Card`        | Content cards    | -            |
+
+### Data Visualization (4)
+
+| Component          | Purpose            |
+| ------------------ | ------------------ |
+| `LoadingIndicator` | Spinner/progress   |
+| `QrCode`           | QR code generation |
+| `BlurhashPanel`    | Image placeholders |
+| `ProgressBar`      | Progress display   |
+
+### Layout (4)
+
+| Component     | Purpose            | bits-ui Base     |
+| ------------- | ------------------ | ---------------- |
+| `Tabs`        | Tab container      | Tabs.Root        |
+| `TabContent`  | Tab panel content  | Tabs.Content     |
+| `Collapsible` | Expandable content | Collapsible.Root |
+| `Separator`   | Visual divider     | Separator.Root   |
+
+### Feedback (2)
+
+| Component     | Purpose              |
+| ------------- | -------------------- |
+| `Toast`       | Notifications        |
+| `AlertDialog` | Confirmation dialogs |
+
+### Links (2)
+
+| Component   | Purpose        |
+| ----------- | -------------- |
+| `Author`    | Creator link   |
+| `Publisher` | Publisher link |
+
+---
+
+## Component Patterns
+
+### Props Pattern (Svelte 5)
+
 ```svelte
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import type { HTMLButtonAttributes } from 'svelte/elements';
 
-  interface Props {
-    value?: string;
-    disabled?: boolean;
+  interface Props extends HTMLButtonAttributes {
+    variant?: 'primary' | 'secondary' | 'ghost';
+    size?: 'sm' | 'md' | 'lg';
+    loading?: boolean;
     children?: Snippet;
-    onclick?: (event: MouseEvent) => void;
   }
 
   let {
-    value = $bindable(''),
-    disabled = false,
+    variant = 'primary',
+    size = 'md',
+    loading = false,
     children,
-    onclick,
+    class: className,
     ...rest
   }: Props = $props();
 </script>
+
+<button
+  class={twMerge(
+    baseStyles,
+    variantStyles[variant],
+    sizeStyles[size],
+    className,
+  )}
+  disabled={loading || rest.disabled}
+  {...rest}
+>
+  {#if loading}
+    <LoadingIndicator size="sm" />
+  {:else}
+    {@render children?.()}
+  {/if}
+</button>
 ```
 
-**bits-ui Integration:**
+### bits-ui Integration
+
 ```svelte
-<script>
+<script lang="ts">
   import { Button } from 'bits-ui';
-  const ButtonRoot = Button.Root;
+  import { twMerge } from 'tailwind-merge';
+
+  interface Props {
+    variant?: 'primary' | 'secondary';
+    children?: Snippet;
+  }
+
+  let { variant = 'primary', children, ...rest }: Props = $props();
+
+  const variantStyles = {
+    primary: 'bg-blue-600 text-white hover:bg-blue-700',
+    secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
+  };
 </script>
 
-<ButtonRoot class={twMerge(baseStyles, variantStyles, className)} {...rest}>
+<Button.Root
+  class={twMerge(
+    'rounded-lg px-4 py-2 font-medium transition-colors',
+    'focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none',
+    variantStyles[variant],
+  )}
+  {...rest}
+>
   {@render children?.()}
-</ButtonRoot>
+</Button.Root>
 ```
 
-### bits-ui Components Used
-- **Button** - Base for Button.svelte
-- **Tabs** - Base for Tabs.svelte
-- **NavigationMenu** - Base for NavigationMenu, NavigationLink
-- **Collapsible** - Used in NavigationSection
-- **Popover** - Used in EmojiPicker
+### Bindable Props
 
-### Styling Patterns
+```svelte
+<script lang="ts">
+  interface Props {
+    value?: string;
+    open?: boolean;
+  }
 
-**CRITICAL: Tailwind CSS 4 Border/Ring Color Requirements**
+  let { value = $bindable(''), open = $bindable(false) }: Props = $props();
+</script>
 
-In Tailwind CSS 4 (unlike v3), border and ring utilities REQUIRE explicit color classes. There are NO default colors.
+<!-- Parent can bind: -->
+<!-- <Component bind:value bind:open /> -->
+```
 
-**Always include color with border/ring utilities:**
+---
+
+## Styling Patterns
+
+### Tailwind CSS 4 Requirements
+
+**CRITICAL: Border and ring utilities REQUIRE explicit colors in Tailwind CSS 4.**
+
 ```svelte
 <!-- CORRECT -->
 <div class="border border-gray-200 dark:border-gray-700">...</div>
-<div class="ring ring-gray-300 dark:ring-gray-700">...</div>
-<div class="border-2 border-dashed border-gray-300">...</div>
-<div class="outline outline-blue-500">...</div>
+<div class="ring-2 ring-blue-500">...</div>
+<button class="focus-visible:ring-2 focus-visible:ring-blue-500">...</button>
 
 <!-- INCORRECT - will not show border/ring -->
 <div class="border">...</div>
-<div class="ring">...</div>
-<div class="border-2">...</div>
+<div class="ring-2">...</div>
 ```
 
-**This applies to all border/ring utilities:**
-- `border`, `border-2`, `border-t`, `border-b`, `border-l`, `border-r`
-- `border-x`, `border-y`, `border-s`, `border-e`
-- `ring`, `ring-2`, `ring-4`, `ring-inset`
-- `outline`, `outline-2`, `outline-dashed`
+### Style Composition with twMerge
 
-**Tailwind with twMerge:**
 ```typescript
 import { twMerge } from 'tailwind-merge';
 
+// Base styles
+const baseStyles = 'px-4 py-2 rounded-lg font-medium transition-colors';
+
+// Focus styles (always include ring color!)
+const focusStyles =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500';
+
+// Variant styles
+const variantStyles = {
+  primary: 'bg-blue-600 text-white hover:bg-blue-700',
+  secondary:
+    'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200',
+  ghost: 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800',
+};
+
+// Compose
 const className = twMerge(
-  'ring-2 ring-gray-200 dark:ring-gray-700',
-  'rounded outline-none shadow',
-  'focus-visible:ring-2 focus-visible:ring-blue-500',
-  customClass
+  baseStyles,
+  focusStyles,
+  variantStyles[variant],
+  customClass,
 );
 ```
 
-**Color Variables:**
-- Text: `gray-300`, `gray-500`, `gray-600`
-- Focus: `blue-500`, `blue-700`
-- Error: `red-500`, `red-700`
-- Dark mode: `dark:` prefix
+### Dark Mode
 
-### Accessibility Patterns
+```svelte
+<div
+  class="
+  border border-gray-200
+  bg-white text-gray-900
+  dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100
+"
+>
+  <!-- Content -->
+</div>
+```
 
-- **ARIA**: Explicit roles, aria-label, aria-current
-- **Keyboard**: Arrow keys, Enter/Space, Tab navigation
-- **Focus**: focus-visible rings, proper tab order
-- **Semantic HTML**: Native elements, proper labels
+### Color Variables
 
-### Storybook Setup
+| Purpose    | Light       | Dark        |
+| ---------- | ----------- | ----------- |
+| Text       | `gray-900`  | `gray-100`  |
+| Muted      | `gray-500`  | `gray-400`  |
+| Border     | `gray-200`  | `gray-700`  |
+| Background | `white`     | `gray-900`  |
+| Primary    | `blue-600`  | `blue-500`  |
+| Error      | `red-600`   | `red-500`   |
+| Success    | `green-600` | `green-500` |
 
-**Story Structure:**
+---
+
+## Accessibility Patterns
+
+### ARIA Attributes
+
+```svelte
+<button
+  role="tab"
+  aria-selected={isSelected}
+  aria-controls={panelId}
+  tabindex={isSelected ? 0 : -1}
+>
+  {label}
+</button>
+
+<div role="tabpanel" id={panelId} aria-labelledby={tabId} hidden={!isSelected}>
+  {@render children?.()}
+</div>
+```
+
+### Keyboard Navigation
+
+```svelte
+<script lang="ts">
+  function handleKeydown(event: KeyboardEvent) {
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        event.preventDefault();
+        focusNext();
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        event.preventDefault();
+        focusPrevious();
+        break;
+      case 'Home':
+        event.preventDefault();
+        focusFirst();
+        break;
+      case 'End':
+        event.preventDefault();
+        focusLast();
+        break;
+    }
+  }
+</script>
+
+<div role="tablist" onkeydown={handleKeydown}>
+  <!-- Tab buttons -->
+</div>
+```
+
+### Focus Management
+
+```svelte
+<button
+  class="
+    focus-visible:ring-2
+    focus-visible:ring-blue-500
+    focus-visible:ring-offset-2
+    focus-visible:outline-none
+    dark:focus-visible:ring-offset-gray-900
+  "
+>
+  Focusable Button
+</button>
+```
+
+---
+
+## Storybook Setup
+
+### Story Structure
+
 ```svelte
 <script context="module">
   import { defineMeta } from '@storybook/addon-svelte-csf';
@@ -141,91 +383,235 @@ const className = twMerge(
   const { Story } = defineMeta({
     title: 'Controls/Button',
     component: Button,
+    tags: ['autodocs'],
     argTypes: {
-      // Organized: Data, Control, Styling, Events, Slots
-    }
+      // Data props
+      label: { control: 'text', description: 'Button text' },
+      // Control props
+      variant: {
+        control: 'select',
+        options: ['primary', 'secondary', 'ghost'],
+        description: 'Visual variant',
+      },
+      size: {
+        control: 'select',
+        options: ['sm', 'md', 'lg'],
+        description: 'Button size',
+      },
+      disabled: { control: 'boolean', description: 'Disabled state' },
+      loading: { control: 'boolean', description: 'Loading state' },
+      // Events
+      onclick: { action: 'clicked' },
+    },
+    args: {
+      label: 'Click me',
+      variant: 'primary',
+      size: 'md',
+      disabled: false,
+      loading: false,
+    },
   });
 </script>
 
-<Story name="Default" args={{ label: 'Click me' }} />
+<Story name="Default" />
+
+<Story name="Secondary">
+  {#snippet children(args)}
+    <Button {...args} variant="secondary">Secondary</Button>
+  {/snippet}
+</Story>
+
+<Story name="Loading">
+  {#snippet children(args)}
+    <Button {...args} loading>Loading...</Button>
+  {/snippet}
+</Story>
+
+<Story name="All Variants">
+  {#snippet children(args)}
+    <div class="flex gap-4">
+      <Button variant="primary">Primary</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="ghost">Ghost</Button>
+    </div>
+  {/snippet}
+</Story>
 ```
 
-### Important Files
-- Main export: `packages/ui/src/lib/index.ts`
-- Component index: `packages/ui/src/lib/ui/index.ts`
-- Storybook main: `packages/ui/.storybook/main.ts`
-- Storybook preview: `packages/ui/.storybook/preview.ts`
-- Style root: `packages/ui/src/style.css`
+### Running Storybook
 
-### Adding a New Component
+```bash
+# From repository root
+pnpm storybook
 
-1. Create directory: `src/lib/ui/NewComponent/`
-2. Create `NewComponent.svelte`:
-   - Use Svelte 5 syntax (`$props()`, `$state()`, `$derived()`)
-   - Implement accessibility (ARIA, keyboard)
-   - Use twMerge for styling
-3. Create `NewComponent.stories.svelte`
-4. Create `index.ts` with export
-5. Add export to `src/lib/ui/index.ts`
+# From packages/ui
+pnpm storybook
+```
+
+---
+
+## Defensive Component Patterns
+
+### Guard Against Undefined Props
+
+```svelte
+<script lang="ts">
+  interface Props {
+    data?: DataType;
+  }
+
+  let { data }: Props = $props();
+
+  // Safe derived values
+  let displayName = $derived(data?.name ?? 'Unknown');
+  let items = $derived(data?.items ?? []);
+</script>
+
+{#if data}
+  <MainContent {data} />
+{:else}
+  <EmptyState message="No data available" />
+{/if}
+```
+
+### Modal Components
+
+```svelte
+<!-- Modal: Safe to assume item exists -->
+<script lang="ts">
+  interface Props {
+    item: ItemType; // Non-optional because parent guards
+    open: boolean;
+  }
+
+  let { item, open = $bindable() }: Props = $props();
+
+  // Initialize state from props
+  let name = $state(item.name);
+  let description = $state(item.description ?? '');
+</script>
+
+<!-- Parent: Guard modal rendering -->
+{#if modalOpen && item}
+  <EditModal bind:open={modalOpen} {item} />
+{/if}
+```
+
+### Event Forwarding
+
+```svelte
+<script lang="ts">
+  interface Props {
+    onclick?: (event: MouseEvent) => void;
+    onkeydown?: (event: KeyboardEvent) => void;
+  }
+
+  let { onclick, onkeydown, ...rest }: Props = $props();
+</script>
+
+<button {onclick} {onkeydown} {...rest}>
+  <slot />
+</button>
+```
+
+---
+
+## Adding a New Component
+
+### 1. Create Directory Structure
+
+```
+src/lib/ui/NewComponent/
+├── NewComponent.svelte
+├── NewComponent.stories.svelte
+└── index.ts
+```
+
+### 2. Implement Component
+
+```svelte
+<!-- NewComponent.svelte -->
+<script lang="ts">
+  import type { Snippet } from 'svelte';
+  import { twMerge } from 'tailwind-merge';
+
+  interface Props {
+    variant?: 'default' | 'alt';
+    children?: Snippet;
+    class?: string;
+  }
+
+  let { variant = 'default', children, class: className }: Props = $props();
+</script>
+
+<div
+  class={twMerge(
+    'rounded-lg p-4',
+    variant === 'default'
+      ? 'bg-white dark:bg-gray-800'
+      : 'bg-gray-100 dark:bg-gray-700',
+    className,
+  )}
+>
+  {@render children?.()}
+</div>
+```
+
+### 3. Create Story
+
+```svelte
+<!-- NewComponent.stories.svelte -->
+<script context="module">
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+  import NewComponent from './NewComponent.svelte';
+
+  const { Story } = defineMeta({
+    title: 'Layout/NewComponent',
+    component: NewComponent,
+  });
+</script>
+
+<Story name="Default">
+  {#snippet children()}
+    <NewComponent>
+      <p>Content goes here</p>
+    </NewComponent>
+  {/snippet}
+</Story>
+```
+
+### 4. Export Component
+
+```typescript
+// index.ts
+export { default as NewComponent } from './NewComponent.svelte';
+
+// Add to src/lib/ui/index.ts
+export * from './NewComponent/index.js';
+```
+
+---
 
 ## When to Use This Agent
 
 Use the UI Components Expert when:
+
 - Creating new reusable components
 - Extending bits-ui primitives
 - Writing Storybook stories
 - Implementing accessibility features
 - Working with Tailwind CSS patterns
 - Testing component behavior
-
-### Defensive Component Patterns
-
-**Guard Against Undefined Props:**
-
-When components receive data from page loads, always guard against undefined:
-
-```svelte
-<script lang="ts">
-  import type { PageProps } from './$types';
-
-  let { data }: PageProps = $props();
-  let item = $derived(data.item);  // May be undefined if load fails
-
-  // Use optional chaining for derived values
-  let computedValue = $derived(item?.someProperty ?? defaultValue);
-</script>
-
-<!-- Conditional rendering prevents crashes -->
-{#if item}
-  <MainContent {item} />
-{:else}
-  <LoadingOrErrorState />
-{/if}
-```
-
-**Modal Components:**
-- Only render modals when both `open` AND required data exists
-- Initialize `$state` from props that may be undefined
-
-```svelte
-<!-- Parent: Guard modal rendering -->
-{#if modalOpen && collection}
-  <EditModal bind:open={modalOpen} {collection} />
-{/if}
-
-<!-- Modal: Safe to assume collection exists -->
-<script lang="ts">
-  let { collection }: Props = $props();
-  let name = $state(collection.name);  // Safe - parent guards rendering
-</script>
-```
+- Fixing styling issues
 
 ## Quality Standards
 
-- Use Svelte 5 syntax throughout
-- Support dark mode via Tailwind
+- Use Svelte 5 syntax throughout (`$props()`, `$state()`, `$derived()`)
+- Support dark mode via Tailwind `dark:` prefix
 - Implement proper ARIA attributes
 - Add keyboard navigation
 - Write comprehensive Storybook stories
 - Use TypeScript for type safety
 - Guard against undefined data in components
+- Always include color with border/ring utilities
+- Use `twMerge` for class composition

@@ -107,11 +107,44 @@
       "Bash(timeout 30 pnpm build:*)",
       "Bash(timeout 60 pnpx tsc:*)",
       "Bash(timeout 180 pnpm turbo run check:*)",
-      "Bash(timeout 180 pnpm turbo run lint:*)"
+      "Bash(timeout 180 pnpm turbo run lint:*)",
+      "Bash(git add:*)",
+      "Bash(apps/app/src/lib/components/Sidebar/Sidebar.svelte )",
+      "Bash(apps/app/src/lib/trpc/router.ts )",
+      "Bash(apps/app/src/routes/\\\\\\(library\\\\\\)/works/[work=id]/+page.ts )",
+      "Bash(apps/app/src/routes/\\\\\\(library\\\\\\)/works/[work=id]/+page@\\\\\\(library\\\\\\).svelte )",
+      "Bash(packages/sdk/src/resources/series.ts )",
+      "Bash(apps/app/src/lib/components/Links/SeriesLink.svelte )",
+      "Bash(apps/app/src/lib/components/SeriesBadge.svelte )",
+      "Bash(apps/app/src/lib/trpc/routes/series.ts )",
+      "Bash(apps/app/src/routes/\\\\\\(library\\\\\\)/series/)",
+      "Bash(git commit:*)",
+      "mcp__jetbrains__get_project_modules",
+      "Bash(rimraf:*)",
+      "Bash(node bin/dev.js:*)",
+      "Bash(node bin/run.js:*)",
+      "Bash(timeout 10 node:*)",
+      "Bash(timeout 8 node:*)",
+      "WebFetch(domain:llmstxt.org)",
+      "WebFetch(domain:svelte.dev)",
+      "Bash(timeout 180 pnpm build:docs:*)",
+      "Bash(ADAPTER=static pnpm build:*)",
+      "Bash(ADAPTER=static timeout 180 pnpm build:*)",
+      "Bash(lefthook install:*)",
+      "Bash(lefthook run:*)",
+      "Bash(git restore:*)",
+      "Bash(source .env)",
+      "Bash(gh repo view:*)",
+      "Bash(gh label list:*)",
+      "Bash(gh label create:*)",
+      "Bash(gh issue create:*)",
+      "Bash(gh issue close:*)",
+      "Bash(source:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_close",
+      "WebFetch(domain:peterullrich.com)"
     ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "svelte"
-  ]
+  "enabledMcpjsonServers": ["svelte"]
 }

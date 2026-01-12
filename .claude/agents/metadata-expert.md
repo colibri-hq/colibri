@@ -11,221 +11,480 @@ You are the Metadata Expert for the Colibri platform, specializing in metadata d
 
 ### Package Architecture
 
-**Two packages for metadata:**
+**Two main locations for metadata code:**
+
 1. `packages/sdk/src/metadata/` - Provider implementations & infrastructure
-2. `packages/metadata-reconciliation/` - Domain-specific reconciliation
+2. `packages/metadata-reconciliation/` - Domain-specific reconciliation (if exists)
+3. `packages/open-library-client/` - Dedicated Open Library API client
 
-### Provider Architecture
+### Provider Overview
 
-**Location:** `packages/sdk/src/metadata/`
+**14 Metadata Providers with confidence scoring:**
 
-**Provider Interface:**
+| Provider            | Priority | Rate Limit     | Timeout | Protocol | Focus Area           |
+| ------------------- | -------- | -------------- | ------- | -------- | -------------------- |
+| WikiData            | 85       | 60/min, 1s     | 20s/60s | SPARQL   | Entities, links      |
+| Library of Congress | 85       | 30/min, 2s     | 25s/75s | SRU      | Authority records    |
+| OpenLibrary         | 80       | 100/min, 200ms | 15s/45s | REST     | Books, ISBNs         |
+| VIAF                | 75       | -              | -       | REST     | Authority linking    |
+| BNF                 | 75       | -              | -       | SRU      | French National Lib  |
+| DNB                 | 75       | -              | -       | SRU      | German National Lib  |
+| WorldCat            | 70       | -              | -       | REST     | Library holdings     |
+| OCLC                | 70       | -              | -       | REST     | WorldCat integration |
+| ISNI                | 70       | 50/min, 500ms  | 20s/60s | SRU      | Creator identities   |
+| ISBN-DB             | 65       | -              | -       | REST     | ISBN lookups         |
+| GoogleBooks         | 60       | -              | -       | REST     | Commercial data      |
+| ASIN                | 55       | -              | -       | REST     | Amazon identifiers   |
+| GoodReads           | 50       | -              | -       | REST     | User reviews         |
+| Custom              | 100      | -              | -       | Custom   | User-defined         |
+
+---
+
+## Provider Architecture
+
+### Directory Structure
+
+```
+packages/sdk/src/metadata/
+├── index.ts                    # Main exports
+├── types.ts                    # Shared types (~200 lines)
+├── provider.ts                 # Base provider interface
+├── providers/
+│   ├── open-library.ts         # Open Library provider
+│   ├── wikidata.ts             # WikiData SPARQL provider
+│   ├── library-of-congress.ts  # LoC SRU provider
+│   ├── isni.ts                 # ISNI SRU provider
+│   ├── viaf.ts                 # VIAF REST provider
+│   └── ...                     # Additional providers
+├── cache/
+│   ├── index.ts                # Cache exports
+│   ├── metadata-cache.ts       # Main cache implementation
+│   ├── record-cache.ts         # Record-level caching
+│   └── memoization.ts          # Function memoization
+├── rate-limiter.ts             # Request throttling
+├── timeout-manager.ts          # Request timeouts
+├── reconciliation/
+│   ├── index.ts                # Reconciliation exports
+│   ├── coordinator.ts          # Multi-provider orchestration
+│   ├── author-reconciler.ts    # Author name matching
+│   ├── confidence.ts           # Confidence scoring
+│   └── conflict-detector.ts    # Conflict detection
+└── embedded-metadata-converter.ts # Ebook → search query
+```
+
+### Provider Interface
+
 ```typescript
-interface MetadataProvider {
+export interface MetadataProvider {
   readonly name: string;
   readonly priority: number;
   readonly rateLimit: RateLimitConfig;
   readonly timeout: TimeoutConfig;
 
-  searchByTitle(query): Promise<MetadataRecord[]>;
-  searchByISBN(isbn): Promise<MetadataRecord[]>;
-  searchByCreator(query): Promise<MetadataRecord[]>;
-  searchMultiCriteria(query): Promise<MetadataRecord[]>;
+  // Search methods
+  searchByTitle(query: TitleQuery): Promise<MetadataRecord[]>;
+  searchByISBN(isbn: string): Promise<MetadataRecord | null>;
+  searchByCreator(query: CreatorQuery): Promise<CreatorRecord[]>;
+  searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]>;
 
-  getReliabilityScore(dataType): number;
-  supportsDataType(dataType): boolean;
+  // Capabilities
+  getReliabilityScore(dataType: DataType): number;
+  supportsDataType(dataType: DataType): boolean;
+}
+
+export interface TitleQuery {
+  title: string;
+  author?: string;
+  year?: number;
+  language?: string;
+}
+
+export interface MultiCriteriaQuery {
+  title?: string;
+  author?: string;
+  isbn?: string;
+  publisher?: string;
+  year?: number | { from: number; to: number };
+  language?: string;
+  subject?: string;
 }
 ```
 
-### Provider Configurations
+### Base Provider Implementation
 
-| Provider | Priority | Rate Limit | Timeout | Protocol |
-|----------|----------|------------|---------|----------|
-| WikiData | 85 | 60/min, 1s delay | 20s/60s | SPARQL |
-| Library of Congress | 85 | 30/min, 2s delay | 25s/75s | SRU |
-| Open Library | 80 | 100/min, 200ms | 15s/45s | REST |
-| ISNI | 70 | 50/min, 500ms | 20s/60s | SRU |
-| VIAF | - | - | - | REST |
-
-### Open Library Client
-
-**Location:** `packages/open-library-client/`
-
-**Endpoints:**
-- `/works/{id}.json`, `/books/{id}.json`
-- `/isbn/{isbn}.json`, `/authors/{id}.json`
-- `/search.json`, `/authors/search.json`
-- Covers: `/b/{type}/{identifier}-{size}.jpg`
-
-**Search Query Builder:**
-- Field-based: title, author, publisher, subject, publish_year
-- Range queries: `{ publish_year: { from: 2010, to: 2020 } }`
-- Boolean operators, faceted searches
-
-### WikiData Integration
-
-**Optimization: Exact Matching (NOT Fuzzy)**
-- Uses `?book rdfs:label "Title"@en` for fast queries
-- Early type filtering: `?book wdt:P31 wd:Q7725634`
-- 2-5x faster than fuzzy matching
-
-**Key Properties:**
-- `wdt:P50` - Author
-- `wdt:P957` - ISBN
-- `wdt:P577` - Publication date
-- `wdt:P123` - Publisher
-
-### Reconciliation System
-
-**Location:** `packages/sdk/src/metadata/reconciliation/`
-
-**Types:**
 ```typescript
-interface ReconciledField<T> {
-  value: T;
-  confidence: ConfidenceScore;
-  sources: string[];
-  conflicts?: Conflict[];
-}
+export abstract class BaseMetadataProvider implements MetadataProvider {
+  protected rateLimiter: RateLimiter;
+  protected timeoutManager: TimeoutManager;
+  protected cache: MetadataCache;
 
-interface ConfidenceScore {
-  overall: number;  // 0-1
-  factors: {
-    sourceReliability: number;
-    dataConsistency: number;
-    sourceAgreement: number;
-    dataCompleteness: number;
-  };
-  reasoning: string;
+  abstract readonly name: string;
+  abstract readonly priority: number;
+  abstract readonly rateLimit: RateLimitConfig;
+  abstract readonly timeout: TimeoutConfig;
+
+  protected async fetch<T>(url: string, options?: FetchOptions): Promise<T> {
+    // Rate limiting
+    await this.rateLimiter.waitForSlot();
+
+    // Cache check
+    const cached = this.cache.get<T>(url);
+    if (cached) return cached;
+
+    // Fetch with timeout
+    const response = await this.timeoutManager.withRequestTimeout(
+      fetch(url, options),
+    );
+
+    const data = await response.json();
+
+    // Cache result
+    this.cache.set(url, data);
+
+    return data;
+  }
+
+  abstract searchByTitle(query: TitleQuery): Promise<MetadataRecord[]>;
+  abstract searchByISBN(isbn: string): Promise<MetadataRecord | null>;
+  abstract searchByCreator(query: CreatorQuery): Promise<CreatorRecord[]>;
+  abstract searchMultiCriteria(
+    query: MultiCriteriaQuery,
+  ): Promise<MetadataRecord[]>;
 }
 ```
 
-**Author Reconciler:**
-- Name normalization (remove titles, suffixes)
-- Fuzzy matching with Levenshtein distance
-- Initial matching (J. Smith vs John Smith)
-- Name order variation handling
+---
 
-### Caching System
+## Open Library Client
 
-**Location:** `packages/sdk/src/metadata/cache.ts`
+### Location: `packages/open-library-client/`
 
-**Eviction Strategies:**
-- LRU (Least Recently Used) - Default
-- LFU (Least Frequently Used)
-- FIFO (First In, First Out)
-- TTL_ONLY
+### Endpoints
 
-**Default Config:**
-- maxSize: 1000 entries
-- defaultTtl: 300000ms (5 minutes)
-- cleanupInterval: 60000ms (1 minute)
+| Endpoint                    | Purpose             | Example                          |
+| --------------------------- | ------------------- | -------------------------------- |
+| `/works/{id}.json`          | Get work by ID      | `/works/OL45883W.json`           |
+| `/books/{id}.json`          | Get edition by ID   | `/books/OL7353617M.json`         |
+| `/isbn/{isbn}.json`         | Get edition by ISBN | `/isbn/9780140328721.json`       |
+| `/authors/{id}.json`        | Get author by ID    | `/authors/OL23919A.json`         |
+| `/search.json`              | Search works        | `/search.json?q=the+hobbit`      |
+| `/authors/search.json`      | Search authors      | `/authors/search.json?q=tolkien` |
+| `/b/{type}/{id}-{size}.jpg` | Get cover image     | `/b/isbn/9780140328721-M.jpg`    |
 
-### Rate Limiting
+### Search Query Builder
 
-**RateLimitConfig:**
 ```typescript
-{
-  maxRequests: number;    // Per window
-  windowMs: number;       // Time window
-  requestDelay?: number;  // Between requests
+import { OpenLibraryClient } from '@colibri-hq/open-library-client';
+
+const client = new OpenLibraryClient();
+
+// Simple search
+const results = await client.search({
+  title: 'The Hobbit',
+  author: 'Tolkien',
+});
+
+// Advanced search with ranges
+const results = await client.search({
+  title: 'fantasy',
+  publish_year: { from: 2010, to: 2020 },
+  language: 'eng',
+  limit: 20,
+});
+
+// ISBN lookup
+const edition = await client.getByISBN('9780140328721');
+
+// Author search
+const authors = await client.searchAuthors({ q: 'Tolkien' });
+```
+
+---
+
+## WikiData Integration
+
+### SPARQL Optimization
+
+**Exact Matching (Fast):**
+
+```sparql
+SELECT ?book ?bookLabel ?isbn WHERE {
+  ?book rdfs:label "The Hobbit"@en .
+  ?book wdt:P31 wd:Q7725634 .  # Instance of: literary work
+  OPTIONAL { ?book wdt:P957 ?isbn }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en" }
 }
 ```
+
+**Key WikiData Properties:**
+
+| Property    | Name             | Description         |
+| ----------- | ---------------- | ------------------- |
+| `wdt:P31`   | instance of      | Type classification |
+| `wdt:P50`   | author           | Creator of work     |
+| `wdt:P957`  | ISBN-13          | ISBN identifier     |
+| `wdt:P577`  | publication date | When published      |
+| `wdt:P123`  | publisher        | Publishing entity   |
+| `wdt:P1476` | title            | Work title          |
+| `wdt:P407`  | language         | Language of work    |
+| `wdt:P921`  | main subject     | Subject/topic       |
+
+**WikiData Types:**
+
+| QID         | Type           |
+| ----------- | -------------- |
+| `Q7725634`  | literary work  |
+| `Q571`      | book           |
+| `Q47461344` | written work   |
+| `Q5`        | human (author) |
+| `Q2085381`  | publisher      |
+
+---
+
+## Reconciliation System
 
 ### Confidence Scoring
 
-**Factors:**
-1. Base Confidence (0.5-0.8)
-2. Source Count Boost (+0.05 per source)
-3. Agreement Boost
-4. Quality Boost
-5. Consensus Boost
-6. Disagreement Penalty (-0.1 to -0.2)
-
-**Tiers:**
-- Exceptional: > 0.95
-- Strong: 0.85-0.95
-- Good: 0.70-0.85
-- Moderate: 0.50-0.70
-- Weak: 0.30-0.50
-- Poor: < 0.30
-
-### Metadata Reconciliation Package
-
-**Location:** `packages/metadata-reconciliation/`
-**Package:** `@colibri-hq/metadata-reconciliation`
-
-**Domain-Specific Reconcilers:**
-| Reconciler | Purpose |
-|------------|---------|
-| `DateReconciler` | Publication dates, date ranges |
-| `PublisherReconciler` | Publisher entity merging |
-| `PlaceReconciler` | Publication places |
-| `SubjectReconciler` | Subject/category merging |
-| `IdentifierReconciler` | ISBN, ASIN, OCLC, etc. |
-| `PhysicalReconciler` | Page count, dimensions, format |
-| `ContentReconciler` | Synopsis, TOC, descriptions |
-| `SeriesReconciler` | Series name & position |
-
-**MetadataCoordinator:**
 ```typescript
-// Orchestrates multiple providers with configurable strategies
-const coordinator = new MetadataCoordinator(config);
-const result = await coordinator.search(query);
-// Returns: { records, quality, timing, errors }
+export interface ConfidenceScore {
+  overall: number; // 0-1 final score
+  factors: {
+    sourceReliability: number; // Provider trustworthiness
+    dataConsistency: number; // Internal consistency
+    sourceAgreement: number; // Multi-source agreement
+    dataCompleteness: number; // Field coverage
+  };
+  reasoning: string; // Human-readable explanation
+}
+
+export function calculateConfidence(
+  records: MetadataRecord[],
+  field: string,
+): ConfidenceScore {
+  const baseConfidence = 0.5;
+  let score = baseConfidence;
+
+  // Source count boost (+0.05 per additional source)
+  score += Math.min((records.length - 1) * 0.05, 0.2);
+
+  // Agreement boost (all sources agree)
+  const values = records.map((r) => r[field]);
+  const allAgree = values.every((v) => v === values[0]);
+  if (allAgree && records.length > 1) {
+    score += 0.15;
+  }
+
+  // Quality boost (high-priority sources)
+  const avgPriority =
+    records.reduce((sum, r) => sum + r.source.priority, 0) / records.length;
+  score += (avgPriority / 100) * 0.1;
+
+  // Disagreement penalty
+  if (!allAgree) {
+    score -= 0.1;
+  }
+
+  return {
+    overall: Math.min(Math.max(score, 0), 1),
+    factors: {
+      /* ... */
+    },
+    reasoning: generateReasoning(records, field, score),
+  };
+}
 ```
 
-**QueryStrategyBuilder:**
-```typescript
-// Progressive query relaxation for better results
-const strategy = new QueryStrategyBuilder()
-  .addRelaxationRule({ field: 'author', action: 'remove' })
-  .addRelaxationRule({ field: 'year', action: 'expand', range: 5 })
-  .build();
-```
+### Confidence Tiers
 
-**PreviewGenerator:**
-```typescript
-// Generate human-readable metadata previews
-const preview = PreviewGenerator.generate(records);
-// Returns: { fields, quality, conflicts, sources }
-```
+| Tier        | Range       | Description           |
+| ----------- | ----------- | --------------------- |
+| Exceptional | > 0.95      | Very high confidence  |
+| Strong      | 0.85 - 0.95 | Reliable data         |
+| Good        | 0.70 - 0.85 | Generally trustworthy |
+| Moderate    | 0.50 - 0.70 | Some uncertainty      |
+| Weak        | 0.30 - 0.50 | Low confidence        |
+| Poor        | < 0.30      | Unreliable            |
 
-**ConflictDetector & ConflictDisplayFormatter:**
-```typescript
-// Identify conflicts between sources
-const conflicts = ConflictDetector.detect(records);
-// Format for CLI/UI display
-const formatted = ConflictDisplayFormatter.format(conflicts);
-```
-
-### Embedded Metadata Conversion
-
-**Location:** `packages/sdk/src/metadata/embedded-metadata-converter.ts`
+### Reconciled Field Structure
 
 ```typescript
-// Convert ebook-embedded metadata to provider search queries
-EmbeddedMetadataConverter.convert(ebookMetadata) → BookMetadata
-createSearchQueryFromEmbedded(metadata) → MultiCriteriaQuery
+export interface ReconciledField<T> {
+  value: T;
+  confidence: ConfidenceScore;
+  sources: string[]; // Provider names
+  conflicts?: Conflict[]; // Disagreements
+}
+
+export interface Conflict {
+  field: string;
+  values: { source: string; value: unknown }[];
+  severity: 'low' | 'medium' | 'high';
+}
 ```
 
-### Important Files
+---
 
-- Provider interface: `packages/sdk/src/metadata/provider.ts`
-- Open Library: `packages/sdk/src/metadata/open-library.ts`
-- WikiData: `packages/sdk/src/metadata/wikidata.ts`
-- ISNI: `packages/sdk/src/metadata/isni.ts`
-- LoC: `packages/sdk/src/metadata/library-of-congress.ts`
-- VIAF: `packages/sdk/src/metadata/viaf.ts`
-- Cache: `packages/sdk/src/metadata/cache.ts`
-- Rate limiter: `packages/sdk/src/metadata/rate-limiter.ts`
-- Reconciliation (SDK): `packages/sdk/src/metadata/reconciliation/`
-- Reconciliation (Package): `packages/metadata-reconciliation/src/`
-- Open Library Client: `packages/open-library-client/src/`
+## Caching System
+
+### Cache Configuration
+
+```typescript
+export interface CacheConfig {
+  maxSize: number; // Max entries (default: 1000)
+  defaultTtl: number; // TTL in ms (default: 300000 = 5min)
+  cleanupInterval: number; // Cleanup frequency (default: 60000)
+  evictionStrategy: EvictionStrategy;
+}
+
+export enum EvictionStrategy {
+  LRU = 'lru', // Least Recently Used (default)
+  LFU = 'lfu', // Least Frequently Used
+  FIFO = 'fifo', // First In, First Out
+  TTL_ONLY = 'ttl_only', // Only expire by TTL
+}
+```
+
+### Cache Usage
+
+```typescript
+import { MetadataCache } from '@colibri-hq/sdk/metadata';
+
+const cache = new MetadataCache({
+  maxSize: 500,
+  defaultTtl: 600000, // 10 minutes
+  evictionStrategy: EvictionStrategy.LRU,
+});
+
+// Set with custom TTL
+cache.set('key', value, { ttl: 300000 });
+
+// Get with type safety
+const result = cache.get<MetadataRecord>('key');
+
+// Clear expired entries
+cache.cleanup();
+
+// Get stats
+const stats = cache.getStats();
+// { size, hits, misses, hitRate }
+```
+
+---
+
+## Rate Limiting
+
+```typescript
+export interface RateLimitConfig {
+  maxRequests: number; // Requests per window
+  windowMs: number; // Time window in ms
+  requestDelay?: number; // Min delay between requests
+}
+
+export class RateLimiter {
+  constructor(config: RateLimitConfig);
+
+  async waitForSlot(): Promise<void>;
+
+  getStatus(): {
+    remainingRequests: number;
+    resetAt: Date;
+  };
+}
+
+// Per-provider configuration
+const rateLimiters = {
+  openLibrary: new RateLimiter({
+    maxRequests: 100,
+    windowMs: 60000,
+    requestDelay: 200,
+  }),
+  wikiData: new RateLimiter({
+    maxRequests: 60,
+    windowMs: 60000,
+    requestDelay: 1000,
+  }),
+};
+```
+
+---
+
+## Author Reconciliation
+
+```typescript
+export class AuthorReconciler {
+  // Normalize name (remove titles, suffixes)
+  normalize(name: string): string {
+    return name
+      .replace(/^(Dr\.|Prof\.|Mr\.|Mrs\.|Ms\.)\s*/i, '')
+      .replace(/,?\s*(Jr\.|Sr\.|III|IV|PhD|MD)$/i, '')
+      .trim();
+  }
+
+  // Calculate similarity score
+  calculateSimilarity(name1: string, name2: string): number {
+    const n1 = this.normalize(name1).toLowerCase();
+    const n2 = this.normalize(name2).toLowerCase();
+
+    // Exact match
+    if (n1 === n2) return 1.0;
+
+    // Initial matching (J. Smith vs John Smith)
+    if (this.initialsMatch(n1, n2)) return 0.85;
+
+    // Fuzzy match (Levenshtein)
+    return this.levenshteinSimilarity(n1, n2);
+  }
+
+  // Handle name order variations
+  initialsMatch(name1: string, name2: string): boolean {
+    // "J. R. R. Tolkien" matches "John Ronald Reuel Tolkien"
+    // Implementation...
+  }
+}
+```
+
+---
+
+## Embedded Metadata Conversion
+
+```typescript
+import { EmbeddedMetadataConverter } from '@colibri-hq/sdk/metadata';
+
+// Convert ebook metadata to provider search query
+const ebookMetadata = await loadMetadata(epubFile);
+const searchQuery = EmbeddedMetadataConverter.toSearchQuery(ebookMetadata);
+
+// Result:
+// {
+//   title: "The Hobbit",
+//   author: "J.R.R. Tolkien",
+//   isbn: "9780261103283",
+//   publisher: "HarperCollins",
+//   year: 1937
+// }
+```
+
+---
+
+## Important Files
+
+| File                                        | Purpose                  |
+| ------------------------------------------- | ------------------------ |
+| `packages/sdk/src/metadata/index.ts`        | Main exports             |
+| `packages/sdk/src/metadata/types.ts`        | Shared types             |
+| `packages/sdk/src/metadata/provider.ts`     | Base provider interface  |
+| `packages/sdk/src/metadata/providers/`      | Provider implementations |
+| `packages/sdk/src/metadata/cache/`          | Caching system           |
+| `packages/sdk/src/metadata/rate-limiter.ts` | Rate limiting            |
+| `packages/sdk/src/metadata/reconciliation/` | Reconciliation logic     |
+| `packages/open-library-client/`             | Open Library client      |
+
+---
 
 ## When to Use This Agent
 
 Use the Metadata Expert when:
+
 - Implementing new metadata providers
 - Working with external APIs (Open Library, WikiData, etc.)
 - Implementing reconciliation logic
