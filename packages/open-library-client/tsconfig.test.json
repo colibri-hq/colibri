@@ -2,11 +2,12 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "composite": true,
+    "rootDir": ".",
+    "noEmit": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "tsBuildInfoFile": ".cache/tsbuildinfo.test.json",
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals", "node"]
   },
-  "include": ["src/**/*.test.ts", "src/**/*.spec.ts", "test/**/*.ts"],
-  "references": [{ "path": "./tsconfig.lib.json" }]
+  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "exclude": ["dist"]
 }

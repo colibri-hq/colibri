@@ -4,5 +4,5 @@
   "compilerOptions": { "tsBuildInfoFile": ".cache/tsbuildinfo.json" },
   "exclude": ["src/**/*.test.ts", "src/**/*.spec.ts"],
   "include": ["src/**/*.ts"],
-  "references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.test.json" }]
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

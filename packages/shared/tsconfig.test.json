@@ -2,11 +2,12 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "composite": true,
+    "rootDir": ".",
+    "noEmit": true,
     "lib": ["ESNext"],
     "tsBuildInfoFile": ".cache/tsbuildinfo.test.json",
     "types": ["vitest/globals", "node"]
   },
-  "include": ["src/**/*.test.ts", "src/**/*.spec.ts", "tests/**/*.ts"],
-  "exclude": []
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
+  "exclude": ["dist"]
 }
