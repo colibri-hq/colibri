@@ -7,6 +7,7 @@ export default defineConfig({
     include: ["src/**/*.test.ts"],
     exclude: ["node_modules", "dist"],
     maxWorkers: 4,
+    reporters: process.env.CI ? ["default", "github-actions"] : ["default"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],

@@ -46,18 +46,23 @@
     "lint:ci": "oxlint --format github && eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
     "fmt": "oxfmt --write .",
     "fmt:ci": "oxfmt --check .",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
     "prepack": "pnpm run fmt && pnpm run check && pnpm run lint && pnpm run build"
   },
   "dependencies": {
-    "@colibri-hq/shared": "workspace:*",
-    "vitest": "catalog:"
+    "@colibri-hq/shared": "workspace:*"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
     "eslint": "catalog:",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
     "rimraf": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

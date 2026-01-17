@@ -1,10 +1,13 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig, mergeConfig } from "vitest/config";
+
+export { mergeConfig };
 
 export const config = defineConfig({
   test: {
     globals: true,
     environment: "node",
     include: ["src/**/*.test.ts"],
+    reporters: process.env.CI ? ["default", "github-actions"] : ["default"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
