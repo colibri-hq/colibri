@@ -292,7 +292,7 @@ test.describe("Metadata Enrichment Database Operations", () => {
     expect(errorThrown).toBe(true);
   });
 
-  test("cascade delete removes enrichment when work is deleted", async ({ database }) => {
+  test("cascade delete removes enrichment when work is deleted", async () => {
     // This test would need a temporary work to avoid affecting other tests
     // Skipping implementation as it would require complex setup
     test.skip();

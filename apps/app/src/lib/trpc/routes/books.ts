@@ -1,5 +1,5 @@
 import { emitImportEvent } from "$lib/server/import-events";
-import { downloadUrl, uploadUrl, read } from "$lib/server/storage";
+import { uploadUrl, read } from "$lib/server/storage";
 import { procedure, t, unguardedProcedure } from "$lib/trpc/t";
 import {
   createEdition,
@@ -74,7 +74,7 @@ export const books = t.router({
         description: z.string().nullable().optional(),
       }),
     )
-    .mutation(async ({ input: { id }, ctx: { database } }) => {
+    .mutation(async ({ input: { id } }) => {
       if (!id) {
         throw new Error("Works must not be created via the JSON API");
       }
@@ -83,7 +83,7 @@ export const books = t.router({
 
   delete: procedure()
     .input(z.string())
-    .mutation(async ({ input: id, ctx: { database } }) => {
+    .mutation(async () => {
       // TODO: Implement work deletion via SDK
     }),
 
@@ -201,10 +201,7 @@ export const books = t.router({
       }),
     )
     .mutation(
-      async ({
-        input: { uploadId, checksum, mimeType, size, filename },
-        ctx: { userId, database, storage },
-      }) => {
+      async ({ input: { uploadId, checksum, filename }, ctx: { userId, database, storage } }) => {
         // Check for exact duplicate by checksum
         const existingAsset = await findAssetByChecksum(database, checksum);
 
@@ -450,7 +447,7 @@ export const books = t.router({
    */
   applyEnrichment: procedure()
     .input(z.object({ enrichmentId: z.string(), selectedFields: z.array(z.string()).optional() }))
-    .mutation(async ({ input: { enrichmentId, selectedFields }, ctx: { database, userId } }) => {
+    .mutation(async ({ input: { enrichmentId, selectedFields }, ctx: { database } }) => {
       // Load enrichment result
       const enrichment = await database
         .selectFrom("enrichment_result")
@@ -459,7 +456,6 @@ export const books = t.router({
         .where("status", "=", "pending")
         .executeTakeFirstOrThrow();
 
-      const preview = enrichment.preview as MetadataPreview;
       const improvements = enrichment.improvements as Record<string, unknown>;
 
       // Build update object based on selected fields (or all if not specified)

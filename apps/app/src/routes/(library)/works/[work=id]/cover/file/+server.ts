@@ -50,6 +50,7 @@ export const GET = async function ({ params, request, url, locals: { database, s
   const key = storageUrl.pathname.slice(1); // Remove leading /
   const body = await read(await storage, key);
 
+  // @ts-expect-error Type mismatch between Web and Node Response
   return new Response(body, {
     status: 200,
     headers: {

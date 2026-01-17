@@ -114,6 +114,7 @@
               <p class="text-sm text-gray-500 dark:text-gray-400">No resolved reports yet</p>
             {:else}
               {@const total = stats.byResolution.dismissed + stats.byResolution.hidden + stats.byResolution.deleted}
+              <!-- eslint-disable svelte/no-inline-styles -- Dynamic progress bar widths from statistics -->
               <div class="space-y-2">
                 <div class="flex items-center gap-2">
                   <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
@@ -143,6 +144,7 @@
                   <span class="text-xs text-gray-500 w-20">Deleted ({stats.byResolution.deleted})</span>
                 </div>
               </div>
+              <!-- eslint-enable svelte/no-inline-styles -->
             {/if}
 
             {#if stats.averageResolutionTimeHours !== null}

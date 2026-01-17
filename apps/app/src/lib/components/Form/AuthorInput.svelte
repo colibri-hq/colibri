@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Autocomplete, Icon } from '@colibri-hq/ui';
   import { trpc } from '$lib/trpc/client';
+  import { page } from '$app/state';
 
   interface Props {
     name?: string;
@@ -28,7 +29,7 @@
 
     loading = true;
     try {
-      const authors = await trpc({} as any).creators.autocomplete.query(term);
+      const authors = await trpc(page).creators.autocomplete.query(term);
       items = authors.map(({ id, name }) => ({ id, label: name }));
     } catch (error) {
       console.error(`Failed to fetch suggestions: ${(error as Error).message}`);
@@ -89,11 +90,13 @@
   placeholder="Search authors…"
 />
 {#if nameFixable}
-  <div
+  <button
     class="flex cursor-pointer items-center justify-end pt-1 text-xs text-blue-500 select-none"
     onclick={useFixedName}
   >
     <Icon class="mr-1 text-sm" name="lightbulb" />
-    <span class="text-blue-500 underline">Use "{fixedName}" instead</span>
-  </div>
+    <span class="text-blue-500 underline">
+      Use "{fixedName}" instead
+    </span>
+  </button>
 {/if}

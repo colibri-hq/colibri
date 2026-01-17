@@ -3,6 +3,7 @@
   import { Icon } from '@colibri-hq/ui';
   import { SvelteSet } from 'svelte/reactivity';
   import type { ContentSearchResult } from '@colibri-hq/sdk';
+  import { resolve } from '$app/paths';
 
   interface Props {
     results: ContentSearchResult[];
@@ -40,7 +41,7 @@
       <li class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <div class="flex gap-4">
           <!-- Book cover thumbnail -->
-          <a href="/works/{result.workId}" class="shrink-0">
+          <a href={resolve('/(library)/works/[work=id]', {work: result.workId})} class="shrink-0">
             <BookCover
               book={result.workId}
               edition={result.editionId}
@@ -53,12 +54,13 @@
           <!-- Content -->
           <div class="min-w-0 flex-1">
             <div class="flex items-start justify-between gap-2">
-              <a href="/works/{result.workId}" class="hover:underline">
+              <a href={resolve('/(library)/works/[work=id]', {work: result.workId})} class="hover:underline">
                 <h3 class="font-serif text-lg font-medium text-gray-900 dark:text-gray-100">
                   {result.title}
                 </h3>
               </a>
-              <span class="shrink-0 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+              <span
+                class="shrink-0 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                 {result.matchCount} {result.matchCount === 1 ? 'match' : 'matches'}
               </span>
             </div>
@@ -94,11 +96,11 @@
   </ul>
 {/if}
 
-<style>
-  @reference "tailwindcss";
+<style lang="postcss">
+    @reference "tailwindcss";
 
-  /* Highlight matched terms from ts_headline */
-  :global(mark) {
-    @apply rounded bg-yellow-200 px-0.5 font-medium text-gray-900 dark:bg-yellow-500/30 dark:text-yellow-200;
-  }
+    /* Highlight matched terms from ts_headline */
+    :global(mark) {
+        @apply rounded bg-yellow-200 px-0.5 font-medium text-gray-900 dark:bg-yellow-500/30 dark:text-yellow-200;
+    }
 </style>

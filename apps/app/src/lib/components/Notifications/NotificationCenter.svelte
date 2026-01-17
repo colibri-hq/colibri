@@ -60,7 +60,6 @@
 <!-- Drawer overlay and panel -->
 {#if open}
   <!-- Backdrop -->
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm"
     in:fade={{ duration: 200 }}
@@ -70,7 +69,6 @@
     role="presentation"
   >
     <!-- Drawer Panel -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl rounded-s-4xl
              dark:bg-gray-900 dark:ring dark:ring-gray-800"

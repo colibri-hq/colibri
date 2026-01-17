@@ -32,8 +32,10 @@
     missingCover = true;
   }
 
-  // Generate a consistent color based on the book ID for variety
-  function getBookGradient(id: string): string {
+  /**
+   * Generates a consistent color based on the book ID for variety
+   */
+  function getBookGradient(id: string) {
     const gradients = [
       'linear-gradient(to bottom right, #9f1239, #4c0519)', // rose
       'linear-gradient(to bottom right, #b45309, #78350f)', // amber
@@ -47,14 +49,16 @@
       'linear-gradient(to bottom right, #c2410c, #7c2d12)', // orange
     ];
     let hash = 0;
+
     for (let i = 0; i < id.length; i++) {
       hash = (hash << 5) - hash + id.charCodeAt(i);
       hash |= 0;
     }
-    return gradients[Math.abs(hash) % gradients.length];
+
+    return gradients[Math.abs(hash) % gradients.length]!;
   }
 
-  let bgGradient = $derived(getBookGradient(book));
+  const bgGradient = $derived(getBookGradient(book));
 </script>
 
 <div
@@ -74,7 +78,8 @@
       <BlurhashPanel class="absolute inset-0 z-0 h-full w-full" {blurhash} />
     {:else}
       <!-- Fallback book cover design -->
-      <div class="fallback-cover absolute inset-0" style="background: {bgGradient}">
+      <!-- eslint-disable-next-line svelte/no-inline-styles -- Dynamic background based on book title -->
+      <div class="fallback-cover absolute inset-0" style:background={bgGradient}>
         <!-- Inner border/frame -->
         <div
           class="absolute inset-3 rounded-sm border border-white/20 sm:inset-4"
@@ -106,7 +111,7 @@
     {/if}
 
     <!-- Aspect ratio placeholder for fallback -->
-    <div class="aspect-[2/3]"></div>
+    <div class="aspect-2/3"></div>
   {/if}
 
   <!-- Book spine highlight overlay (always visible) -->
@@ -114,41 +119,40 @@
 </div>
 
 <style lang="postcss">
-  .book-cover {
-    /* Subtle book shadow */
-    box-shadow:
-      2px 2px 8px rgba(0, 0, 0, 0.3),
-      inset -1px 0 0 rgba(255, 255, 255, 0.1);
-  }
+    .book-cover {
+        /* Subtle book shadow */
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3),
+        inset -1px 0 0 rgba(255, 255, 255, 0.1);
+    }
 
-  .spine-overlay {
-    background: linear-gradient(
-      to right,
-      /* Spine edge shadow */ rgba(0, 0, 0, 0.4) 0%,
-      rgba(0, 0, 0, 0.2) 0.5%,
-      /* Spine highlight */ rgba(255, 255, 255, 0.3) 1%,
-      rgba(255, 255, 255, 0.15) 1.5%,
-      rgba(255, 255, 255, 0.1) 2%,
-      /* Transition to cover */ rgba(0, 0, 0, 0.05) 2.5%,
-      transparent 4%,
-      /* Subtle page edge on right */ transparent 97%,
-      rgba(255, 255, 255, 0.05) 98%,
-      rgba(0, 0, 0, 0.1) 100%
-    );
-  }
+    .spine-overlay {
+        background: linear-gradient(
+                to right,
+                    /* Spine edge shadow */ rgba(0, 0, 0, 0.4) 0%,
+                rgba(0, 0, 0, 0.2) 0.5%,
+                    /* Spine highlight */ rgba(255, 255, 255, 0.3) 1%,
+                rgba(255, 255, 255, 0.15) 1.5%,
+                rgba(255, 255, 255, 0.1) 2%,
+                    /* Transition to cover */ rgba(0, 0, 0, 0.05) 2.5%,
+                transparent 4%,
+                    /* Subtle page edge on right */ transparent 97%,
+                rgba(255, 255, 255, 0.05) 98%,
+                rgba(0, 0, 0, 0.1) 100%
+        );
+    }
 
-  .fallback-cover::before {
-    /* Subtle texture overlay */
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 2px,
-      rgba(255, 255, 255, 0.03) 2px,
-      rgba(255, 255, 255, 0.03) 4px
-    );
-    pointer-events: none;
-  }
+    .fallback-cover::before {
+        /* Subtle texture overlay */
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 2px,
+                rgba(255, 255, 255, 0.03) 2px,
+                rgba(255, 255, 255, 0.03) 4px
+        );
+        pointer-events: none;
+    }
 </style>

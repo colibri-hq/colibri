@@ -1,6 +1,5 @@
 import { procedure, t } from "$lib/trpc/t";
 import {
-  createNotification,
   deleteNotification,
   getNotifications,
   getOrCreateNotificationPreferences,

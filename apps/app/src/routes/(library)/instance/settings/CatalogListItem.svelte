@@ -42,10 +42,12 @@
   class="rounded-3xl bg-gray-50 shadow-inner-sm dark:bg-gray-900 dark:shadow-none dark:ring
   dark:ring-gray-700/50"
 >
+  <!-- eslint-disable svelte/no-inline-styles -- Dynamic gradient from catalog data -->
   <div
     class="flex items-start rounded-3xl p-4"
     style:background="linear-gradient(120deg, {backgroundColor} 5%, transparent 50%)"
   >
+  <!-- eslint-enable svelte/no-inline-styles -->
     <!-- region Catalog image -->
     <div
       class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-white"

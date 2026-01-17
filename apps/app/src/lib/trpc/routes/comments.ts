@@ -38,7 +38,6 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 const entityTypeSchema = z.enum(["work", "creator", "publisher", "series", "collection"]);
-type EntityType = z.infer<typeof entityTypeSchema>;
 
 /**
  * Extract @mentioned usernames from content

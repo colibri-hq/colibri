@@ -15,7 +15,7 @@
     onclick,
   }: Props = $props();
 
-  const statusConfig = {
+  const statusConfig = $derived({
     none: {
       icon: "auto_fix_high",
       label: "Fetch metadata",
@@ -31,7 +31,7 @@
       label: `${improvementCount} improvement${improvementCount !== 1 ? "s" : ""} available`,
       class: "text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-300",
     },
-  };
+  });
 
   const config = $derived(statusConfig[status]);
 </script>

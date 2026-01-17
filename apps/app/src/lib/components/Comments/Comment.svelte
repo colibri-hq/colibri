@@ -99,7 +99,7 @@
 
   // Find the reaction of the active user
   let reaction = $state<string | undefined>(
-    comment.reactions.find((r: CommentReaction) => r.user_id.toString() === activeUserId)
+    comment.reactions.find(({ user_id }: CommentReaction) => user_id.toString() === activeUserId)
       ?.emoji,
   );
 
@@ -123,13 +123,14 @@
 
   async function addReaction(event: { emoji: string }) {
     const commentId = comment.id;
+
     onReaction?.({ commentId, emoji: event.emoji });
   }
 
   function toggleReaction(emoji: string) {
     return async () => {
-      reaction = reaction === emoji ? undefined : emoji;
       const commentId = comment.id;
+      reaction = reaction === emoji ? undefined : emoji;
 
       return reaction
         ? onReaction?.({ commentId, emoji })
@@ -150,11 +151,15 @@
   async function saveEdit() {
     if (editContent.trim() === comment.content.trim()) {
       isEditing = false;
+
       return;
     }
+
     isSaving = true;
+
     try {
       await onEdit?.({ commentId: comment.id, content: editContent.trim() });
+
       isEditing = false;
     } finally {
       isSaving = false;
@@ -167,8 +172,10 @@
 
   async function executeDelete() {
     isDeleting = true;
+
     try {
       await onDelete?.({ commentId: comment.id });
+
       showDeleteConfirm = false;
     } finally {
       isDeleting = false;

@@ -1054,7 +1054,8 @@
               <div
                 class="rounded-lg border bg-white dark:bg-gray-900 overflow-hidden transition-all {isFocused ? 'border-blue-400 dark:border-blue-500 shadow-md' : 'border-gray-200 dark:border-gray-700'} {isSelected ? 'ring-2 ring-blue-500' : ''}"
                 role="article"
-                tabindex={isFocused ? 0 : -1}>
+                tabindex={isFocused ? 0 : -1}
+              >
                 <!-- Report header -->
                 <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
                   <div class="flex items-center justify-between">
@@ -1065,7 +1066,7 @@
                           checked={selectedReportIds.has(report.id.toString())}
                           onchange={() => toggleReportSelection(report.id.toString())}
                           class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          onclick={(e: Event) => e.stopPropagation()}
+                          onclick={(e) => e.stopPropagation()}
                         />
                       {/if}
                       <Gravatar

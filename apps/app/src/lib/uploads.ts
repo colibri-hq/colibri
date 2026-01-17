@@ -4,10 +4,9 @@ import type {
   ResumeRequest,
   UploadRequest,
   UploadResponse,
-  UploadStatus,
 } from "$lib/workers/upload.worker.types";
 import { browser } from "$app/environment";
-import { success, error as notifyError, warning } from "$lib/notifications";
+import { error as notifyError, warning } from "$lib/notifications";
 import { loadWorker, type WebWorker } from "$lib/workers/workers";
 import { generateRandomUuid } from "@colibri-hq/shared";
 import { derived, get, writable } from "svelte/store";

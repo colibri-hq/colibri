@@ -6,6 +6,7 @@
   import { error as notifyError, success } from '$lib/notifications';
   import { Icon } from '@colibri-hq/ui';
   import type { SettingKey } from '@colibri-hq/sdk';
+  import { SvelteSet } from 'svelte/reactivity';
 
   interface ProviderState {
     enabled: boolean;
@@ -142,7 +143,7 @@
 
   // State
   let loading = $state(true);
-  let savingKeys = $state<Set<string>>(new Set());
+  let savingKeys = new SvelteSet<string>();
   let enabledProviders = $state<string[]>([]);
   let providersState = $state<Record<string, ProviderState>>({});
   let coverFallbackEnabled = $state(true);
@@ -203,7 +204,6 @@
 
   async function saveSetting(key: SettingKey, value: unknown) {
     savingKeys.add(key);
-    savingKeys = new Set(savingKeys);
 
     try {
       await trpc(page).settings.set.mutate({ key, value });
@@ -214,7 +214,6 @@
       });
     } finally {
       savingKeys.delete(key);
-      savingKeys = new Set(savingKeys);
     }
   }
 

@@ -4,7 +4,7 @@
   import ContentSearchResults from '$lib/components/Search/ContentSearchResults.svelte';
   import { trpc } from '$lib/trpc/client';
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import type { PageProps } from './$types';
   import type { ContentSearchResult } from '@colibri-hq/sdk';
 
@@ -12,7 +12,7 @@
   let works = $derived(data.works);
 
   // Search state
-  let searchTerm = $state($page.url.searchParams.get('q') || '');
+  let searchTerm = $state(page.url.searchParams.get('q') || '');
   let searchMode = $state<'titles' | 'content'>('titles');
   let contentResults = $state<ContentSearchResult[]>([]);
   let isSearchingContent = $state(false);
@@ -27,15 +27,16 @@
     }
 
     isSearchingContent = true;
+
     try {
-      const results = await trpc($page).search.content.query({
+      contentResults = await trpc(page).search.content.query({
         query,
         limit: 20,
         chunksPerWork: 5,
       });
-      contentResults = results;
     } catch (error) {
       console.error('Content search failed:', error);
+
       contentResults = [];
     } finally {
       isSearchingContent = false;
@@ -46,13 +47,15 @@
     searchTerm = value;
 
     if (searchMode === 'titles') {
-      // Update URL for title search
-      const url = new URL($page.url);
+      const url = new URL(page.url);
+
       if (value.trim()) {
         url.searchParams.set('q', value);
       } else {
         url.searchParams.delete('q');
       }
+
+       
       goto(url.toString(), { replaceState: true, keepFocus: true });
     } else {
       // Debounced content search
@@ -103,8 +106,8 @@
         <Tabs
           tabs={searchTabs}
           value={searchMode}
-          onChange={(mode) => handleModeChange(mode as 'titles' | 'content')}
-          class="!gap-0 !mb-0"
+          onChange={(mode) => handleModeChange(mode)}
+          class="gap-0! mb-0!"
         >
           {#snippet titlesContent()}{/snippet}
           {#snippet contentContent()}{/snippet}

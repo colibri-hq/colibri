@@ -161,6 +161,7 @@
 
 {#if collection}
   <article class="relative flex min-h-full flex-col">
+    <!-- eslint-disable svelte/no-inline-styles -- Dynamic colors from collection settings -->
     <header
       class="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl p-4 -m-4"
       style={colorHex ? `background-color: ${colorHex}15` : ''}
@@ -179,6 +180,7 @@
             </button>
           {/snippet}
         </IconPicker>
+        <!-- eslint-enable svelte/no-inline-styles -->
 
         <div class="flex flex-col">
           <h1 class="font-serif text-4xl leading-none font-medium dark:text-gray-300">

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Autocomplete } from '@colibri-hq/ui';
   import { trpc } from '$lib/trpc/client';
+  import { page } from '$app/state';
 
   interface Props {
     name?: string;
@@ -28,7 +29,7 @@
 
     loading = true;
     try {
-      const publishers = await trpc({} as any).publishers.autocomplete.query(term);
+      const publishers = await trpc(page).publishers.autocomplete.query(term);
       items = publishers.map(({ id, name }) => ({ id, label: name }));
     } catch (error) {
       console.error(`Failed to fetch suggestions: ${(error as Error).message}`);

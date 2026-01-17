@@ -188,14 +188,18 @@ function authenticateSession(cookies: Cookies): ApiAuthResult | null {
  * Check if the auth result has the required scope.
  * Session auth (scopes = null) always has access.
  */
-export function hasRequiredScope(auth: ApiAuthResult, requiredScope: ScopeName): boolean {
+export async function hasRequiredScope(
+  auth: ApiAuthResult,
+  requiredScope: ScopeName,
+): Promise<boolean> {
   // Session auth = full access
   if (auth.scopes === null) {
     return true;
   }
 
   // Import scope checking dynamically to avoid circular deps
-  const { satisfiesScope } = require("@colibri-hq/sdk/scopes");
+  const { satisfiesScope } = await import("@colibri-hq/sdk/scopes");
+
   return satisfiesScope(auth.scopes, requiredScope);
 }
 

@@ -15,8 +15,8 @@
     color?: ArrayBuffer | null;
     shared?: boolean | null;
     age_requirement?: number;
-    like_count?: number;
-    created_by?: string | null;
+    // Allow extra properties from parent component
+    [key: string]: unknown;
   }
 
   interface Props {
@@ -133,6 +133,7 @@
         </span>
         <IconPicker bind:open={iconPickerOpen} bind:value={icon}>
           {#snippet trigger({ props })}
+            <!-- eslint-disable svelte/no-inline-styles -- Dynamic color from user selection -->
             <button
               {...props}
               type="button"
@@ -141,6 +142,7 @@
               dark:hover:border-gray-500"
               style={color ? `background-color: ${color}20` : ''}
             >
+            <!-- eslint-enable svelte/no-inline-styles -->
               {#if icon}
                 <IconRenderer {icon} class="text-3xl" />
               {:else}
@@ -157,6 +159,7 @@
         </span>
         <ColorPicker bind:open={colorPickerOpen} bind:value={color}>
           {#snippet trigger({ props })}
+            <!-- eslint-disable svelte/no-inline-styles -- Dynamic color from user selection -->
             <button
               {...props}
               type="button"
@@ -166,6 +169,7 @@
                 : 'border-dashed border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'}"
               style={color ? `background-color: ${color}` : ''}
             >
+            <!-- eslint-enable svelte/no-inline-styles -->
               {#if !color}
                 <Icon name="palette" class="text-gray-400" />
               {/if}

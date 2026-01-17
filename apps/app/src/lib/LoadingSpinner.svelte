@@ -28,7 +28,7 @@
 
   let dash: number = $derived((2 * Math.PI * radius * (100 - gap)) / 100);
 
-  const classList = twMerge(className, 'relative');
+  const classList = $derived(twMerge(className, 'relative'));
 </script>
 
 <div
@@ -41,6 +41,7 @@
   class={classList}
   role="progressbar"
 >
+  <!-- eslint-disable svelte/no-inline-styles -- Dynamic animation speed/state from props -->
   <svg
     class="svelte-spinner animate-spin transition-transform"
     height={size}
@@ -72,6 +73,7 @@
       style:animation-duration="{speed * 2}ms"
     />
   </svg>
+  <!-- eslint-enable svelte/no-inline-styles -->
 
   <div class="absolute inset-0 flex items-center justify-center">
     {@render children?.()}

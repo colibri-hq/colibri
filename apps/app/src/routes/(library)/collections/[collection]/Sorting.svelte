@@ -44,8 +44,8 @@
 <div class="flex w-full flex-col items-center justify-center">
   <div class="relative text-right">
     <div class="relative inline-block text-left">
-      <div class="contents" on:select={onSelect} use:menu.button>
-        <Button class="!pr-2" variant="subtle">
+      <div class="contents" onselect={onSelect} use:menu.button>
+        <Button class="pr-2!" variant="subtle">
           <span class="mr-2">Sort by: {fieldLabel}</span>
           <Icon class="text-lg" name="expand_more" />
         </Button>

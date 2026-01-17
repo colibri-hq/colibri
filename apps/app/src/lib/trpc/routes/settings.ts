@@ -9,7 +9,6 @@ import {
   isValidSettingKey,
   resetSetting,
   setSetting,
-  type SettingKey,
 } from "@colibri-hq/sdk";
 import { z } from "zod";
 

@@ -292,7 +292,7 @@
         <Field name="isbn" value={isbn || ''} />
       </dd>
 
-      {#each metadata as [property, value]}
+      {#each metadata as [property, value] (property)}
         <dt class="mr-2 font-bold">{property}</dt>
         <dd class="flex items-center">
           <Field class="grow" name="metadata[{property}]" value={value || ''}>

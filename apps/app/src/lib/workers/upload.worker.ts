@@ -222,7 +222,7 @@ async function handleResumption({ ids }: ResumePayload) {
   }
 
   // Resume uploads using the same flow as new uploads
-  for (const { id, file, container } of resumable) {
+  for (const { id, file } of resumable) {
     const controller = new AbortController();
     pending.set(id, controller);
     const { signal } = controller;
@@ -339,6 +339,7 @@ async function handleCancelAllUploads(_payload: CancelPayload) {
  * @param container
  * @param signal
  */
+// oxlint-disable-next-line no-unused-vars
 async function processFile(
   id: string,
   file: File,

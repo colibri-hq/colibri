@@ -15,26 +15,5 @@
     "strict": true,
     "tsBuildInfoFile": ".cache/tsbuildinfo.json",
     "verbatimModuleSyntax": true
-  },
-  "include": [
-    "./.svelte-kit/ambient.d.ts",
-    "./.svelte-kit/non-ambient.d.ts",
-    "./.svelte-kit/types/**/$types.d.ts",
-    "./vite.config.ts",
-    "./src/**/*.ts",
-    "./src/**/*.svelte",
-    "./tests/**/*.ts",
-    "./tests/**/*.svelte",
-
-    // This is a workaround since TypeScript does not pick up dot files by default
-    "./src/routes/.well-known/**/*.ts",
-    "./src/routes/.well-known/**/*.svelte"
-  ],
-  "exclude": [
-    "./node_modules/**",
-    "./src/service-worker.ts",
-    "./src/service-worker/**/*.ts",
-    "./src/service-worker.d.ts",
-    "./src/service-worker/**/*.d.ts"
-  ]
+  }
 }

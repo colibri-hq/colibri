@@ -1,7 +1,8 @@
 <script lang="ts">
   import Modal from "$lib/components/Modal.svelte";
-  import { Button, Icon, Toggle } from "@colibri-hq/ui";
+  import { Button, Icon } from "@colibri-hq/ui";
   import type { MetadataPreview } from "@colibri-hq/sdk/metadata";
+  import { SvelteSet } from 'svelte/reactivity';
 
   interface Props {
     open?: boolean;
@@ -25,13 +26,7 @@
     onDismiss,
   }: Props = $props();
 
-  // Track selected fields
-  let selectedFields = $state<Set<string>>(new Set(Object.keys(improvements)));
-
-  // Reset selection when improvements change
-  $effect(() => {
-    selectedFields = new Set(Object.keys(improvements));
-  });
+  let selectedFields = $derived(new Set(Object.keys(improvements)));
 
   function toggleField(field: string) {
     if (selectedFields.has(field)) {
@@ -39,15 +34,16 @@
     } else {
       selectedFields.add(field);
     }
-    selectedFields = new Set(selectedFields);
+
+    selectedFields = new SvelteSet(selectedFields);
   }
 
   function selectAll() {
-    selectedFields = new Set(Object.keys(improvements));
+    selectedFields = new SvelteSet(Object.keys(improvements));
   }
 
   function selectNone() {
-    selectedFields = new Set();
+    selectedFields = new SvelteSet();
   }
 
   function handleApply() {
@@ -144,8 +140,9 @@
 
       <!-- Improvements list -->
       <div class="space-y-3">
-        {#each Object.entries(improvements) as [field, value]}
+        {#each Object.entries(improvements) as [field, value] (field)}
           {@const isSelected = selectedFields.has(field)}
+
           <label
             class={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
               isSelected
@@ -159,14 +156,15 @@
               checked={selectedFields.has(field)}
               onchange={() => toggleField(field)}
             />
-            <div class="min-w-0 flex-1">
-              <div class="mb-1 font-medium text-gray-900 dark:text-gray-100">
+
+            <span class="block min-w-0 flex-1">
+              <span class="mb-1 font-medium text-gray-900 dark:text-gray-100">
                 {fieldLabels[field] ?? field}
-              </div>
-              <div class="text-sm text-gray-600 dark:text-gray-400">
+              </span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">
                 <span class="line-clamp-2">{formatValue(field, value)}</span>
-              </div>
-            </div>
+              </span>
+            </span>
           </label>
         {/each}
       </div>

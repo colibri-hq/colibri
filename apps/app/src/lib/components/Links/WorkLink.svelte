@@ -1,9 +1,10 @@
 <script lang="ts">
   import BookCover from '$lib/components/BookCover.svelte';
+  import {resolve} from '$app/paths';
 
   interface Creator {
-    id: string;
-    name: string;
+    id: string | null;
+    name: string | null;
   }
 
   interface Props {
@@ -22,11 +23,13 @@
     creators
       ?.filter((c): c is Creator => c !== null && c.name !== null)
       .map((c) => c.name)
-      .join(', ') || ''
+      .join(', ') || '',
   );
 
   function handleDragStart(event: DragEvent) {
-    if (!draggable || !event.dataTransfer) return;
+    if (!draggable || !event.dataTransfer) {
+      return;
+    }
 
     event.dataTransfer.effectAllowed = 'copy';
     event.dataTransfer.setData(
@@ -38,7 +41,7 @@
 
 <a
   class="contents"
-  href="/works/{work}"
+  href={resolve('/(library)/works/[work=id]', {work})}
   draggable={draggable ? 'true' : 'false'}
   ondragstart={handleDragStart}
 >

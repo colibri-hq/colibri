@@ -18,14 +18,14 @@
 
   let { data }: PageProps = $props();
 
-  let loading: boolean = $state(false);
-  let updatedName: string = $state(data.user.name || '');
-  let updatedEmailAddress: string = $state(data.user.email);
+  let loading = $state<boolean>(false);
+  let updatedName = $state<string>(data.user.name || '');
+  let updatedEmailAddress = $state<string>(data.user.email);
 
   // Notification preferences
-  let notifyOnReplies: boolean = $state(data.notificationPreferences?.comment_replies ?? true);
-  let notifyOnReactions: boolean = $state(data.notificationPreferences?.comment_reactions ?? true);
-  let notifyOnMentions: boolean = $state(data.notificationPreferences?.comment_mentions ?? true);
+  let notifyOnReplies = $state<boolean>(data.notificationPreferences?.comment_replies ?? true);
+  let notifyOnReactions = $state<boolean>(data.notificationPreferences?.comment_reactions ?? true);
+  let notifyOnMentions = $state<boolean>(data.notificationPreferences?.comment_mentions ?? true);
 
   async function updateName() {
     loading = true;

@@ -16,6 +16,7 @@
   let name = $state('');
   let expiresIn = $state<string>('never');
   let creating = $state(false);
+  // eslint-disable-next-line svelte/no-unnecessary-state-wrap -- $state needed for reassignments
   let selectedScopes = $state(new SvelteSet<ApiKeyScope>(API_KEY_SCOPES));
   let showAdvanced = $state(false);
 

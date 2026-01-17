@@ -671,9 +671,11 @@ export interface AtomPerson {
 export type AtomLinkRelType = "alternate" | "enclosure" | "related" | "self" | "via";
 
 /** representation of &lt;author&gt; element */
+// oxlint-disable-next-line no-empty-object-type
 export interface AtomAuthor extends AtomPerson {}
 
 /** representation of &lt;contributor&gt; element */
+// oxlint-disable-next-line no-empty-object-type
 export interface AtomContributor extends AtomPerson {}
 
 /**

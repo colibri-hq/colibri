@@ -136,6 +136,7 @@
       {#each filteredCollections as collection (collection.id)}
         {@const colorHex = bufferToHex(collection.color)}
         <li>
+          <!-- eslint-disable svelte/no-inline-styles -- Dynamic colors from collection settings -->
           <a
             href="/collections/{collection.id}"
             class="group flex flex-col rounded-2xl border border-gray-200 bg-white p-5
@@ -156,6 +157,7 @@
                   fallback="collections_bookmark"
                 />
               </div>
+              <!-- eslint-enable svelte/no-inline-styles -->
 
               <div
                 class="flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-xs

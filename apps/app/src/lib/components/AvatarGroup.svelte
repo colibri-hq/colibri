@@ -5,7 +5,7 @@
 
   interface Props {
      
-    users?: any[];
+    users?: unknown[];
     size?: number;
   }
 
