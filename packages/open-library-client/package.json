@@ -42,8 +42,8 @@
     "dev": "tsc --watch",
     "check": "tsc --noEmit --project tsconfig.lib.json && tsc --noEmit --project tsconfig.node.json",
     "coverage": "npx make-coverage-badge --output-path ./badges/coverage.svg",
-    "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
-    "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
+    "lint": "oxlint --fix && eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
+    "lint:ci": "oxlint --format github && eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
     "fmt": "oxfmt --write .",
     "fmt:ci": "oxfmt --check .",
     "test": "vitest",
@@ -56,6 +56,7 @@
   "devDependencies": {
     "eslint": "catalog:",
     "oxfmt": "catalog:",
+    "oxlint": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:"
   }

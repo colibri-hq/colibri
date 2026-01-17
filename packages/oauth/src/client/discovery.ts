@@ -1,4 +1,8 @@
-import type { AuthorizationServerMetadata } from "../types.js";
+import type {
+  AuthorizationServerMetadata,
+  OAuthGrantType,
+  PkceCodeChallengeMethod,
+} from "../types.js";
 import type { Fetch } from "./types.js";
 import { DiscoveryError, NetworkError } from "./errors.js";
 
@@ -76,7 +80,7 @@ export async function discoverServer(
 
       try {
         return await fetchMetadata(openIdUrl, normalizedIssuer, customFetch, timeout);
-      } catch (openIdError) {
+      } catch {
         // Both failed, throw a combined error
         throw new DiscoveryError(
           `Failed to discover server metadata from both OAuth (${OAUTH_METADATA_PATH}) and OpenID Connect (${OPENID_METADATA_PATH}) endpoints`,
@@ -305,7 +309,7 @@ export function supportsGrantType(
 ): boolean {
   // Default grant types if not specified per RFC 8414
   const supportedGrantTypes = metadata.grant_types_supported ?? ["authorization_code"];
-  return supportedGrantTypes.includes(grantType as any);
+  return supportedGrantTypes.includes(grantType as unknown as OAuthGrantType);
 }
 
 /**
@@ -320,7 +324,9 @@ export function supportsCodeChallengeMethod(
     return false;
   }
 
-  return metadata.code_challenge_methods_supported.includes(method as any);
+  return metadata.code_challenge_methods_supported.includes(
+    method as unknown as PkceCodeChallengeMethod,
+  );
 }
 
 /**

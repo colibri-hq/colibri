@@ -1020,19 +1020,19 @@ async function authorize<T extends AuthorizationServerOptions>(
 }
 
 async function validateCodeVerifier(verifier: string, challenge: string, method: string) {
-  switch (method) {
-    case "plain":
-      return verifier === challenge;
-
-    case "S256":
-      const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
-      const base64 = btoa(String.fromCharCode(...new Uint8Array(hash)))
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/, "");
-      return base64 === challenge;
-
-    default:
-      throw new OAuthError("invalid_request", `Unsupported code challenge method: ${method}`);
+  if (method === "plain") {
+    return verifier === challenge;
   }
+
+  if (method === "S256") {
+    const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+    const base64 = btoa(String.fromCharCode(...new Uint8Array(hash)))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+
+    return base64 === challenge;
+  }
+
+  throw new OAuthError("invalid_request", `Unsupported code challenge method: ${method}`);
 }

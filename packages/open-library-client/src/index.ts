@@ -220,7 +220,7 @@ export class Client {
     return this.loadOne<ImageMetadata>(url);
   }
 
-  async loadOne<T = any>(
+  async loadOne<T = unknown>(
     endpoint: string | URL,
     init?: RequestInit,
     readResponse?: ResponseReader<T>,
@@ -275,6 +275,7 @@ export class Client {
       }
     }
   }
+
   // endregion
 
   #loadImage(url: URL, filename: string): Promise<File | null> {
@@ -359,7 +360,9 @@ export class Client {
 
     try {
       response = await this.#fetch(request);
-    } catch (cause) {
+    } catch (error) {
+      let cause = error;
+
       if (!(cause instanceof Error)) {
         cause = new Error(`Unknown Error: ${String(cause)}`, { cause });
       }
@@ -385,7 +388,9 @@ export class Client {
 
       if (typeof payload !== "object" || payload === null) {
         throw new Error(
-          `OpenLibrary API Request failed: Expected an object, but received ${typeof payload}: ${JSON.stringify(payload)}`,
+          `OpenLibrary API Request failed: Expected an object, but received ${typeof payload}: ${JSON.stringify(
+            payload,
+          )}`,
         );
       }
     } catch (error) {

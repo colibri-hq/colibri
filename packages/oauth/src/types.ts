@@ -113,6 +113,26 @@ export interface AuthorizationServerMetadata {
   scopes_supported?: string[] | undefined;
 
   /**
+   * **RECOMMENDED.** JSON array containing a list of the claim names of the
+   * [OpenID Connect](https://openid.net/specs/openid-connect-core-1_0.html#Claims)
+   * that this authorization server **MAY** be able to supply values for.
+   * Note that for privacy or other reasons, this might not be an exhaustive list.
+   *
+   * @see https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata, OpenID
+   *      Connect Discovery 1.0: Provider Metadata
+   */
+  claims_supported?: string[] | undefined;
+
+  /**
+   * **REQUIRED.** JSON array containing a list of the Subject Identifier types that this OP
+   * supports. Valid types include *pairwise* and *public*.
+   *
+   * @see https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata, OpenID
+   *      Connect Discovery 1.0: Provider Metadata
+   */
+  subject_types_supported?: SubjectType[] | undefined;
+
+  /**
    * **OPTIONAL.** JSON array containing a list of the OAuth 2.0 `response_mode` values that this
    * authorization server supports, as specified
    * in OAuth 2.0 Multiple Response Type Encoding Practices
@@ -331,6 +351,19 @@ export interface AuthorizationServerMetadata {
    * @see https://datatracker.ietf.org/doc/html/rfc9207 RFC 9207
    */
   authorization_response_iss_parameter_supported?: boolean | undefined;
+
+  /**
+   * **REQUIRED.** JSON array containing a list of the JWS signing algorithms (alg values) supported
+   * by the OP for the ID Token to encode the Claims in a JWT
+   * [JWT](https://openid.net/specs/openid-connect-discovery-1_0.html#JWT). The algorithm RS256
+   * **MUST** be included. The value `none` **MAY** be supported but **MUST NOT** be used unless the
+   * Response Type used returns no ID Token from the Authorization Endpoint (such as when using the
+   * Authorization Code Flow).
+   *
+   * @see https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata, OpenID
+   *      Connect Discovery 1.0: Provider Metadata
+   */
+  id_token_signing_alg_values_supported?: JwtSigningAlgorithm[] | undefined;
 }
 
 /**
@@ -381,6 +414,7 @@ export type TokenEndpointAuthenticationMethod =
 type AccessTokenType = "Bearer" | "N_A" | "PoP" | "DPoP";
 export type JwtSigningAlgorithm = "HS256" | "RS256" | "ES256" | "none";
 export type PkceCodeChallengeMethod = "plain" | "S256";
+export type SubjectType = "public" | "pairwise";
 
 export type OAuthErrorCode =
   // The request is missing a parameter, so the server can’t proceed with the request. This may also
@@ -504,6 +538,7 @@ export interface TokenPayload {
  * These models are used to store and retrieve data from the persistence layer and can be used as
  * a reference for all required fields.
  */
+// oxlint-disable-next-line no-namespace
 export namespace Entities {
   /**
    * Client
@@ -782,6 +817,7 @@ export interface AuthorizationServerOptions<
   clientManagement?: false | ClientManagementOptions;
 }
 
+// oxlint-disable-next-line no-empty-object-type
 type TokenExchangeGrantOptions = {
   // TODO: Implement token exchange grant type
 };
@@ -844,5 +880,6 @@ type ServerMetadataOptions = { extraMetadata?: Record<string, unknown> };
 type UserInfoOptions = { endpoint?: string | URL };
 
 type ClientRegistrationOptions = { endpoint?: string | URL };
+// oxlint-disable-next-line no-empty-object-type
 type ClientManagementOptions = {};
 // endregion

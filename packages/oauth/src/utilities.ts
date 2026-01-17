@@ -62,7 +62,7 @@ export function redirectResponse(
  * @param payload The payload to include in the JSON response.
  * @param init Optional response initialization options. Passed to the Response constructor verbatim
  */
-export function jsonResponse(payload: any, init?: ResponseInit): Response {
+export function jsonResponse(payload: unknown, init?: ResponseInit): Response {
   // Indenting the JSON response isn't very common. However, it makes it easier to read the response
   // body when debugging an already annoying issue, so let's grant this curtesy to the developer
   // dealing with our library here, at the cost of a few bytes in the response body.

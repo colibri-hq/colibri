@@ -1,5 +1,7 @@
+// oxlint-disable no-explicit-any
 declare module "binary-parser" {
   // An empty interface to allow users to augment it.
+  // oxlint-disable-next-line no-empty-object-type
   export interface ParserRegistry {}
 
   // A helper to resolve a choice (string name or direct parser) to its schema type.
@@ -161,6 +163,7 @@ declare module "binary-parser" {
   > = ParserContext<T, TParent, TRoot> & { $index: number };
 
   export declare class Parser<
+    // oxlint-disable-next-line no-empty-object-type
     T extends object = {},
     TParent extends object | null = null,
     TRoot extends object = T,
@@ -172,6 +175,7 @@ declare module "binary-parser" {
     head?: Parser<T, TParent, TRoot>;
 
     static start<
+      // oxlint-disable-next-line no-empty-object-type
       TInitial extends object = {},
       TInitialParent extends object | null = null,
     >(): Parser<TInitial, TInitialParent, TInitial>;
@@ -717,6 +721,7 @@ declare module "binary-parser" {
     parse(buffer: ArrayBuffer | Uint8Array): T;
   }
 }
+// oxlint-enable no-explicit-any
 
 declare module "lcid" {
   export function from(code: number): string | undefined;

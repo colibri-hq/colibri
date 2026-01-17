@@ -25,6 +25,7 @@ import type { Entities, OAuthGrantType, RequestedToken } from "../types.js";
  */
 export function defineGrantType<
   T extends ZodType,
+  // oxlint-disable-next-line no-explicit-any
   V extends ValidateFn<T, any, C, O>,
   C extends Entities.Client = Entities.Client,
   O extends GrantTypeOptions = GrantTypeOptions,

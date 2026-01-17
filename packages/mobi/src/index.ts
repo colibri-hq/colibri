@@ -135,8 +135,6 @@ function extractCoverImage(
   const [record, nextRecord] = records.slice(index, index + 2);
 
   if (!record) {
-    console.warn(`Cover image PDB record index ${index} is out of bounds.`);
-
     return undefined;
   }
 

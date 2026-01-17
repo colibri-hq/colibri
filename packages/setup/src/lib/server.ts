@@ -22,10 +22,12 @@ export async function startGuiServer(options: GuiServerOptions): Promise<void> {
 
   const address = server.resolvedUrls?.local?.[0] ?? `http://localhost:${port}`;
 
-  console.log(`\n  Colibri Setup Wizard`);
-  console.log(`  ────────────────────`);
-  console.log(`  Running at: ${address}`);
-  console.log(`\n  Press Ctrl+C to stop\n`);
+  // oxlint-disable no-console
+  console.info(`\n  Colibri Setup Wizard`);
+  console.info(`  ────────────────────`);
+  console.info(`  Running at: ${address}`);
+  console.info(`\n  Press Ctrl+C to stop\n`);
+  // oxlint-enable no-console
 
   // Open browser
   if (open) {

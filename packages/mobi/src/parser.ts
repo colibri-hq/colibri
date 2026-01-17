@@ -78,7 +78,6 @@ function parseEncoding(value: number) {
     return "windows-1252";
   }
 
-  console.log("Unknown encoding:", value);
   return undefined;
 }
 
@@ -463,6 +462,7 @@ const exthRecordParser = Parser.start()
     // Transform all records into objects with a "field" and "value" property for easier iteration
     formatter({ $root: _a, $parent: _b, value: { ...result } }) {
       const [type, value] = Object.entries(result).at(0)!;
+      // oxlint-disable-next-line no-explicit-any
       const field = type !== "fallback" ? type : (this as any).type;
 
       return { field, value } as {
@@ -472,7 +472,7 @@ const exthRecordParser = Parser.start()
     },
 
     // Choice parser to pick the correct parser based on the type of the record
-    // @ts-ignore
+    // @ts-expect-error TS is confused about the this context here
     type: Parser.start<ExtendedHeader, { type: number; length: number }>().choice("value", {
       tag: function () {
         return this.$parent.type;
