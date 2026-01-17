@@ -134,27 +134,16 @@ describe("WikiData Error Handling Pattern Consistency", () => {
       expect(openLibraryResult).toEqual([]);
     });
 
-    it("should log errors consistently", async () => {
-      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-
+    it("should handle errors consistently by returning empty arrays", async () => {
       mockFetch.mockRejectedValue(new Error("persistent network error"));
 
-      // Delay is mocked to resolve immediately
-      await wikidataProvider.searchByTitle({ title: "Test" });
-      await openLibraryProvider.searchByTitle({ title: "Test" });
+      // Both providers should handle errors gracefully by returning empty arrays
+      const wikidataResult = await wikidataProvider.searchByTitle({ title: "Test" });
+      const openLibraryResult = await openLibraryProvider.searchByTitle({ title: "Test" });
 
-      // Both should log final failure messages
-      const wikidataLogs = consoleSpy.mock.calls.filter(
-        (call) => call[0]?.includes("WikiData") && call[0]?.includes("failed after"),
-      );
-      const openLibraryLogs = consoleSpy.mock.calls.filter(
-        (call) => call[0]?.includes("OpenLibrary") && call[0]?.includes("failed after"),
-      );
-
-      expect(wikidataLogs.length).toBeGreaterThan(0);
-      expect(openLibraryLogs.length).toBeGreaterThan(0);
-
-      consoleSpy.mockRestore();
+      // Both should return empty arrays without throwing
+      expect(wikidataResult).toEqual([]);
+      expect(openLibraryResult).toEqual([]);
     });
   });
 

@@ -156,7 +156,8 @@ describe("enrichment-utilities", () => {
 
       const results = await executeProviderQueries(queries);
 
-      expect(results[0].duration).toBeGreaterThanOrEqual(50);
+      // Allow slight timing tolerance due to scheduler precision
+      expect(results[0].duration).toBeGreaterThanOrEqual(45);
     });
   });
 

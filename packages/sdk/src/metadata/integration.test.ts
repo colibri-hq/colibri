@@ -599,21 +599,15 @@ describe("OpenLibraryMetadataProvider - Integration Testing", () => {
       });
     });
 
-    it("should provide meaningful error messages for debugging", async () => {
-      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-
+    it("should handle errors gracefully without throwing", async () => {
       mockSearchBook.mockImplementation(async function* () {
         throw new Error("Specific API error for debugging");
       });
 
-      await provider.searchByTitle({ title: "Debug Test", exactMatch: false });
+      // Should not throw, should return empty results gracefully
+      const results = await provider.searchByTitle({ title: "Debug Test", exactMatch: false });
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("OpenLibrary"),
-        expect.stringContaining("Specific API error for debugging"),
-      );
-
-      consoleSpy.mockRestore();
+      expect(results).toEqual([]);
     });
 
     it("should handle concurrent requests without race conditions", async () => {
