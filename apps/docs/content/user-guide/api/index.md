@@ -11,7 +11,7 @@ relevance: 70
 
 > **Coming Soon**: The public HTTP API is currently under development.
 >
-> In the meantime, see the [CLI documentation](/cli) for programmatic access.
+> In the meantime, see the [CLI documentation](/user-guide/cli) for programmatic access.
 
 ## Current Status
 

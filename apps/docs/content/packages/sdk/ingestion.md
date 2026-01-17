@@ -106,10 +106,7 @@ console.log(
   metadata.contributors?.filter((c) => c.roles.includes("aut")),
 );
 console.log("Cover:", metadata.coverImage);
-console.log(
-  "ISBN:",
-  metadata.identifiers?.find((i) => i.type === "isbn")?.value,
-);
+console.log("ISBN:", metadata.identifiers?.find((i) => i.type === "isbn")?.value);
 ```
 
 **Extracted data:**
@@ -276,9 +273,7 @@ Compares ISBN-10 or ISBN-13:
 
 ```typescript
 const duplicates = await detectDuplicates(database, {
-  metadata: {
-    identifiers: [{ type: "isbn", value: "9780743273565" }],
-  },
+  metadata: { identifiers: [{ type: "isbn", value: "9780743273565" }] },
 });
 
 if (duplicates.isbnMatches.length > 0) {
@@ -503,10 +498,7 @@ await addTagsToWork(
 Convert provider metadata to ingestion format:
 
 ```typescript
-import {
-  convertToExtractedMetadata,
-  mergeMetadataRecords,
-} from "@colibri-hq/sdk/ingestion";
+import { convertToExtractedMetadata, mergeMetadataRecords } from "@colibri-hq/sdk/ingestion";
 
 // Query providers manually
 const wikidata = new WikiDataMetadataProvider();

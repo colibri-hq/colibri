@@ -14,7 +14,7 @@ Colibri is built as a monorepo with several published packages that you can use 
 ## Available Packages
 
 | Package                                                          | Description                                   | npm                                                                  |
-|------------------------------------------------------------------|-----------------------------------------------|----------------------------------------------------------------------|
+| ---------------------------------------------------------------- | --------------------------------------------- | -------------------------------------------------------------------- |
 | [@colibri-hq/sdk](/packages/sdk)                                 | Core SDK with database, metadata, and storage | [npm](https://www.npmjs.com/package/@colibri-hq/sdk)                 |
 | [@colibri-hq/mobi](/packages/mobi)                               | MOBI/Mobipocket ebook parser                  | [npm](https://www.npmjs.com/package/@colibri-hq/mobi)                |
 | [@colibri-hq/pdf](/packages/pdf)                                 | PDF.js wrapper with conditional exports       | [npm](https://www.npmjs.com/package/@colibri-hq/pdf)                 |

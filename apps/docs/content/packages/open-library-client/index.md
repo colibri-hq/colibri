@@ -311,14 +311,10 @@ Control pagination manually if needed:
 
 ```typescript
 // First page
-const page1 = await Array.fromAsync(
-  client.searchBook("javascript", { limit: 20, offset: 0 }),
-);
+const page1 = await Array.fromAsync(client.searchBook("javascript", { limit: 20, offset: 0 }));
 
 // Second page
-const page2 = await Array.fromAsync(
-  client.searchBook("javascript", { limit: 20, offset: 20 }),
-);
+const page2 = await Array.fromAsync(client.searchBook("javascript", { limit: 20, offset: 20 }));
 ```
 
 ---
@@ -533,9 +529,7 @@ async function findBookAndAuthor(isbn: string) {
           console.log("\nOther works:");
           let count = 0;
           for await (const otherWork of client.loadWorksByAuthorId(authorId!)) {
-            console.log(
-              `- ${otherWork.title} (${otherWork.first_publish_year})`,
-            );
+            console.log(`- ${otherWork.title} (${otherWork.first_publish_year})`);
             if (++count >= 5) break;
           }
         }

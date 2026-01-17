@@ -49,7 +49,7 @@ Results from all providers are collected and deduplicated:
 Each metadata field receives a confidence score based on:
 
 | Factor                | Impact         | Description                                                  |
-|-----------------------|----------------|--------------------------------------------------------------|
+| --------------------- | -------------- | ------------------------------------------------------------ |
 | **Source Count**      | +5% per source | Multiple providers agreeing increases confidence             |
 | **Source Quality**    | +8%            | High-priority providers (WikiData, LoC) boost scores         |
 | **Field Agreement**   | +10%           | Same values across sources significantly increase confidence |
@@ -59,7 +59,7 @@ Each metadata field receives a confidence score based on:
 **Confidence Tiers:**
 
 | Score   | Tier        | Meaning                              | Action                          |
-|---------|-------------|--------------------------------------|---------------------------------|
+| ------- | ----------- | ------------------------------------ | ------------------------------- |
 | 95-100% | Exceptional | Multiple authoritative sources agree | Auto-apply with high confidence |
 | 90-95%  | Strong      | Good consensus across sources        | Safe to apply automatically     |
 | 80-90%  | Good        | Moderate agreement, likely accurate  | Review before applying          |
@@ -83,7 +83,7 @@ Colibri integrates with 14+ metadata providers, each with unique strengths.
 ### Free Providers (No API Key Required)
 
 | Provider                | Best For                                 | Coverage                  | Reliability     |
-|-------------------------|------------------------------------------|---------------------------|-----------------|
+| ----------------------- | ---------------------------------------- | ------------------------- | --------------- |
 | **Open Library**        | General books, covers, editions          | International, broad      | High (95%)      |
 | **WikiData**            | Authoritative data, structured metadata  | Curated, high-quality     | Very High (98%) |
 | **Library of Congress** | US publications, cataloging, subjects    | US-centric, comprehensive | Very High (95%) |
@@ -104,7 +104,7 @@ Colibri integrates with 14+ metadata providers, each with unique strengths.
 ### Authenticated Providers (API Key Required)
 
 | Provider         | Best For                                  | API Key Source                                             | Cost                              |
-|------------------|-------------------------------------------|------------------------------------------------------------|-----------------------------------|
+| ---------------- | ----------------------------------------- | ---------------------------------------------------------- | --------------------------------- |
 | **Google Books** | Covers, descriptions, ratings, popularity | [Google Cloud Console](https://console.cloud.google.com/)  | Free (with limits)                |
 | **ISBNdb**       | Comprehensive book data, new releases     | [ISBNdb.com](https://isbndb.com/apidocs)                   | Paid (subscription)               |
 | **Springer**     | Academic books, chapters, journals        | [Springer API Portal](https://dev.springernature.com/)     | Free (academic)                   |
@@ -128,7 +128,7 @@ Colibri integrates with 14+ metadata providers, each with unique strengths.
 ### Provider Comparison by Data Type
 
 | Data Type             | Best Providers                                  | Notes                                       |
-|-----------------------|-------------------------------------------------|---------------------------------------------|
+| --------------------- | ----------------------------------------------- | ------------------------------------------- |
 | **ISBN Lookup**       | WikiData, Library of Congress, Open Library     | Parallel queries for best coverage          |
 | **Cover Images**      | Open Library, Google Books, Internet Archive    | Open Library has largest collection         |
 | **Descriptions**      | Google Books, Open Library, Library of Congress | Google Books often has most detailed        |
@@ -168,37 +168,37 @@ Enable automatic enrichment in **Settings > Instance > Metadata**:
 Enrich books already in your library:
 
 1. **Navigate to the work's detail page**
-    - Click on any book in your library
-    - Or search for the book and open its detail page
+   - Click on any book in your library
+   - Or search for the book and open its detail page
 
 2. **Click "Fetch Metadata"**
-    - Button is in the top-right corner
-    - May also appear as "Enrich" or "Update Metadata"
+   - Button is in the top-right corner
+   - May also appear as "Enrich" or "Update Metadata"
 
 3. **Wait for providers to respond**
-    - Progress indicator shows which providers are querying
-    - Typically completes in 5-10 seconds
-    - Some providers may timeout (this is normal)
+   - Progress indicator shows which providers are querying
+   - Typically completes in 5-10 seconds
+   - Some providers may timeout (this is normal)
 
 4. **Review the suggestions**
-    - Opens the enrichment preview modal
-    - Shows original values vs. enriched values
-    - Each field displays:
-        - Current value (from your library)
-        - Suggested value (from enrichment)
-        - Confidence score (0-100%)
-        - Source provider(s)
-        - Conflict indicator (if values disagree)
+   - Opens the enrichment preview modal
+   - Shows original values vs. enriched values
+   - Each field displays:
+     - Current value (from your library)
+     - Suggested value (from enrichment)
+     - Confidence score (0-100%)
+     - Source provider(s)
+     - Conflict indicator (if values disagree)
 
 5. **Accept or reject changes**
-    - **Accept All**: Apply all high-confidence suggestions (90%+)
-    - **Reject All**: Keep all existing metadata
-    - **Selective**: Choose individual fields to apply
-    - **Edit Manually**: Override with your own values
+   - **Accept All**: Apply all high-confidence suggestions (90%+)
+   - **Reject All**: Keep all existing metadata
+   - **Selective**: Choose individual fields to apply
+   - **Edit Manually**: Override with your own values
 
 6. **Save changes**
-    - Click "Apply" to update the book's metadata
-    - Original metadata is preserved in version history
+   - Click "Apply" to update the book's metadata
+   - Original metadata is preserved in version history
 
 **Recommended for:**
 
@@ -236,7 +236,7 @@ Confidence scores help you understand how reliable the enriched metadata is.
 Base confidence from provider reliability:
 
 | Provider            | Base Confidence | Why                                   |
-|---------------------|-----------------|---------------------------------------|
+| ------------------- | --------------- | ------------------------------------- |
 | WikiData            | 90%             | Curated, structured data              |
 | Library of Congress | 88%             | Authoritative cataloging              |
 | Open Library        | 85%             | Large coverage, community-contributed |
@@ -305,7 +305,7 @@ WikiData alone: 90%
 Different metadata fields have different natural confidence levels:
 
 | Field            | Typical Confidence | Why                                               |
-|------------------|--------------------|---------------------------------------------------|
+| ---------------- | ------------------ | ------------------------------------------------- |
 | ISBN             | 95-98%             | Standardized, exact matching                      |
 | Title            | 85-95%             | Minor variations common (subtitles, edition info) |
 | Authors          | 90-95%             | Generally reliable, name formatting varies        |
@@ -438,7 +438,7 @@ Navigate to **Settings > Instance > Metadata Providers**:
 For each provider, you can configure:
 
 | Setting         | Description                     | Example   |
-|-----------------|---------------------------------|-----------|
+| --------------- | ------------------------------- | --------- |
 | **Enabled**     | Whether to use this provider    | ✓         |
 | **Priority**    | Query order (higher = first)    | 85        |
 | **API Key**     | Authentication credential       | `AIza...` |
@@ -490,21 +490,9 @@ Advanced users can fine-tune provider behavior:
 ```json
 {
   "providerStrategy": {
-    "isbn": [
-      "WikiData",
-      "LibraryOfCongress",
-      "OpenLibrary"
-    ],
-    "title": [
-      "OpenLibrary",
-      "WikiData",
-      "GoogleBooks"
-    ],
-    "author": [
-      "VIAF",
-      "ISNI",
-      "WikiData"
-    ]
+    "isbn": ["WikiData", "LibraryOfCongress", "OpenLibrary"],
+    "title": ["OpenLibrary", "WikiData", "GoogleBooks"],
+    "author": ["VIAF", "ISNI", "WikiData"]
   }
 }
 ```
@@ -512,12 +500,7 @@ Advanced users can fine-tune provider behavior:
 **Example: Disable specific providers**
 
 ```json
-{
-  "disabledProviders": [
-    "Springer",
-    "DNB"
-  ]
-}
+{ "disabledProviders": ["Springer", "DNB"] }
 ```
 
 See [Configuration Guide](/setup/configuration) for advanced settings.

@@ -24,7 +24,7 @@ colibri users list [options]
 ### Options
 
 | Option     | Description                         |
-|------------|-------------------------------------|
+| ---------- | ----------------------------------- |
 | `--role`   | Filter by role: admin, adult, child |
 | `--active` | Show only active users              |
 | `--json`   | Output as JSON                      |
@@ -68,7 +68,7 @@ colibri users create <email>
 ### Options
 
 | Option          | Description                                     |
-|-----------------|-------------------------------------------------|
+| --------------- | ----------------------------------------------- |
 | `--name`        | Display name                                    |
 | `--role`        | User role: admin, adult, child (default: adult) |
 | `--send-invite` | Send invitation email                           |
@@ -102,7 +102,7 @@ colibri users invite <email>
 ### Options
 
 | Option      | Description                                        |
-|-------------|----------------------------------------------------|
+| ----------- | -------------------------------------------------- |
 | `--role`    | Initial role (default: adult)                      |
 | `--message` | Custom message to include                          |
 | `--expires` | Invitation expiry in hours (default: 168 = 7 days) |
@@ -160,7 +160,7 @@ colibri users edit <user-id> [options]
 ### Options
 
 | Option    | Description          |
-|-----------|----------------------|
+| --------- | -------------------- |
 | `--email` | Update email address |
 | `--name`  | Update display name  |
 | `--role`  | Change role          |
@@ -195,7 +195,7 @@ colibri users disable <user-id>
 ### Options
 
 | Option     | Description          |
-|------------|----------------------|
+| ---------- | -------------------- |
 | `--reason` | Reason for disabling |
 
 ### Examples
@@ -243,7 +243,7 @@ By default:
 ### Options
 
 | Option                   | Description                                |
-|--------------------------|--------------------------------------------|
+| ------------------------ | ------------------------------------------ |
 | `--purge-content`        | Delete user's books, reviews, and comments |
 | `--preserve-collections` | Keep collections (make them public)        |
 | `--confirm`              | Skip confirmation prompt                   |
@@ -326,7 +326,7 @@ colibri users reset-auth <user-id>
 ### Options
 
 | Option     | Description                             |
-|------------|-----------------------------------------|
+| ---------- | --------------------------------------- |
 | `--notify` | Send email notification (default: true) |
 
 ### Examples
@@ -396,7 +396,7 @@ Creates a ZIP file containing:
 ### Options
 
 | Option     | Description                       |
-|------------|-----------------------------------|
+| ---------- | --------------------------------- |
 | `--format` | Format: json, csv (default: json) |
 | `--output` | Output file path                  |
 
@@ -430,7 +430,7 @@ child@example.com,Child User,child
 ### Options
 
 | Option           | Description              |
-|------------------|--------------------------|
+| ---------------- | ------------------------ |
 | `--send-invites` | Send invitation emails   |
 | `--dry-run`      | Preview without creating |
 
@@ -452,7 +452,7 @@ colibri users import users.csv --dry-run
 ### Role Permissions
 
 | Permission         | Admin | Adult     | Child         |
-|--------------------|-------|-----------|---------------|
+| ------------------ | ----- | --------- | ------------- |
 | Upload books       | ✓     | ✓         | ✗             |
 | Edit metadata      | ✓     | ✓         | ✗             |
 | Delete books       | ✓     | Own books | ✗             |

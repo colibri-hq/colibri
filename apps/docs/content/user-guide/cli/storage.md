@@ -415,14 +415,8 @@ colibri storage list-buckets --json
 
 ```json
 [
-  {
-    "Name": "colibri",
-    "CreationDate": "2024-01-01T00:00:00Z"
-  },
-  {
-    "Name": "colibri-backup",
-    "CreationDate": "2024-01-15T00:00:00Z"
-  }
+  { "Name": "colibri", "CreationDate": "2024-01-01T00:00:00Z" },
+  { "Name": "colibri-backup", "CreationDate": "2024-01-15T00:00:00Z" }
 ]
 ```
 

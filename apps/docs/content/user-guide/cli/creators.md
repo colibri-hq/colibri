@@ -550,16 +550,8 @@ colibri creators inspect abc123 --json
     "goodreadsId": "656983"
   },
   "works": [
-    {
-      "id": "work123",
-      "title": "The Hobbit",
-      "role": "author"
-    },
-    {
-      "id": "work456",
-      "title": "The Fellowship of the Ring",
-      "role": "author"
-    }
+    { "id": "work123", "title": "The Hobbit", "role": "author" },
+    { "id": "work456", "title": "The Fellowship of the Ring", "role": "author" }
   ],
   "createdAt": "2024-01-15T10:30:00Z",
   "updatedAt": "2024-01-20T14:45:00Z"
@@ -574,12 +566,7 @@ colibri creators list --search "Tolkien" --json
 
 ```json
 [
-  {
-    "id": "abc123",
-    "name": "J.R.R. Tolkien",
-    "sortingKey": "Tolkien, J.R.R.",
-    "workCount": 4
-  },
+  { "id": "abc123", "name": "J.R.R. Tolkien", "sortingKey": "Tolkien, J.R.R.", "workCount": 4 },
   {
     "id": "xyz789",
     "name": "Christopher Tolkien",

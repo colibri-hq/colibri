@@ -26,10 +26,7 @@ The SDK provides multiple entry points for different use cases:
 import { createDatabase, Work, Creator } from "@colibri-hq/sdk";
 
 // Metadata providers
-import {
-  MetadataAggregator,
-  OpenLibraryMetadataProvider,
-} from "@colibri-hq/sdk/metadata";
+import { MetadataAggregator, OpenLibraryMetadataProvider } from "@colibri-hq/sdk/metadata";
 
 // Ingestion pipeline
 import { ingestEbook, detectDuplicates } from "@colibri-hq/sdk/ingestion";
@@ -54,18 +51,13 @@ import type { WorkData, CreatorData } from "@colibri-hq/sdk/types";
 ```typescript
 import { createDatabase } from "@colibri-hq/sdk";
 
-const db = createDatabase({
-  connectionString: process.env.DATABASE_URL,
-});
+const db = createDatabase({ connectionString: process.env.DATABASE_URL });
 ```
 
 ### Metadata Search
 
 ```typescript
-import {
-  MetadataAggregator,
-  OpenLibraryMetadataProvider,
-} from "@colibri-hq/sdk/metadata";
+import { MetadataAggregator, OpenLibraryMetadataProvider } from "@colibri-hq/sdk/metadata";
 
 const aggregator = new MetadataAggregator([new OpenLibraryMetadataProvider()]);
 

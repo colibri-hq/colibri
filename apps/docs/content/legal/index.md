@@ -14,4 +14,4 @@ This section contains legal documents and policies for Colibri.
 ## Documents
 
 - [Privacy Policy](/legal/privacy) - How we handle your data
-- [License](/legal/license) - Open source license information (coming soon)
+- [License](/legal/license) - Open source license information

@@ -131,15 +131,8 @@ Sources: WikiData, Open Library, Library of Congress
     "authors": ["F. Scott Fitzgerald"],
     "publicationDate": "1925-04-10"
   },
-  "edition": {
-    "id": "edition_def456",
-    "format": "epub",
-    "fileSize": 5242880
-  },
-  "enrichment": {
-    "confidence": 0.95,
-    "sources": ["WikiData", "OpenLibrary", "LoC"]
-  }
+  "edition": { "id": "edition_def456", "format": "epub", "fileSize": 5242880 },
+  "enrichment": { "confidence": 0.95, "sources": ["WikiData", "OpenLibrary", "LoC"] }
 }
 ```
 

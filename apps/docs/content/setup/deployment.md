@@ -253,10 +253,7 @@ module.exports = {
       script: "build/index.js",
       instances: "max",
       exec_mode: "cluster",
-      env: {
-        NODE_ENV: "production",
-        PORT: 3000,
-      },
+      env: { NODE_ENV: "production", PORT: 3000 },
       max_memory_restart: "500M",
       error_file: "./logs/error.log",
       out_file: "./logs/out.log",
@@ -402,16 +399,8 @@ Add to crontab:
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:DeleteObject",
-        "s3:ListBucket"
-      ],
-      "Resource": [
-        "arn:aws:s3:::your-bucket-name",
-        "arn:aws:s3:::your-bucket-name/*"
-      ]
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:ListBucket"],
+      "Resource": ["arn:aws:s3:::your-bucket-name", "arn:aws:s3:::your-bucket-name/*"]
     }
   ]
 }

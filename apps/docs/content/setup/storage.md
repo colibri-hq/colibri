@@ -271,9 +271,7 @@ Set up lifecycle rules to automatically clean up temporary files:
       "Id": "DeleteTempUploads",
       "Status": "Enabled",
       "Prefix": "imports/",
-      "Expiration": {
-        "Days": 7
-      }
+      "Expiration": { "Days": 7 }
     }
   ]
 }

@@ -129,22 +129,14 @@ Follow these principles:
 ```typescript
 // ✓ Good: Explicit types, clear naming
 async function fetchWorkById(id: string): Promise<Work | null> {
-  const result = await db
-    .selectFrom("works")
-    .selectAll()
-    .where("id", "=", id)
-    .executeTakeFirst();
+  const result = await db.selectFrom("works").selectAll().where("id", "=", id).executeTakeFirst();
 
   return result ? new Work(result) : null;
 }
 
 // ✗ Avoid: Implicit types, unclear naming
 async function get(x: string) {
-  const r = await db
-    .selectFrom("works")
-    .selectAll()
-    .where("id", "=", x)
-    .executeTakeFirst();
+  const r = await db.selectFrom("works").selectAll().where("id", "=", x).executeTakeFirst();
   return r ? new Work(r) : null;
 }
 ```

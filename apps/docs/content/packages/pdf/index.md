@@ -59,8 +59,5 @@ Extract the first page as a cover image:
 ```typescript
 import { extractPdfCover } from "@colibri-hq/pdf";
 
-const cover = await extractPdfCover(buffer, {
-  width: 300,
-  format: "jpeg",
-});
+const cover = await extractPdfCover(buffer, { width: 300, format: "jpeg" });
 ```

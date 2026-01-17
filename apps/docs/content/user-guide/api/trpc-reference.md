@@ -122,9 +122,7 @@ trpc.works.list.query({
 Get a single work by ID.
 
 ```typescript
-trpc.works.get.query({
-  id: string,
-});
+trpc.works.get.query({ id: string });
 ```
 
 ### `works.create`
@@ -176,9 +174,7 @@ trpc.works.update.mutate({
 Delete a work.
 
 ```typescript
-trpc.works.delete.mutate({
-  id: string,
-});
+trpc.works.delete.mutate({ id: string });
 ```
 
 ### `works.enrich`
@@ -210,9 +206,7 @@ trpc.collections.list.query({
 Get a single collection.
 
 ```typescript
-trpc.collections.get.query({
-  id: string,
-});
+trpc.collections.get.query({ id: string });
 ```
 
 ### `collections.create`
@@ -249,9 +243,7 @@ trpc.collections.update.mutate({
 Delete a collection.
 
 ```typescript
-trpc.collections.delete.mutate({
-  id: string,
-});
+trpc.collections.delete.mutate({ id: string });
 ```
 
 ### `collections.addWork`
@@ -271,10 +263,7 @@ trpc.collections.addWork.mutate({
 Remove a work from a collection.
 
 ```typescript
-trpc.collections.removeWork.mutate({
-  collectionId: string,
-  workId: string,
-});
+trpc.collections.removeWork.mutate({ collectionId: string, workId: string });
 ```
 
 ## Comments Router
@@ -322,9 +311,7 @@ trpc.comments.update.mutate({
 Delete a comment.
 
 ```typescript
-trpc.comments.delete.mutate({
-  id: string,
-});
+trpc.comments.delete.mutate({ id: string });
 ```
 
 ### `comments.react`
@@ -369,9 +356,7 @@ trpc.creators.list.query({
 Get a single creator.
 
 ```typescript
-trpc.creators.get.query({
-  id: string,
-});
+trpc.creators.get.query({ id: string });
 ```
 
 ### `creators.create`
@@ -450,9 +435,7 @@ trpc.notifications.list.query({
 Mark notification as read.
 
 ```typescript
-trpc.notifications.markRead.mutate({
-  id: string,
-});
+trpc.notifications.markRead.mutate({ id: string });
 ```
 
 ### `notifications.markAllRead`
@@ -492,11 +475,7 @@ trpc.settings.get.query({
 Update settings.
 
 ```typescript
-trpc.settings.update.mutate({
-  scope: "instance" | "user",
-  key: string,
-  value: any,
-});
+trpc.settings.update.mutate({ scope: "instance" | "user", key: string, value: any });
 ```
 
 ### `settings.getMetadataProviders`
@@ -513,12 +492,7 @@ Update metadata provider configuration.
 
 ```typescript
 trpc.settings.updateMetadataProviders.mutate({
-  providers: Array<{
-    name: string;
-    enabled: boolean;
-    apiKey?: string;
-    priority?: number;
-  }>,
+  providers: Array<{ name: string; enabled: boolean; apiKey?: string; priority?: number }>,
 });
 ```
 
@@ -541,9 +515,7 @@ trpc.users.list.query({
 Get user details.
 
 ```typescript
-trpc.users.get.query({
-  id: string,
-});
+trpc.users.get.query({ id: string });
 ```
 
 ### `users.update`
@@ -604,9 +576,7 @@ trpc.accounts.listPasskeys.query();
 Delete a Passkey.
 
 ```typescript
-trpc.accounts.deletePasskey.mutate({
-  id: string,
-});
+trpc.accounts.deletePasskey.mutate({ id: string });
 ```
 
 ## Error Handling
@@ -615,12 +585,7 @@ tRPC errors include:
 
 ```typescript
 interface TRPCError {
-  code:
-    | "BAD_REQUEST"
-    | "UNAUTHORIZED"
-    | "FORBIDDEN"
-    | "NOT_FOUND"
-    | "INTERNAL_SERVER_ERROR";
+  code: "BAD_REQUEST" | "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "INTERNAL_SERVER_ERROR";
   message: string;
   data?: {
     // Additional error context
@@ -742,10 +707,6 @@ Enable tRPC logging:
 ```typescript
 const trpc = createTRPCClient({
   // ...
-  links: [
-    loggerLink({
-      enabled: (opts) => process.env.NODE_ENV === "development",
-    }),
-  ],
+  links: [loggerLink({ enabled: (opts) => process.env.NODE_ENV === "development" })],
 });
 ```

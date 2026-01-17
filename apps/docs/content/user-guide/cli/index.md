@@ -115,9 +115,7 @@ The CLI stores configuration in `~/.config/colibri/`:
 {
   "defaultInstance": "https://colibri.example.com/",
   "instances": {
-    "https://colibri.example.com/": {
-      "databaseUri": "postgres://user:pass@host:5432/db"
-    }
+    "https://colibri.example.com/": { "databaseUri": "postgres://user:pass@host:5432/db" }
   }
 }
 ```
@@ -289,14 +287,7 @@ colibri creators list --json
 Output:
 
 ```json
-[
-  {
-    "id": "abc123",
-    "name": "J.R.R. Tolkien",
-    "sortingKey": "Tolkien, J.R.R.",
-    "workCount": 4
-  }
-]
+[{ "id": "abc123", "name": "J.R.R. Tolkien", "sortingKey": "Tolkien, J.R.R.", "workCount": 4 }]
 ```
 
 ### Quiet Mode

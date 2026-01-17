@@ -547,11 +547,7 @@ Otherwise TypeScript won't know about your changes.
 When importing local packages, use workspace protocol in `package.json`:
 
 ```json
-{
-  "dependencies": {
-    "@colibri-hq/sdk": "workspace:*"
-  }
-}
+{ "dependencies": { "@colibri-hq/sdk": "workspace:*" } }
 ```
 
 ### 3. Environment Variables

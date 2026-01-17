@@ -61,6 +61,7 @@ Your Colibri instance may connect to external services for metadata enrichment:
 - **Other providers** - Various national libraries and bibliographic databases
 
 These connections:
+
 - Only occur when you explicitly request metadata enrichment
 - Send only the book identifiers (ISBN, title, author) needed for the lookup
 - Don't include any user information
