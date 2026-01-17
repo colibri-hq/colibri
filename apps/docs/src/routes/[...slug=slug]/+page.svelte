@@ -14,7 +14,7 @@
   const breadcrumbs = $derived(getBreadcrumbs(data.slug));
   const jsonLdBreadcrumbs = $derived([
     ...breadcrumbs,
-    { title: data.title, href: page.url.pathname },
+    { title: data.metadata.title, href: page.url.pathname },
   ].map(({ href, title: name }) => ({
     url: new URL(href, PUBLIC_SITE_URL).toString(),
     name,

@@ -71,7 +71,9 @@ let initPromise: Promise<void> | null = null;
  * In production, pagefind is generated at build time.
  */
 export async function initSearch(): Promise<void> {
-  if (pagefind) return;
+  if (pagefind) {
+    return;
+  }
 
   if (initPromise) {
     await initPromise;
@@ -86,8 +88,7 @@ export async function initSearch(): Promise<void> {
       const module = await import("/pagefind/pagefind.js");
       pagefind = module as unknown as PagefindAPI;
       await pagefind.init();
-    } catch (error) {
-      console.warn("[search] Failed to initialize pagefind:", error);
+    } catch {
       initPromise = null;
     }
   })();
@@ -161,7 +162,9 @@ const MAX_RECENT = 5;
  * Get recent search queries from localStorage.
  */
 export function getRecentSearches(): string[] {
-  if (typeof localStorage === "undefined") return [];
+  if (typeof localStorage === "undefined") {
+    return [];
+  }
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
@@ -175,7 +178,9 @@ export function getRecentSearches(): string[] {
  * Moves existing entries to the top and limits to MAX_RECENT items.
  */
 export function addRecentSearch(query: string): void {
-  if (typeof localStorage === "undefined" || !query.trim()) return;
+  if (typeof localStorage === "undefined" || !query.trim()) {
+    return;
+  }
   try {
     const recent = getRecentSearches().filter((q) => q !== query);
     recent.unshift(query.trim());
@@ -189,7 +194,9 @@ export function addRecentSearch(query: string): void {
  * Remove a specific search query from recent searches.
  */
 export function removeRecentSearch(query: string): void {
-  if (typeof localStorage === "undefined") return;
+  if (typeof localStorage === "undefined") {
+    return;
+  }
   try {
     const recent = getRecentSearches().filter((q) => q !== query);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(recent));

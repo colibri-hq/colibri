@@ -1,24 +1,27 @@
 <script lang="ts">
   import { getAllGlossaryEntries, searchGlossary } from '$lib/components/glossary';
   import { SearchIcon } from '@lucide/svelte';
+  import { SvelteMap } from 'svelte/reactivity';
 
   let searchQuery = $state('');
 
   const allEntries = getAllGlossaryEntries();
 
   const filteredEntries = $derived(
-    searchQuery.trim() ? searchGlossary(searchQuery) : allEntries
+    searchQuery.trim() ? searchGlossary(searchQuery) : allEntries,
   );
 
   // Group entries by first letter
   const groupedEntries = $derived(() => {
-    const groups = new Map<string, typeof filteredEntries>();
+    const groups = new SvelteMap<string, typeof filteredEntries>();
 
     for (const entry of filteredEntries) {
-      const firstLetter = entry.displayTerm[0].toUpperCase();
+      const firstLetter = entry.displayTerm[0]!.toUpperCase();
+
       if (!groups.has(firstLetter)) {
         groups.set(firstLetter, []);
       }
+
       groups.get(firstLetter)!.push(entry);
     }
 

@@ -1,0 +1,8 @@
+{
+  "extends": ["../../.oxlintrc.json"],
+  "ignorePatterns": [
+    ".wrangler/**",
+    "src/lib/components/blog/BlogJsonLd.svelte",
+    "src/lib/components/page/JsonLd.svelte"
+  ]
+}

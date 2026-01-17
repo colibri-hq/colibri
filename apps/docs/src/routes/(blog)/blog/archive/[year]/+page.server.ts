@@ -1,5 +1,4 @@
 import { getAvailableYears, getPostsByYear } from "$lib/content/blog";
-import { error } from "@sveltejs/kit";
 import type { EntryGenerator, PageServerLoad } from "./$types.js";
 
 export const prerender = true;

@@ -63,11 +63,14 @@
       })),
     };
   });
+
 </script>
 
 <svelte:head>
-  {@html `<script type="application/ld+json">${JSON.stringify(techArticle)}</script>`}
+  <!-- eslint-disable-next-line svelte/no-at-html-tags -- JSON-LD is safe, data is from our own props -->
+  {@html `<script type="application/ld+json">${JSON.stringify(techArticle)}<\/script>`}
   {#if breadcrumbList}
-    {@html `<script type="application/ld+json">${JSON.stringify(breadcrumbList)}</script>`}
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -- JSON-LD is safe, data is from our own props -->
+    {@html `<script type="application/ld+json">${JSON.stringify(breadcrumbList)}<\/script>`}
   {/if}
 </svelte:head>

@@ -12,8 +12,8 @@
   <div class="link-preview-content">
     {#if data.breadcrumbs.length > 0}
       <div class="link-preview-breadcrumb">
-        {#each data.breadcrumbs as crumb, i}
-          {#if i > 0}
+        {#each data.breadcrumbs as crumb, index (index)}
+          {#if index > 0}
             <span class="link-preview-breadcrumb-separator">/</span>
           {/if}
           <span>{crumb.title}</span>

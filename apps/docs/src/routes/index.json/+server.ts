@@ -1,11 +1,5 @@
 import { getBlogPosts } from "$lib/content/blog.js";
-import {
-  getContentTree,
-  isDirectory,
-  isPage,
-  type Page,
-  type Directory,
-} from "$lib/content/content.js";
+import { getContentTree, isDirectory, isPage, type Directory } from "$lib/content/content.js";
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types.js";
 import { siteConfig, blogConfig } from "../../../site.config.js";

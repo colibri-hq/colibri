@@ -36,7 +36,7 @@
 
   let container: HTMLDivElement;
   let loaded = $state(false);
-  const repositoryName = $derived(repository.split('github.com/').at(1)?.replace(/\.git$/, ''));
+  const repositoryName = $derived(repository.split('github.com/').at(1)?.replace(/\.git$/, '') ?? 'colibri-hq/colibri');
 
   function loadGiscus() {
     if (loaded || !container) {

@@ -17,17 +17,26 @@ import { visit } from "unist-util-visit";
  * not at build time, to avoid Node.js module loading issues.
  */
 export function remarkGlossaryLinks() {
-  return (tree, file) => {
+  /**
+   * @param {import('unist').Node} tree
+   */
+  return (tree) => {
     visit(tree, "link", (node, index, parent) => {
       // Skip non-glossary links
-      if (!node.url?.startsWith("glossary:")) {
+      // @ts-expect-error url property exists on link nodes
+      if (!("url" in node) || !node.url || !node.url.startsWith("glossary:")) {
         return;
       }
 
       // Extract term ID from URL
+      // @ts-expect-error url property exists on link nodes
       const termId = node.url.replace("glossary:", "").trim();
 
       // Extract link text recursively (handles nested formatting like **bold**)
+      /**
+       * @param {any} node
+       * @return {*|string}
+       */
       function extractText(node) {
         if (node.type === "text") {
           return node.value;
@@ -39,6 +48,7 @@ export function remarkGlossaryLinks() {
         return "";
       }
 
+      // @ts-expect-error children property exists on nodes
       const text = node.children.map(extractText).join("");
 
       // Escape quotes in text for HTML attribute safety
@@ -48,7 +58,10 @@ export function remarkGlossaryLinks() {
       const html = `<GlossaryTerm term="${termId}">${escapedText}</GlossaryTerm>`;
 
       // Replace link node with HTML node
-      parent.children[index] = { type: "html", value: html };
+      if (index) {
+        // @ts-expect-error children property exists on nodes
+        parent.children[index] = { type: "html", value: html };
+      }
     });
   };
 }

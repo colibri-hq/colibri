@@ -67,8 +67,10 @@
 </script>
 
 <svelte:head>
-  {@html `<script type="application/ld+json">${JSON.stringify(blogPosting)}</script>`}
+  <!-- eslint-disable-next-line svelte/no-at-html-tags -- JSON-LD is safe, data is from our own props -->
+  {@html `<script type="application/ld+json">${JSON.stringify(blogPosting)}<\/script>`}
   {#if breadcrumbList}
-    {@html `<script type="application/ld+json">${JSON.stringify(breadcrumbList)}</script>`}
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -- JSON-LD is safe, data is from our own props -->
+    {@html `<script type="application/ld+json">${JSON.stringify(breadcrumbList)}<\/script>`}
   {/if}
 </svelte:head>

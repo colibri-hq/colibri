@@ -1,12 +1,10 @@
 import { getAuthorWithGravatar, type AuthorWithGravatar } from "$lib/content/author.js";
 import {
   getBlogPost,
-  getBlogPosts,
   getAdjacentPosts,
   getSeriesPosts,
   getSeriesSlug,
   getRelatedPosts,
-  type BlogPost,
   type BlogPostMetadata,
 } from "$lib/content/blog.js";
 import {

@@ -17,12 +17,14 @@
   `);
 </script>
 
+<!-- eslint-disable svelte/no-inline-styles -- Dynamic styles required for animation props -->
 <svg
   class="absolute left-0 top-0 opacity-0 blur-[1px] will-change-auto bird-flight bird-flight-{id}"
   viewBox="0 0 50 28"
   style={birdStyle}
   aria-hidden="true"
 >
+<!-- eslint-enable svelte/no-inline-styles -->
   <!-- Body -->
   <ellipse cx="22" cy="16" rx="9" ry="5" class="bird-body" />
 

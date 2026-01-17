@@ -15,7 +15,7 @@ declare global {
   }
 
   declare namespace svelteHTML {
-    interface HTMLAttributes<_T> {}
+    // interface HTMLAttributes<_T> {}
   }
 
   declare const PACKAGE_REPOSITORY_URL: string;

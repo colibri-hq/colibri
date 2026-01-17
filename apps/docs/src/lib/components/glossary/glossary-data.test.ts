@@ -5,7 +5,6 @@ import {
   hasGlossaryEntry,
   getAllGlossaryEntries,
   searchGlossary,
-  type GlossaryEntry,
 } from "./glossary-data.js";
 
 describe("glossary-data", () => {
@@ -115,7 +114,7 @@ describe("glossary-data", () => {
 
       // Check if sorted
       for (let i = 1; i < terms.length; i++) {
-        expect(terms[i].localeCompare(terms[i - 1])).toBeGreaterThanOrEqual(0);
+        expect(terms[i]!.localeCompare(terms[i - 1]!)).toBeGreaterThanOrEqual(0);
       }
     });
 

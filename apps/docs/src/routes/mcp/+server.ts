@@ -182,8 +182,6 @@ export const POST: RequestHandler = async ({ request, fetch, url }) => {
       return json(errorResponse(id, err.code as number, err.message as string));
     }
 
-    // Handle generic errors
-    console.error("MCP handler error:", err);
     return json(
       errorResponse(
         id,

@@ -48,7 +48,7 @@ const config = {
               .replace(/"/g, "&quot;")
               .replace(/'/g, "&#39;")
               .replace(/\{/g, "&#123;")
-              .replace(/\}/g, "&#125;");
+              .replace(/}/g, "&#125;");
             // Return format that rehype-mermaid expects
             return `<pre><code class="language-mermaid">${escapedCode}</code></pre>`;
           }
@@ -197,6 +197,18 @@ const config = {
       handleHttpError: "warn",
       handleMissingId: "warn",
       handleUnseenRoutes: "warn",
+    },
+    typescript: {
+      config(config) {
+        return {
+          ...config,
+          include: [
+            ...config.include,
+            "../src/routes/.well-known/**/*.ts",
+            "../src/routes/.well-known/**/*.svelte",
+          ],
+        };
+      },
     },
   },
 };
