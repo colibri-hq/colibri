@@ -148,13 +148,12 @@ export async function* discoverBookMetadata(
       for (const result of results) {
         yield result;
       }
-    } catch (cause) {
-      if (!(cause instanceof Error)) {
-        cause = new Error(`Unknown Error: ${cause}`, { cause });
-      }
+    } catch (caught) {
+      const cause =
+        caught instanceof Error ? caught : new Error(`Unknown Error: ${caught}`, { cause: caught });
 
       throw new Error(
-        `Error searching book metadata with provider ${provider.constructor.name}: ${(cause as Error).message}`,
+        `Error searching book metadata with provider ${provider.constructor.name}: ${cause.message}`,
         { cause },
       );
     }

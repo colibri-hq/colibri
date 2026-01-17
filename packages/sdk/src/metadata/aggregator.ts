@@ -32,7 +32,7 @@ export interface AggregatorOptions {
   deduplicateByIsbn?: boolean;
   /** Whether to calculate consensus confidence (default: true) */
   calculateConsensus?: boolean;
-  /** Whether to enable debug logging (default: false) */
+  /** @deprecated Logging is no longer supported. Use timing/errors from results instead. */
   enableLogging?: boolean;
 }
 
@@ -103,13 +103,6 @@ export class MetadataAggregator {
 
     this.providers = providers;
     this.options = { ...DEFAULT_OPTIONS, ...options };
-
-    if (this.options.enableLogging) {
-      console.log(
-        `MetadataAggregator initialized with ${providers.length} provider(s):`,
-        providers.map((p) => p.name).join(", "),
-      );
-    }
   }
 
   /**
@@ -119,12 +112,6 @@ export class MetadataAggregator {
    * @returns Aggregated results from all providers
    */
   async searchByISBN(isbn: string): Promise<AggregatedResult> {
-    const startTime = performance.now();
-
-    if (this.options.enableLogging) {
-      console.log(`[Aggregator] Searching for ISBN: ${isbn}`);
-    }
-
     const providerPromises = this.providers.map((provider) =>
       this.executeProviderQuery(
         provider,
@@ -134,15 +121,7 @@ export class MetadataAggregator {
     );
 
     const results = await this.awaitProviderResults(providerPromises);
-    const aggregated = this.aggregateResults(results);
-
-    if (this.options.enableLogging) {
-      const totalTime = performance.now() - startTime;
-      console.log(`[Aggregator] ISBN search completed in ${totalTime.toFixed(2)}ms`);
-      console.log(`[Aggregator] Found ${aggregated.results.length} unique results`);
-    }
-
-    return aggregated;
+    return this.aggregateResults(results);
   }
 
   /**
@@ -152,12 +131,6 @@ export class MetadataAggregator {
    * @returns Aggregated results from all providers
    */
   async searchByTitle(query: TitleQuery): Promise<AggregatedResult> {
-    const startTime = performance.now();
-
-    if (this.options.enableLogging) {
-      console.log(`[Aggregator] Searching for title: ${query.title}`);
-    }
-
     const providerPromises = this.providers.map((provider) =>
       this.executeProviderQuery(
         provider,
@@ -167,15 +140,7 @@ export class MetadataAggregator {
     );
 
     const results = await this.awaitProviderResults(providerPromises);
-    const aggregated = this.aggregateResults(results);
-
-    if (this.options.enableLogging) {
-      const totalTime = performance.now() - startTime;
-      console.log(`[Aggregator] Title search completed in ${totalTime.toFixed(2)}ms`);
-      console.log(`[Aggregator] Found ${aggregated.results.length} unique results`);
-    }
-
-    return aggregated;
+    return this.aggregateResults(results);
   }
 
   /**
@@ -185,12 +150,6 @@ export class MetadataAggregator {
    * @returns Aggregated results from all providers
    */
   async searchMultiCriteria(query: MultiCriteriaQuery): Promise<AggregatedResult> {
-    const startTime = performance.now();
-
-    if (this.options.enableLogging) {
-      console.log(`[Aggregator] Multi-criteria search:`, query);
-    }
-
     const providerPromises = this.providers.map((provider) =>
       this.executeProviderQuery(
         provider,
@@ -200,15 +159,7 @@ export class MetadataAggregator {
     );
 
     const results = await this.awaitProviderResults(providerPromises);
-    const aggregated = this.aggregateResults(results);
-
-    if (this.options.enableLogging) {
-      const totalTime = performance.now() - startTime;
-      console.log(`[Aggregator] Multi-criteria search completed in ${totalTime.toFixed(2)}ms`);
-      console.log(`[Aggregator] Found ${aggregated.results.length} unique results`);
-    }
-
-    return aggregated;
+    return this.aggregateResults(results);
   }
 
   /**
@@ -231,32 +182,18 @@ export class MetadataAggregator {
   private async executeProviderQuery(
     provider: MetadataProvider,
     queryFn: () => Promise<MetadataRecord[]>,
-    operationName: string,
+    _operationName: string,
   ): Promise<ProviderResult> {
     const startTime = performance.now();
     const providerName = provider.name;
 
     try {
-      if (this.options.enableLogging) {
-        console.log(`[${providerName}] Starting ${operationName}`);
-      }
-
       const records = await queryFn();
       const timing = performance.now() - startTime;
-
-      if (this.options.enableLogging) {
-        console.log(
-          `[${providerName}] Completed in ${timing.toFixed(2)}ms with ${records.length} results`,
-        );
-      }
 
       return { provider: providerName, records, timing };
     } catch (error) {
       const timing = performance.now() - startTime;
-
-      if (this.options.enableLogging) {
-        console.error(`[${providerName}] Failed after ${timing.toFixed(2)}ms:`, error);
-      }
 
       return {
         provider: providerName,
@@ -294,13 +231,9 @@ export class MetadataAggregator {
     // Check if minimum provider requirement is met
     const successfulProviders = results.filter((r) => !r.error).length;
     if (successfulProviders < this.options.minProviders) {
-      const errorMessage = `Only ${successfulProviders} provider(s) responded successfully, minimum ${this.options.minProviders} required`;
-
-      if (this.options.enableLogging) {
-        console.error(`[Aggregator] ${errorMessage}`);
-      }
-
-      throw new Error(errorMessage);
+      throw new Error(
+        `Only ${successfulProviders} provider(s) responded successfully, minimum ${this.options.minProviders} required`,
+      );
     }
 
     return results;
@@ -415,12 +348,6 @@ export class MetadataAggregator {
 
     // Add non-ISBN records
     mergedResults.push(...nonIsbnRecords);
-
-    if (this.options.enableLogging) {
-      console.log(
-        `[Aggregator] Deduplication: ${records.length} -> ${mergedResults.length} records`,
-      );
-    }
 
     return mergedResults;
   }

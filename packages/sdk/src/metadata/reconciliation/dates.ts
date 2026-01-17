@@ -118,15 +118,15 @@ export class DateReconciler {
     // Try different date patterns
     const _patterns = [
       // YYYY-MM-DD or YYYY/MM/DD
-      /^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/,
+      /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/,
       // MM-DD-YYYY or MM/DD/YYYY
-      /^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/,
+      /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/,
       // DD-MM-YYYY or DD/MM/YYYY (European format)
-      /^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/,
+      /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/,
       // YYYY-MM or YYYY/MM
-      /^(\d{4})[-\/](\d{1,2})$/,
+      /^(\d{4})[-/](\d{1,2})$/,
       // MM-YYYY or MM/YYYY
-      /^(\d{1,2})[-\/](\d{4})$/,
+      /^(\d{1,2})[-/](\d{4})$/,
       // Just year
       /^(\d{4})$/,
     ];

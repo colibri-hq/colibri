@@ -446,13 +446,8 @@ export async function fetchCover(
 
       // Otherwise, save it as a potential fallback
       results.push({ cover, assessment });
-    } catch (error) {
-      // Log error but continue to next source
-      if (error instanceof CoverFetchError) {
-        console.warn(`Cover fetch failed for ${error.source}:`, error.message);
-      } else {
-        console.warn(`Unexpected error fetching from ${source.name}:`, error);
-      }
+    } catch {
+      // Continue to next source on error
     }
   }
 

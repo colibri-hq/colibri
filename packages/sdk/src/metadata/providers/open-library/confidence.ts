@@ -552,21 +552,8 @@ function normalizeForComparison(value: string): string {
 
 /**
  * Log confidence calculation for debugging
+ * @deprecated Logging removed - use factors directly for debugging
  */
-function logConfidenceCalculation(results: MetadataRecord[], factors: ConfidenceFactors): void {
-  console.log("=== OpenLibrary Confidence Calculation ===");
-  console.log(`Sources: ${results.length}`);
-  console.log(`Base confidence: ${factors.baseConfidence.toFixed(3)}`);
-  console.log(`Consensus boost: +${factors.consensusBoost.toFixed(3)}`);
-  console.log(`Agreement boost: +${factors.agreementBoost.toFixed(3)}`);
-  console.log(`Quality boost: +${factors.qualityBoost.toFixed(3)}`);
-  console.log(`Reliability boost: +${factors.reliabilityBoost.toFixed(3)}`);
-  console.log(`Source count boost: +${factors.sourceCountBoost.toFixed(3)}`);
-  console.log(`Disagreement penalty: -${factors.disagreementPenalty.toFixed(3)}`);
-  console.log(`Final confidence: ${factors.finalConfidence.toFixed(3)}`);
-  console.log(`Tier: ${factors.tier}`);
-  if (factors.penalties.length > 0) {
-    console.log(`Penalties: ${factors.penalties.join(", ")}`);
-  }
-  console.log("==========================================");
+function logConfidenceCalculation(_results: MetadataRecord[], _factors: ConfidenceFactors): void {
+  // Logging removed - confidence factors are available in the returned ConfidenceFactors
 }

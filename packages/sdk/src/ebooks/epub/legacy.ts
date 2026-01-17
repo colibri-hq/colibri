@@ -103,8 +103,8 @@ export class Epub {
         this.toc = toc;
         this.pageList = pageList;
         this.landmarks = landmarks;
-      } catch (error) {
-        console.warn(error);
+      } catch {
+        // Nav parsing failed - will try NCX fallback
       }
     }
 
@@ -116,8 +116,8 @@ export class Epub {
 
         this.toc = toc;
         this.pageList = pageList;
-      } catch (error: unknown) {
-        console.warn(`Failed to parse NCX: ${error}`);
+      } catch {
+        // NCX parsing failed
       }
     }
 
@@ -283,8 +283,6 @@ export class Epub {
         const item = resources.getItemByID(idref);
 
         if (!item) {
-          console.warn(`Could not find item with ID "${idref}" in manifest`);
-
           return;
         }
 
@@ -607,9 +605,7 @@ function resolveURL(uri: string | URL, relativeTo: string | URL) {
     url.search = "";
 
     return decodeURI(url.href.replace(root, ""));
-  } catch (error) {
-    console.warn(error);
-
+  } catch {
     return uri;
   }
 }
@@ -1167,7 +1163,6 @@ class MediaOverlay extends EventTarget {
   }
 
   #error(error: unknown) {
-    console.error(error);
     this.dispatchEvent(new CustomEvent("error", { detail: error }));
   }
 
@@ -1351,6 +1346,7 @@ async function sha1Hash(value: string) {
 function deobfuscators(): Record<string, Algorithm> {
   return {
     "http://www.idpf.org/2008/embedding": {
+      // eslint-disable-next-line no-control-regex -- Matching whitespace chars for EPUB deobfuscation
       key: (opf) => sha1Hash(getIdentifier(opf).replaceAll(/[\u0020\u0009\u000d\u000a]/g, "")),
       decode: (key, blob) => deobfuscate(key, 1040, blob),
     },
@@ -1393,8 +1389,6 @@ class Encryption {
         const implementation = this.#algorithms[algorithm];
 
         if (!implementation) {
-          console.warn(`Unknown encryption algorithm ${algorithm}: Cannot decrypt ${uri}`);
-
           continue;
         }
 
@@ -1670,9 +1664,6 @@ class Loader {
 
       // change to HTML if it's not valid XHTML
       if (mediaType === MIME.XHTML && document.getElementsByTagName("parsererror").length > 0) {
-        const parserError = document.getElementsByTagName("parsererror")[0]?.textContent;
-        console.warn(`Could not parse XHTML: ${parserError}`);
-
         item.mediaType = MIME.HTML;
         document = new DOMParser().parseFromString(value, item.mediaType!);
       }

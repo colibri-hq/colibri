@@ -250,7 +250,7 @@ export class GoogleBooksMetadataProvider extends RetryableMetadataProvider {
   #escapeQuery(query: string): string {
     // Google Books uses quotes for exact phrase matching
     // Remove problematic characters and wrap in quotes for better results
-    return `"${query.replace(/["\[\]]/g, "")}"`;
+    return `"${query.replace(/["[\]]/g, "")}"`;
   }
 
   /**

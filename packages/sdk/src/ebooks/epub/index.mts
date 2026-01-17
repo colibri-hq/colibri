@@ -276,10 +276,8 @@ class _DOMWrapper {
       this._extractNamespaces(parsed, namespaces);
 
       return new XMLDocument(parsed, namespaces);
-    } catch (err) {
-      console.error("XML parsing error:", err);
-      const errorDoc = new XMLDocument([{ error: { message: String(err) } }], {});
-      return errorDoc;
+    } catch (error) {
+      return new XMLDocument([{ error: { message: String(error) } }], {});
     }
   }
 

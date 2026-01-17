@@ -354,7 +354,7 @@ export class SubjectReconciler {
       .replace(/\s*--\s*/g, " - ") // Normalize separators
       .replace(/\s*;\s*/g, "; ") // Normalize semicolons
       .replace(/\s*,\s*/g, ", ") // Normalize commas
-      .replace(/[^\w\s\-;,&\/\+]/g, " ") // Replace special characters with spaces except separators and common chars
+      .replace(/[^\w\s;,&/+-]/g, " ") // Replace special characters with spaces except separators and common chars
       .replace(/\s+/g, " ") // Normalize whitespace
       .trim();
 

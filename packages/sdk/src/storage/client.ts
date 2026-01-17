@@ -82,7 +82,7 @@ export function client({
   region,
   secretAccessKey,
 }: StorageConnection & StorageOptions): Storage {
-  // @ts-ignore -- exact optional property types problem, but completely valid
+  // @ts-expect-error -- exact optional property types problem, but completely valid
   const client = new S3Client({
     ...clientOptions,
     credentials: { accessKeyId, secretAccessKey },

@@ -359,17 +359,9 @@ export class PerformanceMonitor {
       error: metric.error,
     };
 
-    if (metric.success) {
-      console.log(
-        `[PERF] ${metric.operation}${metric.provider ? ` (${metric.provider})` : ""}: ${metric.duration}ms`,
-        logData,
-      );
-    } else {
-      console.warn(
-        `[PERF] ${metric.operation}${metric.provider ? ` (${metric.provider})` : ""}: FAILED after ${metric.duration}ms`,
-        logData,
-      );
-    }
+    // Performance metrics are available via getMetrics() for programmatic access
+    // Logging removed - use getMetrics() or getReport() instead
+    void logData;
   }
 
   /**

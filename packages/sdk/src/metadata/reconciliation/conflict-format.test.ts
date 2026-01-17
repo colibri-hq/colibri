@@ -339,6 +339,7 @@ describe("ConflictDisplayFormatter", () => {
       const formatted = noColorFormatter.formatConflict(mockConflict);
 
       // Should not contain ANSI color codes
+      // eslint-disable-next-line no-control-regex -- Testing for ANSI escape sequences
       expect(formatted.severityIndicator).not.toMatch(/\x1b\[\d+m/);
     });
 

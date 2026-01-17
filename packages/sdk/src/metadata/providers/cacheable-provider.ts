@@ -137,9 +137,8 @@ export abstract class CacheableMetadataProvider extends ConfigurableMetadataProv
     const warmupPromises = commonQueries.map(async (query) => {
       try {
         await this.searchMultiCriteria(query);
-      } catch (error) {
+      } catch {
         // Ignore errors during warmup
-        console.warn(`Cache warmup failed for query:`, query, error);
       }
     });
 

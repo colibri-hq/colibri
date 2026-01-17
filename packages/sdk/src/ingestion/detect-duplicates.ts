@@ -342,10 +342,9 @@ async function checkSimilarTitles(
         };
       }
     }
-  } catch (error) {
+  } catch {
     // If pg_trgm extension is not available, similarity function will fail
     // This is expected and we should fall back to no match
-    console.warn("Fuzzy title matching unavailable:", error);
   }
 
   return { hasDuplicate: false, confidence: 0 };

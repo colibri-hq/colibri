@@ -152,8 +152,7 @@ async function createGoogleBooksProvider(
 
     // Google Books works without an API key (with lower rate limits)
     return new GoogleBooksMetadataProvider(fetch, apiKey || undefined);
-  } catch (error) {
-    console.warn("Failed to create Google Books provider:", error);
+  } catch {
     return null;
   }
 }
@@ -175,7 +174,6 @@ async function createAmazonProvider(
 
     // All credentials are required for Amazon
     if (!accessKey || !secretKey || !partnerTag) {
-      console.debug("Amazon PAAPI provider not configured: missing credentials");
       return null;
     }
 
@@ -188,8 +186,7 @@ async function createAmazonProvider(
       },
       fetch,
     );
-  } catch (error) {
-    console.warn("Failed to create Amazon PAAPI provider:", error);
+  } catch {
     return null;
   }
 }
@@ -205,13 +202,11 @@ async function createISBNdbProvider(
     const apiKey = await getSettingValue(database, "urn:colibri:settings:metadata:isbndb-api-key");
 
     if (!apiKey) {
-      console.debug("ISBNdb provider not configured: missing API key");
       return null;
     }
 
     return new ISBNdbMetadataProvider(database, fetch);
-  } catch (error) {
-    console.warn("Failed to create ISBNdb provider:", error);
+  } catch {
     return null;
   }
 }
@@ -230,13 +225,11 @@ async function createSpringerProvider(
     );
 
     if (!apiKey) {
-      console.debug("Springer Nature provider not configured: missing API key");
       return null;
     }
 
     return new SpringerNatureMetadataProvider(apiKey, fetch);
-  } catch (error) {
-    console.warn("Failed to create Springer Nature provider:", error);
+  } catch {
     return null;
   }
 }
@@ -324,21 +317,7 @@ export async function initializeMetadataProviders(
     }
   }
 
-  // Log summary
-  const successCount = results.filter((r) => r.success && !r.error).length;
-  const failedCount = results.filter((r) => !r.success).length;
-  const disabledCount = results.filter((r) => r.success && r.error?.includes("disabled")).length;
-
-  console.info(
-    `Metadata providers initialized: ${successCount} active, ${disabledCount} disabled, ${failedCount} failed`,
-  );
-
-  // Log failures in detail
-  for (const result of results) {
-    if (!result.success) {
-      console.warn(`  - ${result.name}: ${result.error || "Unknown error"}`);
-    }
-  }
+  // Results are tracked but not logged - callers can use getProviderStatus() to check state
 }
 
 /**
@@ -355,7 +334,6 @@ export async function reinitializeProvider(
 ): Promise<boolean> {
   const config = PROVIDER_CONFIGS.find((c) => c.name === providerName);
   if (!config) {
-    console.warn(`Unknown provider: ${providerName}`);
     return false;
   }
 
@@ -369,7 +347,6 @@ export async function reinitializeProvider(
   );
 
   if (!enabledProviderNames.includes(providerName)) {
-    console.debug(`Provider ${providerName} is not in enabled list`);
     return false;
   }
 
@@ -377,7 +354,6 @@ export async function reinitializeProvider(
   if (config.enabledSettingKey) {
     const isEnabled = await getSettingValue(database, config.enabledSettingKey);
     if (!isEnabled) {
-      console.debug(`Provider ${providerName} is explicitly disabled`);
       return false;
     }
   }
@@ -394,11 +370,10 @@ export async function reinitializeProvider(
       if (provider.initialize) {
         await provider.initialize();
       }
-      console.info(`Provider ${providerName} reinitialized successfully`);
       return true;
     }
-  } catch (error) {
-    console.warn(`Failed to reinitialize provider ${providerName}:`, error);
+  } catch {
+    // Provider initialization failed
   }
 
   return false;

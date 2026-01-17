@@ -648,33 +648,10 @@ export class OpenLibraryMetadataProvider
 
   /**
    * Log detailed confidence calculation for debugging
+   * @deprecated Logging removed - use factors directly for debugging
    */
-  #logConfidenceCalculation(results: MetadataRecord[], factors: ConfidenceFactors): void {
-    if (process.env.NODE_ENV === "development" || process.env.DEBUG_CONFIDENCE === "true") {
-      console.log("🔍 Confidence Calculation Details:", {
-        sourceCount: results.length,
-        tier: factors.tier,
-        finalConfidence: factors.finalConfidence,
-        breakdown: {
-          baseConfidence: factors.baseConfidence,
-          consensusBoost: factors.consensusBoost,
-          agreementBoost: factors.agreementBoost,
-          qualityBoost: factors.qualityBoost,
-          sourceCountBoost: factors.sourceCountBoost,
-          reliabilityBoost: factors.reliabilityBoost,
-          languagePreferenceBoost: factors.languagePreferenceBoost,
-          disagreementPenalty: -factors.disagreementPenalty,
-        },
-        factors: factors.factors,
-        penalties: factors.penalties,
-        sources: results.map((r) => ({
-          id: r.id,
-          confidence: r.confidence,
-          title: r.title,
-          authors: r.authors,
-        })),
-      });
-    }
+  #logConfidenceCalculation(_results: MetadataRecord[], _factors: ConfidenceFactors): void {
+    // Logging removed - confidence factors are available on the returned record
   }
 
   /**

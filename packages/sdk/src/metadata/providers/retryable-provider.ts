@@ -89,9 +89,6 @@ export abstract class RetryableMetadataProvider extends BaseMetadataProvider {
         // Check if this is a rate limit error
         if (this.isRateLimitError(lastError)) {
           const retryAfter = this.extractRetryAfter(lastError);
-          console.warn(
-            `${this.name} rate limit hit for ${operationName}, waiting ${retryAfter}ms before retry ${attempt + 1}/${maxRetries}`,
-          );
 
           if (attempt < maxRetries) {
             await this.delay(retryAfter);
@@ -102,10 +99,6 @@ export abstract class RetryableMetadataProvider extends BaseMetadataProvider {
         // Check if this is a retryable error
         if (this.isRetryableError(lastError) && attempt < maxRetries) {
           const backoffDelay = this.calculateBackoffDelay(attempt);
-          console.warn(
-            `${this.name} ${operationName} failed (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${backoffDelay}ms:`,
-            lastError.message,
-          );
           await this.delay(backoffDelay);
           continue;
         }
@@ -114,12 +107,6 @@ export abstract class RetryableMetadataProvider extends BaseMetadataProvider {
         break;
       }
     }
-
-    // Log the final error and return empty result
-    console.warn(
-      `${this.name} ${operationName} failed after ${maxRetries + 1} attempts:`,
-      lastError?.message,
-    );
 
     // Return empty array as fallback - callers expecting other types should handle this
     return [] as unknown as T;

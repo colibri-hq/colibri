@@ -48,9 +48,7 @@ export class MetadataProviderRegistry {
     if (registration) {
       // Cleanup provider if it supports cleanup
       if (registration.provider.cleanup) {
-        registration.provider.cleanup().catch((error) => {
-          console.warn(`Error cleaning up provider ${providerName}:`, error);
-        });
+        registration.provider.cleanup().finally();
       }
       return this.providers.delete(providerName);
     }
@@ -99,10 +97,14 @@ export class MetadataProviderRegistry {
         // Sort by reliability score for this data type, then by priority
         const scoreA = a.getReliabilityScore(dataType);
         const scoreB = b.getReliabilityScore(dataType);
+
+        // Higher score first
         if (scoreA !== scoreB) {
-          return scoreB - scoreA; // Higher score first
+          return scoreB - scoreA;
         }
-        return b.priority - a.priority; // Higher priority first
+
+        // Higher priority first
+        return b.priority - a.priority;
       });
   }
 
@@ -236,8 +238,7 @@ export class MetadataProviderRegistry {
       .map(async (reg) => {
         try {
           await reg.provider.initialize!();
-        } catch (error) {
-          console.warn(`Failed to initialize provider ${reg.provider.name}:`, error);
+        } catch {
           // Disable provider in ConfigManager if initialization fails
           this.configManager.setProviderEnabled(reg.provider.name, false);
         }
@@ -256,8 +257,8 @@ export class MetadataProviderRegistry {
       .map(async (reg) => {
         try {
           await reg.provider.cleanup!();
-        } catch (error) {
-          console.warn(`Error cleaning up provider ${reg.provider.name}:`, error);
+        } catch {
+          // Ignore cleanup errors
         }
       });
 
@@ -269,9 +270,7 @@ export class MetadataProviderRegistry {
    * Clear all providers
    */
   clear(): void {
-    this.cleanup().catch((error) => {
-      console.warn("Error during cleanup:", error);
-    });
+    void this.cleanup();
     this.providers.clear();
     this.initialized = false;
   }

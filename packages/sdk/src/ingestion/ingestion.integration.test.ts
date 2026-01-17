@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import type { IngestWorkOptions } from "./types.js";
 import { initialize, type Database } from "../database.js";
+import { loadTagsForWork } from "../resources/tag.js";
 import { ingestWork, confirmIngestion } from "./index.js";
 
 /**
@@ -47,22 +48,15 @@ describe.skipIf(!process.env.DATABASE_URL)("Ingestion Integration Tests", () => 
     // Initialize database connection
     database = initialize(process.env.DATABASE_URL!, {
       certificate: process.env.DATABASE_CERTIFICATE,
-    });
+    } as unknown as Parameters<typeof initialize>[1]);
 
     // Load the test EPUB file
-    try {
-      const fileBuffer = await readFile(TEST_EPUB_PATH);
-      testFile = new File([fileBuffer], "Mogi, Ken - Ikigai.epub", {
-        type: "application/epub+zip",
-      });
+    const fileBuffer = await readFile(TEST_EPUB_PATH);
+    testFile = new File([fileBuffer], "Mogi, Ken - Ikigai.epub", { type: "application/epub+zip" });
 
-      // Calculate checksum for later duplicate tests
-      const checksumBuffer = await subtle.digest("SHA-256", fileBuffer);
-      testFileChecksum = new Uint8Array(checksumBuffer);
-    } catch (error) {
-      console.error(`Failed to load test EPUB file at ${TEST_EPUB_PATH}`);
-      throw error;
-    }
+    // Calculate checksum for later duplicate tests
+    const checksumBuffer = await subtle.digest("SHA-256", fileBuffer);
+    testFileChecksum = new Uint8Array(checksumBuffer);
   });
 
   afterAll(async () => {

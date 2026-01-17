@@ -707,8 +707,8 @@ async function getFont(buffer: ArrayBuffer, unzlib) {
   if (Number(flags) & 1) {
     try {
       return await unzlib(array);
-    } catch (error) {
-      console.warn("Failed to decompress font", error);
+    } catch {
+      // Font decompression failed - return raw data
     }
   }
 
@@ -788,8 +788,8 @@ export class MOBI extends PDB {
           this.headers = this.#getHeaders(await super.loadRecord(boundary));
           this.#start = boundary;
           isKF8 = true;
-        } catch (error) {
-          console.warn("Failed to open KF8; falling back to MOBI", { error });
+        } catch {
+          // Failed to open KF8; falling back to MOBI
         }
       }
     }
@@ -961,10 +961,10 @@ const getIndent = (el) => {
   return x;
 };
 
-type Mobi6Section = {};
+type Mobi6Section = Record<string, never>;
 type Mobi6SectionLoader = {
   id: number;
-  load: () => Promise<{}>;
+  load: () => Promise<Record<string, never>>;
   createDocument: () => Document;
   size: number;
 };
@@ -1069,8 +1069,8 @@ class MOBI6 implements Format {
           return arr;
         }, []);
       }
-    } catch (e) {
-      console.warn(e);
+    } catch {
+      // TOC parsing failed
     }
 
     // get list of all `filepos` references in the book,
@@ -1116,7 +1116,7 @@ class MOBI6 implements Format {
       try {
         (img as HTMLImageElement).src = await this.loadRecIndex(recIndex);
       } catch {
-        console.warn(`Failed to load image ${recIndex}`);
+        // Image loading failed
       }
     }
 
@@ -1132,7 +1132,7 @@ class MOBI6 implements Format {
           (media as HTMLMediaElement).poster = await this.loadRecIndex(recIndex);
         }
       } catch {
-        console.warn(`Failed to load media ${mediaRecIndex}`);
+        // Media loading failed
       }
     }
 
@@ -1379,7 +1379,9 @@ class KF8 implements Format {
       );
       this.#tables.fdstTable = fdstTable;
       this.#fullRawLength = fdstTable[fdstTable.length - 1][1];
-    } catch {}
+    } catch {
+      // FDST table is optional, ignore parse errors
+    }
 
     const skelTable = (await getIndexData(Number(kf8.skel), loadRecord)).table.map(
       ({ name, tagMap }, index) => ({
@@ -1454,8 +1456,8 @@ class KF8 implements Format {
       };
       this.toc = ncx?.map(map);
       this.landmarks = await this.getGuide();
-    } catch (e) {
-      console.warn(e);
+    } catch {
+      // TOC/landmarks parsing failed
     }
 
     const { exth } = this.mobi.headers;
@@ -1488,7 +1490,9 @@ class KF8 implements Format {
         if (match) {
           results[match] = i;
         }
-      } catch {}
+      } catch {
+        // Skip invalid records during resource scanning
+      }
     }
     return results;
   }

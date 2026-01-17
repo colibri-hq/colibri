@@ -144,9 +144,6 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
    */
   async searchByTitle(query: TitleQuery): Promise<MetadataRecord[]> {
     if (!this.isConfigured()) {
-      console.warn(
-        `Amazon PAAPI provider is not configured. Please set access key, secret key, and partner tag via settings.`,
-      );
       return [];
     }
 
@@ -173,9 +170,6 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
    */
   async searchByISBN(isbn: string): Promise<MetadataRecord[]> {
     if (!this.isConfigured()) {
-      console.warn(
-        `Amazon PAAPI provider is not configured. Please set access key, secret key, and partner tag via settings.`,
-      );
       return [];
     }
 
@@ -204,9 +198,6 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
    */
   async searchByCreator(query: CreatorQuery): Promise<MetadataRecord[]> {
     if (!this.isConfigured()) {
-      console.warn(
-        `Amazon PAAPI provider is not configured. Please set access key, secret key, and partner tag via settings.`,
-      );
       return [];
     }
 
@@ -243,9 +234,6 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
     // Strategy 2: Title + Author search
     if (query.title && query.authors && query.authors.length > 0) {
       if (!this.isConfigured()) {
-        console.warn(
-          `Amazon PAAPI provider is not configured. Please set access key, secret key, and partner tag via settings.`,
-        );
         return [];
       }
 

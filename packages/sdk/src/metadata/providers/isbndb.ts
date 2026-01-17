@@ -292,7 +292,6 @@ export class ISBNdbMetadataProvider extends RetryableMetadataProvider {
     const apiKey = await this.getApiKey();
 
     if (!apiKey) {
-      console.warn("ISBNdb API key not configured - skipping ISBNdb metadata lookup");
       return null;
     }
 

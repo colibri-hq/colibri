@@ -239,8 +239,7 @@ export class DNBMetadataProvider extends RetryableMetadataProvider {
           this.#mapMarcRecordToMetadata(record, `${this.name}-${Date.now()}-${index}`),
         )
         .filter((r): r is MetadataRecord => r !== null);
-    } catch (error) {
-      console.warn("Failed to parse DNB SRU response:", error);
+    } catch {
       return [];
     }
   }

@@ -225,7 +225,7 @@ export async function ingestWork(
           enrichmentConfidence,
         };
 
-      case "prompt":
+      case "prompt": {
         // Store for later confirmation in database
         if (!options.userId) {
           throw new Error("userId is required for pending confirmations");
@@ -254,6 +254,7 @@ export async function ingestWork(
           enrichmentSources,
           enrichmentConfidence,
         };
+      }
 
       case "add-edition":
         // Continue to add as new edition of existing work
@@ -702,11 +703,7 @@ async function findOrCreatePublisher(database: Database, name: string, sortingKe
   if (normalizedName) {
     const similar = await findSimilarPublishers(database, normalizedName, 0.7);
     if (similar.length > 0) {
-      const match = similar[0];
-      console.log(
-        `[Ingestion] Auto-merged publisher "${name}" → "${match.publisher.name}" (${Math.round(match.similarity * 100)}% similarity)`,
-      );
-      return match.publisher;
+      return similar[0].publisher;
     }
   }
 
@@ -735,11 +732,7 @@ async function findOrCreateCreator(database: Database, name: string, sortingKey?
   if (normalizedName) {
     const similar = await findSimilarCreators(database, normalizedName, 0.7);
     if (similar.length > 0) {
-      const match = similar[0];
-      console.log(
-        `[Ingestion] Auto-merged creator "${name}" → "${match.creator.name}" (${Math.round(match.similarity * 100)}% similarity)`,
-      );
-      return match.creator;
+      return similar[0].creator;
     }
   }
 

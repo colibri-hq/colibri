@@ -233,7 +233,7 @@ export class MetadataCache<T = any> {
       case EvictionStrategy.FIFO:
         entries.sort(([, a], [, b]) => a.timestamp - b.timestamp);
         break;
-      case EvictionStrategy.TTL_ONLY:
+      case EvictionStrategy.TTL_ONLY: {
         // Only evict expired entries
         const expiredEntries = entries.filter(([, entry]) => this.isExpired(entry));
         for (let i = 0; i < Math.min(count, expiredEntries.length); i++) {
@@ -241,6 +241,7 @@ export class MetadataCache<T = any> {
           this.stats.evictions++;
         }
         return;
+      }
     }
 
     // Evict the oldest/least used entries

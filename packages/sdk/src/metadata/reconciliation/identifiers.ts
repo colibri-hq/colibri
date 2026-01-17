@@ -161,7 +161,7 @@ export class IdentifierReconciler {
    * Detect the type of identifier from its format
    */
   private detectIdentifierType(value: string): Identifier["type"] {
-    const cleaned = value.replace(/[\s\-]/g, "");
+    const cleaned = value.replace(/[\s-]/g, "");
 
     // DOI patterns (check before ISBN since DOI is more specific)
     if (/^10\.\d{4,}\//.test(value) || /^doi:/i.test(value) || value.includes("doi.org")) {
@@ -234,7 +234,7 @@ export class IdentifierReconciler {
    * Normalize ISBN (convert to ISBN-13 format)
    */
   private normalizeISBN(isbn: string): string {
-    const cleaned = isbn.replace(/[\s\-]/g, "");
+    const cleaned = isbn.replace(/[\s-]/g, "");
 
     // If it's already ISBN-13, return as-is (validation happens separately)
     if (cleaned.length === 13) {
@@ -277,7 +277,7 @@ export class IdentifierReconciler {
    * Normalize OCLC number
    */
   private normalizeOCLC(oclc: string): string {
-    let normalized = oclc.replace(/[\s\-]/g, "");
+    let normalized = oclc.replace(/[\s-]/g, "");
     normalized = normalized.replace(/^(ocm|ocn|on)/i, "");
     return normalized;
   }
@@ -287,7 +287,7 @@ export class IdentifierReconciler {
    */
   private normalizeLCCN(lccn: string): string {
     // Remove spaces and hyphens, keep letters and numbers
-    return lccn.replace(/[\s\-]/g, "").toLowerCase();
+    return lccn.replace(/[\s-]/g, "").toLowerCase();
   }
 
   /**

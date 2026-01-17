@@ -491,8 +491,8 @@ export class MetadataConfigManager {
     for (const listener of this.listeners) {
       try {
         listener(this.config);
-      } catch (error) {
-        console.warn("Error in configuration change listener:", error);
+      } catch {
+        // Silently ignore listener errors to avoid cascading failures
       }
     }
   }

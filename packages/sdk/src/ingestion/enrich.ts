@@ -67,9 +67,8 @@ export async function enrichMetadata(
     ]);
 
     return result;
-  } catch (error) {
+  } catch {
     // On timeout or error, return partial results
-    console.warn("Enrichment failed or timed out:", error);
     return { enriched, sources, confidence };
   }
 }
@@ -116,8 +115,7 @@ async function performEnrichment(
         }
 
         return { provider: provider.name, records: [] };
-      } catch (error) {
-        console.warn(`Provider ${provider.name} failed:`, error);
+      } catch {
         return { provider: provider.name, records: [] };
       }
     }),

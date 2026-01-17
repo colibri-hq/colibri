@@ -932,12 +932,13 @@ export class ConflictDetector {
       case "quality_difference":
         return true;
 
-      case "value_mismatch":
+      case "value_mismatch": {
         // Auto-resolvable if there's a clear reliability winner
         const allSources = valueGroups.flat().map((v) => v.source);
         const maxReliability = Math.max(...allSources.map((s) => s.reliability));
         const highReliabilitySources = allSources.filter((s) => s.reliability === maxReliability);
         return highReliabilitySources.length === 1 && maxReliability > 0.8;
+      }
 
       default:
         return false;
