@@ -4,16 +4,11 @@
  * Tests for state parameter and nonce validation as specified in RFC 9700
  * @see https://datatracker.ietf.org/doc/rfc9700/
  */
-import { describe, expect, it, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { AuthorizationCodeClient } from "../../../src/client/authorization-code.js";
-import { StateMismatchError, OAuthClientError } from "../../../src/client/errors.js";
+import { OAuthClientError, StateMismatchError } from "../../../src/client/errors.js";
 import { randomString } from "../__helpers__/crypto.js";
-import {
-  createFullMockFetch,
-  createMockTokenStore,
-  mockMetadata,
-  createJsonResponse,
-} from "../__helpers__/mock-server.js";
+import { createFullMockFetch, createMockTokenStore } from "../__helpers__/mock-server.js";
 
 describe("CSRF Protection (State Parameter)", () => {
   let mockFetch: ReturnType<typeof createFullMockFetch>;

@@ -484,7 +484,6 @@ describe("Extended Error Handling", () => {
     });
 
     it("should throw PollingTimeoutError when device code expires", async () => {
-      let pollCount = 0;
       const pendingFetch = vi.fn().mockImplementation(async (url: RequestInfo | URL) => {
         const urlString = url.toString();
         if (urlString.includes("/.well-known/")) {
@@ -503,7 +502,6 @@ describe("Extended Error Handling", () => {
           );
         }
         if (urlString.includes("/token")) {
-          pollCount++;
           return createJsonResponse(
             {
               error: "authorization_pending",
@@ -532,7 +530,6 @@ describe("Extended Error Handling", () => {
     });
 
     it("should handle slow_down error and increase interval", async () => {
-      const intervals: number[] = [];
       let callCount = 0;
 
       const slowDownFetch = vi.fn().mockImplementation(async (url: RequestInfo | URL) => {

@@ -22,12 +22,7 @@ import {
   getUserInfoEndpoint,
 } from "../../src/client/discovery.js";
 import { DiscoveryError } from "../../src/client/errors.js";
-import {
-  createFullMockFetch,
-  createMockTokenStore,
-  mockMetadata,
-  createJsonResponse,
-} from "./__helpers__/mock-server.js";
+import { createMockTokenStore, createJsonResponse } from "./__helpers__/mock-server.js";
 
 describe("Extended Discovery Tests", () => {
   const fullMetadata: AuthorizationServerMetadata = {

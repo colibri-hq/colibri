@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, vi } from "vitest";
+import { describe, expect, it, beforeEach } from "vitest";
 import type { StoredTokens } from "../../../src/client/types.js";
 import { LocalStorageTokenStore } from "../../../src/client/storage/local-storage.js";
 

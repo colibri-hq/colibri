@@ -120,9 +120,9 @@ describe("PKCE Utilities", () => {
     });
 
     it("should reject non-string input", () => {
-      expect(isValidCodeVerifier(null as any)).toBe(false);
-      expect(isValidCodeVerifier(undefined as any)).toBe(false);
-      expect(isValidCodeVerifier(123 as any)).toBe(false);
+      expect(isValidCodeVerifier(null as unknown as string)).toBe(false);
+      expect(isValidCodeVerifier(undefined as unknown as string)).toBe(false);
+      expect(isValidCodeVerifier(123 as unknown as string)).toBe(false);
     });
   });
 

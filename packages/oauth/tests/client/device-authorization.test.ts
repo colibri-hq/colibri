@@ -381,10 +381,13 @@ describe("DeviceAuthorizationClient", () => {
 
       const pollPromise = client.pollForToken("device_code_123", 5);
 
+      // Set up rejection handler before advancing timers to avoid unhandled rejection
+      const expectation = expect(pollPromise).rejects.toThrow(PollingTimeoutError);
+
       // Advance time past timeout
       await vi.advanceTimersByTimeAsync(15000);
 
-      await expect(pollPromise).rejects.toThrow(PollingTimeoutError);
+      await expectation;
     });
 
     it("should respect AbortSignal", async () => {
@@ -415,12 +418,15 @@ describe("DeviceAuthorizationClient", () => {
         signal: abortController.signal,
       });
 
+      // Set up rejection handler before advancing timers to avoid unhandled rejection
+      const expectation = expect(pollPromise).rejects.toThrow(AbortError);
+
       // Abort after first poll starts waiting
       await vi.advanceTimersByTimeAsync(2000);
       abortController.abort();
       await vi.advanceTimersByTimeAsync(1);
 
-      await expect(pollPromise).rejects.toThrow(AbortError);
+      await expectation;
     });
 
     it("should throw on access_denied", async () => {
@@ -447,9 +453,12 @@ describe("DeviceAuthorizationClient", () => {
 
       const pollPromise = client.pollForToken("device_code_123", 1);
 
+      // Set up rejection handler before advancing timers to avoid unhandled rejection
+      const expectation = expect(pollPromise).rejects.toThrow(OAuthClientError);
+
       await vi.advanceTimersByTimeAsync(1000);
 
-      await expect(pollPromise).rejects.toThrow(OAuthClientError);
+      await expectation;
     });
 
     it("should throw on expired_token", async () => {
@@ -476,9 +485,12 @@ describe("DeviceAuthorizationClient", () => {
 
       const pollPromise = client.pollForToken("device_code_123", 1);
 
+      // Set up rejection handler before advancing timers to avoid unhandled rejection
+      const expectation = expect(pollPromise).rejects.toThrow(OAuthClientError);
+
       await vi.advanceTimersByTimeAsync(1000);
 
-      await expect(pollPromise).rejects.toThrow(OAuthClientError);
+      await expectation;
     });
 
     it("should call onPoll callback on each attempt", async () => {
@@ -682,11 +694,14 @@ describe("DeviceAuthorizationClient", () => {
 
       const authorizePromise = client.authorize(undefined, { signal: abortController.signal });
 
+      // Set up rejection handler before advancing timers to avoid unhandled rejection
+      const expectation = expect(authorizePromise).rejects.toThrow(AbortError);
+
       await vi.advanceTimersByTimeAsync(500);
       abortController.abort();
       await vi.advanceTimersByTimeAsync(1);
 
-      await expect(authorizePromise).rejects.toThrow(AbortError);
+      await expectation;
     });
   });
 });

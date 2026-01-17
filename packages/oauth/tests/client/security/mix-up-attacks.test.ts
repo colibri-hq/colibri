@@ -8,14 +8,14 @@
  * @see https://datatracker.ietf.org/doc/rfc9700/
  * @see https://arxiv.org/abs/1601.01229 (Original mix-up attack paper)
  */
-import { describe, expect, it, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { AuthorizationCodeClient } from "../../../src/client/authorization-code.js";
-import { IssuerMismatchError, ConfigurationError } from "../../../src/client/errors.js";
+import { ConfigurationError, IssuerMismatchError } from "../../../src/client/errors.js";
 import {
   createFullMockFetch,
+  createJsonResponse,
   createMockTokenStore,
   mockMetadata,
-  createJsonResponse,
 } from "../__helpers__/mock-server.js";
 
 describe("Mix-Up Attack Prevention (RFC 9700 Section 4.4)", () => {
@@ -177,10 +177,12 @@ describe("Mix-Up Attack Prevention (RFC 9700 Section 4.4)", () => {
 
       let tokenEndpointCalled: string | null = null;
 
-      const trackingFetch = async (url: RequestInfo | URL, init?: RequestInit) => {
+      const trackingFetch = async (url: RequestInfo | URL, _init?: RequestInit) => {
         const urlString = url.toString();
+
         if (urlString.includes("/token")) {
           tokenEndpointCalled = urlString;
+
           return createJsonResponse(
             { access_token: "access_token", token_type: "Bearer", expires_in: 3600 },
             200,
@@ -223,7 +225,7 @@ describe("Mix-Up Attack Prevention (RFC 9700 Section 4.4)", () => {
         tokenStore: mockTokenStore,
       });
 
-      const maliciousRedirect = new AuthorizationCodeClient({
+      const _maliciousRedirect = new AuthorizationCodeClient({
         issuer: "https://malicious-idp.example.com",
         clientId: "test-client",
         redirectUri: "https://app.example.com/callback",
@@ -327,8 +329,9 @@ describe("Mix-Up Attack Prevention (RFC 9700 Section 4.4)", () => {
     it("should use token endpoint from discovered metadata", async () => {
       let calledEndpoint: string | null = null;
 
-      const discoveryFetch = async (url: RequestInfo | URL, init?: RequestInit) => {
+      const discoveryFetch = async (url: RequestInfo | URL, _init?: RequestInit) => {
         const urlString = url.toString();
+
         if (urlString.includes("/token")) {
           calledEndpoint = urlString;
           return createJsonResponse(
@@ -336,12 +339,14 @@ describe("Mix-Up Attack Prevention (RFC 9700 Section 4.4)", () => {
             200,
           );
         }
+
         if (urlString.includes("/.well-known/")) {
           return createJsonResponse(
             { ...mockMetadata, token_endpoint: "https://auth.example.com/oauth/token" },
             200,
           );
         }
+
         return new Response("Not Found", { status: 404 });
       };
 

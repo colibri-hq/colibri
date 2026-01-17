@@ -130,11 +130,6 @@ describe("SecureTokenStore", () => {
       await store1.set("test-client", tokens);
       await store2.set("test-client", tokens);
 
-      const encrypted1 = mockStorage.getItem("oauth_secure_test-client");
-      const storage2 = (store2 as unknown as { storage: Storage }).storage;
-      // We can't directly access store2's storage, but we can verify the behavior
-      // by trying to decrypt with the wrong key
-
       // Create a new store with wrong key pointing to same storage
       const wrongKeyStore = new SecureTokenStore({ key: "wrong-password", storage: mockStorage });
 

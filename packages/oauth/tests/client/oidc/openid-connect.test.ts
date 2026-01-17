@@ -323,7 +323,7 @@ describe("OpenID Connect", () => {
     it("should resolve relative userinfo endpoint against issuer", () => {
       const metadata: AuthorizationServerMetadata = {
         ...mockMetadata,
-        userinfo_endpoint: "/userinfo" as any,
+        userinfo_endpoint: "/userinfo" as unknown as `https://${string}`,
       };
 
       const endpoint = getUserInfoEndpoint(metadata, "https://auth.example.com");
