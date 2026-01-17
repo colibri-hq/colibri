@@ -60,6 +60,9 @@ catalogs:
     eslint:
       specifier: ^9.39.2
       version: 9.39.2
+    eslint-plugin-oxlint:
+      specifier: ^1.39.0
+      version: 1.39.0
     esm-env:
       specifier: ^1.2.2
       version: 1.2.2
@@ -72,6 +75,9 @@ catalogs:
     oxfmt:
       specifier: ^0.24.0
       version: 0.24.0
+    oxlint:
+      specifier: ^1.39.0
+      version: 1.39.0
     rimraf:
       specifier: ^6.1.2
       version: 6.1.2
@@ -280,6 +286,9 @@ importers:
       oxfmt:
         specifier: 'catalog:'
         version: 0.24.0
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.39.0
       svelte-check:
         specifier: 'catalog:'
         version: 4.3.5(picomatch@4.0.3)(svelte@5.46.4)(typescript@5.9.3)
@@ -370,7 +379,7 @@ importers:
         version: 4.4.4(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-import:
         specifier: ^2.32.0
-        version: 2.32.0(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
+        version: 2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-n:
         specifier: ^17.23.2
         version: 17.23.2(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
@@ -392,6 +401,9 @@ importers:
       oxfmt:
         specifier: 'catalog:'
         version: 0.24.0
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.39.0
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -462,6 +474,9 @@ importers:
       '@tailwindcss/vite':
         specifier: 'catalog:'
         version: 4.1.18(vite@7.3.1(@types/node@25.0.9)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.39.0)(tsx@4.21.0)(yaml@2.8.2))
+      '@types/unist':
+        specifier: ^3.0.3
+        version: 3.0.3
       '@vitest/browser':
         specifier: 'catalog:'
         version: 4.0.17(msw@2.12.7(@types/node@25.0.9)(typescript@5.9.3))(vite@7.3.1(@types/node@25.0.9)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.39.0)(tsx@4.21.0)(yaml@2.8.2))(vitest@4.0.17)
@@ -486,6 +501,9 @@ importers:
       oxfmt:
         specifier: 'catalog:'
         version: 0.24.0
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.39.0
       pagefind:
         specifier: ^1.4.0
         version: 1.4.0
@@ -546,6 +564,9 @@ importers:
       oxfmt:
         specifier: 'catalog:'
         version: 0.24.0
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.39.0
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -577,6 +598,9 @@ importers:
       oxfmt:
         specifier: 'catalog:'
         version: 0.24.0
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.39.0
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -626,6 +650,9 @@ importers:
       oxfmt:
         specifier: 'catalog:'
         version: 0.24.0
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.39.0
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -654,6 +681,9 @@ importers:
       oxfmt:
         specifier: 'catalog:'
         version: 0.24.0
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.39.0
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -679,6 +709,9 @@ importers:
       oxfmt:
         specifier: 'catalog:'
         version: 0.24.0
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.39.0
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -791,6 +824,9 @@ importers:
       oxfmt:
         specifier: 'catalog:'
         version: 0.24.0
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.39.0
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -860,7 +896,7 @@ importers:
         version: 4.4.4(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-import:
         specifier: ^2.32.0
-        version: 2.32.0(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
+        version: 2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-n:
         specifier: ^17.23.2
         version: 17.23.2(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
@@ -879,6 +915,9 @@ importers:
       oxfmt:
         specifier: 'catalog:'
         version: 0.24.0
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.39.0
       pg:
         specifier: ^8.17.1
         version: 8.17.1
@@ -947,7 +986,7 @@ importers:
         specifier: ^10.1.8
         version: 10.1.8(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-oxlint:
-        specifier: ^1.39.0
+        specifier: 'catalog:'
         version: 1.39.0
       eslint-plugin-svelte:
         specifier: ^3.14.0
@@ -959,7 +998,7 @@ importers:
         specifier: 'catalog:'
         version: 0.24.0
       oxlint:
-        specifier: ^1.39.0
+        specifier: 'catalog:'
         version: 1.39.0
       rimraf:
         specifier: 'catalog:'
@@ -1100,6 +1139,9 @@ importers:
       oxfmt:
         specifier: 'catalog:'
         version: 0.24.0
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.39.0
       publint:
         specifier: ^0.3.16
         version: 0.3.16
@@ -13633,14 +13675,15 @@ snapshots:
       tinyglobby: 0.2.15
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1)):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
+      '@typescript-eslint/parser': 8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.39.2(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 4.4.4(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1))
@@ -13654,7 +13697,7 @@ snapshots:
       eslint: 9.39.2(jiti@2.6.1)
       eslint-compat-utils: 0.5.1(eslint@9.39.2(jiti@2.6.1))
 
-  eslint-plugin-import@2.32.0(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1)):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -13665,7 +13708,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.39.2(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -13676,6 +13719,8 @@ snapshots:
       semver: 6.3.1
       string.prototype.trimend: 1.0.9
       tsconfig-paths: 3.15.0
+    optionalDependencies:
+      '@typescript-eslint/parser': 8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack

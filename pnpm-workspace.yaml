@@ -23,10 +23,12 @@ catalog:
   '@vitest/coverage-v8': ^4.0.17
   '@vitest/ui': ^4.0.17
   eslint: ^9.39.2
+  eslint-plugin-oxlint: ^1.39.0
   esm-env: ^1.2.2
   globals: ^16.5.0
   jsonwebtoken: ^9.0.3
   oxfmt: ^0.24.0
+  oxlint: ^1.39.0
   rimraf: ^6.1.2
   svelte: ^5.46.4
   svelte-check: ^4.3.5
