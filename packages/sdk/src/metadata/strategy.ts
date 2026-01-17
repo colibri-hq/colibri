@@ -1,9 +1,6 @@
-import type {
-  MetadataProvider,
-  MultiCriteriaQuery,
-} from "./providers/provider.js";
-import { MetadataType } from "./providers/provider.js";
 import type { PerformanceMonitor } from "./performance.js";
+import type { MetadataProvider, MultiCriteriaQuery } from "./providers/provider.js";
+import { MetadataType } from "./providers/provider.js";
 
 /**
  * Provider selection strategies
@@ -41,20 +38,7 @@ interface ProviderWithScore {
  * Maps provider name to supported language codes (ISO 639-1)
  */
 const PROVIDER_LANGUAGE_SUPPORT: Record<string, string[]> = {
-  OpenLibrary: [
-    "en",
-    "es",
-    "fr",
-    "de",
-    "it",
-    "pt",
-    "nl",
-    "pl",
-    "ru",
-    "ja",
-    "zh",
-    "ar",
-  ],
+  OpenLibrary: ["en", "es", "fr", "de", "it", "pt", "nl", "pl", "ru", "ja", "zh", "ar"],
   WikiData: [
     "en",
     "es",
@@ -146,9 +130,7 @@ export function selectProviders(
  * @param providers - Providers to sort
  * @returns Sorted providers (descending priority)
  */
-export function sortByPriority(
-  providers: MetadataProvider[],
-): MetadataProvider[] {
+export function sortByPriority(providers: MetadataProvider[]): MetadataProvider[] {
   return providers.toSorted(({ priority: a }, { priority: b }) => b - a);
 }
 
@@ -174,9 +156,7 @@ export function sortBySpeed(
   const providersWithSpeed = providers.map((provider) => {
     // Get all stats and filter for this provider
     const allStats = monitor.getStats();
-    const providerStats = allStats.filter(
-      ({ provider: candidate }) => candidate === provider.name,
-    );
+    const providerStats = allStats.filter(({ provider: candidate }) => candidate === provider.name);
 
     // Calculate average duration across all operations for this provider
     let avgDuration = Infinity;
@@ -185,12 +165,8 @@ export function sortBySpeed(
         (sum, stat) => sum + stat.averageDuration * stat.totalOperations,
         0,
       );
-      const totalOperations = providerStats.reduce(
-        (sum, stat) => sum + stat.totalOperations,
-        0,
-      );
-      avgDuration =
-        totalOperations > 0 ? totalDuration / totalOperations : Infinity;
+      const totalOperations = providerStats.reduce((sum, stat) => sum + stat.totalOperations, 0);
+      avgDuration = totalOperations > 0 ? totalDuration / totalOperations : Infinity;
     }
 
     return { provider, avgDuration };
@@ -222,9 +198,7 @@ export function filterByDataTypeSupport(
     return providers;
   }
 
-  return providers.filter((provider) =>
-    dataTypes.every((type) => provider.supportsDataType(type)),
-  );
+  return providers.filter((provider) => dataTypes.every((type) => provider.supportsDataType(type)));
 }
 
 /**
@@ -247,15 +221,10 @@ export function filterByLanguageSupport(
 
   const providersWithScore: ProviderWithScore[] = providers.map((provider) => {
     const supportedLangs = PROVIDER_LANGUAGE_SUPPORT[provider.name] ?? ["en"];
-    const matchCount = languages.filter((lang) =>
-      supportedLangs.includes(lang),
-    ).length;
+    const matchCount = languages.filter((lang) => supportedLangs.includes(lang)).length;
     const selectionScore = matchCount / languages.length;
 
-    return {
-      provider,
-      selectionScore,
-    };
+    return { provider, selectionScore };
   });
 
   // Sort by language match score (descending), then by priority
@@ -289,8 +258,7 @@ export function filterByReliability(
   return providers.filter((provider) => {
     // Calculate average reliability across all required data types
     const scores = dataTypes.map((type) => provider.getReliabilityScore(type));
-    const avgScore =
-      scores.reduce((sum, score) => sum + score, 0) / scores.length;
+    const avgScore = scores.reduce((sum, score) => sum + score, 0) / scores.length;
     return avgScore >= minScore;
   });
 }
@@ -302,10 +270,7 @@ export function filterByReliability(
  * @param options - Filter options
  * @returns Filtered providers
  */
-function applyFilters(
-  providers: MetadataProvider[],
-  options: StrategyOptions,
-): MetadataProvider[] {
+function applyFilters(providers: MetadataProvider[], options: StrategyOptions): MetadataProvider[] {
   let filtered = providers;
 
   // Exclude providers by name
@@ -320,11 +285,7 @@ function applyFilters(
   }
 
   // Filter by reliability
-  if (
-    options.minReliabilityScore &&
-    options.minReliabilityScore > 0 &&
-    options.requiredDataTypes
-  ) {
+  if (options.minReliabilityScore && options.minReliabilityScore > 0 && options.requiredDataTypes) {
     filtered = filterByReliability(
       filtered,
       options.requiredDataTypes,
@@ -362,18 +323,11 @@ function selectForConsensus(
 
   // Score each provider based on reliability for relevant data types
   const providersWithScore: ProviderWithScore[] = providers.map((provider) => {
-    const scores = relevantDataTypes.map((type) =>
-      provider.getReliabilityScore(type),
-    );
+    const scores = relevantDataTypes.map((type) => provider.getReliabilityScore(type));
     const avgScore =
-      scores.length > 0
-        ? scores.reduce((sum, score) => sum + score, 0) / scores.length
-        : 0.5;
+      scores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / scores.length : 0.5;
 
-    return {
-      provider,
-      selectionScore: avgScore,
-    };
+    return { provider, selectionScore: avgScore };
   });
 
   // Sort by reliability score (descending), then by priority
@@ -403,9 +357,7 @@ function selectForConsensus(
     // Check if this provider covers data types not well-covered by selected ones
     const addsDiversity = relevantDataTypes.some((type) => {
       const thisScore = item.provider.getReliabilityScore(type);
-      const maxExistingScore = Math.max(
-        ...selected.map((p) => p.getReliabilityScore(type)),
-      );
+      const maxExistingScore = Math.max(...selected.map((p) => p.getReliabilityScore(type)));
       // Add if this provider is significantly better for this type
       return thisScore > maxExistingScore + 0.1;
     });
@@ -469,10 +421,7 @@ function getRelevantDataTypes(query: MultiCriteriaQuery): MetadataType[] {
  * @param providerName - Name of the provider
  * @param languages - Supported language codes (ISO 639-1)
  */
-export function registerProviderLanguageSupport(
-  providerName: string,
-  languages: string[],
-): void {
+export function registerProviderLanguageSupport(providerName: string, languages: string[]): void {
   PROVIDER_LANGUAGE_SUPPORT[providerName] = languages;
 }
 

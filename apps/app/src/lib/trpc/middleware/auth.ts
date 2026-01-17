@@ -8,9 +8,7 @@ export function auth(t: Trpc) {
     }
 
     if (!ctx.userId) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-      });
+      throw new TRPCError({ code: "UNAUTHORIZED" });
     }
 
     return next();

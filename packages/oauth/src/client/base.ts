@@ -8,17 +8,12 @@ import type {
   TokenStore,
 } from "./types.js";
 import {
-  ConfigurationError,
-  NetworkError,
-  OAuthClientError,
-  TokenExpiredError,
-} from "./errors.js";
-import {
   discoverServer,
   getIntrospectionEndpoint,
   getRevocationEndpoint,
   getTokenEndpoint,
 } from "./discovery.js";
+import { ConfigurationError, NetworkError, OAuthClientError, TokenExpiredError } from "./errors.js";
 import { MemoryTokenStore } from "./storage/memory.js";
 
 /**
@@ -54,8 +49,7 @@ export abstract class OAuthClientBase {
       throw new ConfigurationError("clientId is required");
     }
 
-    this.#issuer =
-      typeof config.issuer === "string" ? new URL(config.issuer) : config.issuer;
+    this.#issuer = typeof config.issuer === "string" ? new URL(config.issuer) : config.issuer;
     this.#clientId = config.clientId;
     this.#clientSecret = config.clientSecret;
     this.#scopes = config.scopes ?? [];
@@ -133,9 +127,7 @@ export abstract class OAuthClientBase {
       return this.#discoveryPromise;
     }
 
-    this.#discoveryPromise = discoverServer(this.#issuer, {
-      fetch: this.#fetch,
-    });
+    this.#discoveryPromise = discoverServer(this.#issuer, { fetch: this.#fetch });
 
     try {
       this.#serverMetadata = await this.#discoveryPromise;
@@ -258,10 +250,7 @@ export abstract class OAuthClientBase {
       throw new ConfigurationError("Server does not support token revocation");
     }
 
-    const params: Record<string, string> = {
-      token,
-      client_id: this.#clientId,
-    };
+    const params: Record<string, string> = { token, client_id: this.#clientId };
 
     if (tokenTypeHint) {
       params.token_type_hint = tokenTypeHint;
@@ -273,9 +262,7 @@ export abstract class OAuthClientBase {
 
     await this.request(revocationEndpoint, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams(params).toString(),
     });
   }
@@ -295,10 +282,7 @@ export abstract class OAuthClientBase {
       throw new ConfigurationError("Server does not support token introspection");
     }
 
-    const params: Record<string, string> = {
-      token,
-      client_id: this.#clientId,
-    };
+    const params: Record<string, string> = { token, client_id: this.#clientId };
 
     if (this.#clientSecret) {
       params.client_secret = this.#clientSecret;
@@ -306,10 +290,7 @@ export abstract class OAuthClientBase {
 
     return await this.request<IntrospectionResponse>(introspectionEndpoint, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Accept: "application/json",
-      },
+      headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
       body: new URLSearchParams(params).toString(),
     });
   }
@@ -375,10 +356,9 @@ export abstract class OAuthClientBase {
       }
 
       // Generic HTTP error
-      throw new NetworkError(
-        `Request to ${endpoint} failed with status ${response.status}`,
-        { cause: response },
-      );
+      throw new NetworkError(`Request to ${endpoint} failed with status ${response.status}`, {
+        cause: response,
+      });
     }
 
     // Handle empty responses (e.g., revocation endpoint)
@@ -390,9 +370,7 @@ export abstract class OAuthClientBase {
     try {
       return (await response.json()) as T;
     } catch (error) {
-      throw new NetworkError(`Failed to parse response from ${endpoint}`, {
-        cause: error,
-      });
+      throw new NetworkError(`Failed to parse response from ${endpoint}`, { cause: error });
     }
   }
 
@@ -410,10 +388,7 @@ export abstract class OAuthClientBase {
   ): Promise<TokenPayload> {
     return await this.request<TokenPayload>(endpoint, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Accept: "application/json",
-      },
+      headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
       body: new URLSearchParams(params).toString(),
     });
   }

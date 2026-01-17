@@ -1,9 +1,5 @@
+import { type BlogPost, getBlogPosts, getFeaturedPosts } from "$lib/content/blog.js";
 import { json } from "@sveltejs/kit";
-import {
-  type BlogPost,
-  getBlogPosts,
-  getFeaturedPosts,
-} from "$lib/content/blog.js";
 import type { RequestHandler } from "./$types";
 
 export const prerender = true;
@@ -19,10 +15,7 @@ export const GET = async function GET({ url }) {
     posts: posts.map(summarizePost),
     featured: featured.map(summarizePost),
     total: posts.length,
-    links: {
-      html: `${baseUrl}/blog`,
-      json: `${baseUrl}/blog.json`,
-    },
+    links: { html: `${baseUrl}/blog`, json: `${baseUrl}/blog.json` },
   };
 
   return json(response, {
@@ -66,8 +59,5 @@ type BlogListingResponse = {
   posts: BlogPostSummary[];
   featured: BlogPostSummary[];
   total: number;
-  links: {
-    html: string;
-    json: string;
-  };
+  links: { html: string; json: string };
 };

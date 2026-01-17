@@ -29,11 +29,7 @@ export interface ProviderConfig {
   };
 
   /** Custom endpoints or URLs */
-  endpoints?: {
-    baseUrl?: string;
-    searchUrl?: string;
-    [key: string]: string;
-  };
+  endpoints?: { baseUrl?: string; searchUrl?: string; [key: string]: string };
 
   /** Feature flags for this provider */
   features?: {
@@ -80,12 +76,7 @@ export interface MetadataSystemConfig {
   };
 
   /** Retry configuration */
-  retry: {
-    maxAttempts: number;
-    baseDelay: number;
-    maxDelay: number;
-    exponentialBackoff: boolean;
-  };
+  retry: { maxAttempts: number; baseDelay: number; maxDelay: number; exponentialBackoff: boolean };
 }
 
 /**
@@ -114,111 +105,47 @@ export const DEFAULT_METADATA_CONFIG: MetadataSystemConfig = {
     "open-library": {
       enabled: true,
       priority: 80,
-      rateLimit: {
-        maxRequests: 100,
-        windowMs: 60000,
-        requestDelay: 100,
-      },
-      timeout: {
-        requestTimeout: 15000,
-        operationTimeout: 30000,
-      },
-      features: {
-        fuzzySearch: true,
-        multiCriteria: true,
-        coverImages: true,
-      },
+      rateLimit: { maxRequests: 100, windowMs: 60000, requestDelay: 100 },
+      timeout: { requestTimeout: 15000, operationTimeout: 30000 },
+      features: { fuzzySearch: true, multiCriteria: true, coverImages: true },
     },
 
     "library-of-congress": {
       enabled: true,
       priority: 90,
-      rateLimit: {
-        maxRequests: 50,
-        windowMs: 60000,
-        requestDelay: 200,
-      },
-      timeout: {
-        requestTimeout: 20000,
-        operationTimeout: 45000,
-      },
-      features: {
-        fuzzySearch: false,
-        multiCriteria: true,
-        coverImages: false,
-      },
+      rateLimit: { maxRequests: 50, windowMs: 60000, requestDelay: 200 },
+      timeout: { requestTimeout: 20000, operationTimeout: 45000 },
+      features: { fuzzySearch: false, multiCriteria: true, coverImages: false },
     },
 
     wikidata: {
       enabled: true,
       priority: 70,
-      rateLimit: {
-        maxRequests: 200,
-        windowMs: 60000,
-        requestDelay: 50,
-      },
-      timeout: {
-        requestTimeout: 12000,
-        operationTimeout: 30000,
-      },
-      features: {
-        fuzzySearch: true,
-        multiCriteria: true,
-        coverImages: false,
-      },
+      rateLimit: { maxRequests: 200, windowMs: 60000, requestDelay: 50 },
+      timeout: { requestTimeout: 12000, operationTimeout: 30000 },
+      features: { fuzzySearch: true, multiCriteria: true, coverImages: false },
     },
 
     isni: {
       enabled: true,
       priority: 60,
-      rateLimit: {
-        maxRequests: 30,
-        windowMs: 60000,
-        requestDelay: 500,
-      },
-      timeout: {
-        requestTimeout: 10000,
-        operationTimeout: 25000,
-      },
-      features: {
-        fuzzySearch: false,
-        multiCriteria: false,
-        coverImages: false,
-      },
+      rateLimit: { maxRequests: 30, windowMs: 60000, requestDelay: 500 },
+      timeout: { requestTimeout: 10000, operationTimeout: 25000 },
+      features: { fuzzySearch: false, multiCriteria: false, coverImages: false },
     },
 
     viaf: {
       enabled: false, // Disabled by default
       priority: 50,
-      rateLimit: {
-        maxRequests: 20,
-        windowMs: 60000,
-        requestDelay: 1000,
-      },
-      timeout: {
-        requestTimeout: 15000,
-        operationTimeout: 30000,
-      },
-      features: {
-        fuzzySearch: false,
-        multiCriteria: false,
-        coverImages: false,
-      },
+      rateLimit: { maxRequests: 20, windowMs: 60000, requestDelay: 1000 },
+      timeout: { requestTimeout: 15000, operationTimeout: 30000 },
+      features: { fuzzySearch: false, multiCriteria: false, coverImages: false },
     },
   },
 
-  logging: {
-    level: "info",
-    enableProviderLogs: true,
-    enablePerformanceLogs: false,
-  },
+  logging: { level: "info", enableProviderLogs: true, enablePerformanceLogs: false },
 
-  retry: {
-    maxAttempts: 3,
-    baseDelay: 1000,
-    maxDelay: 10000,
-    exponentialBackoff: true,
-  },
+  retry: { maxAttempts: 3, baseDelay: 1000, maxDelay: 10000, exponentialBackoff: true },
 };
 
 /**
@@ -257,13 +184,8 @@ export class MetadataConfigManager {
   /**
    * Update configuration for a specific provider
    */
-  updateProviderConfig(
-    providerName: string,
-    config: Partial<ProviderConfig>,
-  ): void {
-    const currentConfig = this.config.providers[providerName] || {
-      enabled: true,
-    };
+  updateProviderConfig(providerName: string, config: Partial<ProviderConfig>): void {
+    const currentConfig = this.config.providers[providerName] || { enabled: true };
     this.config.providers[providerName] = { ...currentConfig, ...config };
     this.notifyListeners();
   }
@@ -296,10 +218,7 @@ export class MetadataConfigManager {
       return this.config.defaultRateLimit;
     }
 
-    return {
-      ...this.config.defaultRateLimit,
-      ...providerConfig.rateLimit,
-    };
+    return { ...this.config.defaultRateLimit, ...providerConfig.rateLimit };
   }
 
   /**
@@ -311,10 +230,7 @@ export class MetadataConfigManager {
       return this.config.defaultTimeout;
     }
 
-    return {
-      ...this.config.defaultTimeout,
-      ...providerConfig.timeout,
-    };
+    return { ...this.config.defaultTimeout, ...providerConfig.timeout };
   }
 
   /**
@@ -404,13 +320,8 @@ export class MetadataConfigManager {
     }
 
     // Validate provider configurations
-    for (const [providerName, providerConfig] of Object.entries(
-      this.config.providers,
-    )) {
-      if (
-        providerConfig.priority !== undefined &&
-        providerConfig.priority < 0
-      ) {
+    for (const [providerName, providerConfig] of Object.entries(this.config.providers)) {
+      if (providerConfig.priority !== undefined && providerConfig.priority < 0) {
         errors.push(`Provider ${providerName}: priority must be non-negative`);
       }
 
@@ -419,17 +330,13 @@ export class MetadataConfigManager {
           providerConfig.rateLimit.maxRequests !== undefined &&
           providerConfig.rateLimit.maxRequests <= 0
         ) {
-          errors.push(
-            `Provider ${providerName}: rateLimit.maxRequests must be greater than 0`,
-          );
+          errors.push(`Provider ${providerName}: rateLimit.maxRequests must be greater than 0`);
         }
         if (
           providerConfig.rateLimit.windowMs !== undefined &&
           providerConfig.rateLimit.windowMs <= 0
         ) {
-          errors.push(
-            `Provider ${providerName}: rateLimit.windowMs must be greater than 0`,
-          );
+          errors.push(`Provider ${providerName}: rateLimit.windowMs must be greater than 0`);
         }
       }
 
@@ -438,25 +345,18 @@ export class MetadataConfigManager {
           providerConfig.timeout.requestTimeout !== undefined &&
           providerConfig.timeout.requestTimeout <= 0
         ) {
-          errors.push(
-            `Provider ${providerName}: timeout.requestTimeout must be greater than 0`,
-          );
+          errors.push(`Provider ${providerName}: timeout.requestTimeout must be greater than 0`);
         }
         if (
           providerConfig.timeout.operationTimeout !== undefined &&
           providerConfig.timeout.operationTimeout <= 0
         ) {
-          errors.push(
-            `Provider ${providerName}: timeout.operationTimeout must be greater than 0`,
-          );
+          errors.push(`Provider ${providerName}: timeout.operationTimeout must be greater than 0`);
         }
       }
     }
 
-    return {
-      valid: errors.length === 0,
-      errors,
-    };
+    return { valid: errors.length === 0, errors };
   }
 
   private mergeConfig(
@@ -480,10 +380,7 @@ export class MetadataConfigManager {
       for (const [name, config] of Object.entries(override.providers)) {
         if (mergedProviders[name]) {
           const baseConfig = mergedProviders[name];
-          const merged: ProviderConfig = {
-            ...baseConfig,
-            ...config,
-          };
+          const merged: ProviderConfig = { ...baseConfig, ...config };
 
           // Handle nested objects with proper merging
           if (config.rateLimit && baseConfig.rateLimit) {
@@ -532,10 +429,7 @@ export class MetadataConfigManager {
     return {
       ...base,
       ...override,
-      defaultRateLimit: {
-        ...base.defaultRateLimit,
-        ...override.defaultRateLimit,
-      },
+      defaultRateLimit: { ...base.defaultRateLimit, ...override.defaultRateLimit },
       defaultTimeout: { ...base.defaultTimeout, ...override.defaultTimeout },
       providers: mergedProviders,
       logging: { ...base.logging, ...override.logging },
@@ -560,9 +454,7 @@ export class MetadataConfigManager {
   }
 
   private deepCopyProviderConfig(config: ProviderConfig): ProviderConfig {
-    const copy: ProviderConfig = {
-      enabled: config.enabled,
-    };
+    const copy: ProviderConfig = { enabled: config.enabled };
 
     if (config.priority !== undefined) {
       copy.priority = config.priority;

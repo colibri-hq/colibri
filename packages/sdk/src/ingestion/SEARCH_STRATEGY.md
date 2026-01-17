@@ -155,11 +155,7 @@ const [wikidataResults, locResults, olResults] = await Promise.all([
 ]);
 
 // Merge and reconcile
-const merged = mergeMetadataRecords([
-  ...wikidataResults,
-  ...locResults,
-  ...olResults,
-]);
+const merged = mergeMetadataRecords([...wikidataResults, ...locResults, ...olResults]);
 ```
 
 **Priority Order:**
@@ -368,10 +364,7 @@ Different fields require different conflict resolution approaches:
 For complex scenarios, use the `@colibri-hq/metadata-reconciliation` package:
 
 ```typescript
-import {
-  DateReconciler,
-  PublisherReconciler,
-} from "@colibri-hq/metadata-reconciliation";
+import { DateReconciler, PublisherReconciler } from "@colibri-hq/metadata-reconciliation";
 
 // Date reconciliation with confidence scoring
 const dateReconciler = new DateReconciler();
@@ -501,10 +494,7 @@ for (const provider of providers) {
 
 ```typescript
 import { enrichMetadata } from "./enrich.js";
-import {
-  convertToExtractedMetadata,
-  mergeMetadataRecords,
-} from "./metadata-converter.js";
+import { convertToExtractedMetadata, mergeMetadataRecords } from "./metadata-converter.js";
 import { globalProviderRegistry } from "../metadata/registry.js";
 
 // 1. Get providers (auto-sorted by priority)
@@ -526,10 +516,7 @@ const enrichmentResult = await enrichMetadata(ebookMetadata, providers, {
 });
 
 // 4. Merge enriched data with original
-const finalMetadata = {
-  ...ebookMetadata,
-  ...enrichmentResult.enriched,
-};
+const finalMetadata = { ...ebookMetadata, ...enrichmentResult.enriched };
 
 console.log("Enriched metadata:", finalMetadata);
 console.log("Data sources:", enrichmentResult.sources);

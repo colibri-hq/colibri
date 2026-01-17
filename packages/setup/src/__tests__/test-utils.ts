@@ -1,7 +1,4 @@
-import {
-  PostgreSqlContainer,
-  type StartedPostgreSqlContainer,
-} from "@testcontainers/postgresql";
+import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -130,27 +127,17 @@ async function applyMigrations(connectionString: string): Promise<void> {
     // The 'isn' extension might not be available in the test container,
     // so we'll skip it and handle any dependent features gracefully
     try {
-      await client.query(
-        `CREATE EXTENSION IF NOT EXISTS "isn" WITH SCHEMA extensions;`,
-      );
+      await client.query(`CREATE EXTENSION IF NOT EXISTS "isn" WITH SCHEMA extensions;`);
     } catch {
       // Extension not available, that's okay for tests
     }
 
     // unaccent is commonly available
-    await client.query(
-      `CREATE EXTENSION IF NOT EXISTS "unaccent" WITH SCHEMA public;`,
-    );
+    await client.query(`CREATE EXTENSION IF NOT EXISTS "unaccent" WITH SCHEMA public;`);
 
     // Read and execute migration files
-    const migrationsDir = resolve(
-      currentDir,
-      "../../../../supabase/migrations",
-    );
-    const migrationFiles = [
-      "20251225151111_schema.sql",
-      "20251226212735_pending_ingestion.sql",
-    ];
+    const migrationsDir = resolve(currentDir, "../../../../supabase/migrations");
+    const migrationFiles = ["20251225151111_schema.sql", "20251226212735_pending_ingestion.sql"];
 
     for (const file of migrationFiles) {
       const sql = readFileSync(resolve(migrationsDir, file), "utf8");
@@ -158,10 +145,7 @@ async function applyMigrations(connectionString: string): Promise<void> {
       // Process the SQL to handle extensions that might not be available
       const processedSql = sql
         // Skip the 'isn' extension creation since it's not available in standard postgres
-        .replaceAll(
-          /create extension if not exists "isn"[^;]*;/gi,
-          "-- skipped: isn extension",
-        )
+        .replaceAll(/create extension if not exists "isn"[^;]*;/gi, "-- skipped: isn extension")
         // The unaccent was already created above
         .replaceAll(
           /create extension if not exists "unaccent"[^;]*;/gi,
@@ -178,18 +162,14 @@ async function applyMigrations(connectionString: string): Promise<void> {
 /**
  * Teardown the test database
  */
-export async function teardownTestDatabase(
-  context: TestContext,
-): Promise<void> {
+export async function teardownTestDatabase(context: TestContext): Promise<void> {
   await context.container.stop();
 }
 
 /**
  * Clear all data from the database while keeping the schema
  */
-export async function clearTestDatabase(
-  connectionString: string,
-): Promise<void> {
+export async function clearTestDatabase(connectionString: string): Promise<void> {
   const client = new Client({ connectionString });
   await client.connect();
 
@@ -203,9 +183,7 @@ export async function clearTestDatabase(
     `);
 
     for (const row of result.rows) {
-      await client.query(
-        `TRUNCATE "${row.schemaname}"."${row.tablename}" CASCADE`,
-      );
+      await client.query(`TRUNCATE "${row.schemaname}"."${row.tablename}" CASCADE`);
     }
   } finally {
     await client.end();

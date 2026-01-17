@@ -8,6 +8,8 @@
  */
 
 import type { Database } from "@colibri-hq/sdk";
+import type { ScopeName } from "@colibri-hq/sdk/scopes";
+import type { Cookies } from "@sveltejs/kit";
 import {
   validateApiKey,
   updateApiKeyLastUsed,
@@ -15,8 +17,6 @@ import {
   loadAccessToken,
   type ApiKey,
 } from "@colibri-hq/sdk";
-import type { ScopeName } from "@colibri-hq/sdk/scopes";
-import type { Cookies } from "@sveltejs/kit";
 import { resolveUserId } from "./auth";
 
 export type AuthMethod = "basic" | "bearer" | "session";
@@ -118,12 +118,7 @@ async function authenticateBasicAuth(
     const clientIp = extractClientIp(request);
     await updateApiKeyLastUsed(database, apiKey.id.toString(), clientIp);
 
-    return {
-      userId: user.id.toString(),
-      method: "basic",
-      scopes: apiKey.scopes,
-      apiKey,
-    };
+    return { userId: user.id.toString(), method: "basic", scopes: apiKey.scopes, apiKey };
   } catch {
     return null;
   }
@@ -139,9 +134,7 @@ async function authenticateBearerToken(
   try {
     const token = authorization.slice(7); // Remove "Bearer "
 
-    const accessToken = await loadAccessToken(database, token).catch(
-      () => null,
-    );
+    const accessToken = await loadAccessToken(database, token).catch(() => null);
 
     if (!accessToken) {
       return null;
@@ -195,10 +188,7 @@ function authenticateSession(cookies: Cookies): ApiAuthResult | null {
  * Check if the auth result has the required scope.
  * Session auth (scopes = null) always has access.
  */
-export function hasRequiredScope(
-  auth: ApiAuthResult,
-  requiredScope: ScopeName,
-): boolean {
+export function hasRequiredScope(auth: ApiAuthResult, requiredScope: ScopeName): boolean {
   // Session auth = full access
   if (auth.scopes === null) {
     return true;

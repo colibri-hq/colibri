@@ -1,4 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import type { AuthorizationServerMetadata } from "../../src/types.js";
 import {
   discoverServer,
   getTokenEndpoint,
@@ -12,7 +13,6 @@ import {
   requiresPAR,
 } from "../../src/client/discovery.js";
 import { DiscoveryError } from "../../src/client/errors.js";
-import type { AuthorizationServerMetadata } from "../../src/types.js";
 
 describe("Server Discovery", () => {
   const mockMetadata: AuthorizationServerMetadata = {
@@ -41,10 +41,7 @@ describe("Server Discovery", () => {
 
   describe("discoverServer", () => {
     it("should discover server metadata from OAuth path", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockMetadata) });
 
       const result = await discoverServer("https://auth.example.com", { fetch: mockFetch });
 
@@ -57,15 +54,8 @@ describe("Server Discovery", () => {
 
     it("should fall back to OpenID Connect discovery path", async () => {
       mockFetch
-        .mockResolvedValueOnce({
-          ok: false,
-          status: 404,
-          statusText: "Not Found",
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(mockMetadata),
-        });
+        .mockResolvedValueOnce({ ok: false, status: 404, statusText: "Not Found" })
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockMetadata) });
 
       const result = await discoverServer("https://auth.example.com", { fetch: mockFetch });
 
@@ -97,10 +87,7 @@ describe("Server Discovery", () => {
     });
 
     it("should handle URL with trailing slash", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockMetadata) });
 
       await discoverServer("https://auth.example.com/", { fetch: mockFetch });
 
@@ -111,10 +98,7 @@ describe("Server Discovery", () => {
     });
 
     it("should validate issuer matches", async () => {
-      const mismatchedMetadata = {
-        ...mockMetadata,
-        issuer: "https://different.example.com",
-      };
+      const mismatchedMetadata = { ...mockMetadata, issuer: "https://different.example.com" };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -144,17 +128,10 @@ describe("Server Discovery", () => {
     });
 
     it("should not fallback when fallbackToOpenId is false", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        statusText: "Not Found",
-      });
+      mockFetch.mockResolvedValueOnce({ ok: false, status: 404, statusText: "Not Found" });
 
       await expect(
-        discoverServer("https://auth.example.com", {
-          fetch: mockFetch,
-          fallbackToOpenId: false,
-        }),
+        discoverServer("https://auth.example.com", { fetch: mockFetch, fallbackToOpenId: false }),
       ).rejects.toThrow(DiscoveryError);
 
       expect(mockFetch).toHaveBeenCalledTimes(1);

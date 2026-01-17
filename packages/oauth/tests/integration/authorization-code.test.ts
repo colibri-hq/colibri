@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import { createMockPersistence, createTestServer } from "../utilities";
-import { type Entities } from "../../src/index.js";
 import type { FastifyInstance } from "fastify";
 import crypto from "crypto";
+import { beforeEach, describe, expect, it } from "vitest";
+import { type Entities } from "../../src/index.js";
+import { createMockPersistence, createTestServer } from "../utilities";
 
 describe("Authorization Code Grant Integration Tests", () => {
   let server: FastifyInstance;
@@ -60,19 +60,14 @@ describe("Authorization Code Grant Integration Tests", () => {
       });
 
       expect(response.statusCode).toBe(302);
-      expect(response.headers.location).toContain(
-        "https://example.com/callback",
-      );
+      expect(response.headers.location).toContain("https://example.com/callback");
       expect(response.headers.location).toContain("code=");
       expect(response.headers.location).toContain("state=test-state");
     });
 
     it("should handle authorization request with PKCE", async () => {
       const codeVerifier = crypto.randomBytes(32).toString("base64url");
-      const codeChallenge = crypto
-        .createHash("sha256")
-        .update(codeVerifier)
-        .digest("base64url");
+      const codeChallenge = crypto.createHash("sha256").update(codeVerifier).digest("base64url");
 
       const response = await server.inject({
         method: "GET",
@@ -89,9 +84,7 @@ describe("Authorization Code Grant Integration Tests", () => {
       });
 
       expect(response.statusCode).toBe(302);
-      expect(response.headers.location).toContain(
-        "https://example.com/callback",
-      );
+      expect(response.headers.location).toContain("https://example.com/callback");
       expect(response.headers.location).toContain("code=");
       expect(response.headers.location).toContain("state=test-state");
     });
@@ -167,10 +160,7 @@ describe("Authorization Code Grant Integration Tests", () => {
 
     it("should handle token request with PKCE", async () => {
       const codeVerifier = crypto.randomBytes(32).toString("base64url");
-      const codeChallenge = crypto
-        .createHash("sha256")
-        .update(codeVerifier)
-        .digest("base64url");
+      const codeChallenge = crypto.createHash("sha256").update(codeVerifier).digest("base64url");
 
       // Mock authorization code with PKCE
       const mockCode: Entities.AuthorizationCode = {

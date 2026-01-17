@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import { createMockPersistence, createTestServer } from "../utilities";
-import { type Entities } from "../../src/index.js";
 import type { FastifyInstance } from "fastify";
+import { beforeEach, describe, expect, it } from "vitest";
+import { type Entities } from "../../src/index.js";
+import { createMockPersistence, createTestServer } from "../utilities";
 
 describe("OAuth Integration Tests", () => {
   let server: FastifyInstance;

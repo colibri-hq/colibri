@@ -12,7 +12,5 @@ Disallow:
 Sitemap: ${siteUrl}/sitemap.xml
 `;
 
-  return new Response(robots, {
-    headers: { "Content-Type": "text/plain" },
-  });
+  return new Response(robots, { headers: { "Content-Type": "text/plain" } });
 } satisfies RequestHandler;

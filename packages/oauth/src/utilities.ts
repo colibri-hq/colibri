@@ -71,11 +71,7 @@ export function jsonResponse(payload: any, init?: ResponseInit): Response {
   return new Response(body, {
     ...init,
     status: 200,
-    headers: {
-      ...standardHeaders(),
-      "content-type": "application/json",
-      ...init?.headers,
-    },
+    headers: { ...standardHeaders(), "content-type": "application/json", ...init?.headers },
   });
 }
 
@@ -88,10 +84,7 @@ export function jsonResponse(payload: any, init?: ResponseInit): Response {
  * [Section 5.1 of RFC 6749](https://datatracker.ietf.org/doc/html/rfc6749#section-5.1)).
  */
 function standardHeaders() {
-  return {
-    "cache-control": "no-store",
-    pragma: "no-cache",
-  };
+  return { "cache-control": "no-store", pragma: "no-cache" };
 }
 
 // endregion
@@ -117,10 +110,7 @@ export function timeOffset(date: Date, reference = new Date()) {
  * @throws OAuthError if the request content type is not `application/x-www-form-urlencoded`.
  */
 export async function parseRequestBody<
-  T extends Record<string, FormDataEntryValue> = Record<
-    string,
-    FormDataEntryValue
-  >,
+  T extends Record<string, FormDataEntryValue> = Record<string, FormDataEntryValue>,
 >(request: Request) {
   try {
     const body = await request.formData();
@@ -157,31 +147,19 @@ export async function resolveClient<
   try {
     client = await loadClient(clientId);
   } catch {
-    throw new OAuthError(
-      "invalid_request",
-      "The client ID is missing or invalid",
-    );
+    throw new OAuthError("invalid_request", "The client ID is missing or invalid");
   }
 
   if (!client) {
-    throw new OAuthError(
-      "invalid_client",
-      "The client ID is missing or invalid",
-    );
+    throw new OAuthError("invalid_client", "The client ID is missing or invalid");
   }
 
   if (!client.active) {
-    throw new OAuthError(
-      "invalid_client",
-      "The client is currently inactive and cannot be used",
-    );
+    throw new OAuthError("invalid_client", "The client is currently inactive and cannot be used");
   }
 
   if (client.revoked) {
-    throw new OAuthError(
-      "invalid_client",
-      "The client has been revoked and can no longer be used",
-    );
+    throw new OAuthError("invalid_client", "The client has been revoked and can no longer be used");
   }
 
   return client;

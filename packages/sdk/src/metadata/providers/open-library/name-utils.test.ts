@@ -105,21 +105,15 @@ describe("Name Utilities", () => {
     });
 
     it("should handle middle names", () => {
-      expect(convertToFirstLastFormat("Smith, John Robert")).toBe(
-        "John Robert Smith",
-      );
+      expect(convertToFirstLastFormat("Smith, John Robert")).toBe("John Robert Smith");
     });
 
     it("should preserve particles", () => {
-      expect(convertToFirstLastFormat("van Gogh, Vincent")).toBe(
-        "Vincent van Gogh",
-      );
+      expect(convertToFirstLastFormat("van Gogh, Vincent")).toBe("Vincent van Gogh");
     });
 
     it("should preserve titles and suffixes", () => {
-      expect(convertToFirstLastFormat("Dr. John Smith Jr.")).toBe(
-        "Dr. John Smith Jr.",
-      );
+      expect(convertToFirstLastFormat("Dr. John Smith Jr.")).toBe("Dr. John Smith Jr.");
     });
   });
 
@@ -204,9 +198,7 @@ describe("Name Utilities", () => {
     });
 
     it("should match Tolkien name variants", () => {
-      expect(areNamesEquivalent("J.R.R. Tolkien", "Tolkien, J.R.R.")).toBe(
-        true,
-      );
+      expect(areNamesEquivalent("J.R.R. Tolkien", "Tolkien, J.R.R.")).toBe(true);
     });
   });
 

@@ -29,9 +29,7 @@ async function download(url: string): Promise<string> {
   const response = await fetch(url);
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to download ${url}: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`Failed to download ${url}: ${response.status} ${response.statusText}`);
   }
 
   return response.text();
@@ -45,9 +43,7 @@ async function main(): Promise<void> {
     const content = await download(file.url);
     const path = join(DATA_DIR, file.name);
     await writeFile(path, content, "utf-8");
-    console.log(
-      `Saved ${file.name} (${content.length.toLocaleString()} bytes)`,
-    );
+    console.log(`Saved ${file.name} (${content.length.toLocaleString()} bytes)`);
   }
 
   console.log("\nDownload complete!");

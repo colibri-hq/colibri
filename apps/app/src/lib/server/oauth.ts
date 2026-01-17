@@ -1,6 +1,6 @@
+import type { Database } from "@colibri-hq/sdk";
 import { env } from "$env/dynamic/private";
 import { type OAuthErrorCode, statusMap } from "@colibri-hq/oauth";
-import type { Database } from "@colibri-hq/sdk";
 import { server } from "@colibri-hq/sdk/oauth";
 import { resolveAcceptedMediaTypes } from "@colibri-hq/shared";
 import { error, json, redirect } from "@sveltejs/kit";
@@ -10,12 +10,8 @@ export function oauth(database: Database, url?: URL) {
   return server(database, {
     issuer: env.OAUTH_ISSUER ?? url?.origin ?? "https://colibri.dev",
     jwtSecret: env.JWT_SECRET,
-    accessTokenTtl: env.OAUTH_ACCESS_TOKEN_TTL
-      ? Number(env.OAUTH_ACCESS_TOKEN_TTL)
-      : undefined,
-    refreshTokenTtl: env.OAUTH_REFRESH_TOKEN_TTL
-      ? Number(env.OAUTH_REFRESH_TOKEN_TTL)
-      : undefined,
+    accessTokenTtl: env.OAUTH_ACCESS_TOKEN_TTL ? Number(env.OAUTH_ACCESS_TOKEN_TTL) : undefined,
+    refreshTokenTtl: env.OAUTH_REFRESH_TOKEN_TTL ? Number(env.OAUTH_REFRESH_TOKEN_TTL) : undefined,
   });
 }
 
@@ -27,17 +23,13 @@ function formatErrorDescription(error: ZodError | string | undefined) {
   return error.format()._errors.join(", ");
 }
 
-export function handleOAuthValidationErrors(
-  issues: (ZodIssue | ZodCustomIssue)[],
-) {
+export function handleOAuthValidationErrors(issues: (ZodIssue | ZodCustomIssue)[]) {
   for (const issue of issues) {
     const { path, message } = issue;
 
     // Determine the OAuth error code
     const errorCode =
-      "params" in issue && issue.params?.oauth_error
-        ? issue.params.oauth_error
-        : "invalid_request";
+      "params" in issue && issue.params?.oauth_error ? issue.params.oauth_error : "invalid_request";
 
     // Handle specific field errors
     if (path.includes("client_id")) {
@@ -117,10 +109,7 @@ export function userFacingOauthError(
 
   for (const accepted of resolveAcceptedMediaTypes(request)) {
     if (accepted.startsWith("text/html")) {
-      return error(status, {
-        title,
-        message: formatErrorDescription(description) ?? title,
-      });
+      return error(status, { title, message: formatErrorDescription(description) ?? title });
     }
   }
 

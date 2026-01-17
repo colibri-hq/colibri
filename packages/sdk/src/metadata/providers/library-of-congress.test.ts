@@ -114,9 +114,7 @@ describe("LibraryOfCongressMetadataProvider", () => {
       expect(provider.getReliabilityScore(MetadataType.AUTHORS)).toBe(0.95);
       expect(provider.getReliabilityScore(MetadataType.SUBJECTS)).toBe(0.95);
       expect(provider.getReliabilityScore(MetadataType.ISBN)).toBe(0.9);
-      expect(provider.getReliabilityScore(MetadataType.PUBLICATION_DATE)).toBe(
-        0.9,
-      );
+      expect(provider.getReliabilityScore(MetadataType.PUBLICATION_DATE)).toBe(0.9);
     });
 
     it("should return lower reliability scores for limited data types", () => {
@@ -134,9 +132,7 @@ describe("LibraryOfCongressMetadataProvider", () => {
       expect(provider.supportsDataType(MetadataType.AUTHORS)).toBe(true);
       expect(provider.supportsDataType(MetadataType.ISBN)).toBe(true);
       expect(provider.supportsDataType(MetadataType.SUBJECTS)).toBe(true);
-      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(
-        true,
-      );
+      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.PUBLISHER)).toBe(true);
       expect(provider.supportsDataType(MetadataType.LANGUAGE)).toBe(true);
     });
@@ -153,9 +149,7 @@ describe("LibraryOfCongressMetadataProvider", () => {
         text: () => Promise.resolve(mockLoCSRUResponse),
       });
 
-      const results = await provider.searchByTitle({
-        title: "The great adventure",
-      });
+      const results = await provider.searchByTitle({ title: "The great adventure" });
 
       const fetchCall = mockFetch.mock.calls[0][0] as string;
       expect(fetchCall).toContain("title%3DThe+great+adventure");
@@ -183,10 +177,7 @@ describe("LibraryOfCongressMetadataProvider", () => {
         text: () => Promise.resolve(mockLoCSRUResponse),
       });
 
-      await provider.searchByTitle({
-        title: "The great adventure",
-        exactMatch: true,
-      });
+      await provider.searchByTitle({ title: "The great adventure", exactMatch: true });
 
       const fetchCall = mockFetch.mock.calls[0][0] as string;
       expect(fetchCall).toContain("title%3D%22The+great+adventure%22");
@@ -198,9 +189,7 @@ describe("LibraryOfCongressMetadataProvider", () => {
         text: () => Promise.resolve(mockEmptyLoCSRUResponse),
       });
 
-      const results = await provider.searchByTitle({
-        title: "Nonexistent Book",
-      });
+      const results = await provider.searchByTitle({ title: "Nonexistent Book" });
 
       expect(results).toHaveLength(0);
     });
@@ -296,10 +285,7 @@ describe("LibraryOfCongressMetadataProvider", () => {
         text: () => Promise.resolve(mockLoCSRUResponse),
       });
 
-      await provider.searchMultiCriteria({
-        title: "The great adventure",
-        yearRange: [2020, 2022],
-      });
+      await provider.searchMultiCriteria({ title: "The great adventure", yearRange: [2020, 2022] });
 
       const fetchCall = mockFetch.mock.calls[0][0] as string;
       expect(fetchCall).toContain("date%3E%3D2020+and+date%3C%3D2022");
@@ -320,9 +306,7 @@ describe("LibraryOfCongressMetadataProvider", () => {
         text: () => Promise.resolve(mockLoCSRUResponse),
       });
 
-      const results = await provider.searchByTitle({
-        title: "The great adventure",
-      });
+      const results = await provider.searchByTitle({ title: "The great adventure" });
       const record = results[0];
 
       expect(record.title).toBe("The great adventure");
@@ -330,22 +314,13 @@ describe("LibraryOfCongressMetadataProvider", () => {
       expect(record.isbn).toEqual(["9781234567890"]);
       expect(record.publisher).toBe("Example Press");
       expect(record.publicationDate).toEqual(new Date(2021, 0, 1));
-      expect(record.subjects).toEqual([
-        "Adventure stories",
-        "Friendship",
-        "Fiction",
-      ]);
+      expect(record.subjects).toEqual(["Adventure stories", "Friendship", "Fiction"]);
       expect(record.language).toBe("en"); // Normalized from 3-letter code
       expect(record.pageCount).toBe(256);
       expect(record.physicalDimensions).toEqual({ height: 24, unit: "cm" });
-      expect(record.series).toEqual({
-        name: "Adventure series",
-        volume: 1,
-      });
+      expect(record.series).toEqual({ name: "Adventure series", volume: 1 });
       expect(record.edition).toBe("1st ed");
-      expect(record.description).toBe(
-        "A thrilling adventure story about courage and friendship.",
-      );
+      expect(record.description).toBe("A thrilling adventure story about courage and friendship.");
     });
 
     it("should store Library of Congress specific data", async () => {
@@ -354,9 +329,7 @@ describe("LibraryOfCongressMetadataProvider", () => {
         text: () => Promise.resolve(mockLoCSRUResponse),
       });
 
-      const results = await provider.searchByTitle({
-        title: "The great adventure",
-      });
+      const results = await provider.searchByTitle({ title: "The great adventure" });
       const record = results[0];
 
       expect(record.providerData).toEqual({
@@ -407,10 +380,7 @@ describe("LibraryOfCongressMetadataProvider", () => {
       // First call fails with network error, second succeeds
       mockFetch
         .mockRejectedValueOnce(new Error("Network timeout"))
-        .mockResolvedValueOnce({
-          ok: true,
-          text: () => Promise.resolve(mockLoCSRUResponse),
-        });
+        .mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(mockLoCSRUResponse) });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -454,9 +424,7 @@ describe("LibraryOfCongressMetadataProvider", () => {
         text: () => Promise.resolve(mockLoCSRUResponse),
       });
 
-      const results = await provider.searchByTitle({
-        title: "The great adventure",
-      });
+      const results = await provider.searchByTitle({ title: "The great adventure" });
 
       expect(results[0].confidence).toBeGreaterThan(0.8);
       expect(results[0].confidence).toBeLessThanOrEqual(0.99);
@@ -468,9 +436,7 @@ describe("LibraryOfCongressMetadataProvider", () => {
         text: () => Promise.resolve(mockLoCSRUResponse),
       });
 
-      const results = await provider.searchByTitle({
-        title: "The great adventure",
-      });
+      const results = await provider.searchByTitle({ title: "The great adventure" });
 
       // Complete record should have high confidence
       expect(results[0].confidence).toBeGreaterThan(0.85);

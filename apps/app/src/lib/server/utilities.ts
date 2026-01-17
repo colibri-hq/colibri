@@ -1,21 +1,14 @@
 import type { MaybePromise } from "@colibri-hq/shared";
 import { type Cookies, redirect } from "@sveltejs/kit";
 
-export function resolvePreviousLocation(
-  cookies: Cookies,
-  url: URL,
-  fallback: string | URL = "/",
-) {
-  const previous =
-    cookies.get("_previous") ?? url.searchParams.get("previous") ?? fallback;
+export function resolvePreviousLocation(cookies: Cookies, url: URL, fallback: string | URL = "/") {
+  const previous = cookies.get("_previous") ?? url.searchParams.get("previous") ?? fallback;
   cookies.delete("_previous", { path: "/auth" });
   url.searchParams.delete("previous");
 
   return new URL(
     // Remove the origin from the previous URL to prevent redirecting to a different domain
-    previous instanceof URL
-      ? previous.toString().replace(previous.origin, "")
-      : previous,
+    previous instanceof URL ? previous.toString().replace(previous.origin, "") : previous,
     url,
   );
 }
@@ -36,11 +29,7 @@ export function storePreviousLocation(cookies: Cookies, url: URL) {
 
   url.searchParams.set("previous", destination);
 
-  cookies.set("_previous", destination, {
-    path: "/auth",
-    sameSite: "lax",
-    httpOnly: true,
-  });
+  cookies.set("_previous", destination, { path: "/auth", sameSite: "lax", httpOnly: true });
 }
 
 export async function ensureLoggedIn(

@@ -4,7 +4,7 @@ import {
   type MultiCriteriaQuery,
   type NewMetadataProvider,
   OpenLibraryMetadataProvider,
-  WikiDataMetadataProvider
+  WikiDataMetadataProvider,
 } from "@colibri-hq/sdk/metadata";
 import { Args, Flags } from "@oclif/core";
 import { BaseCommand } from "../../command.js";
@@ -24,7 +24,9 @@ class SimpleMetadataCoordinator {
     return [...this.providers];
   }
 
-  async query(query: MultiCriteriaQuery): Promise<{
+  async query(
+    query: MultiCriteriaQuery,
+  ): Promise<{
     aggregatedRecords: MetadataRecord[];
     providers: Array<{
       duration: number;
@@ -105,12 +107,10 @@ export class PreviewCoordinator extends BaseCommand<typeof PreviewCoordinator> {
   static override examples = [
     {
       command: "<%= config .bin %> <%= command.id %> 'The Great Gatsby'",
-      description:
-        "Preview coordinated metadata discovery for 'The Great Gatsby'",
+      description: "Preview coordinated metadata discovery for 'The Great Gatsby'",
     },
     {
-      command:
-        "<%= config .bin %> <%= command.id %> --isbn '978-0-7432-7356-5'",
+      command: "<%= config .bin %> <%= command.id %> --isbn '978-0-7432-7356-5'",
       description: "Preview coordinated metadata discovery by ISBN",
     },
     {
@@ -131,21 +131,9 @@ export class PreviewCoordinator extends BaseCommand<typeof PreviewCoordinator> {
       default: false,
       description: "Use fuzzy matching for search terms",
     }),
-    isbn: Flags.string({
-      char: "i",
-      description: "ISBN of the book",
-      required: false,
-    }),
-    language: Flags.string({
-      char: "l",
-      description: "Language of the book",
-      required: false,
-    }),
-    publisher: Flags.string({
-      char: "p",
-      description: "Publisher of the book",
-      required: false,
-    }),
+    isbn: Flags.string({ char: "i", description: "ISBN of the book", required: false }),
+    language: Flags.string({ char: "l", description: "Language of the book", required: false }),
+    publisher: Flags.string({ char: "p", description: "Publisher of the book", required: false }),
     "show-confidence": Flags.boolean({
       default: true,
       description: "Show confidence scores and source attribution",
@@ -160,14 +148,8 @@ export class PreviewCoordinator extends BaseCommand<typeof PreviewCoordinator> {
       multiple: true,
       required: false,
     }),
-    "year-from": Flags.integer({
-      description: "Earliest publication year",
-      required: false,
-    }),
-    "year-to": Flags.integer({
-      description: "Latest publication year",
-      required: false,
-    }),
+    "year-from": Flags.integer({ description: "Earliest publication year", required: false }),
+    "year-to": Flags.integer({ description: "Latest publication year", required: false }),
   };
 
   async run() {
@@ -219,10 +201,7 @@ export class PreviewCoordinator extends BaseCommand<typeof PreviewCoordinator> {
       // Build multi-criteria query
       const yearRange =
         yearFrom || yearTo
-          ? ([yearFrom || 1000, yearTo || new Date().getFullYear()] as [
-              number,
-              number,
-            ])
+          ? ([yearFrom || 1000, yearTo || new Date().getFullYear()] as [number, number])
           : undefined;
 
       const query: MultiCriteriaQuery = { fuzzy };
@@ -292,9 +271,7 @@ export class PreviewCoordinator extends BaseCommand<typeof PreviewCoordinator> {
         this.log("=== Provider-Specific Results ===");
         for (const providerResult of result.providers) {
           this.log(`\n--- ${providerResult.name} ---`);
-          this.log(
-            `Status: ${providerResult.success ? "✅ Success" : "❌ Failed"}`,
-          );
+          this.log(`Status: ${providerResult.success ? "✅ Success" : "❌ Failed"}`);
           this.log(`Duration: ${providerResult.duration}ms`);
           this.log(`Records: ${providerResult.records.length}`);
 
@@ -303,14 +280,10 @@ export class PreviewCoordinator extends BaseCommand<typeof PreviewCoordinator> {
           }
 
           if (providerResult.success && providerResult.records.length > 0) {
-            for (const [index, record] of providerResult.records
-              .slice(0, 3)
-              .entries()) {
+            for (const [index, record] of providerResult.records.slice(0, 3).entries()) {
               this.log(`\n  Record ${index + 1}:`);
               this.log(`    ID: ${record.id}`);
-              this.log(
-                `    Confidence: ${(record.confidence * 100).toFixed(1)}%`,
-              );
+              this.log(`    Confidence: ${(record.confidence * 100).toFixed(1)}%`);
               if (record.title) {
                 this.log(`    Title: ${record.title}`);
               }
@@ -327,16 +300,12 @@ export class PreviewCoordinator extends BaseCommand<typeof PreviewCoordinator> {
                 this.log(`    Publisher: ${record.publisher}`);
               }
               if (record.publicationDate) {
-                this.log(
-                  `    Publication Date: ${record.publicationDate.getFullYear()}`,
-                );
+                this.log(`    Publication Date: ${record.publicationDate.getFullYear()}`);
               }
             }
 
             if (providerResult.records.length > 3) {
-              this.log(
-                `    ... and ${providerResult.records.length - 3} more records`,
-              );
+              this.log(`    ... and ${providerResult.records.length - 3} more records`);
             }
           }
         }
@@ -356,30 +325,18 @@ export class PreviewCoordinator extends BaseCommand<typeof PreviewCoordinator> {
       this.log("=== Coordinated Metadata Results ===");
 
       const bestResult = result.aggregatedRecords[0]; // Already sorted by confidence
-      this.log(
-        `Best Match (Confidence: ${(bestResult.confidence * 100).toFixed(1)}%):`,
-      );
+      this.log(`Best Match (Confidence: ${(bestResult.confidence * 100).toFixed(1)}%):`);
       this.log("");
 
       // Display core metadata fields
-      this.displayMetadataField(
-        "Title",
-        bestResult.title,
-        bestResult.confidence,
-        showConfidence,
-      );
+      this.displayMetadataField("Title", bestResult.title, bestResult.confidence, showConfidence);
       this.displayMetadataField(
         "Authors",
         bestResult.authors,
         bestResult.confidence,
         showConfidence,
       );
-      this.displayMetadataField(
-        "ISBN",
-        bestResult.isbn,
-        bestResult.confidence,
-        showConfidence,
-      );
+      this.displayMetadataField("ISBN", bestResult.isbn, bestResult.confidence, showConfidence);
       this.displayMetadataField(
         "Publication Date",
         bestResult.publicationDate,
@@ -410,12 +367,7 @@ export class PreviewCoordinator extends BaseCommand<typeof PreviewCoordinator> {
         bestResult.confidence,
         showConfidence,
       );
-      this.displayMetadataField(
-        "Series",
-        bestResult.series,
-        bestResult.confidence,
-        showConfidence,
-      );
+      this.displayMetadataField("Series", bestResult.series, bestResult.confidence, showConfidence);
       this.displayMetadataField(
         "Page Count",
         bestResult.pageCount,
@@ -438,9 +390,7 @@ export class PreviewCoordinator extends BaseCommand<typeof PreviewCoordinator> {
           for (const type of dataTypes) {
             const score = provider.getReliabilityScore(type);
             const supported = provider.supportsDataType(type);
-            this.log(
-              `  ${type}: ${(score * 100).toFixed(1)}% ${supported ? "✓" : "✗"}`,
-            );
+            this.log(`  ${type}: ${(score * 100).toFixed(1)}% ${supported ? "✓" : "✗"}`);
           }
         }
       }
@@ -448,21 +398,15 @@ export class PreviewCoordinator extends BaseCommand<typeof PreviewCoordinator> {
       // Show all results summary
       if (result.aggregatedRecords.length > 1) {
         this.log(`\n=== All Coordinated Results ===`);
-        this.log(
-          `Found ${result.aggregatedRecords.length} unique results after deduplication:`,
-        );
-        for (const [index, record] of result.aggregatedRecords
-          .slice(0, 10)
-          .entries()) {
+        this.log(`Found ${result.aggregatedRecords.length} unique results after deduplication:`);
+        for (const [index, record] of result.aggregatedRecords.slice(0, 10).entries()) {
           this.log(
             `  ${index + 1}. ${record.title || "Unknown Title"} (${(record.confidence * 100).toFixed(1)}% confidence) - ${record.source}`,
           );
         }
 
         if (result.aggregatedRecords.length > 10) {
-          this.log(
-            `  ... and ${result.aggregatedRecords.length - 10} more results`,
-          );
+          this.log(`  ... and ${result.aggregatedRecords.length - 10} more results`);
         }
       }
     } catch (error) {
@@ -520,12 +464,8 @@ export class PreviewCoordinator extends BaseCommand<typeof PreviewCoordinator> {
     this.log(`${label}: ${displayValue}`);
 
     if (showConfidence) {
-      const confidenceIcon =
-        confidence >= 0.8 ? "🟢" : confidence > 0.5 ? "🟡" : "🔴";
-      const source =
-        typeof value === "object" && "source" in value
-          ? value.source
-          : "Unknown";
+      const confidenceIcon = confidence >= 0.8 ? "🟢" : confidence > 0.5 ? "🟡" : "🔴";
+      const source = typeof value === "object" && "source" in value ? value.source : "Unknown";
       this.log(
         `  ${confidenceIcon} Confidence: ${(confidence * 100).toFixed(1)}% | Source: ${source}`,
       );

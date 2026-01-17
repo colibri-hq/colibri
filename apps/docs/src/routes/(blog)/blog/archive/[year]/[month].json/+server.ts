@@ -1,10 +1,10 @@
-import { error, json } from "@sveltejs/kit";
 import {
   getAvailableMonthsForYear,
   getAvailableYears,
   getPostsByYearAndMonth,
   MONTH_NAMES,
 } from "$lib/content/blog.js";
+import { error, json } from "@sveltejs/kit";
 import type { EntryGenerator, RequestHandler } from "./$types.js";
 
 export const prerender = true;
@@ -15,10 +15,7 @@ export const entries = function entries() {
 
   for (const year of getAvailableYears()) {
     for (const month of getAvailableMonthsForYear(year)) {
-      entries.push({
-        year: String(year),
-        month: String(month).padStart(2, "0"),
-      });
+      entries.push({ year: String(year), month: String(month).padStart(2, "0") });
     }
   }
 
@@ -76,14 +73,8 @@ export const GET = async function GET({ params, url }) {
         html: `${baseUrl}/blog/archive/${year}`,
         json: `${baseUrl}/blog/archive/${year}.json`,
       },
-      archive: {
-        html: `${baseUrl}/blog/archive`,
-        json: `${baseUrl}/blog/archive.json`,
-      },
-      blog: {
-        html: `${baseUrl}/blog`,
-        json: `${baseUrl}/blog.json`,
-      },
+      archive: { html: `${baseUrl}/blog/archive`, json: `${baseUrl}/blog/archive.json` },
+      blog: { html: `${baseUrl}/blog`, json: `${baseUrl}/blog.json` },
     },
   };
 
@@ -98,8 +89,7 @@ export const GET = async function GET({ params, url }) {
   }
 
   const currentIndex = allMonths.findIndex(
-    ({ month: currentMonth, year: currentYear }) =>
-      currentYear === year && currentMonth === month,
+    ({ month: currentMonth, year: currentYear }) => currentYear === year && currentMonth === month,
   );
   const prev = currentIndex > 0 ? allMonths[currentIndex - 1] : undefined;
   const next =
@@ -151,11 +141,7 @@ type PostSummary = {
   date: string;
   author: string;
   tags: string[];
-  links: {
-    html: string;
-    json: string;
-    markdown: string;
-  };
+  links: { html: string; json: string; markdown: string };
 };
 
 type MonthArchiveResponse = {
@@ -166,37 +152,13 @@ type MonthArchiveResponse = {
   posts: PostSummary[];
   total: number;
   links: {
-    self: {
-      html: string;
-      json: string;
-    };
-    year: {
-      html: string;
-      json: string;
-    };
-    archive: {
-      html: string;
-      json: string;
-    };
-    blog: {
-      html: string;
-      json: string;
-    };
+    self: { html: string; json: string };
+    year: { html: string; json: string };
+    archive: { html: string; json: string };
+    blog: { html: string; json: string };
     adjacent?: {
-      previous?: {
-        year: number;
-        month: number;
-        monthName: string;
-        html: string;
-        json: string;
-      };
-      next?: {
-        year: number;
-        month: number;
-        monthName: string;
-        html: string;
-        json: string;
-      };
+      previous?: { year: number; month: number; monthName: string; html: string; json: string };
+      next?: { year: number; month: number; monthName: string; html: string; json: string };
     };
   };
 };

@@ -295,13 +295,7 @@ function renderTopBorder(
     invertLabels,
     justifyLabels,
     justifyTitle,
-    theme: {
-      crossingTopEnd,
-      crossingTopStart,
-      horizontalBorder,
-      terminusEnd,
-      terminusStart,
-    },
+    theme: { crossingTopEnd, crossingTopStart, horizontalBorder, terminusEnd, terminusStart },
     title,
   }: BoxOptions,
 ) {
@@ -325,13 +319,7 @@ function renderBottomBorder(
     invertLabels,
     justifyFooter,
     justifyLabels,
-    theme: {
-      crossingBottomEnd,
-      crossingBottomStart,
-      horizontalBorder,
-      terminusEnd,
-      terminusStart,
-    },
+    theme: { crossingBottomEnd, crossingBottomStart, horizontalBorder, terminusEnd, terminusStart },
   }: BoxOptions,
 ) {
   return renderBorder({
@@ -372,9 +360,7 @@ function renderBorder({
     return start + border.repeat(width - 2) + end;
   }
 
-  label = invert
-    ? inverse(` ${label} `)
-    : `${terminusStart} ${label} ${terminusEnd}`;
+  label = invert ? inverse(` ${label} `) : `${terminusStart} ${label} ${terminusEnd}`;
 
   const padding = width - ansis.strip(label).length - 2;
 
@@ -396,17 +382,11 @@ function determineWidth(content: string, { margin, title, width }: BoxOptions) {
   const titleLength = title ? ansis.strip(title).length : 0;
 
   if (typeof width === "number") {
-    return (
-      Math.min(Math.max(width, titleLength + 6), process.stdout.columns) -
-      2 * margin
-    );
+    return Math.min(Math.max(width, titleLength + 6), process.stdout.columns) - 2 * margin;
   }
 
   const contentWidth = Math.min(
-    Math.max(
-      ...content.split("\n").map((line) => ansis.strip(line).length + 4),
-      titleLength,
-    ),
+    Math.max(...content.split("\n").map((line) => ansis.strip(line).length + 4), titleLength),
     process.stdout.columns,
   );
 
@@ -418,9 +398,7 @@ function determineWidth(content: string, { margin, title, width }: BoxOptions) {
     return process.stdout.columns - 2 * margin;
   }
 
-  return (
-    Math.min(Math.max(60, contentWidth), process.stdout.columns) + 2 * margin
-  );
+  return Math.min(Math.max(60, contentWidth), process.stdout.columns) + 2 * margin;
 }
 
 type BoxTheme = {

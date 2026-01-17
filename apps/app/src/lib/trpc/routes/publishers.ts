@@ -20,15 +20,11 @@ export const publishers = t.router({
 
   loadBooksForPublisher: procedure()
     .input(z.string())
-    .query(({ input, ctx: { database } }) =>
-      loadWorksForPublisher(database, input),
-    ),
+    .query(({ input, ctx: { database } }) => loadWorksForPublisher(database, input)),
 
   loadCreatorsForPublisher: procedure()
     .input(z.string())
-    .query(({ input, ctx: { database } }) =>
-      loadCreatorsForPublisher(database, input),
-    ),
+    .query(({ input, ctx: { database } }) => loadCreatorsForPublisher(database, input)),
 
   save: procedure()
     .input(
@@ -40,16 +36,9 @@ export const publishers = t.router({
       }),
     )
     .mutation(
-      async ({
-        input: { id, name, description, wikipediaUrl },
-        ctx: { database, userId },
-      }) => {
+      async ({ input: { id, name, description, wikipediaUrl }, ctx: { database, userId } }) => {
         if (id) {
-          return updatePublisher(database, id, {
-            name,
-            description,
-            wikipediaUrl,
-          });
+          return updatePublisher(database, id, { name, description, wikipediaUrl });
         }
 
         return createPublisher(database, name || "Unknown Publisher", {

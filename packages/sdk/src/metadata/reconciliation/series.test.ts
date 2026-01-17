@@ -1,11 +1,6 @@
 import { describe, expect, it } from "vitest";
+import type { CollectionInput, MetadataSource, SeriesInput, WorkEditionInput } from "./types.js";
 import { SeriesReconciler } from "./series.js";
-import type {
-  CollectionInput,
-  MetadataSource,
-  SeriesInput,
-  WorkEditionInput,
-} from "./types.js";
 
 describe("SeriesReconciler", () => {
   const reconciler = new SeriesReconciler();
@@ -31,23 +26,10 @@ describe("SeriesReconciler", () => {
   describe("reconcileSeries", () => {
     it("should reconcile series from multiple sources", () => {
       const inputs: SeriesInput[] = [
+        { series: ["Harry Potter, Book 1"], source: mockSource1 },
+        { series: ["Harry Potter #1"], source: mockSource2 },
         {
-          series: ["Harry Potter, Book 1"],
-          source: mockSource1,
-        },
-        {
-          series: ["Harry Potter #1"],
-          source: mockSource2,
-        },
-        {
-          series: [
-            {
-              name: "Harry Potter",
-              volume: 1,
-              seriesType: "numbered",
-              totalVolumes: 7,
-            },
-          ],
+          series: [{ name: "Harry Potter", volume: 1, seriesType: "numbered", totalVolumes: 7 }],
           source: mockSource3,
         },
       ];
@@ -64,18 +46,9 @@ describe("SeriesReconciler", () => {
 
     it("should handle series with different volume formats", () => {
       const inputs: SeriesInput[] = [
-        {
-          series: ["The Chronicles of Narnia, Volume I"],
-          source: mockSource1,
-        },
-        {
-          series: ["Chronicles of Narnia Vol. 1"],
-          source: mockSource2,
-        },
-        {
-          series: ["The Chronicles of Narnia: Book One"],
-          source: mockSource3,
-        },
+        { series: ["The Chronicles of Narnia, Volume I"], source: mockSource1 },
+        { series: ["Chronicles of Narnia Vol. 1"], source: mockSource2 },
+        { series: ["The Chronicles of Narnia: Book One"], source: mockSource3 },
       ];
 
       const result = reconciler.reconcileSeries(inputs);
@@ -87,14 +60,8 @@ describe("SeriesReconciler", () => {
 
     it("should handle roman numerals in series volumes", () => {
       const inputs: SeriesInput[] = [
-        {
-          series: ["Foundation, Volume III"],
-          source: mockSource1,
-        },
-        {
-          series: ["Foundation Vol. iii"],
-          source: mockSource2,
-        },
+        { series: ["Foundation, Volume III"], source: mockSource1 },
+        { series: ["Foundation Vol. iii"], source: mockSource2 },
       ];
 
       const result = reconciler.reconcileSeries(inputs);
@@ -105,36 +72,23 @@ describe("SeriesReconciler", () => {
 
     it("should detect anthology and collection series types", () => {
       const inputs: SeriesInput[] = [
-        {
-          series: ["Best Science Fiction Anthology 2024"],
-          source: mockSource1,
-        },
-        {
-          series: ["Complete Works Collection"],
-          source: mockSource2,
-        },
+        { series: ["Best Science Fiction Anthology 2024"], source: mockSource1 },
+        { series: ["Complete Works Collection"], source: mockSource2 },
       ];
 
       const result = reconciler.reconcileSeries(inputs);
 
       expect(result.series.value).toHaveLength(2);
-      expect(
-        result.series.value.find((s) => s.name.includes("Anthology"))
-          ?.seriesType,
-      ).toBe("anthology");
-      expect(
-        result.series.value.find((s) => s.name.includes("Collection"))
-          ?.seriesType,
-      ).toBe("collection");
+      expect(result.series.value.find((s) => s.name.includes("Anthology"))?.seriesType).toBe(
+        "anthology",
+      );
+      expect(result.series.value.find((s) => s.name.includes("Collection"))?.seriesType).toBe(
+        "collection",
+      );
     });
 
     it("should handle empty series input", () => {
-      const inputs: SeriesInput[] = [
-        {
-          series: [],
-          source: mockSource1,
-        },
-      ];
+      const inputs: SeriesInput[] = [{ series: [], source: mockSource1 }];
 
       const result = reconciler.reconcileSeries(inputs);
 
@@ -162,15 +116,8 @@ describe("SeriesReconciler", () => {
           source: mockSource1,
         },
         {
-          work: {
-            title: "The Great Gatsby",
-            type: "novel",
-            originalLanguage: "en",
-          },
-          edition: {
-            publisher: { name: "Scribner" },
-            pageCount: 180,
-          },
+          work: { title: "The Great Gatsby", type: "novel", originalLanguage: "en" },
+          edition: { publisher: { name: "Scribner" }, pageCount: 180 },
           source: mockSource2,
         },
       ];
@@ -197,21 +144,13 @@ describe("SeriesReconciler", () => {
               relationshipType: "adaptation",
               confidence: 0.9,
             },
-            {
-              title: "Winter Dreams",
-              relationshipType: "prequel",
-              confidence: 0.7,
-            },
+            { title: "Winter Dreams", relationshipType: "prequel", confidence: 0.7 },
           ],
           source: mockSource1,
         },
         {
           relatedWorks: [
-            {
-              title: "The Great Gatsby Movie",
-              relationshipType: "adaptation",
-              confidence: 0.8,
-            },
+            { title: "The Great Gatsby Movie", relationshipType: "adaptation", confidence: 0.8 },
           ],
           source: mockSource2,
         },
@@ -227,19 +166,13 @@ describe("SeriesReconciler", () => {
       expect(adaptation).toBeDefined();
       expect(adaptation?.confidence).toBeGreaterThan(0.8);
 
-      const prequel = result.relatedWorks.value.find(
-        (rw) => rw.relationshipType === "prequel",
-      );
+      const prequel = result.relatedWorks.value.find((rw) => rw.relationshipType === "prequel");
       expect(prequel).toBeDefined();
       expect(prequel?.title).toBe("Winter Dreams");
     });
 
     it("should handle missing work/edition data gracefully", () => {
-      const inputs: WorkEditionInput[] = [
-        {
-          source: mockSource1,
-        },
-      ];
+      const inputs: WorkEditionInput[] = [{ source: mockSource1 }];
 
       const result = reconciler.reconcileWorkEdition(inputs);
 
@@ -264,18 +197,13 @@ describe("SeriesReconciler", () => {
           ],
           source: mockSource1,
         },
-        {
-          collections: ["Best American Short Stories 2024"],
-          source: mockSource2,
-        },
+        { collections: ["Best American Short Stories 2024"], source: mockSource2 },
       ];
 
       const result = reconciler.reconcileCollections(inputs);
 
       expect(result.collections.value).toHaveLength(1);
-      expect(result.collections.value[0].name).toBe(
-        "The Best American Short Stories 2024",
-      );
+      expect(result.collections.value[0].name).toBe("The Best American Short Stories 2024");
       expect(result.collections.value[0].type).toBe("anthology");
       expect(result.collections.value[0].editors).toContain("Jess Walter");
       expect(result.collections.value[0].totalWorks).toBe(20);
@@ -321,9 +249,7 @@ describe("SeriesReconciler", () => {
 
       expect(result.collectionContents.value).toHaveLength(2);
 
-      const lottery = result.collectionContents.value.find(
-        (c) => c.title === "The Lottery",
-      );
+      const lottery = result.collectionContents.value.find((c) => c.title === "The Lottery");
       expect(lottery).toBeDefined();
       expect(lottery?.type).toBe("short_story");
       expect(lottery?.position).toBe(1);
@@ -362,12 +288,7 @@ describe("SeriesReconciler", () => {
     });
 
     it("should handle empty collection input", () => {
-      const inputs: CollectionInput[] = [
-        {
-          collections: [],
-          source: mockSource1,
-        },
-      ];
+      const inputs: CollectionInput[] = [{ collections: [], source: mockSource1 }];
 
       const result = reconciler.reconcileCollections(inputs);
 
@@ -416,20 +337,14 @@ describe("SeriesReconciler", () => {
       ];
 
       for (const testCase of testCases) {
-        const inputs: SeriesInput[] = [
-          {
-            series: [testCase.input],
-            source: mockSource1,
-          },
-        ];
+        const inputs: SeriesInput[] = [{ series: [testCase.input], source: mockSource1 }];
 
         const result = reconciler.reconcileSeries(inputs);
 
         if (result.series.value.length > 0) {
-          expect(
-            result.series.value[0].volume,
-            `Failed for input: "${testCase.input}"`,
-          ).toBe(testCase.expectedVolume);
+          expect(result.series.value[0].volume, `Failed for input: "${testCase.input}"`).toBe(
+            testCase.expectedVolume,
+          );
         }
       }
     });
@@ -437,9 +352,7 @@ describe("SeriesReconciler", () => {
 
   describe("error handling", () => {
     it("should throw error for empty series input array", () => {
-      expect(() => reconciler.reconcileSeries([])).toThrow(
-        "No series inputs to reconcile",
-      );
+      expect(() => reconciler.reconcileSeries([])).toThrow("No series inputs to reconcile");
     });
 
     it("should throw error for empty work/edition input array", () => {

@@ -1,12 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { OpenLibraryMetadataProvider } from "./providers/open-library.js";
-import type {
-  CreatorQuery,
-  MultiCriteriaQuery,
-  TitleQuery,
-} from "./providers/provider.js";
-import { MetadataType } from "./providers/provider.js";
 import { sleep } from "@colibri-hq/shared";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { CreatorQuery, MultiCriteriaQuery, TitleQuery } from "./providers/provider.js";
+import { OpenLibraryMetadataProvider } from "./providers/open-library.js";
+import { MetadataType } from "./providers/provider.js";
 
 // Mock the OpenLibrary client
 const mockSearchBook = vi.fn();
@@ -45,9 +41,7 @@ describe("OpenLibraryMetadataProvider - Integration Testing", () => {
     already_read_count: 1553,
     has_fulltext: false,
     public_scan_b: false,
-    first_sentence: [
-      'Ikigai is a Japanese concept that means "a reason for being."',
-    ],
+    first_sentence: ['Ikigai is a Japanese concept that means "a reason for being."'],
     ...overrides,
   });
 
@@ -109,11 +103,7 @@ describe("OpenLibraryMetadataProvider - Integration Testing", () => {
           first_publish_year: 1995,
           isbn: ["9780134610993", "0134610997"],
           publisher: ["Pearson"],
-          subject: [
-            "Artificial intelligence",
-            "Computer science",
-            "Machine learning",
-          ],
+          subject: ["Artificial intelligence", "Computer science", "Machine learning"],
           number_of_pages_median: 1152,
           edition_count: 4,
           key: "/works/OL15328W",
@@ -157,11 +147,7 @@ describe("OpenLibraryMetadataProvider - Integration Testing", () => {
           first_publish_year: 1967,
           language: ["spa"],
           publisher: ["Editorial Sudamericana"],
-          subject: [
-            "Magic realism",
-            "Colombian literature",
-            "Latin American literature",
-          ],
+          subject: ["Magic realism", "Colombian literature", "Latin American literature"],
           key: "/works/OL27258W",
         }),
         createRealisticResult({
@@ -392,15 +378,9 @@ describe("OpenLibraryMetadataProvider - Integration Testing", () => {
       expect(provider.priority).toBeGreaterThan(0);
 
       // Test reliability scores
-      expect(provider.getReliabilityScore(MetadataType.TITLE)).toBeGreaterThan(
-        0,
-      );
-      expect(
-        provider.getReliabilityScore(MetadataType.AUTHORS),
-      ).toBeGreaterThan(0);
-      expect(provider.getReliabilityScore(MetadataType.ISBN)).toBeGreaterThan(
-        0,
-      );
+      expect(provider.getReliabilityScore(MetadataType.TITLE)).toBeGreaterThan(0);
+      expect(provider.getReliabilityScore(MetadataType.AUTHORS)).toBeGreaterThan(0);
+      expect(provider.getReliabilityScore(MetadataType.ISBN)).toBeGreaterThan(0);
 
       // Test data type support
       expect(provider.supportsDataType(MetadataType.TITLE)).toBe(true);
@@ -443,8 +423,7 @@ describe("OpenLibraryMetadataProvider - Integration Testing", () => {
       if (record.title) expect(typeof record.title).toBe("string");
       if (record.authors) expect(Array.isArray(record.authors)).toBe(true);
       if (record.isbn) expect(Array.isArray(record.isbn)).toBe(true);
-      if (record.publicationDate)
-        expect(record.publicationDate).toBeInstanceOf(Date);
+      if (record.publicationDate) expect(record.publicationDate).toBeInstanceOf(Date);
       if (record.language) expect(typeof record.language).toBe("string");
       if (record.publisher) expect(typeof record.publisher).toBe("string");
       if (record.subjects) expect(Array.isArray(record.subjects)).toBe(true);
@@ -476,10 +455,7 @@ describe("OpenLibraryMetadataProvider - Integration Testing", () => {
         }
       });
 
-      const results = await provider.searchByTitle({
-        title: "Malformed Test",
-        exactMatch: false,
-      });
+      const results = await provider.searchByTitle({ title: "Malformed Test", exactMatch: false });
 
       // Should handle malformed data gracefully and return what it can
       expect(results).toHaveLength(1);
@@ -521,10 +497,7 @@ describe("OpenLibraryMetadataProvider - Integration Testing", () => {
           throw new Error("Request timed out after 15000ms");
         });
 
-        const resultsPromise = provider.searchByTitle({
-          title: "Timeout Test",
-          exactMatch: false,
-        });
+        const resultsPromise = provider.searchByTitle({ title: "Timeout Test", exactMatch: false });
 
         // Advance timers to complete retries
         await vi.runAllTimersAsync();
@@ -605,18 +578,9 @@ describe("OpenLibraryMetadataProvider - Integration Testing", () => {
 
       // Perform the same search multiple times
       const searches = await Promise.all([
-        provider.searchByTitle({
-          title: "Consistency Test Book",
-          exactMatch: false,
-        }),
-        provider.searchByTitle({
-          title: "Consistency Test Book",
-          exactMatch: false,
-        }),
-        provider.searchByTitle({
-          title: "Consistency Test Book",
-          exactMatch: false,
-        }),
+        provider.searchByTitle({ title: "Consistency Test Book", exactMatch: false }),
+        provider.searchByTitle({ title: "Consistency Test Book", exactMatch: false }),
+        provider.searchByTitle({ title: "Consistency Test Book", exactMatch: false }),
       ]);
 
       // Results should be consistent across searches
@@ -629,8 +593,7 @@ describe("OpenLibraryMetadataProvider - Integration Testing", () => {
 
       // Confidence scores should be consistent
       const confidences = searches.map((results) => results[0].confidence);
-      const avgConfidence =
-        confidences.reduce((sum, conf) => sum + conf, 0) / confidences.length;
+      const avgConfidence = confidences.reduce((sum, conf) => sum + conf, 0) / confidences.length;
       confidences.forEach((confidence) => {
         expect(Math.abs(confidence - avgConfidence)).toBeLessThan(0.01); // Very small variance
       });
@@ -672,10 +635,7 @@ describe("OpenLibraryMetadataProvider - Integration Testing", () => {
 
       // Launch multiple concurrent requests
       const concurrentRequests = Array.from({ length: 10 }, (_, i) =>
-        provider.searchByTitle({
-          title: `Concurrent Test Book ${i}`,
-          exactMatch: false,
-        }),
+        provider.searchByTitle({ title: `Concurrent Test Book ${i}`, exactMatch: false }),
       );
 
       const results = await Promise.all(concurrentRequests);

@@ -1,6 +1,6 @@
-import type { PageLoad } from "./$types.js";
 import { getAllPages, type Page } from "$lib/content/content";
 import { error } from "@sveltejs/kit";
+import type { PageLoad } from "./$types.js";
 
 export const load = function load({ data }) {
   const { tag } = data;

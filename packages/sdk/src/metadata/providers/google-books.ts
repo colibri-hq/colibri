@@ -19,10 +19,7 @@ interface GoogleBooksVolumeInfo {
   publisher?: string;
   publishedDate?: string;
   description?: string;
-  industryIdentifiers?: Array<{
-    type: "ISBN_10" | "ISBN_13" | "OTHER";
-    identifier: string;
-  }>;
+  industryIdentifiers?: Array<{ type: "ISBN_10" | "ISBN_13" | "OTHER"; identifier: string }>;
   pageCount?: number;
   categories?: string[];
   language?: string;
@@ -104,10 +101,7 @@ export class GoogleBooksMetadataProvider extends RetryableMetadataProvider {
    */
   async searchByTitle(query: TitleQuery): Promise<MetadataRecord[]> {
     const searchQuery = `intitle:${this.#escapeQuery(query.title)}`;
-    const response = await this.executeRequest(
-      searchQuery,
-      `title search for "${query.title}"`,
-    );
+    const response = await this.executeRequest(searchQuery, `title search for "${query.title}"`);
 
     return this.#processSearchResults(response, "title");
   }
@@ -118,10 +112,7 @@ export class GoogleBooksMetadataProvider extends RetryableMetadataProvider {
   async searchByISBN(isbn: string): Promise<MetadataRecord[]> {
     const cleanedIsbn = this.cleanIsbn(isbn);
     const searchQuery = `isbn:${cleanedIsbn}`;
-    const response = await this.executeRequest(
-      searchQuery,
-      `ISBN search for "${isbn}"`,
-    );
+    const response = await this.executeRequest(searchQuery, `ISBN search for "${isbn}"`);
 
     return this.#processSearchResults(response, "isbn");
   }
@@ -131,10 +122,7 @@ export class GoogleBooksMetadataProvider extends RetryableMetadataProvider {
    */
   async searchByCreator(query: CreatorQuery): Promise<MetadataRecord[]> {
     const searchQuery = `inauthor:${this.#escapeQuery(query.name)}`;
-    const response = await this.executeRequest(
-      searchQuery,
-      `author search for "${query.name}"`,
-    );
+    const response = await this.executeRequest(searchQuery, `author search for "${query.name}"`);
 
     return this.#processSearchResults(response, "author");
   }
@@ -142,9 +130,7 @@ export class GoogleBooksMetadataProvider extends RetryableMetadataProvider {
   /**
    * Search using multiple criteria
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     const queryParts: string[] = [];
 
     // ISBN has highest priority
@@ -170,10 +156,7 @@ export class GoogleBooksMetadataProvider extends RetryableMetadataProvider {
     }
 
     const searchQuery = queryParts.join("+");
-    const response = await this.executeRequest(
-      searchQuery,
-      `multi-criteria search`,
-    );
+    const response = await this.executeRequest(searchQuery, `multi-criteria search`);
 
     return this.#processSearchResults(response, "multi", query);
   }
@@ -225,10 +208,7 @@ export class GoogleBooksMetadataProvider extends RetryableMetadataProvider {
   /**
    * Execute a Google Books API request
    */
-  private async executeRequest(
-    query: string,
-    operationName: string,
-  ): Promise<GoogleBooksResponse> {
+  private async executeRequest(query: string, operationName: string): Promise<GoogleBooksResponse> {
     const result = await this.executeWithRetry(async () => {
       // Build URL with query and optional API key
       const url = new URL(this.baseUrl);
@@ -242,10 +222,7 @@ export class GoogleBooksMetadataProvider extends RetryableMetadataProvider {
 
       const response = await this.fetch(url.toString(), {
         method: "GET",
-        headers: {
-          Accept: "application/json",
-          "User-Agent": this.userAgent,
-        },
+        headers: { Accept: "application/json", "User-Agent": this.userAgent },
       });
 
       if (!response.ok) {
@@ -289,9 +266,7 @@ export class GoogleBooksMetadataProvider extends RetryableMetadataProvider {
     }
 
     return response.items
-      .map((item) =>
-        this.#createMetadataRecordFromVolume(item, searchType, query),
-      )
+      .map((item) => this.#createMetadataRecordFromVolume(item, searchType, query))
       .filter((record): record is MetadataRecord => record !== null);
   }
 
@@ -333,16 +308,13 @@ export class GoogleBooksMetadataProvider extends RetryableMetadataProvider {
     const coverImage = this.#extractCoverImage(info.imageLinks);
 
     // Build full title (include subtitle if present)
-    const fullTitle = info.subtitle
-      ? `${info.title}: ${info.subtitle}`
-      : info.title;
+    const fullTitle = info.subtitle ? `${info.title}: ${info.subtitle}` : info.title;
 
     return this.createMetadataRecord(
       `google-books-${volume.id}`,
       {
         title: fullTitle,
-        authors:
-          info.authors && info.authors.length > 0 ? info.authors : undefined,
+        authors: info.authors && info.authors.length > 0 ? info.authors : undefined,
         isbn: isbns && isbns.length > 0 ? isbns : undefined,
         publicationDate,
         publisher: info.publisher,
@@ -351,11 +323,7 @@ export class GoogleBooksMetadataProvider extends RetryableMetadataProvider {
         description: info.description,
         subjects: info.categories,
         coverImage,
-        providerData: {
-          googleBooksId: volume.id,
-          maturityRating: info.maturityRating,
-          searchType,
-        },
+        providerData: { googleBooksId: volume.id, maturityRating: info.maturityRating, searchType },
       },
       this.#calculateConfidence(info, searchType, query),
     );
@@ -424,14 +392,12 @@ export class GoogleBooksMetadataProvider extends RetryableMetadataProvider {
     let completenessBoost = 0;
     if (info.title) completenessBoost += 0.01;
     if (info.authors && info.authors.length > 0) completenessBoost += 0.02;
-    if (info.industryIdentifiers && info.industryIdentifiers.length > 0)
-      completenessBoost += 0.03;
+    if (info.industryIdentifiers && info.industryIdentifiers.length > 0) completenessBoost += 0.03;
     if (info.publishedDate) completenessBoost += 0.02;
     if (info.publisher) completenessBoost += 0.01;
     if (info.description) completenessBoost += 0.02;
     if (info.pageCount) completenessBoost += 0.01;
-    if (info.categories && info.categories.length > 0)
-      completenessBoost += 0.01;
+    if (info.categories && info.categories.length > 0) completenessBoost += 0.01;
     if (info.imageLinks) completenessBoost += 0.02;
 
     // For multi-criteria searches, boost if multiple criteria match
@@ -480,10 +446,7 @@ export class GoogleBooksMetadataProvider extends RetryableMetadataProvider {
     }
 
     // Calculate final confidence (cap at 0.95 to allow for uncertainty)
-    const finalConfidence = Math.min(
-      0.95,
-      baseConfidence + completenessBoost + criteriaMatchBoost,
-    );
+    const finalConfidence = Math.min(0.95, baseConfidence + completenessBoost + criteriaMatchBoost);
 
     return Math.round(finalConfidence * 100) / 100;
   }

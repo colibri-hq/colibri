@@ -1,12 +1,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { PreviewGenerator } from "./preview.js";
-import {
-  calculateArraySimilarity,
-  calculateStringSimilarity,
-} from "./similarity.js";
-import { EditionSelector } from "./editions.js";
 import type { MetadataRecord } from "../providers/provider.js";
 import type { MetadataSource, ReconciledField } from "./types.js";
+import { EditionSelector } from "./editions.js";
+import { PreviewGenerator } from "./preview.js";
+import { calculateArraySimilarity, calculateStringSimilarity } from "./similarity.js";
 
 describe("PreviewGenerator", () => {
   let generator: PreviewGenerator;
@@ -17,21 +14,9 @@ describe("PreviewGenerator", () => {
     generator = new PreviewGenerator();
 
     mockSources = [
-      {
-        name: "OpenLibrary",
-        reliability: 0.8,
-        timestamp: new Date("2024-01-01"),
-      },
-      {
-        name: "WikiData",
-        reliability: 0.9,
-        timestamp: new Date("2024-01-02"),
-      },
-      {
-        name: "LibraryOfCongress",
-        reliability: 0.95,
-        timestamp: new Date("2024-01-03"),
-      },
+      { name: "OpenLibrary", reliability: 0.8, timestamp: new Date("2024-01-01") },
+      { name: "WikiData", reliability: 0.9, timestamp: new Date("2024-01-02") },
+      { name: "LibraryOfCongress", reliability: 0.95, timestamp: new Date("2024-01-03") },
     ];
 
     mockRawMetadata = [
@@ -48,16 +33,9 @@ describe("PreviewGenerator", () => {
         description: "A classic American novel",
         language: "en",
         publisher: "Scribner",
-        series: {
-          name: "Classic Literature",
-          volume: 1,
-        },
+        series: { name: "Classic Literature", volume: 1 },
         pageCount: 180,
-        coverImage: {
-          url: "https://example.com/cover1.jpg",
-          width: 300,
-          height: 450,
-        },
+        coverImage: { url: "https://example.com/cover1.jpg", width: 300, height: 450 },
       },
       {
         id: "2",
@@ -84,16 +62,11 @@ describe("PreviewGenerator", () => {
         isbn: ["9780743273565"],
         publicationDate: new Date("1925-04-10"),
         subjects: ["American fiction", "20th century"],
-        description:
-          "The story of Jay Gatsby and his pursuit of the American Dream",
+        description: "The story of Jay Gatsby and his pursuit of the American Dream",
         language: "eng",
         publisher: "Scribner",
         pageCount: 182,
-        coverImage: {
-          url: "https://example.com/cover2.jpg",
-          width: 400,
-          height: 600,
-        },
+        coverImage: { url: "https://example.com/cover2.jpg", width: 400, height: 600 },
       },
     ];
   });
@@ -118,15 +91,11 @@ describe("PreviewGenerator", () => {
         reasoning: "Reconciled from multiple high-quality sources",
       };
 
-      const preview = generator.generatePreview(mockRawMetadata, {
-        title: reconciledTitle,
-      });
+      const preview = generator.generatePreview(mockRawMetadata, { title: reconciledTitle });
 
       expect(preview.title.value).toBe("The Great Gatsby (Reconciled)");
       expect(preview.title.confidence).toBe(0.95);
-      expect(preview.title.reasoning).toBe(
-        "Reconciled from multiple high-quality sources",
-      );
+      expect(preview.title.reasoning).toBe("Reconciled from multiple high-quality sources");
     });
 
     it("should create fallback fields when reconciled data is not available", () => {
@@ -170,10 +139,7 @@ describe("PreviewGenerator", () => {
       expect(primarySource!.source.reliability).toBe(0.95);
 
       // Should calculate weights correctly
-      const totalWeight = preview.title.sources.reduce(
-        (sum, s) => sum + s.weight,
-        0,
-      );
+      const totalWeight = preview.title.sources.reduce((sum, s) => sum + s.weight, 0);
       expect(totalWeight).toBeCloseTo(1, 2);
     });
 
@@ -185,12 +151,8 @@ describe("PreviewGenerator", () => {
       );
       expect(openLibraryAttribution?.originalValue).toBe("The Great Gatsby");
 
-      const wikiDataAttribution = preview.authors.sources.find(
-        (s) => s.source.name === "WikiData",
-      );
-      expect(wikiDataAttribution?.originalValue).toEqual([
-        "Francis Scott Fitzgerald",
-      ]);
+      const wikiDataAttribution = preview.authors.sources.find((s) => s.source.name === "WikiData");
+      expect(wikiDataAttribution?.originalValue).toEqual(["Francis Scott Fitzgerald"]);
     });
 
     it("should limit sources per field to configured maximum", () => {
@@ -211,12 +173,8 @@ describe("PreviewGenerator", () => {
 
       // Should have quality factors
       expect(preview.title.quality.factors.length).toBeGreaterThan(0);
-      expect(
-        preview.title.quality.factors.some((f) => f.name === "confidence"),
-      ).toBe(true);
-      expect(
-        preview.title.quality.factors.some((f) => f.name === "source_count"),
-      ).toBe(true);
+      expect(preview.title.quality.factors.some((f) => f.name === "confidence")).toBe(true);
+      expect(preview.title.quality.factors.some((f) => f.name === "source_count")).toBe(true);
     });
 
     it("should identify high confidence fields", () => {
@@ -244,15 +202,11 @@ describe("PreviewGenerator", () => {
         reasoning: "Resolved author name conflict",
       };
 
-      const preview = generator.generatePreview(mockRawMetadata, {
-        authors: conflictedField,
-      });
+      const preview = generator.generatePreview(mockRawMetadata, { authors: conflictedField });
 
       expect(preview.authors.hasConflicts).toBe(true);
       expect(preview.authors.conflicts).toHaveLength(1);
-      expect(
-        preview.authors.quality.factors.some((f) => f.name === "conflicts"),
-      ).toBe(true);
+      expect(preview.authors.quality.factors.some((f) => f.name === "conflicts")).toBe(true);
     });
 
     it("should provide quality suggestions", () => {
@@ -263,16 +217,12 @@ describe("PreviewGenerator", () => {
         reasoning: "Low confidence due to single unreliable source",
       };
 
-      const preview = generator.generatePreview(mockRawMetadata, {
-        title: lowQualityField,
-      });
+      const preview = generator.generatePreview(mockRawMetadata, { title: lowQualityField });
 
       expect(preview.title.quality.suggestions.length).toBeGreaterThan(0);
-      expect(
-        preview.title.quality.suggestions.some((s) =>
-          s.includes("reliable sources"),
-        ),
-      ).toBe(true);
+      expect(preview.title.quality.suggestions.some((s) => s.includes("reliable sources"))).toBe(
+        true,
+      );
     });
   });
 
@@ -289,9 +239,7 @@ describe("PreviewGenerator", () => {
       expect(preview.summary.leastReliableSource.name).toBe("OpenLibrary");
 
       expect(preview.summary.overallQuality).toBeDefined();
-      expect(preview.summary.overallQuality.level).toMatch(
-        /^(excellent|good|fair|poor)$/,
-      );
+      expect(preview.summary.overallQuality.level).toMatch(/^(excellent|good|fair|poor)$/);
     });
 
     it("should identify strengths and weaknesses", () => {
@@ -303,10 +251,7 @@ describe("PreviewGenerator", () => {
       // Should identify good data completeness
       expect(
         preview.summary.strengths.some(
-          (s) =>
-            s.includes("completeness") ||
-            s.includes("confidence") ||
-            s.includes("sources"),
+          (s) => s.includes("completeness") || s.includes("confidence") || s.includes("sources"),
         ),
       ).toBe(true);
     });
@@ -332,18 +277,13 @@ describe("PreviewGenerator", () => {
 
   describe("enhanced preview generation", () => {
     it("should generate enhanced preview with conflict detection", () => {
-      const enhancedPreview =
-        generator.generateEnhancedPreview(mockRawMetadata);
+      const enhancedPreview = generator.generateEnhancedPreview(mockRawMetadata);
 
       expect(enhancedPreview.conflictAnalysis).toBeDefined();
       expect(enhancedPreview.conflictDisplay).toBeDefined();
       expect(enhancedPreview.conflictDetectionMetadata).toBeDefined();
-      expect(
-        enhancedPreview.conflictDetectionMetadata.detectedAt,
-      ).toBeInstanceOf(Date);
-      expect(enhancedPreview.conflictDetectionMetadata.detectorVersion).toBe(
-        "1.0.0",
-      );
+      expect(enhancedPreview.conflictDetectionMetadata.detectedAt).toBeInstanceOf(Date);
+      expect(enhancedPreview.conflictDetectionMetadata.detectorVersion).toBe("1.0.0");
     });
 
     it("should detect conflicts in enhanced preview", () => {
@@ -361,20 +301,14 @@ describe("PreviewGenerator", () => {
         },
       ];
 
-      const enhancedPreview =
-        generator.generateEnhancedPreview(conflictingMetadata);
+      const enhancedPreview = generator.generateEnhancedPreview(conflictingMetadata);
 
-      expect(enhancedPreview.conflictAnalysis.totalConflicts).toBeGreaterThan(
-        0,
-      );
-      expect(
-        enhancedPreview.conflictDetectionMetadata.totalConflictsDetected,
-      ).toBeGreaterThan(0);
+      expect(enhancedPreview.conflictAnalysis.totalConflicts).toBeGreaterThan(0);
+      expect(enhancedPreview.conflictDetectionMetadata.totalConflictsDetected).toBeGreaterThan(0);
     });
 
     it("should generate conflict report", () => {
-      const enhancedPreview =
-        generator.generateEnhancedPreview(mockRawMetadata);
+      const enhancedPreview = generator.generateEnhancedPreview(mockRawMetadata);
       const report = generator.generateConflictReport(enhancedPreview);
 
       expect(report).toContain("METADATA CONFLICT ANALYSIS REPORT");
@@ -383,29 +317,21 @@ describe("PreviewGenerator", () => {
     });
 
     it("should handle disabled conflict detection", () => {
-      const noConflictGenerator = new PreviewGenerator({
-        enableConflictDetection: false,
-      });
+      const noConflictGenerator = new PreviewGenerator({ enableConflictDetection: false });
 
-      const enhancedPreview =
-        noConflictGenerator.generateEnhancedPreview(mockRawMetadata);
+      const enhancedPreview = noConflictGenerator.generateEnhancedPreview(mockRawMetadata);
 
       expect(enhancedPreview.conflictAnalysis.totalConflicts).toBe(0);
-      expect(
-        enhancedPreview.conflictDetectionMetadata.totalConflictsDetected,
-      ).toBe(0);
+      expect(enhancedPreview.conflictDetectionMetadata.totalConflictsDetected).toBe(0);
       expect(enhancedPreview.conflictAnalysis.recommendations).toContain(
         "Conflict detection is disabled",
       );
     });
 
     it("should handle disabled conflict display", () => {
-      const noDisplayGenerator = new PreviewGenerator({
-        includeConflictDisplay: false,
-      });
+      const noDisplayGenerator = new PreviewGenerator({ includeConflictDisplay: false });
 
-      const enhancedPreview =
-        noDisplayGenerator.generateEnhancedPreview(mockRawMetadata);
+      const enhancedPreview = noDisplayGenerator.generateEnhancedPreview(mockRawMetadata);
       const report = noDisplayGenerator.generateConflictReport(enhancedPreview);
 
       expect(enhancedPreview.conflictDisplay.recommendations).toContain(
@@ -437,11 +363,7 @@ describe("PreviewGenerator", () => {
         { value: "Different Title", source: mockSources[1] },
       ];
 
-      const conflicts = generator.detectFieldConflicts(
-        field,
-        "title",
-        rawValues,
-      );
+      const conflicts = generator.detectFieldConflicts(field, "title", rawValues);
 
       expect(conflicts).toBeInstanceOf(Array);
       // May or may not have conflicts depending on similarity threshold
@@ -450,9 +372,7 @@ describe("PreviewGenerator", () => {
 
   describe("configuration", () => {
     it("should respect high confidence threshold", () => {
-      const strictGenerator = new PreviewGenerator({
-        highConfidenceThreshold: 0.99,
-      });
+      const strictGenerator = new PreviewGenerator({ highConfidenceThreshold: 0.99 });
       const preview = strictGenerator.generatePreview(mockRawMetadata);
 
       // With very high threshold, most fields should not be high confidence
@@ -460,9 +380,7 @@ describe("PreviewGenerator", () => {
     });
 
     it("should respect quality threshold", () => {
-      const strictGenerator = new PreviewGenerator({
-        goodQualityThreshold: 0.95,
-      });
+      const strictGenerator = new PreviewGenerator({ goodQualityThreshold: 0.95 });
       const preview = strictGenerator.generatePreview(mockRawMetadata);
 
       // With very high quality threshold, quality levels should be lower
@@ -477,9 +395,7 @@ describe("PreviewGenerator", () => {
     });
 
     it("should control detailed reasoning inclusion", () => {
-      const minimalGenerator = new PreviewGenerator({
-        includeDetailedReasoning: false,
-      });
+      const minimalGenerator = new PreviewGenerator({ includeDetailedReasoning: false });
       const preview = minimalGenerator.generatePreview(mockRawMetadata);
 
       // Should still have basic reasoning
@@ -487,9 +403,7 @@ describe("PreviewGenerator", () => {
     });
 
     it("should control quality suggestions inclusion", () => {
-      const noSuggestionsGenerator = new PreviewGenerator({
-        includeQualitySuggestions: false,
-      });
+      const noSuggestionsGenerator = new PreviewGenerator({ includeQualitySuggestions: false });
 
       const lowQualityField: ReconciledField<string> = {
         value: "Test",
@@ -510,10 +424,7 @@ describe("PreviewGenerator", () => {
       expect(config.enableConflictDetection).toBe(true);
       expect(config.includeConflictDisplay).toBe(true);
 
-      generator.updateConfig({
-        enableConflictDetection: false,
-        includeConflictDisplay: false,
-      });
+      generator.updateConfig({ enableConflictDetection: false, includeConflictDisplay: false });
 
       const updatedConfig = generator.getConfig();
       expect(updatedConfig.enableConflictDetection).toBe(false);
@@ -588,12 +499,7 @@ describe("PreviewGenerator", () => {
           id: "existing-1",
           title: "Classic Literature Volume 2",
           authors: ["Various Authors"],
-          series: [
-            {
-              name: "Classic Literature",
-              volume: 2,
-            },
-          ],
+          series: [{ name: "Classic Literature", volume: 2 }],
           addedDate: new Date("2023-01-01"),
           lastModified: new Date("2023-01-01"),
           readStatus: "read" as const,
@@ -602,12 +508,7 @@ describe("PreviewGenerator", () => {
 
       // Create reconciled data with series information
       const reconciledSeries = {
-        value: [
-          {
-            name: "Classic Literature",
-            volume: 1,
-          },
-        ],
+        value: [{ name: "Classic Literature", volume: 1 }],
         confidence: 0.8,
         sources: mockSources,
         reasoning: "Series detected from metadata",
@@ -620,12 +521,8 @@ describe("PreviewGenerator", () => {
       );
 
       expect(libraryPreview.seriesRelationships).toHaveLength(1);
-      expect(libraryPreview.seriesRelationships[0].series.name).toBe(
-        "Classic Literature",
-      );
-      expect(libraryPreview.seriesRelationships[0].relatedWorks).toHaveLength(
-        1,
-      );
+      expect(libraryPreview.seriesRelationships[0].series.name).toBe("Classic Literature");
+      expect(libraryPreview.seriesRelationships[0].relatedWorks).toHaveLength(1);
     });
 
     it("should generate appropriate recommendations", () => {
@@ -660,48 +557,29 @@ describe("PreviewGenerator", () => {
 
       expect(libraryPreview.quality).toBeDefined();
       expect(libraryPreview.quality.score).toBeGreaterThan(0);
-      expect(libraryPreview.quality.level).toMatch(
-        /^(excellent|good|fair|poor)$/,
-      );
+      expect(libraryPreview.quality.level).toMatch(/^(excellent|good|fair|poor)$/);
       expect(libraryPreview.quality.completeness).toBeGreaterThan(0);
       expect(libraryPreview.quality.accuracy).toBeGreaterThan(0);
       expect(libraryPreview.quality.consistency).toBeGreaterThan(0);
     });
 
     it("should handle empty existing library", () => {
-      const libraryPreview = generator.generateLibraryPreview(
-        mockRawMetadata,
-        undefined,
-        [],
-      );
+      const libraryPreview = generator.generateLibraryPreview(mockRawMetadata, undefined, []);
 
       expect(libraryPreview.duplicates).toHaveLength(0);
       expect(libraryPreview.entry).toBeDefined();
-      expect(
-        libraryPreview.recommendations.some(
-          (r) => r.type === "merge_duplicates",
-        ),
-      ).toBe(false);
+      expect(libraryPreview.recommendations.some((r) => r.type === "merge_duplicates")).toBe(false);
     });
 
     it("should calculate string similarity correctly", () => {
       // Use the exported function from similarity.ts
-      const similarity1 = calculateStringSimilarity(
-        "The Great Gatsby",
-        "The Great Gatsby",
-      );
+      const similarity1 = calculateStringSimilarity("The Great Gatsby", "The Great Gatsby");
       expect(similarity1).toBe(1);
 
-      const similarity2 = calculateStringSimilarity(
-        "The Great Gatsby",
-        "Great Gatsby",
-      );
+      const similarity2 = calculateStringSimilarity("The Great Gatsby", "Great Gatsby");
       expect(similarity2).toBeGreaterThan(0.7); // Adjusted expectation
 
-      const similarity3 = calculateStringSimilarity(
-        "The Great Gatsby",
-        "Completely Different",
-      );
+      const similarity3 = calculateStringSimilarity("The Great Gatsby", "Completely Different");
       expect(similarity3).toBeLessThan(0.3);
     });
 
@@ -854,11 +732,7 @@ describe("PreviewGenerator", () => {
     it("should handle duplicate sources", () => {
       const duplicateMetadata = [
         ...mockRawMetadata,
-        {
-          ...mockRawMetadata[0],
-          id: "4",
-          title: "Different Title",
-        },
+        { ...mockRawMetadata[0], id: "4", title: "Different Title" },
       ];
 
       const preview = generator.generatePreview(duplicateMetadata);

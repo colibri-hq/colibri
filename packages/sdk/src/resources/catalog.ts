@@ -4,12 +4,7 @@ import { paginate } from "../utilities.js";
 
 const table = "catalog" as const;
 
-export async function loadCatalogs(
-  database: Database,
-  _query?: string,
-  page = 1,
-  perPage = 10,
-) {
+export async function loadCatalogs(database: Database, _query?: string, page = 1, perPage = 10) {
   return paginate(database, table, page, perPage)
     .orderBy("updated_at desc")
     .selectAll(table)
@@ -17,11 +12,7 @@ export async function loadCatalogs(
       fn("slugify", [
         fn.coalesce(
           "title",
-          fn("regexp_replace", [
-            "feed_url",
-            val("^(https?://)?(www\\.)?"),
-            val(""),
-          ]),
+          fn("regexp_replace", ["feed_url", val("^(https?://)?(www\\.)?"), val("")]),
         ),
       ]).as("slug"),
     )
@@ -37,29 +28,18 @@ export async function loadCatalog(database: Database, id: string) {
       fn("slugify", [
         fn.coalesce(
           "title",
-          fn("regexp_replace", [
-            "feed_url",
-            val("^(https?://)?(www\\.)?"),
-            val(""),
-          ]),
+          fn("regexp_replace", ["feed_url", val("^(https?://)?(www\\.)?"), val("")]),
         ),
       ]).as("slug"),
     )
     .executeTakeFirstOrThrow();
 }
 
-export async function updateCatalog(
-  database: Database,
-  id: string,
-  data: Updateable<Table>,
-) {
+export async function updateCatalog(database: Database, id: string, data: Updateable<Table>) {
   await database.updateTable(table).set(data).where("id", "=", id).execute();
 }
 
-export async function createCatalog(
-  database: Database,
-  data: Insertable<Table>,
-) {
+export async function createCatalog(database: Database, data: Insertable<Table>) {
   await database.insertInto(table).values(data).execute();
 }
 

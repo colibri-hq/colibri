@@ -7,18 +7,18 @@ import type {
 } from "./types.js";
 import { OAuthClientBase } from "./base.js";
 import {
-  ConfigurationError,
-  IssuerMismatchError,
-  OAuthClientError,
-  StateMismatchError,
-} from "./errors.js";
-import {
   getAuthorizationEndpoint,
   getPushedAuthorizationRequestEndpoint,
   getTokenEndpoint,
   requiresPAR,
   supportsCodeChallengeMethod,
 } from "./discovery.js";
+import {
+  ConfigurationError,
+  IssuerMismatchError,
+  OAuthClientError,
+  StateMismatchError,
+} from "./errors.js";
 import {
   generateCodeChallenge,
   generateCodeVerifier,
@@ -100,14 +100,12 @@ export class AuthorizationCodeClient extends OAuthClientBase {
 
     // Generate PKCE code verifier and challenge
     const codeVerifier = generateCodeVerifier();
-    const codeChallenge = await generateCodeChallenge(
-      codeVerifier,
-      this.#codeChallengeMethod,
-    );
+    const codeChallenge = await generateCodeChallenge(codeVerifier, this.#codeChallengeMethod);
 
     // Generate state and optional nonce
     const state = options.state ?? generateState();
-    const nonce = options.nonce ?? (options.scopes?.includes("openid") ? generateNonce() : undefined);
+    const nonce =
+      options.nonce ?? (options.scopes?.includes("openid") ? generateNonce() : undefined);
 
     // Build authorization URL
     const authorizationEndpoint = getAuthorizationEndpoint(metadata, this.issuer);
@@ -141,12 +139,7 @@ export class AuthorizationCodeClient extends OAuthClientBase {
       }
     }
 
-    return {
-      url,
-      codeVerifier,
-      state,
-      nonce,
-    };
+    return { url, codeVerifier, state, nonce };
   }
 
   /**
@@ -164,22 +157,18 @@ export class AuthorizationCodeClient extends OAuthClientBase {
    * @returns The PAR result including request URI and authorization URL
    * @see RFC 9126
    */
-  async pushAuthorizationRequest(
-    options: AuthorizationUrlOptions = {},
-  ): Promise<PARResult> {
+  async pushAuthorizationRequest(options: AuthorizationUrlOptions = {}): Promise<PARResult> {
     const metadata = await this.getServerMetadata();
     const parEndpoint = getPushedAuthorizationRequestEndpoint(metadata, this.issuer);
 
     // Generate PKCE code verifier and challenge
     const codeVerifier = generateCodeVerifier();
-    const codeChallenge = await generateCodeChallenge(
-      codeVerifier,
-      this.#codeChallengeMethod,
-    );
+    const codeChallenge = await generateCodeChallenge(codeVerifier, this.#codeChallengeMethod);
 
     // Generate state and optional nonce
     const state = options.state ?? generateState();
-    const nonce = options.nonce ?? (options.scopes?.includes("openid") ? generateNonce() : undefined);
+    const nonce =
+      options.nonce ?? (options.scopes?.includes("openid") ? generateNonce() : undefined);
 
     // Build PAR request parameters
     const params: Record<string, string> = {
@@ -215,10 +204,7 @@ export class AuthorizationCodeClient extends OAuthClientBase {
     // Send PAR request
     const response = await this.request<PARResponse>(parEndpoint, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Accept: "application/json",
-      },
+      headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
       body: new URLSearchParams(params).toString(),
     });
 
@@ -228,11 +214,7 @@ export class AuthorizationCodeClient extends OAuthClientBase {
     url.searchParams.set("client_id", this.clientId);
     url.searchParams.set("request_uri", response.request_uri);
 
-    return {
-      requestUri: response.request_uri,
-      expiresIn: response.expires_in,
-      url,
-    };
+    return { requestUri: response.request_uri, expiresIn: response.expires_in, url };
   }
 
   /**
@@ -338,17 +320,10 @@ export class AuthorizationCodeClient extends OAuthClientBase {
     // Extract authorization code
     const code = url.searchParams.get("code");
     if (!code) {
-      throw new OAuthClientError(
-        "invalid_request",
-        "Missing authorization code in callback URL",
-      );
+      throw new OAuthClientError("invalid_request", "Missing authorization code in callback URL");
     }
 
-    return {
-      code,
-      ...(state !== undefined && { state }),
-      ...(iss !== undefined && { iss }),
-    };
+    return { code, ...(state !== undefined && { state }), ...(iss !== undefined && { iss }) };
   }
 
   /**

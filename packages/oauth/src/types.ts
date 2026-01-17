@@ -1,9 +1,9 @@
 import type { MaybePromise } from "@colibri-hq/shared";
-import type { ClientCredentialsGrantOptions } from "./grantTypes/clientCredentialsGrant.js";
-import type { RefreshTokenGrantOptions } from "./grantTypes/refreshTokenGrant.js";
-import type { AuthorizationCodeGrantOptions } from "./grantTypes/authorizationCodeGrant.js";
-import type { DeviceCodeGrantOptions } from "./grantTypes/deviceCodeGrant.js";
 import { z } from "zod";
+import type { AuthorizationCodeGrantOptions } from "./grantTypes/authorizationCodeGrant.js";
+import type { ClientCredentialsGrantOptions } from "./grantTypes/clientCredentialsGrant.js";
+import type { DeviceCodeGrantOptions } from "./grantTypes/deviceCodeGrant.js";
+import type { RefreshTokenGrantOptions } from "./grantTypes/refreshTokenGrant.js";
 
 // region Specification
 /**
@@ -138,9 +138,7 @@ export interface AuthorizationServerMetadata {
    * @see https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method IANA
    *      OAuth Parameters Registry: Token Endpoint Authentication Methods
    */
-  token_endpoint_auth_methods_supported?:
-    | TokenEndpointAuthenticationMethod[]
-    | undefined;
+  token_endpoint_auth_methods_supported?: TokenEndpointAuthenticationMethod[] | undefined;
 
   /**
    * **OPTIONAL.** JSON array containing a list of the JWS signing algorithms (`alg` values)
@@ -155,9 +153,7 @@ export interface AuthorizationServerMetadata {
    * @see https://datatracker.ietf.org/doc/html/rfc7519#section-8 RFC 7519, Section 8
    * @see https://datatracker.ietf.org/doc/html/rfc7518#autoid-5 RFC 7518
    */
-  token_endpoint_auth_signing_alg_values_supported?:
-    | JwtSigningAlgorithm[]
-    | undefined;
+  token_endpoint_auth_signing_alg_values_supported?: JwtSigningAlgorithm[] | undefined;
 
   /**
    * **OPTIONAL.** URL of a page containing human-readable information that developers might want or
@@ -225,9 +221,7 @@ export interface AuthorizationServerMetadata {
    * @see https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method IANA
    *      OAuth Parameters Registry: Token Endpoint Authentication Methods
    */
-  revocation_endpoint_auth_methods_supported?:
-    | TokenEndpointAuthenticationMethod[]
-    | undefined;
+  revocation_endpoint_auth_methods_supported?: TokenEndpointAuthenticationMethod[] | undefined;
 
   /**
    * **OPTIONAL.** JSON array containing a list of the JWS signing algorithms (`alg` values)
@@ -242,9 +236,7 @@ export interface AuthorizationServerMetadata {
    * @see https://datatracker.ietf.org/doc/html/rfc7519#section-8 RFC 7519, Section 8
    * @see https://datatracker.ietf.org/doc/html/rfc7518#autoid-5 RFC 7518
    */
-  revocation_endpoint_auth_signing_alg_values_supported?:
-    | JwtSigningAlgorithm[]
-    | undefined;
+  revocation_endpoint_auth_signing_alg_values_supported?: JwtSigningAlgorithm[] | undefined;
 
   /**
    * **OPTIONAL.** URL of the authorization server's OAuth 2.0 Introspection Endpoint
@@ -268,9 +260,7 @@ export interface AuthorizationServerMetadata {
    * @see https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-types IANA
    *      OAuth Parameters Registry: OAuth Access Token Types
    */
-  introspection_endpoint_auth_methods_supported?:
-    | TokenEndpointAuthenticationMethod[]
-    | undefined;
+  introspection_endpoint_auth_methods_supported?: TokenEndpointAuthenticationMethod[] | undefined;
 
   /**
    * **OPTIONAL.** JSON array containing a list of the JWS signing algorithms (`alg` values)
@@ -285,9 +275,7 @@ export interface AuthorizationServerMetadata {
    * @see https://datatracker.ietf.org/doc/html/rfc7519#section-8 RFC 7519, Section 8
    * @see https://datatracker.ietf.org/doc/html/rfc7518#autoid-5 RFC 7518
    */
-  introspection_endpoint_auth_signing_alg_values_supported?:
-    | JwtSigningAlgorithm[]
-    | undefined;
+  introspection_endpoint_auth_signing_alg_values_supported?: JwtSigningAlgorithm[] | undefined;
 
   /**
    * **OPTIONAL.** JSON array containing a list of Proof Key for Code Exchange (PKCE)
@@ -634,9 +622,7 @@ export namespace Entities {
 // endregion
 
 // region Token Issuance
-export type RequestedToken<
-  C extends Record<string, unknown> = Record<string, unknown>,
-> = {
+export type RequestedToken<C extends Record<string, unknown> = Record<string, unknown>> = {
   ttl?: number | undefined;
 
   /**
@@ -657,10 +643,7 @@ export type IssueTokensFn = (params: {
   accessToken?: RequestedToken | undefined;
   refreshToken?: RequestedToken | undefined;
   idToken?:
-    | (Omit<RequestedToken, "exchange" | "scopes"> & {
-        exchange?: never;
-        scopes?: never;
-      })
+    | (Omit<RequestedToken, "exchange" | "scopes"> & { exchange?: never; scopes?: never })
     | undefined;
 
   /**
@@ -723,10 +706,8 @@ export interface AuthorizationServerOptions<
   AccessToken extends Entities.AccessToken = Entities.AccessToken,
   RefreshToken extends Entities.RefreshToken = Entities.RefreshToken,
   DeviceChallenge extends Entities.DeviceChallenge = Entities.DeviceChallenge,
-  AuthorizationCode extends Entities.AuthorizationCode =
-    Entities.AuthorizationCode,
-  AuthorizationRequest extends Entities.AuthorizationRequest =
-    Entities.AuthorizationRequest,
+  AuthorizationCode extends Entities.AuthorizationCode = Entities.AuthorizationCode,
+  AuthorizationRequest extends Entities.AuthorizationRequest = Entities.AuthorizationRequest,
 > {
   accessTokenTtl?: number;
 
@@ -792,9 +773,7 @@ export interface AuthorizationServerOptions<
   clientCredentials?: false | ClientCredentialsGrantOptions;
   deviceCode?: false | DeviceCodeGrantOptions<DeviceChallenge>;
   tokenExchange?: false | TokenExchangeGrantOptions;
-  pushedAuthorizationRequests?:
-    | false
-    | PushedAuthorizationRequestOptions<AuthorizationRequest>;
+  pushedAuthorizationRequests?: false | PushedAuthorizationRequestOptions<AuthorizationRequest>;
   tokenRevocation?: false | TokenRevocationOptions;
   tokenIntrospection?: false | TokenIntrospectionOptions<AccessToken>;
   serverMetadata?: false | ServerMetadataOptions;
@@ -839,10 +818,7 @@ type TokenRevocationOptions = {
    * @param token The access token to revoke
    * @param clientIdentifier Identifier of the client the token was issued to
    */
-  revokeAccessToken: (
-    token: string,
-    clientIdentifier: string,
-  ) => MaybePromise<unknown>;
+  revokeAccessToken: (token: string, clientIdentifier: string) => MaybePromise<unknown>;
 
   /**
    * Revokes a refresh token
@@ -850,10 +826,7 @@ type TokenRevocationOptions = {
    * @param token The refresh token to revoke
    * @param clientIdentifier Identifier of the client the token was issued to
    */
-  revokeRefreshToken: (
-    token: string,
-    clientIdentifier: string,
-  ) => MaybePromise<unknown>;
+  revokeRefreshToken: (token: string, clientIdentifier: string) => MaybePromise<unknown>;
 
   endpoint?: string | URL;
   authMethodsSupported?: TokenEndpointAuthenticationMethod[];
@@ -866,16 +839,10 @@ type TokenIntrospectionOptions<_T extends Entities.AccessToken> = {
   authSigningAlgValuesSupported?: JwtSigningAlgorithm[];
 };
 
-type ServerMetadataOptions = {
-  extraMetadata?: Record<string, unknown>;
-};
+type ServerMetadataOptions = { extraMetadata?: Record<string, unknown> };
 
-type UserInfoOptions = {
-  endpoint?: string | URL;
-};
+type UserInfoOptions = { endpoint?: string | URL };
 
-type ClientRegistrationOptions = {
-  endpoint?: string | URL;
-};
+type ClientRegistrationOptions = { endpoint?: string | URL };
 type ClientManagementOptions = {};
 // endregion

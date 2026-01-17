@@ -1,5 +1,5 @@
-import { error } from "@sveltejs/kit";
 import { findUserByIdentifier, type Database } from "@colibri-hq/sdk";
+import { error } from "@sveltejs/kit";
 
 /**
  * Require admin role. Call after authentication is verified.

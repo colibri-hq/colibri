@@ -7,26 +7,25 @@
  */
 
 import type { Database } from "../database.js";
-import { getSettingValue } from "../settings/index.js";
-import { globalProviderRegistry } from "./registry.js";
-import { globalConfigManager } from "./config.js";
 import type { MetadataProvider } from "./providers/provider.js";
-
-// Import all available providers
-import { OpenLibraryMetadataProvider } from "./providers/open-library.js";
-import { WikiDataMetadataProvider } from "./providers/wikidata.js";
-import { LibraryOfCongressMetadataProvider } from "./providers/library-of-congress.js";
-import { ISNIMetadataProvider } from "./providers/isni.js";
-import { ViafMetadataProvider } from "./providers/viaf.js";
-import { GoogleBooksMetadataProvider } from "./providers/google-books.js";
-import { InternetArchiveMetadataProvider } from "./providers/internet-archive.js";
+import { getSettingValue } from "../settings/index.js";
+import { globalConfigManager } from "./config.js";
 import { AmazonPaapiMetadataProvider } from "./providers/amazon.js";
-import { ISBNdbMetadataProvider } from "./providers/isbndb.js";
-import { DNBMetadataProvider } from "./providers/dnb.js";
 import { BNBMetadataProvider } from "./providers/bnb.js";
 import { CrossrefMetadataProvider } from "./providers/crossref.js";
-import { SpringerNatureMetadataProvider } from "./providers/springer.js";
+import { DNBMetadataProvider } from "./providers/dnb.js";
 import { DOABMetadataProvider } from "./providers/doab.js";
+import { GoogleBooksMetadataProvider } from "./providers/google-books.js";
+import { InternetArchiveMetadataProvider } from "./providers/internet-archive.js";
+import { ISBNdbMetadataProvider } from "./providers/isbndb.js";
+import { ISNIMetadataProvider } from "./providers/isni.js";
+import { LibraryOfCongressMetadataProvider } from "./providers/library-of-congress.js";
+// Import all available providers
+import { OpenLibraryMetadataProvider } from "./providers/open-library.js";
+import { SpringerNatureMetadataProvider } from "./providers/springer.js";
+import { ViafMetadataProvider } from "./providers/viaf.js";
+import { WikiDataMetadataProvider } from "./providers/wikidata.js";
+import { globalProviderRegistry } from "./registry.js";
 
 /**
  * Provider factory function type
@@ -168,26 +167,15 @@ async function createAmazonProvider(
 ): Promise<MetadataProvider | null> {
   try {
     const [accessKey, secretKey, partnerTag, region] = await Promise.all([
-      getSettingValue(
-        database,
-        "urn:colibri:settings:metadata:amazon-access-key",
-      ),
-      getSettingValue(
-        database,
-        "urn:colibri:settings:metadata:amazon-secret-key",
-      ),
-      getSettingValue(
-        database,
-        "urn:colibri:settings:metadata:amazon-partner-tag",
-      ),
+      getSettingValue(database, "urn:colibri:settings:metadata:amazon-access-key"),
+      getSettingValue(database, "urn:colibri:settings:metadata:amazon-secret-key"),
+      getSettingValue(database, "urn:colibri:settings:metadata:amazon-partner-tag"),
       getSettingValue(database, "urn:colibri:settings:metadata:amazon-region"),
     ]);
 
     // All credentials are required for Amazon
     if (!accessKey || !secretKey || !partnerTag) {
-      console.debug(
-        "Amazon PAAPI provider not configured: missing credentials",
-      );
+      console.debug("Amazon PAAPI provider not configured: missing credentials");
       return null;
     }
 
@@ -196,17 +184,7 @@ async function createAmazonProvider(
         accessKey,
         secretKey,
         partnerTag,
-        region:
-          (region as
-            | "us"
-            | "uk"
-            | "de"
-            | "fr"
-            | "jp"
-            | "ca"
-            | "it"
-            | "es"
-            | "au") || "us",
+        region: (region as "us" | "uk" | "de" | "fr" | "jp" | "ca" | "it" | "es" | "au") || "us",
       },
       fetch,
     );
@@ -224,10 +202,7 @@ async function createISBNdbProvider(
   fetch?: typeof globalThis.fetch,
 ): Promise<MetadataProvider | null> {
   try {
-    const apiKey = await getSettingValue(
-      database,
-      "urn:colibri:settings:metadata:isbndb-api-key",
-    );
+    const apiKey = await getSettingValue(database, "urn:colibri:settings:metadata:isbndb-api-key");
 
     if (!apiKey) {
       console.debug("ISBNdb provider not configured: missing API key");
@@ -290,11 +265,7 @@ export async function initializeMetadataProviders(
   const enabledSet = new Set(enabledProviderNames);
 
   // Track initialization results
-  const results: Array<{
-    name: string;
-    success: boolean;
-    error?: string;
-  }> = [];
+  const results: Array<{ name: string; success: boolean; error?: string }> = [];
 
   // Initialize each provider
   for (const config of PROVIDER_CONFIGS) {
@@ -305,10 +276,7 @@ export async function initializeMetadataProviders(
     let isExplicitlyEnabled = true;
     if (config.enabledSettingKey) {
       try {
-        isExplicitlyEnabled = await getSettingValue(
-          database,
-          config.enabledSettingKey,
-        );
+        isExplicitlyEnabled = await getSettingValue(database, config.enabledSettingKey);
       } catch {
         // Default to disabled if setting check fails
         isExplicitlyEnabled = false;
@@ -319,11 +287,7 @@ export async function initializeMetadataProviders(
     const shouldEnable = isInEnabledList && isExplicitlyEnabled;
 
     if (!shouldEnable) {
-      results.push({
-        name: config.name,
-        success: true,
-        error: "Provider disabled by settings",
-      });
+      results.push({ name: config.name, success: true, error: "Provider disabled by settings" });
       continue;
     }
 
@@ -363,9 +327,7 @@ export async function initializeMetadataProviders(
   // Log summary
   const successCount = results.filter((r) => r.success && !r.error).length;
   const failedCount = results.filter((r) => !r.success).length;
-  const disabledCount = results.filter(
-    (r) => r.success && r.error?.includes("disabled"),
-  ).length;
+  const disabledCount = results.filter((r) => r.success && r.error?.includes("disabled")).length;
 
   console.info(
     `Metadata providers initialized: ${successCount} active, ${disabledCount} disabled, ${failedCount} failed`,
@@ -471,8 +433,7 @@ export async function getProviderInitializationStatus(
   }> = [];
 
   for (const config of PROVIDER_CONFIGS) {
-    const isRegistered =
-      globalProviderRegistry.getProvider(config.name) !== undefined;
+    const isRegistered = globalProviderRegistry.getProvider(config.name) !== undefined;
     const isEnabled = enabledSet.has(config.name);
 
     // Check if provider has required credentials

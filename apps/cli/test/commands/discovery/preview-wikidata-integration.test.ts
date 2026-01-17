@@ -1,7 +1,4 @@
-import {
-  type MultiCriteriaQuery,
-  WikiDataMetadataProvider,
-} from "@colibri-hq/sdk/metadata";
+import { type MultiCriteriaQuery, WikiDataMetadataProvider } from "@colibri-hq/sdk/metadata";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock fetch for WikiData provider
@@ -40,11 +37,7 @@ describe("CLI Discovery Preview - WikiData Integration", () => {
     it("should run discovery:preview with WikiData provider enabled", async () => {
       // Mock successful WikiData response
       const mockBinding = {
-        authorLabel: {
-          type: "literal",
-          value: "F. Scott Fitzgerald",
-          "xml:lang": "en",
-        },
+        authorLabel: { type: "literal", value: "F. Scott Fitzgerald", "xml:lang": "en" },
         book: { type: "uri", value: "http://www.wikidata.org/entity/Q74287" },
         isbn: { type: "literal", value: "9780743273565" },
         publishDate: {
@@ -52,11 +45,7 @@ describe("CLI Discovery Preview - WikiData Integration", () => {
           type: "literal",
           value: "1925-04-10T00:00:00Z",
         },
-        publisherLabel: {
-          type: "literal",
-          value: "Charles Scribner's Sons",
-          "xml:lang": "en",
-        },
+        publisherLabel: { type: "literal", value: "Charles Scribner's Sons", "xml:lang": "en" },
         title: { type: "literal", value: "The Great Gatsby", "xml:lang": "en" },
       };
 
@@ -66,10 +55,7 @@ describe("CLI Discovery Preview - WikiData Integration", () => {
       });
 
       // Test WikiData provider directly with title search
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "The Great Gatsby",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "The Great Gatsby" };
 
       const results = await wikidataProvider.searchMultiCriteria(query);
 
@@ -93,11 +79,7 @@ describe("CLI Discovery Preview - WikiData Integration", () => {
     it("should verify WikiData results are returned and displayed correctly", async () => {
       // Mock WikiData response with comprehensive metadata
       const mockBinding = {
-        authorLabel: {
-          type: "literal",
-          value: "George Orwell",
-          "xml:lang": "en",
-        },
+        authorLabel: { type: "literal", value: "George Orwell", "xml:lang": "en" },
         book: { type: "uri", value: "http://www.wikidata.org/entity/Q8261" },
         isbn: { type: "literal", value: "9780451524935" },
         publishDate: {
@@ -105,11 +87,7 @@ describe("CLI Discovery Preview - WikiData Integration", () => {
           type: "literal",
           value: "1949-06-08T00:00:00Z",
         },
-        publisherLabel: {
-          type: "literal",
-          value: "Secker & Warburg",
-          "xml:lang": "en",
-        },
+        publisherLabel: { type: "literal", value: "Secker & Warburg", "xml:lang": "en" },
         title: { type: "literal", value: "1984", "xml:lang": "en" },
       };
 
@@ -118,10 +96,7 @@ describe("CLI Discovery Preview - WikiData Integration", () => {
         ok: true,
       });
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "1984",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "1984" };
 
       const results = await wikidataProvider.searchMultiCriteria(query);
 
@@ -157,26 +132,16 @@ describe("CLI Discovery Preview - WikiData Integration", () => {
           type: "literal",
           value: "1960-07-11T00:00:00Z",
         },
-        title: {
-          type: "literal",
-          value: "To Kill a Mockingbird",
-          "xml:lang": "en",
-        },
+        title: { type: "literal", value: "To Kill a Mockingbird", "xml:lang": "en" },
       };
 
       // Simulate realistic network delay (but under 5 seconds)
       mockFetch.mockImplementation(async () => {
         await new Promise((resolve) => setTimeout(resolve, 500)); // 500ms delay
-        return {
-          json: async () => createMockWikiDataResponse([mockBinding]),
-          ok: true,
-        };
+        return { json: async () => createMockWikiDataResponse([mockBinding]), ok: true };
       });
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "To Kill a Mockingbird",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "To Kill a Mockingbird" };
 
       const startTime = Date.now();
       const results = await wikidataProvider.searchMultiCriteria(query);
@@ -194,14 +159,9 @@ describe("CLI Discovery Preview - WikiData Integration", () => {
 
     it("should handle WikiData provider errors gracefully", async () => {
       // Mock WikiData service error
-      mockFetch.mockRejectedValueOnce(
-        new Error("WikiData service temporarily unavailable"),
-      );
+      mockFetch.mockRejectedValueOnce(new Error("WikiData service temporarily unavailable"));
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Test Book",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Test Book" };
 
       // Should not throw error, but return empty results
       const results = await wikidataProvider.searchMultiCriteria(query);
@@ -214,11 +174,7 @@ describe("CLI Discovery Preview - WikiData Integration", () => {
     it("should work with ISBN search via WikiData", async () => {
       // Mock WikiData ISBN search response
       const mockBinding = {
-        authorLabel: {
-          type: "literal",
-          value: "J. D. Salinger",
-          "xml:lang": "en",
-        },
+        authorLabel: { type: "literal", value: "J. D. Salinger", "xml:lang": "en" },
         book: { type: "uri", value: "http://www.wikidata.org/entity/Q25338" },
         isbn: { type: "literal", value: "9780316769174" },
         publishDate: {
@@ -226,16 +182,8 @@ describe("CLI Discovery Preview - WikiData Integration", () => {
           type: "literal",
           value: "1951-07-16T00:00:00Z",
         },
-        publisherLabel: {
-          type: "literal",
-          value: "Little, Brown and Company",
-          "xml:lang": "en",
-        },
-        title: {
-          type: "literal",
-          value: "The Catcher in the Rye",
-          "xml:lang": "en",
-        },
+        publisherLabel: { type: "literal", value: "Little, Brown and Company", "xml:lang": "en" },
+        title: { type: "literal", value: "The Catcher in the Rye", "xml:lang": "en" },
       };
 
       mockFetch.mockResolvedValueOnce({
@@ -243,10 +191,7 @@ describe("CLI Discovery Preview - WikiData Integration", () => {
         ok: true,
       });
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        isbn: "978-0-316-76917-4",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, isbn: "978-0-316-76917-4" };
 
       const results = await wikidataProvider.searchMultiCriteria(query);
 
@@ -266,11 +211,7 @@ describe("CLI Discovery Preview - WikiData Integration", () => {
     it("should work with author search via WikiData", async () => {
       // Mock WikiData author search response
       const mockBinding = {
-        authorLabel: {
-          type: "literal",
-          value: "J. R. R. Tolkien",
-          "xml:lang": "en",
-        },
+        authorLabel: { type: "literal", value: "J. R. R. Tolkien", "xml:lang": "en" },
         book: { type: "uri", value: "http://www.wikidata.org/entity/Q15228" },
         isbn: { type: "literal", value: "9780544003415" },
         publishDate: {
@@ -278,16 +219,8 @@ describe("CLI Discovery Preview - WikiData Integration", () => {
           type: "literal",
           value: "1954-07-29T00:00:00Z",
         },
-        publisherLabel: {
-          type: "literal",
-          value: "George Allen & Unwin",
-          "xml:lang": "en",
-        },
-        title: {
-          type: "literal",
-          value: "The Lord of the Rings",
-          "xml:lang": "en",
-        },
+        publisherLabel: { type: "literal", value: "George Allen & Unwin", "xml:lang": "en" },
+        title: { type: "literal", value: "The Lord of the Rings", "xml:lang": "en" },
       };
 
       mockFetch.mockResolvedValueOnce({
@@ -295,10 +228,7 @@ describe("CLI Discovery Preview - WikiData Integration", () => {
         ok: true,
       });
 
-      const query: MultiCriteriaQuery = {
-        authors: ["J.R.R. Tolkien"],
-        fuzzy: false,
-      };
+      const query: MultiCriteriaQuery = { authors: ["J.R.R. Tolkien"], fuzzy: false };
 
       const results = await wikidataProvider.searchMultiCriteria(query);
 
@@ -329,11 +259,7 @@ describe("CLI Discovery Preview - WikiData Integration", () => {
     it("should handle multi-criteria search prioritization correctly", async () => {
       // Mock WikiData response for ISBN search (should be prioritized)
       const mockBinding = {
-        authorLabel: {
-          type: "literal",
-          value: "Test Author",
-          "xml:lang": "en",
-        },
+        authorLabel: { type: "literal", value: "Test Author", "xml:lang": "en" },
         book: { type: "uri", value: "http://www.wikidata.org/entity/Q123" },
         isbn: { type: "literal", value: "9781234567890" },
         title: { type: "literal", value: "Test Book", "xml:lang": "en" },

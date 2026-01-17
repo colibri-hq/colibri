@@ -60,9 +60,7 @@ export function rgbToCssColor<
   B extends number,
   C extends Color<R, G, B>,
 >([r, g, b]: C, a?: number): CssColor<C, typeof a> {
-  return typeof a !== "undefined"
-    ? `rgba(${r}, ${g}, ${b}, ${a})`
-    : `rgb(${r}, ${g}, ${b})`;
+  return typeof a !== "undefined" ? `rgba(${r}, ${g}, ${b}, ${a})` : `rgb(${r}, ${g}, ${b})`;
 }
 
 export function parseCssColor(color: string) {

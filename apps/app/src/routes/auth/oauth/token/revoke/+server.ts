@@ -4,10 +4,7 @@ import type { RequestHandler } from "./$types";
 
 export const prerender = false;
 
-export const POST: RequestHandler = async function handler({
-  request,
-  locals: { database },
-}) {
+export const POST: RequestHandler = async function handler({ request, locals: { database } }) {
   try {
     return oauth(database).handleTokenRevocationRequest(request);
   } catch (cause) {

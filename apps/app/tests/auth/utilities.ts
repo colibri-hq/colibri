@@ -1,5 +1,5 @@
-import { log } from "$lib/logging";
 import type { MaybePromise } from "@colibri-hq/shared";
+import { log } from "$lib/logging";
 import { createHash } from "node:crypto";
 import { createServer, type IncomingMessage, type Server } from "node:http";
 import { Readable } from "node:stream";
@@ -7,10 +7,7 @@ import { Readable } from "node:stream";
 // region HTTP Responder
 type ServerHandler = (request: Request) => MaybePromise<Response | void>;
 
-export function createHttpResponder(
-  port: number,
-  handlers: Record<`/${string}`, ServerHandler>,
-) {
+export function createHttpResponder(port: number, handlers: Record<`/${string}`, ServerHandler>) {
   function getBody(request: IncomingMessage) {
     return new Promise<Buffer>((resolve, reject) => {
       const chunks: Uint8Array[] = [];
@@ -75,9 +72,7 @@ export function createHttpResponder(
       res.end();
     });
 
-    server.on("request", (req) =>
-      log("test:listener", "info", `Received request for ${req.url}`),
-    );
+    server.on("request", (req) => log("test:listener", "info", `Received request for ${req.url}`));
     server.on("error", (error) => reject(error));
     server.listen(port, () => {
       log("test:listener", "info", `Test server listening on port ${port}`);
@@ -92,17 +87,12 @@ export function generateCodeVerifierAndChallenge(secret = "foobar") {
   const codeVerifier = Buffer.from(secret);
   const codeChallenge = createHash("sha256").update(codeVerifier).digest();
 
-  return [
-    codeVerifier.toString("base64url"),
-    codeChallenge.toString("base64url"),
-  ] as const;
+  return [codeVerifier.toString("base64url"), codeChallenge.toString("base64url")] as const;
 }
 // endregion
 
 // region Parameter Overrides
-export type OverrideOption<T, V = Record<string, unknown>> =
-  | T
-  | ((context: V) => Partial<T>);
+export type OverrideOption<T, V = Record<string, unknown>> = T | ((context: V) => Partial<T>);
 
 export function override<T extends Record<string, unknown>, V>(
   defaults: T,
@@ -110,20 +100,15 @@ export function override<T extends Record<string, unknown>, V>(
   context: V,
 ) {
   const overrideFunction =
-    override && typeof override === "function"
-      ? override
-      : () => override ?? ({} as Partial<T>);
+    override && typeof override === "function" ? override : () => override ?? ({} as Partial<T>);
 
   return transformingDeepMerge(defaults, overrideFunction(context));
 }
 
-function removeOmittedProps<T extends Record<string, unknown>>(
-  properties: T,
-): Required<T> {
+function removeOmittedProps<T extends Record<string, unknown>>(properties: T): Required<T> {
   return Object.fromEntries(
     Object.entries(properties).filter(
-      (entry): entry is [string, Exclude<T[keyof T], undefined>] =>
-        typeof entry[1] !== "undefined",
+      (entry): entry is [string, Exclude<T[keyof T], undefined>] => typeof entry[1] !== "undefined",
     ),
   ) as Required<T>;
 }

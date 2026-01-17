@@ -1,9 +1,5 @@
 // Resolution functions
-export {
-  resolveLanguage,
-  resolveLanguages,
-  isValidLanguageCode,
-} from "./resolve.js";
+export { resolveLanguage, resolveLanguages, isValidLanguageCode } from "./resolve.js";
 
 // Direct index access
 export {
@@ -15,9 +11,4 @@ export {
 } from "./indexes.js";
 
 // Types
-export type {
-  Language,
-  LanguageType,
-  MatchType,
-  ResolvedLanguage,
-} from "./types.js";
+export type { Language, LanguageType, MatchType, ResolvedLanguage } from "./types.js";

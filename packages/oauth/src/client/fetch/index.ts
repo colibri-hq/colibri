@@ -159,11 +159,7 @@ export class AuthenticatedFetch {
     );
 
     // Handle 401 with auto-retry
-    if (
-      response.status === 401 &&
-      this.#autoRetry &&
-      attempt < this.#maxRetries
-    ) {
+    if (response.status === 401 && this.#autoRetry && attempt < this.#maxRetries) {
       try {
         await this.#client.refreshAccessToken();
 

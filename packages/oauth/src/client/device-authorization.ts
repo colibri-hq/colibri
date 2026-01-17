@@ -2,11 +2,11 @@ import type { TokenPayload } from "../types.js";
 import type {
   DeviceAuthorizationClientConfig,
   DeviceAuthorizationResponse,
-  PollOptions
+  PollOptions,
 } from "./types.js";
 import { OAuthClientBase } from "./base.js";
-import { AbortError, OAuthClientError, PollingTimeoutError } from "./errors.js";
 import { getDeviceAuthorizationEndpoint, getTokenEndpoint } from "./discovery.js";
+import { AbortError, OAuthClientError, PollingTimeoutError } from "./errors.js";
 
 /**
  * Default polling interval (seconds) per RFC 8628
@@ -75,18 +75,11 @@ export class DeviceAuthorizationClient extends OAuthClientBase {
    * @returns The device authorization response
    * @see RFC 8628, Section 3.1-3.2
    */
-  async requestDeviceAuthorization(
-    scopes?: string[],
-  ): Promise<DeviceAuthorizationResponse> {
+  async requestDeviceAuthorization(scopes?: string[]): Promise<DeviceAuthorizationResponse> {
     const metadata = await this.getServerMetadata();
-    const deviceEndpoint = getDeviceAuthorizationEndpoint(
-      metadata,
-      this.issuer,
-    );
+    const deviceEndpoint = getDeviceAuthorizationEndpoint(metadata, this.issuer);
 
-    const params: Record<string, string> = {
-      client_id: this.clientId,
-    };
+    const params: Record<string, string> = { client_id: this.clientId };
 
     // Add client secret if configured (for confidential clients)
     if (this.clientSecret) {
@@ -101,10 +94,7 @@ export class DeviceAuthorizationClient extends OAuthClientBase {
 
     const response = await this.request<DeviceCodeResponse>(deviceEndpoint, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Accept: "application/json",
-      },
+      headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
       body: new URLSearchParams(params).toString(),
     });
 

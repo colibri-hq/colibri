@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import type { createMockPersistence } from "../utilities";
 import {
   type AuthorizationServerOptions,
   type Entities,
   createAuthorizationServer,
   AuthorizationCodeGrant,
 } from "../../src";
-import type { createMockPersistence } from "../utilities";
 
 describe("Authorization Server Unit Tests", () => {
   let options: AuthorizationServerOptions;
@@ -14,11 +14,7 @@ describe("Authorization Server Unit Tests", () => {
   beforeEach(() => {
     persistence = createMockPersistence();
 
-    options = {
-      issuer: "http://localhost:3000",
-      jwtSecret: "test-secret",
-      persistence,
-    };
+    options = { issuer: "http://localhost:3000", jwtSecret: "test-secret", persistence };
   });
 
   describe("Client Validation", () => {
@@ -34,10 +30,7 @@ describe("Authorization Server Unit Tests", () => {
 
       persistence.loadClient.mockResolvedValue(mockClient);
 
-      const request = {
-        client_id: "test-client",
-        client_secret: "test-secret",
-      };
+      const request = { client_id: "test-client", client_secret: "test-secret" };
 
       const result = await server.validateClient(request);
       expect(result).toBe(true);
@@ -49,10 +42,7 @@ describe("Authorization Server Unit Tests", () => {
 
       persistence.loadClient.mockResolvedValue(null);
 
-      const request = {
-        client_id: "invalid-client",
-        client_secret: "test-secret",
-      };
+      const request = { client_id: "invalid-client", client_secret: "test-secret" };
 
       const result = await server.validateClient(request);
       expect(result).toBe(false);
@@ -69,10 +59,7 @@ describe("Authorization Server Unit Tests", () => {
 
       persistence.loadClient.mockResolvedValue(mockClient);
 
-      const request = {
-        client_id: "test-client",
-        client_secret: "wrong-secret",
-      };
+      const request = { client_id: "test-client", client_secret: "wrong-secret" };
 
       const result = await server.validateClient(request);
       expect(result).toBe(false);
@@ -107,9 +94,7 @@ describe("Authorization Server Unit Tests", () => {
 
       const result = await server.validateAuthorizationCode(request);
       expect(result).toBe(true);
-      expect(persistence.loadAuthorizationCode).toHaveBeenCalledWith(
-        "test-code",
-      );
+      expect(persistence.loadAuthorizationCode).toHaveBeenCalledWith("test-code");
     });
 
     it("should reject expired authorization code", async () => {

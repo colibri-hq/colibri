@@ -1,24 +1,21 @@
-export function arrayBufferToHex(
-  buffer: ArrayBufferLike | Uint8Array<ArrayBuffer>,
-) {
+export function arrayBufferToHex(buffer: ArrayBufferLike | Uint8Array<ArrayBuffer>) {
   // @ts-expect-error -- Buffer conversion works as intended
   return Array.from(new Uint8Array(buffer)).reduce(
-    (acc, byte) => acc + byte.toString(16).padStart(2, '0'),
-    '',
+    (acc, byte) => acc + byte.toString(16).padStart(2, "0"),
+    "",
   );
 }
 
 export function hexToArrayBuffer(hex: string): ArrayBuffer {
-  const { buffer } = Uint8Array.from(
-    hex.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16)),
-  );
+  const { buffer } = Uint8Array.from(hex.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16)));
 
   return buffer;
 }
 
-export function createStreamFromArrayBuffer<
-  T extends ArrayBuffer | ArrayBufferLike,
->(buffer: T, chunkSize = 64 * 1024): ReadableStream<Uint8Array<T>> {
+export function createStreamFromArrayBuffer<T extends ArrayBuffer | ArrayBufferLike>(
+  buffer: T,
+  chunkSize = 64 * 1024,
+): ReadableStream<Uint8Array<T>> {
   return new ReadableStream({
     start(controller) {
       const bytes = new Uint8Array(buffer);

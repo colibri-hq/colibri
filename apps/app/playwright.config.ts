@@ -8,11 +8,7 @@ import { join } from "node:path";
  */
 dotenv.config({ path: join(import.meta.dirname, "..", "..", ".env") });
 
-export const storageState = join(
-  import.meta.dirname,
-  ".cache",
-  "playwright.json",
-);
+export const storageState = join(import.meta.dirname, ".cache", "playwright.json");
 
 // noinspection JSUnusedGlobalSymbols
 /**
@@ -52,15 +48,8 @@ export default defineConfig({
 
   //  Configure projects for major browsers
   projects: [
-    {
-      name: "setup database",
-      testMatch: "database.setup.ts",
-      teardown: "teardown database",
-    },
-    {
-      name: "teardown database",
-      testMatch: "database.teardown.ts",
-    },
+    { name: "setup database", testMatch: "database.setup.ts", teardown: "teardown database" },
+    { name: "teardown database", testMatch: "database.teardown.ts" },
     {
       name: "setup authentication",
       testMatch: "authentication.setup.ts",
@@ -69,10 +58,7 @@ export default defineConfig({
     {
       name: "authentication",
       testMatch: ["auth/*.spec.ts", "auth/**/*.spec.ts"],
-      use: {
-        ...devices["Desktop Chrome"],
-        storageState,
-      },
+      use: { ...devices["Desktop Chrome"], storageState },
       dependencies: ["setup database", "setup authentication"],
     },
 
@@ -120,9 +106,7 @@ export default defineConfig({
 
   //  Run your local dev server before starting the tests
   webServer: {
-    env: {
-      ORIGIN: "http://localhost:5173",
-    },
+    env: { ORIGIN: "http://localhost:5173" },
     ignoreHTTPSErrors: false,
     command: "npm run dev",
     url: "http://localhost:5173",

@@ -8,9 +8,7 @@ describe("MCP Protocol Endpoints", () => {
       const response = await fetch(`${BASE_URL}/.well-known/mcp.json`);
 
       expect(response.status).toBe(200);
-      expect(response.headers.get("content-type")).toContain(
-        "application/json",
-      );
+      expect(response.headers.get("content-type")).toContain("application/json");
 
       const data = await response.json();
       expect(data).toHaveProperty("name");
@@ -38,9 +36,7 @@ describe("MCP Protocol Endpoints", () => {
       const response = await fetch(`${BASE_URL}/mcp/data/resources.json`);
 
       expect(response.status).toBe(200);
-      expect(response.headers.get("content-type")).toContain(
-        "application/json",
-      );
+      expect(response.headers.get("content-type")).toContain("application/json");
 
       const data = await response.json();
       expect(data).toHaveProperty("resources");
@@ -71,14 +67,10 @@ describe("MCP Protocol Endpoints", () => {
 
   describe("GET /mcp/data/content/[slug].json", () => {
     it("returns content for valid slugs", async () => {
-      const response = await fetch(
-        `${BASE_URL}/mcp/data/content/getting-started.json`,
-      );
+      const response = await fetch(`${BASE_URL}/mcp/data/content/getting-started.json`);
 
       expect(response.status).toBe(200);
-      expect(response.headers.get("content-type")).toContain(
-        "application/json",
-      );
+      expect(response.headers.get("content-type")).toContain("application/json");
 
       const data = await response.json();
       expect(data).toHaveProperty("uri");
@@ -87,9 +79,7 @@ describe("MCP Protocol Endpoints", () => {
     });
 
     it("content has text and mimeType", async () => {
-      const response = await fetch(
-        `${BASE_URL}/mcp/data/content/getting-started.json`,
-      );
+      const response = await fetch(`${BASE_URL}/mcp/data/content/getting-started.json`);
       const data = await response.json();
 
       expect(data).toHaveProperty("text");
@@ -100,9 +90,7 @@ describe("MCP Protocol Endpoints", () => {
 
     it("handles nested slugs", async () => {
       // Try a nested path - adjust if this path doesn't exist
-      const response = await fetch(
-        `${BASE_URL}/mcp/data/content/getting-started/quick-start.json`,
-      );
+      const response = await fetch(`${BASE_URL}/mcp/data/content/getting-started/quick-start.json`);
 
       // Either 200 (exists) or 404 (doesn't exist) is valid
       expect([200, 404]).toContain(response.status);

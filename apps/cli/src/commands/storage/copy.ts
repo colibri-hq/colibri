@@ -7,11 +7,7 @@ import { BaseCommand } from "../../command.ts";
 export class CopyCommand extends BaseCommand<typeof CopyCommand> {
   static aliases = ["storage cp"];
   static args = {
-    source: Args.string({
-      description: "Source path to copy",
-      name: "source",
-      required: true,
-    }),
+    source: Args.string({ description: "Source path to copy", name: "source", required: true }),
     // eslint-disable-next-line perfectionist/sort-objects
     destination: Args.string({
       description: "Destination path to copy to",
@@ -66,9 +62,7 @@ export class CopyCommand extends BaseCommand<typeof CopyCommand> {
         await copyObject(await this.storage, source, destination);
 
         if (this.flags.verbose) {
-          this.logToStderr(
-            `Copied object from "${source}" to "${destination}" successfully.`,
-          );
+          this.logToStderr(`Copied object from "${source}" to "${destination}" successfully.`);
         }
       }),
     );

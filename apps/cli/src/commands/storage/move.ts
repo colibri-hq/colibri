@@ -15,17 +15,12 @@ export class MoveCommand extends BaseCommand<typeof MoveCommand> {
       name: "destination",
       required: true,
     }),
-    source: Args.string({
-      description: "Source path to move",
-      name: "source",
-      required: true,
-    }),
+    source: Args.string({ description: "Source path to move", name: "source", required: true }),
   };
   static description = "Move a file or folder in storage.";
   static examples = [
     {
-      command:
-        "<%= config.bin %> <%= command.id %> assets/old-folder assets/new-folder",
+      command: "<%= config.bin %> <%= command.id %> assets/old-folder assets/new-folder",
       description: "Move 'old-folder' to 'new-folder'",
     },
   ];
@@ -36,9 +31,7 @@ export class MoveCommand extends BaseCommand<typeof MoveCommand> {
     await moveObject(await this.storage, source, destination);
 
     if (this.flags.verbose) {
-      this.logToStderr(
-        `Moved object from "${source}" to "${destination}" successfully.`,
-      );
+      this.logToStderr(`Moved object from "${source}" to "${destination}" successfully.`);
     }
   }
 }

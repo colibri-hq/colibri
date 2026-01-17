@@ -21,23 +21,13 @@ const sampleSparqlResponse = {
   results: {
     bindings: [
       {
-        book: {
-          type: "uri",
-          value: "http://bnb.data.bl.uk/id/resource/016547439",
-        },
-        title: {
-          type: "literal",
-          value: "Pride and prejudice",
-          "xml:lang": "en",
-        },
+        book: { type: "uri", value: "http://bnb.data.bl.uk/id/resource/016547439" },
+        title: { type: "literal", value: "Pride and prejudice", "xml:lang": "en" },
         author: { type: "literal", value: "Austen, Jane", "xml:lang": "en" },
         isbn: { type: "literal", value: "9780141439518" },
         publisher: { type: "literal", value: "Penguin Classics" },
         date: { type: "literal", value: "2003" },
-        language: {
-          type: "uri",
-          value: "http://id.loc.gov/vocabulary/iso639-2/eng",
-        },
+        language: { type: "uri", value: "http://id.loc.gov/vocabulary/iso639-2/eng" },
         ddc: { type: "literal", value: "823.7" },
         pages: {
           type: "literal",
@@ -51,25 +41,17 @@ const sampleSparqlResponse = {
 };
 
 const multipleAuthorsResponse = {
-  head: {
-    vars: ["book", "title", "author", "isbn"],
-  },
+  head: { vars: ["book", "title", "author", "isbn"] },
   results: {
     bindings: [
       {
-        book: {
-          type: "uri",
-          value: "http://bnb.data.bl.uk/id/resource/012345678",
-        },
+        book: { type: "uri", value: "http://bnb.data.bl.uk/id/resource/012345678" },
         title: { type: "literal", value: "Test Book" },
         author: { type: "literal", value: "Author One" },
         isbn: { type: "literal", value: "9781234567890" },
       },
       {
-        book: {
-          type: "uri",
-          value: "http://bnb.data.bl.uk/id/resource/012345678",
-        },
+        book: { type: "uri", value: "http://bnb.data.bl.uk/id/resource/012345678" },
         title: { type: "literal", value: "Test Book" },
         author: { type: "literal", value: "Author Two" },
         isbn: { type: "literal", value: "9781234567890" },
@@ -78,10 +60,7 @@ const multipleAuthorsResponse = {
   },
 };
 
-const emptyResponse = {
-  head: { vars: [] },
-  results: { bindings: [] },
-};
+const emptyResponse = { head: { vars: [] }, results: { bindings: [] } };
 
 describe("BNBMetadataProvider", () => {
   let provider: BNBMetadataProvider;
@@ -95,14 +74,9 @@ describe("BNBMetadataProvider", () => {
 
   describe("searchByTitle", () => {
     it("should search by title and return metadata records", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSparqlResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSparqlResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Pride and prejudice",
-      });
+      const results = await provider.searchByTitle({ title: "Pride and prejudice" });
 
       expect(mockFetch).toHaveBeenCalled();
       expect(results.length).toBeGreaterThan(0);
@@ -117,28 +91,17 @@ describe("BNBMetadataProvider", () => {
     });
 
     it("should return empty array when no results", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => emptyResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => emptyResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Nonexistent Book",
-      });
+      const results = await provider.searchByTitle({ title: "Nonexistent Book" });
 
       expect(results).toEqual([]);
     });
 
     it("should handle exact match searches", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSparqlResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSparqlResponse });
 
-      await provider.searchByTitle({
-        title: "Pride and prejudice",
-        exactMatch: true,
-      });
+      await provider.searchByTitle({ title: "Pride and prejudice", exactMatch: true });
 
       const call = mockFetch.mock.calls[0];
       expect(call[0]).toContain("dct%3Atitle+%22Pride+and+prejudice%22");
@@ -147,10 +110,7 @@ describe("BNBMetadataProvider", () => {
 
   describe("searchByISBN", () => {
     it("should search by ISBN", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSparqlResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSparqlResponse });
 
       const results = await provider.searchByISBN("978-0-14-143951-8");
 
@@ -160,10 +120,7 @@ describe("BNBMetadataProvider", () => {
     });
 
     it("should clean ISBN before searching", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSparqlResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSparqlResponse });
 
       await provider.searchByISBN("978-0-14-143951-8");
 
@@ -176,14 +133,9 @@ describe("BNBMetadataProvider", () => {
 
   describe("searchByCreator", () => {
     it("should search by author name", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSparqlResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSparqlResponse });
 
-      const results = await provider.searchByCreator({
-        name: "Austen, Jane",
-      });
+      const results = await provider.searchByCreator({ name: "Austen, Jane" });
 
       expect(mockFetch).toHaveBeenCalled();
       expect(results.length).toBeGreaterThan(0);
@@ -191,15 +143,9 @@ describe("BNBMetadataProvider", () => {
     });
 
     it("should handle fuzzy author searches", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSparqlResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSparqlResponse });
 
-      await provider.searchByCreator({
-        name: "Austen",
-        fuzzy: true,
-      });
+      await provider.searchByCreator({ name: "Austen", fuzzy: true });
 
       const call = mockFetch.mock.calls[0];
       expect(call[0]).toContain("CONTAINS");
@@ -208,15 +154,9 @@ describe("BNBMetadataProvider", () => {
 
   describe("searchMultiCriteria", () => {
     it("should prioritize ISBN when available", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSparqlResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSparqlResponse });
 
-      await provider.searchMultiCriteria({
-        title: "Pride and prejudice",
-        isbn: "9780141439518",
-      });
+      await provider.searchMultiCriteria({ title: "Pride and prejudice", isbn: "9780141439518" });
 
       const call = mockFetch.mock.calls[0];
       // Should use ISBN in the filter clause
@@ -226,15 +166,9 @@ describe("BNBMetadataProvider", () => {
     });
 
     it("should combine title and author", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSparqlResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSparqlResponse });
 
-      await provider.searchMultiCriteria({
-        title: "Pride and prejudice",
-        authors: ["Austen"],
-      });
+      await provider.searchMultiCriteria({ title: "Pride and prejudice", authors: ["Austen"] });
 
       const call = mockFetch.mock.calls[0];
       expect(call[0]).toContain("dct%3Atitle");
@@ -249,14 +183,9 @@ describe("BNBMetadataProvider", () => {
 
   describe("Result Processing", () => {
     it("should aggregate multiple authors for the same book", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => multipleAuthorsResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => multipleAuthorsResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test Book",
-      });
+      const results = await provider.searchByTitle({ title: "Test Book" });
 
       expect(results.length).toBe(1);
       expect(results[0].authors).toContain("Author One");
@@ -264,27 +193,17 @@ describe("BNBMetadataProvider", () => {
     });
 
     it("should include British Library ID in provider data", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSparqlResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSparqlResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results[0].providerData?.blId).toBe("GBA3-87654");
     });
 
     it("should include DDC classification in provider data", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSparqlResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSparqlResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results[0].providerData?.ddcClassification).toBe("823.7");
     });
@@ -292,14 +211,9 @@ describe("BNBMetadataProvider", () => {
 
   describe("Language Code Normalization", () => {
     it("should normalize ISO 639-2/B codes from URIs", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSparqlResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSparqlResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results[0].language).toBe("en");
     });
@@ -311,23 +225,15 @@ describe("BNBMetadataProvider", () => {
           bindings: [
             {
               ...sampleSparqlResponse.results.bindings[0],
-              language: {
-                type: "uri",
-                value: "http://id.loc.gov/vocabulary/iso639-2/wel",
-              },
+              language: { type: "uri", value: "http://id.loc.gov/vocabulary/iso639-2/wel" },
             },
           ],
         },
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => welshResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => welshResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results[0].language).toBe("cy");
     });
@@ -335,15 +241,9 @@ describe("BNBMetadataProvider", () => {
 
   describe("Error Handling", () => {
     it("should handle HTTP errors gracefully", async () => {
-      mockFetch.mockResolvedValue({
-        ok: false,
-        status: 500,
-        statusText: "Internal Server Error",
-      });
+      mockFetch.mockResolvedValue({ ok: false, status: 500, statusText: "Internal Server Error" });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results).toEqual([]);
     }, 30000);
@@ -352,14 +252,9 @@ describe("BNBMetadataProvider", () => {
       mockFetch
         .mockRejectedValueOnce(new Error("Network error"))
         .mockRejectedValueOnce(new Error("Network error"))
-        .mockResolvedValue({
-          ok: true,
-          json: async () => sampleSparqlResponse,
-        });
+        .mockResolvedValue({ ok: true, json: async () => sampleSparqlResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results.length).toBeGreaterThan(0);
       expect(mockFetch).toHaveBeenCalledTimes(3);
@@ -373,9 +268,7 @@ describe("BNBMetadataProvider", () => {
         },
       });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results).toEqual([]);
     });
@@ -383,24 +276,16 @@ describe("BNBMetadataProvider", () => {
 
   describe("Confidence Scoring", () => {
     it("should assign higher confidence for ISBN searches", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSparqlResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSparqlResponse });
 
       const results = await provider.searchByISBN("9780141439518");
       expect(results[0].confidence).toBeGreaterThanOrEqual(0.9);
     });
 
     it("should boost confidence for complete metadata", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSparqlResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSparqlResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       // Complete record should have higher confidence
       expect(results[0].confidence).toBeGreaterThanOrEqual(0.8);
@@ -430,9 +315,7 @@ describe("BNBMetadataProvider", () => {
       expect(provider.supportsDataType(MetadataType.TITLE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.AUTHORS)).toBe(true);
       expect(provider.supportsDataType(MetadataType.ISBN)).toBe(true);
-      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(
-        true,
-      );
+      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(true);
     });
 
     it("should not support cover images", () => {
@@ -458,28 +341,18 @@ describe("BNBMetadataProvider", () => {
 
   describe("SPARQL Query Escaping", () => {
     it("should escape special characters in title search", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => emptyResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => emptyResponse });
 
-      await provider.searchByTitle({
-        title: 'Book "With" Quotes',
-      });
+      await provider.searchByTitle({ title: 'Book "With" Quotes' });
 
       expect(mockFetch).toHaveBeenCalled();
       // Query should complete without error
     });
 
     it("should escape backslashes and newlines", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => emptyResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => emptyResponse });
 
-      await provider.searchByTitle({
-        title: "Book\\Title\nWith\rNewlines",
-      });
+      await provider.searchByTitle({ title: "Book\\Title\nWith\rNewlines" });
 
       expect(mockFetch).toHaveBeenCalled();
     });

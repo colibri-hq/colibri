@@ -1,9 +1,5 @@
 import { z } from "zod";
-import type {
-  SettingDefinition,
-  SettingKey,
-  SettingValueMap,
-} from "./types.js";
+import type { SettingDefinition, SettingKey, SettingValueMap } from "./types.js";
 
 /**
  * Registry of all instance settings with their definitions.
@@ -81,8 +77,7 @@ export const SETTINGS_REGISTRY: {
     default: false,
     validation: z.boolean(),
     adminOnly: true,
-    description:
-      "Enable the comment moderation system (reporting, hiding, activity logs)",
+    description: "Enable the comment moderation system (reporting, hiding, activity logs)",
   },
 
   // Metadata settings
@@ -296,8 +291,7 @@ export const SETTINGS_REGISTRY: {
     default: true,
     validation: z.boolean(),
     adminOnly: true,
-    description:
-      "Automatically enrich metadata for newly imported books in the background",
+    description: "Automatically enrich metadata for newly imported books in the background",
   },
 
   "urn:colibri:settings:metadata:enrichment-auto-apply-threshold": {
@@ -307,8 +301,7 @@ export const SETTINGS_REGISTRY: {
     default: 0.9,
     validation: z.number().min(0).max(1),
     adminOnly: true,
-    description:
-      "Confidence threshold for auto-applying enrichment improvements (0.0 to 1.0)",
+    description: "Confidence threshold for auto-applying enrichment improvements (0.0 to 1.0)",
   },
 } as const;
 
@@ -338,9 +331,7 @@ export function getAllSettingDefinitions(): SettingDefinition[] {
 export function getSettingDefinitionsByCategory(
   category: SettingDefinition["category"],
 ): SettingDefinition[] {
-  return Object.values(SETTINGS_REGISTRY).filter(
-    (def) => def.category === category,
-  );
+  return Object.values(SETTINGS_REGISTRY).filter((def) => def.category === category);
 }
 
 /**

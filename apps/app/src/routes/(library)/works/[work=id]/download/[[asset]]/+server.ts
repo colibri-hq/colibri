@@ -1,7 +1,7 @@
-import { read } from "$lib/server/storage";
 import type { RequestHandler } from "@sveltejs/kit";
-import { error, redirect } from "@sveltejs/kit";
+import { read } from "$lib/server/storage";
 import { loadWorkWithAssets } from "@colibri-hq/sdk";
+import { error, redirect } from "@sveltejs/kit";
 
 const handler = async function ({
   params,
@@ -16,18 +16,14 @@ const handler = async function ({
   }
 
   const assetId = params.asset;
-  const asset = assetId
-    ? work.assets.find((a) => a.id === assetId)
-    : work.assets.at(0);
+  const asset = assetId ? work.assets.find((a) => a.id === assetId) : work.assets.at(0);
 
   if (!asset || !asset.storage_reference) {
     return error(404, "Failed to locate asset");
   }
 
   if (request.headers.has("if-modified-since")) {
-    const timestamp = new Date(
-      request.headers.get("if-modified-since") as string,
-    );
+    const timestamp = new Date(request.headers.get("if-modified-since") as string);
 
     if (asset.updatedAt <= timestamp) {
       throw redirect(304, url.toString());

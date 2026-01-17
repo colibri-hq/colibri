@@ -1,5 +1,5 @@
-import { error, json } from "@sveltejs/kit";
 import { getAllSeriesSlugs, getSeriesBySlug } from "$lib/content/blog.js";
+import { error, json } from "@sveltejs/kit";
 import type { EntryGenerator, RequestHandler } from "./$types.js";
 
 export const prerender = true;
@@ -62,9 +62,5 @@ type SeriesDetailResponse = {
   description?: string;
   posts: SeriesPostInfo[];
   total: number;
-  links: {
-    html: string;
-    json: string;
-    seriesListing: string;
-  };
+  links: { html: string; json: string; seriesListing: string };
 };

@@ -23,10 +23,7 @@ const enrichmentMap = writable<Map<string, EnrichmentInfo>>(new Map());
 /**
  * Update enrichment status for a work
  */
-export function setEnrichmentStatus(
-  workId: string,
-  info: EnrichmentInfo,
-): void {
+export function setEnrichmentStatus(workId: string, info: EnrichmentInfo): void {
   enrichmentMap.update((map) => {
     const newMap = new Map(map);
     if (info.status === "none") {
@@ -53,11 +50,7 @@ export function markEnrichmentAvailable(
   improvementCount: number,
   sources: string[],
 ): void {
-  setEnrichmentStatus(workId, {
-    status: "available",
-    improvementCount,
-    sources,
-  });
+  setEnrichmentStatus(workId, { status: "available", improvementCount, sources });
 }
 
 /**
@@ -71,10 +64,7 @@ export function clearEnrichmentStatus(workId: string): void {
  * Get enrichment status for a specific work
  */
 export function getEnrichmentStatus(workId: string) {
-  return derived(
-    enrichmentMap,
-    ($map) => $map.get(workId) ?? { status: "none" as const },
-  );
+  return derived(enrichmentMap, ($map) => $map.get(workId) ?? { status: "none" as const });
 }
 
 /**
@@ -88,6 +78,5 @@ export const hasActiveEnrichments = derived(enrichmentMap, ($map) => {
  * Get count of available enrichments
  */
 export const availableEnrichmentCount = derived(enrichmentMap, ($map) => {
-  return Array.from($map.values()).filter((info) => info.status === "available")
-    .length;
+  return Array.from($map.values()).filter((info) => info.status === "available").length;
 });

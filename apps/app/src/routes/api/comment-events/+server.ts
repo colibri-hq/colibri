@@ -1,7 +1,4 @@
-import {
-  subscribeToCommentEvents,
-  type CommentEvent,
-} from "$lib/server/comment-events";
+import { subscribeToCommentEvents, type CommentEvent } from "$lib/server/comment-events";
 import type { RequestHandler } from "./$types";
 
 /**
@@ -54,19 +51,16 @@ export const GET: RequestHandler = async ({ request, locals }) => {
       controller.enqueue(encoder.encode(connectEvent));
 
       // Subscribe to comment events for this user
-      const unsubscribe = subscribeToCommentEvents(
-        userId,
-        (event: CommentEvent) => {
-          if (isClosed) return;
-          try {
-            const sseEvent = `data: ${JSON.stringify(event)}\n\n`;
-            controller.enqueue(encoder.encode(sseEvent));
-          } catch {
-            // Client disconnected, clean up
-            cleanup();
-          }
-        },
-      );
+      const unsubscribe = subscribeToCommentEvents(userId, (event: CommentEvent) => {
+        if (isClosed) return;
+        try {
+          const sseEvent = `data: ${JSON.stringify(event)}\n\n`;
+          controller.enqueue(encoder.encode(sseEvent));
+        } catch {
+          // Client disconnected, clean up
+          cleanup();
+        }
+      });
 
       // Send keepalive every 30 seconds to prevent connection timeout
       const keepaliveInterval = setInterval(() => {

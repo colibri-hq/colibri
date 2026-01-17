@@ -2,12 +2,7 @@ import { ensureLoggedIn } from "$lib/server/utilities";
 import { getSettingValue } from "@colibri-hq/sdk";
 import type { LayoutServerLoad } from "./$types";
 
-export const load: LayoutServerLoad = async ({
-  cookies,
-  url,
-  parent,
-  locals: { database },
-}) => {
+export const load: LayoutServerLoad = async ({ cookies, url, parent, locals: { database } }) => {
   const authData = parent();
   await ensureLoggedIn(cookies, url, authData);
 

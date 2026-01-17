@@ -19,12 +19,7 @@ import {
 import { type Cookies, error, json, type RequestHandler } from "@sveltejs/kit";
 import jwt from "jsonwebtoken";
 
-export const POST = async function handler({
-  url,
-  request,
-  cookies,
-  locals: { database },
-}) {
+export const POST = async function handler({ url, request, cookies, locals: { database } }) {
   // region Resolve Authentication Session
   const sessionId = getAuthSessionIdFromCookie(cookies);
 
@@ -77,8 +72,7 @@ export const POST = async function handler({
   try {
     authenticator = await resolveAuthenticator(database, response, userId);
   } catch (reason) {
-    const { message } =
-      reason instanceof Error ? reason : { message: "Invalid authenticator" };
+    const { message } = reason instanceof Error ? reason : { message: "Invalid authenticator" };
 
     await deleteChallenges(database, sessionId);
 
@@ -90,15 +84,9 @@ export const POST = async function handler({
   let verificationResponse: VerifiedAuthenticationResponse;
 
   try {
-    verificationResponse = await verify(
-      url,
-      response,
-      challenge,
-      authenticator,
-    );
+    verificationResponse = await verify(url, response, challenge, authenticator);
   } catch (cause) {
-    const { message } =
-      cause instanceof Error ? cause : { message: "Failed to verify response" };
+    const { message } = cause instanceof Error ? cause : { message: "Failed to verify response" };
 
     await deleteChallenges(database, sessionId);
 
@@ -140,10 +128,7 @@ async function resolveAuthenticator(
   let authenticator: Authenticator | null;
 
   try {
-    authenticator = await findAuthenticatorByIdentifier(
-      database,
-      response.rawId,
-    );
+    authenticator = await findAuthenticatorByIdentifier(database, response.rawId);
   } catch (cause) {
     if (!(cause instanceof NoResultError)) {
       throw cause;
@@ -186,32 +171,19 @@ async function verify(
       throw cause;
     }
 
-    throw new Error(
-      `Failed to verify authentication response: ${cause.message}`,
-      {
-        cause,
-      },
-    );
+    throw new Error(`Failed to verify authentication response: ${cause.message}`, { cause });
   }
 }
 
-function issueAccessToken(
-  cookies: Cookies,
-  { id: authenticator, user_id }: Authenticator,
-) {
+function issueAccessToken(cookies: Cookies, { id: authenticator, user_id }: Authenticator) {
   console.error("Unexpected token issue", { authenticator, user_id });
   // Sign the user token: We have authenticated the user successfully using the passcode, so they
   // may use this JWT to create their pass *key*.
-  const token = jwt.sign({ authenticator }, env.JWT_SECRET, {
-    subject: user_id,
-  });
+  const token = jwt.sign({ authenticator }, env.JWT_SECRET, { subject: user_id });
 
   // Set the cookie on the response: It will be included in any requests to the server, including
   // for tRPC. This makes for a nice, transparent, and "just works" authentication scheme.
   setJwtCookie(cookies, token);
 }
 
-export type VerificationResponse = {
-  verified: boolean;
-  destination: string;
-};
+export type VerificationResponse = { verified: boolean; destination: string };

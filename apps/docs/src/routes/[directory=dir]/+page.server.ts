@@ -1,6 +1,6 @@
 import { Directory, getContentTree } from "$lib/content/content.js";
-import type { EntryGenerator, PageServerLoad } from "./$types.js";
 import { error } from "@sveltejs/kit";
+import type { EntryGenerator, PageServerLoad } from "./$types.js";
 
 export const prerender = true;
 

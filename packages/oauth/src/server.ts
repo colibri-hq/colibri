@@ -1,27 +1,20 @@
-import { OAuthError } from "./errors.js";
+import { z } from "zod";
 import type { AuthorizationServerOptions, Entities } from "./types.js";
-import {
-  GrantType,
-  type GrantTypeFactory,
-  type GrantTypeOptions,
-} from "./grantTypes/grantType.js";
-import { handleTokenIntrospection } from "./server/introspection.js";
-import { handleServerMetadataRequest } from "./server/metadata.js";
-import { handleTokenRevocation } from "./server/revocation.js";
-import { handleTokenRequest } from "./server/token.js";
-import { assertAuthorization } from "./server/assert.js";
+import { OAuthError } from "./errors.js";
 import {
   AuthorizationCodeGrant,
   handleAuthorizationRequest,
   handlePushedAuthorizationRequest,
 } from "./grantTypes/authorizationCodeGrant.js";
-import {
-  DeviceCodeGrant,
-  handleDeviceAuthorizationRequest,
-} from "./grantTypes/deviceCodeGrant.js";
 import { ClientCredentialsGrant } from "./grantTypes/clientCredentialsGrant.js";
+import { DeviceCodeGrant, handleDeviceAuthorizationRequest } from "./grantTypes/deviceCodeGrant.js";
+import { GrantType, type GrantTypeFactory, type GrantTypeOptions } from "./grantTypes/grantType.js";
 import { RefreshTokenGrant } from "./grantTypes/refreshTokenGrant.js";
-import { z } from "zod";
+import { assertAuthorization } from "./server/assert.js";
+import { handleTokenIntrospection } from "./server/introspection.js";
+import { handleServerMetadataRequest } from "./server/metadata.js";
+import { handleTokenRevocation } from "./server/revocation.js";
+import { handleTokenRequest } from "./server/token.js";
 
 export function createAuthorizationServer<
   C extends Entities.Client,
@@ -39,16 +32,12 @@ export function createAuthorizationServer<
  * It implements the OAuth 2.0 Authorization Framework and provides support for pluggable
  * grant types.
  */
-class AuthorizationServer<
-  C extends Entities.Client,
-  A extends Entities.AccessToken,
-> {
+class AuthorizationServer<C extends Entities.Client, A extends Entities.AccessToken> {
   public readonly baseUri: URL;
   /**
    * Missing still: 'urn:ietf:params:oauth:grant-type:token-exchange'
    */
-  #grantTypes: Map<GrantType["type"], GrantType<GrantTypeOptions, C>> =
-    new Map();
+  #grantTypes: Map<GrantType["type"], GrantType<GrantTypeOptions, C>> = new Map();
   readonly #options: Required<AuthorizationServerOptions<C, A>>;
 
   public constructor(options: AuthorizationServerOptions<C, A>) {
@@ -88,10 +77,7 @@ class AuthorizationServer<
     };
 
     if (options.authorizationCode) {
-      this.enableGrantType(AuthorizationCodeGrant, {
-        ttl: 300,
-        ...options.authorizationCode,
-      });
+      this.enableGrantType(AuthorizationCodeGrant, { ttl: 300, ...options.authorizationCode });
     }
 
     if (options.deviceCode) {
@@ -133,29 +119,18 @@ class AuthorizationServer<
 
     const authorizationCodeOptions = authorizationCode
       ? {
-          authorizationEndpoint: new URL(
-            authorizationCode.endpoint ?? "./authorize",
-            this.baseUri,
-          ),
+          authorizationEndpoint: new URL(authorizationCode.endpoint ?? "./authorize", this.baseUri),
           authorizationResponseIssParameterSupported: true,
-          codeChallengeMethodsSupported:
-            authorizationCode.codeChallengeMethodsSupported ?? ["S256"],
-          responseModesSupported: authorizationCode.responseModesSupported ?? [
-            "query",
+          codeChallengeMethodsSupported: authorizationCode.codeChallengeMethodsSupported ?? [
+            "S256",
           ],
-          responseTypesSupported: authorizationCode.responseTypesSupported ?? [
-            "code",
-          ],
+          responseModesSupported: authorizationCode.responseModesSupported ?? ["query"],
+          responseTypesSupported: authorizationCode.responseTypesSupported ?? ["code"],
         }
       : undefined;
 
     const deviceCodeOptions = deviceCode
-      ? {
-          deviceAuthorizationEndpoint: new URL(
-            deviceCode.endpoint ?? "./device",
-            this.baseUri,
-          ),
-        }
+      ? { deviceAuthorizationEndpoint: new URL(deviceCode.endpoint ?? "./device", this.baseUri) }
       : undefined;
 
     const pushedAuthorizationRequestsOptions = pushedAuthorizationRequests
@@ -164,8 +139,7 @@ class AuthorizationServer<
             pushedAuthorizationRequests.endpoint ?? "./par",
             this.baseUri,
           ),
-          requirePushedAuthorizationRequests:
-            pushedAuthorizationRequests.required,
+          requirePushedAuthorizationRequests: pushedAuthorizationRequests.required,
         }
       : undefined;
 
@@ -175,8 +149,7 @@ class AuthorizationServer<
             tokenIntrospection.endpoint ?? "./tokeninfo",
             this.baseUri,
           ),
-          introspectionEndpointAuthMethodsSupported:
-            tokenIntrospection.authMethodsSupported,
+          introspectionEndpointAuthMethodsSupported: tokenIntrospection.authMethodsSupported,
           introspectionEndpointAuthSigningAlgValuesSupported:
             tokenIntrospection.authSigningAlgValuesSupported,
         }
@@ -184,12 +157,8 @@ class AuthorizationServer<
 
     const tokenRevocationOptions = tokenRevocation
       ? {
-          revocationEndpoint: new URL(
-            tokenRevocation.endpoint ?? "./token/revoke",
-            this.baseUri,
-          ),
-          revocationEndpointAuthMethodsSupported:
-            tokenRevocation.authMethodsSupported,
+          revocationEndpoint: new URL(tokenRevocation.endpoint ?? "./token/revoke", this.baseUri),
+          revocationEndpointAuthMethodsSupported: tokenRevocation.authMethodsSupported,
           revocationEndpointAuthSigningAlgValuesSupported:
             tokenRevocation.authSigningAlgValuesSupported,
         }
@@ -198,8 +167,7 @@ class AuthorizationServer<
     const tokenEndpointOptions = {
       tokenEndpoint: new URL(token.endpoint!, this.baseUri),
       tokenEndpointAuthMethodsSupported: token.authMethodsSupported!,
-      tokenEndpointAuthSigningAlgValuesSupported:
-        token.authSigningAlgValuesSupported!,
+      tokenEndpointAuthSigningAlgValuesSupported: token.authSigningAlgValuesSupported!,
     };
 
     return {
@@ -215,9 +183,7 @@ class AuthorizationServer<
       issuer: this.baseUri,
       jwksUri: jwksUri ? new URL(jwksUri, this.baseUri) : undefined,
       opPolicyUri: policyUri ? new URL(policyUri, this.baseUri) : undefined,
-      opTosUri: termsOfServiceUri
-        ? new URL(termsOfServiceUri, this.baseUri)
-        : undefined,
+      opTosUri: termsOfServiceUri ? new URL(termsOfServiceUri, this.baseUri) : undefined,
 
       registrationEndpoint: clientRegistration
         ? new URL(clientRegistration.endpoint ?? "./register", this.baseUri)
@@ -235,13 +201,8 @@ class AuthorizationServer<
   public enableGrantType<
     G extends GrantType,
     F extends GrantTypeFactory<G>,
-    O extends GrantTypeOptions = F extends GrantTypeFactory<G, infer O>
-      ? O
-      : never,
-  >(
-    GrantTypeFactory: GrantTypeFactory<G, O>,
-    options: Omit<O, keyof GrantTypeOptions>,
-  ) {
+    O extends GrantTypeOptions = F extends GrantTypeFactory<G, infer O> ? O : never,
+  >(GrantTypeFactory: GrantTypeFactory<G, O>, options: Omit<O, keyof GrantTypeOptions>) {
     const grantType = new GrantTypeFactory({
       accessTokenTtl: this.#options.accessTokenTtl,
       refreshTokenTtl: this.#options.refreshTokenTtl,
@@ -253,27 +214,18 @@ class AuthorizationServer<
 
   // region OAuth 2.0 endpoints
   public async handleTokenRequest(request: Request): Promise<Response> {
-    return handleTokenRequest(request, {
-      grantTypes: this.#grantTypes,
-      options: this.#options,
-    });
+    return handleTokenRequest(request, { grantTypes: this.#grantTypes, options: this.#options });
   }
 
-  public async handleTokenRevocationRequest(
-    request: Request,
-  ): Promise<Response> {
+  public async handleTokenRevocationRequest(request: Request): Promise<Response> {
     return handleTokenRevocation(request, this.#options);
   }
 
-  public async handleTokenIntrospectionRequest(
-    request: Request,
-  ): Promise<Response> {
+  public async handleTokenIntrospectionRequest(request: Request): Promise<Response> {
     return handleTokenIntrospection(request, this.#options);
   }
 
-  public async handleServerMetadataRequest(
-    request: Request,
-  ): Promise<Response> {
+  public async handleServerMetadataRequest(request: Request): Promise<Response> {
     return handleServerMetadataRequest(request, {
       configuration: this.configuration,
       options: this.#options,
@@ -298,9 +250,7 @@ class AuthorizationServer<
     });
   }
 
-  public async handleDeviceAuthorizationRequest(
-    request: Request,
-  ): Promise<Response> {
+  public async handleDeviceAuthorizationRequest(request: Request): Promise<Response> {
     if (!this.#options.deviceCode) {
       throw new OAuthError(
         "unauthorized_client",
@@ -314,9 +264,7 @@ class AuthorizationServer<
     });
   }
 
-  public async handlePushedAuthorizationRequest(
-    request: Request,
-  ): Promise<Response> {
+  public async handlePushedAuthorizationRequest(request: Request): Promise<Response> {
     if (!this.#options.authorizationCode) {
       throw new OAuthError(
         "unauthorized_client",

@@ -85,10 +85,7 @@ async function requestAssertion(fetch: Fetch) {
   return assertionOptions;
 }
 
-async function verifyAssertion(
-  fetch: Fetch,
-  assertion: AuthenticationResponseJSON,
-) {
+async function verifyAssertion(fetch: Fetch, assertion: AuthenticationResponseJSON) {
   const verificationResponse = await fetch("/auth/assertion/verify", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -98,9 +95,7 @@ async function verifyAssertion(
   const data: VerificationResponse = await verificationResponse.json();
 
   if (!data) {
-    throw new Error(
-      "Verification failed: Unexpected payload: No verification data",
-    );
+    throw new Error("Verification failed: Unexpected payload: No verification data");
   }
 
   if (!data.verified) {

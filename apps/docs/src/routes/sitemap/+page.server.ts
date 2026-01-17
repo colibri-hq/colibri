@@ -1,26 +1,22 @@
 import {
-  type Directory,
-  getContentTree,
-  isDirectory,
-  isPage,
-  type Page,
-} from "$lib/content/content";
-import {
   getAllSeries,
   getAvailableYears,
   getBlogAuthors,
   getBlogPosts,
   getBlogTags,
 } from "$lib/content/blog";
+import {
+  type Directory,
+  getContentTree,
+  isDirectory,
+  isPage,
+  type Page,
+} from "$lib/content/content";
 import type { PageServerLoad } from "./$types.js";
 
 export const prerender = true;
 
-export type SitemapPage = {
-  title: string;
-  href: string;
-  description?: string;
-};
+export type SitemapPage = { title: string; href: string; description?: string };
 
 export type SitemapSection = {
   title: string;
@@ -31,11 +27,7 @@ export type SitemapSection = {
 
 function extractPages(item: Page | Directory): SitemapSection {
   if (isPage(item)) {
-    return {
-      title: item.metadata.title,
-      href: item.slug,
-      pages: [],
-    };
+    return { title: item.metadata.title, href: item.slug, pages: [] };
   }
 
   // Directory
@@ -90,20 +82,19 @@ export const load = async function load() {
     if (!postsByYear.has(year)) {
       postsByYear.set(year, []);
     }
-    postsByYear.get(year)!.push({
-      title: post.metadata.title,
-      href: `/blog/${post.urlSlug}`,
-      description: post.metadata.description,
-    });
+    postsByYear
+      .get(year)!
+      .push({
+        title: post.metadata.title,
+        href: `/blog/${post.urlSlug}`,
+        description: post.metadata.description,
+      });
   }
 
   // Convert to sorted array
   const blogByYear = Array.from(postsByYear.entries())
     .sort(([a], [b]) => b - a)
-    .map(([year, pages]) => ({
-      year,
-      pages,
-    }));
+    .map(([year, pages]) => ({ year, pages }));
 
   // Get all series
   const series = getAllSeries().map((s) => ({
@@ -116,11 +107,7 @@ export const load = async function load() {
   const tagsMap = getBlogTags();
   const tags = Array.from(tagsMap.entries())
     .sort((a, b) => b[1] - a[1])
-    .map(([name, count]) => ({
-      href: `/blog/tag/${name}`,
-      name,
-      count,
-    }));
+    .map(([name, count]) => ({ href: `/blog/tag/${name}`, name, count }));
 
   // Get all authors with counts
   const authorsMap = await getBlogAuthors();
@@ -133,10 +120,7 @@ export const load = async function load() {
     }));
 
   // Get archive years
-  const archiveYears = getAvailableYears().map((year) => ({
-    year,
-    href: `/blog/archive/${year}`,
-  }));
+  const archiveYears = getAvailableYears().map((year) => ({ year, href: `/blog/archive/${year}` }));
 
   return {
     topLevelPages,

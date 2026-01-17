@@ -4,9 +4,7 @@ import { buildSearchQuery } from "./search.js";
 describe("Search", () => {
   describe("Query Builder", () => {
     it("should build a search query with a single term", () => {
-      const result = buildSearchQuery<"title">({
-        title: "Gatsby",
-      });
+      const result = buildSearchQuery<"title">({ title: "Gatsby" });
 
       expect(result).toEqual("title:Gatsby");
     });
@@ -21,57 +19,43 @@ describe("Search", () => {
     });
 
     it("should handle whitespace in terms", () => {
-      const result = buildSearchQuery<"title">({
-        title: "The Great Gatsby",
-      });
+      const result = buildSearchQuery<"title">({ title: "The Great Gatsby" });
 
       expect(result).toEqual('title:"The Great Gatsby"');
     });
 
     it("should handle negation in terms", () => {
-      const result = buildSearchQuery<"title">({
-        "!title": "Gatsby",
-      });
+      const result = buildSearchQuery<"title">({ "!title": "Gatsby" });
 
       expect(result).toEqual("NOT title:Gatsby");
     });
 
     it("should handle multiple values for a single key", () => {
-      const result = buildSearchQuery<"title">({
-        title: ["Gatsby", "Mockingbird"],
-      });
+      const result = buildSearchQuery<"title">({ title: ["Gatsby", "Mockingbird"] });
 
       expect(result).toEqual("title:(Gatsby Mockingbird)");
     });
 
     it("should handle alternative values", () => {
-      const result = buildSearchQuery<"title">({
-        title: [["Gatsby", "Mockingbird"]],
-      });
+      const result = buildSearchQuery<"title">({ title: [["Gatsby", "Mockingbird"]] });
 
       expect(result).toEqual("title:(Gatsby OR Mockingbird)");
     });
 
     it("should handle range queries", () => {
-      const result = buildSearchQuery<"year">({
-        year: { from: 1920, to: 1930 },
-      });
+      const result = buildSearchQuery<"year">({ year: { from: 1920, to: 1930 } });
 
       expect(result).toEqual("year:[1920 TO 1930]");
     });
 
     it("should handle range queries with FROM wildcard", () => {
-      const result = buildSearchQuery<"year">({
-        year: { to: 1930 },
-      });
+      const result = buildSearchQuery<"year">({ year: { to: 1930 } });
 
       expect(result).toEqual("year:[* TO 1930]");
     });
 
     it("should handle range queries with TO wildcard", () => {
-      const result = buildSearchQuery<"year">({
-        year: { from: 1920 },
-      });
+      const result = buildSearchQuery<"year">({ year: { from: 1920 } });
 
       expect(result).toEqual("year:[1920 TO *]");
     });

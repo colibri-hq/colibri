@@ -7,9 +7,7 @@ export const prerender = true;
 export const entries: EntryGenerator = () => {
   return Array.from(getAllPages().keys())
     .filter((slug) => !slug.startsWith("/blog/"))
-    .map((slug) => ({
-      slug: slug.replace(/^\//, ""),
-    }));
+    .map((slug) => ({ slug: slug.replace(/^\//, "") }));
 };
 
 export const load = function load({ params: { slug } }) {

@@ -5,15 +5,15 @@
  * OAuth tokens and handles token refresh on 401 responses.
  */
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import type { OAuthClientBase } from "../../../src/client/base.js";
+import type { StoredTokens } from "../../../src/client/types.js";
+import { TokenExpiredError } from "../../../src/client/errors.js";
 import {
   AuthenticatedFetch,
   createAuthenticatedFetch,
   createLoggingInterceptors,
   createRetryInterceptor,
 } from "../../../src/client/fetch/index.js";
-import { TokenExpiredError } from "../../../src/client/errors.js";
-import type { OAuthClientBase } from "../../../src/client/base.js";
-import type { StoredTokens } from "../../../src/client/types.js";
 
 /**
  * Create a mock OAuth client for testing
@@ -24,7 +24,8 @@ function createMockClient(options: {
   isAuthenticated?: boolean;
   onRefresh?: () => void;
 }): OAuthClientBase {
-  let currentToken: string | null = options.accessToken === null ? null : (options.accessToken ?? "test-access-token");
+  let currentToken: string | null =
+    options.accessToken === null ? null : (options.accessToken ?? "test-access-token");
 
   return {
     getAccessToken: vi.fn().mockImplementation(async () => {
@@ -47,21 +48,20 @@ describe("AuthenticatedFetch", () => {
   let mockFetch: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    mockFetch = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ data: "test" }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
+    mockFetch = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ data: "test" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
   });
 
   describe("token injection", () => {
     it("should automatically attach Bearer token to requests", async () => {
       const client = createMockClient({ accessToken: "my-access-token" });
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
       await authFetch.fetch("https://api.example.com/data");
 
@@ -72,16 +72,10 @@ describe("AuthenticatedFetch", () => {
 
     it("should preserve existing headers", async () => {
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
       await authFetch.fetch("https://api.example.com/data", {
-        headers: {
-          "Content-Type": "application/json",
-          "X-Custom-Header": "custom-value",
-        },
+        headers: { "Content-Type": "application/json", "X-Custom-Header": "custom-value" },
       });
 
       const request = mockFetch.mock.calls[0][0] as Request;
@@ -92,10 +86,7 @@ describe("AuthenticatedFetch", () => {
 
     it("should throw TokenExpiredError when no token available", async () => {
       const client = createMockClient({ accessToken: null });
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
       await expect(authFetch.fetch("https://api.example.com/data")).rejects.toThrow(
         TokenExpiredError,
@@ -128,11 +119,7 @@ describe("AuthenticatedFetch", () => {
       });
 
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-        autoRetry: true,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch, autoRetry: true });
 
       const response = await authFetch.fetch("https://api.example.com/data");
 
@@ -149,11 +136,7 @@ describe("AuthenticatedFetch", () => {
       mockFetch = vi.fn().mockResolvedValue(new Response("Unauthorized", { status: 401 }));
 
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-        autoRetry: false,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch, autoRetry: false });
 
       const response = await authFetch.fetch("https://api.example.com/data");
 
@@ -206,16 +189,12 @@ describe("AuthenticatedFetch", () => {
 
   describe("non-401 error handling", () => {
     it("should not retry on non-401 errors", async () => {
-      mockFetch = vi.fn().mockResolvedValue(
-        new Response(JSON.stringify({ error: "Bad Request" }), { status: 400 }),
-      );
+      mockFetch = vi
+        .fn()
+        .mockResolvedValue(new Response(JSON.stringify({ error: "Bad Request" }), { status: 400 }));
 
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-        autoRetry: true,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch, autoRetry: true });
 
       const response = await authFetch.fetch("https://api.example.com/data");
 
@@ -225,16 +204,10 @@ describe("AuthenticatedFetch", () => {
     });
 
     it("should pass through 500 errors without retry", async () => {
-      mockFetch = vi.fn().mockResolvedValue(
-        new Response("Internal Server Error", { status: 500 }),
-      );
+      mockFetch = vi.fn().mockResolvedValue(new Response("Internal Server Error", { status: 500 }));
 
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-        autoRetry: true,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch, autoRetry: true });
 
       const response = await authFetch.fetch("https://api.example.com/data");
 
@@ -246,10 +219,7 @@ describe("AuthenticatedFetch", () => {
   describe("request interceptors", () => {
     it("should run request interceptors before fetch", async () => {
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
       let interceptorCalled = false;
       authFetch.addRequestInterceptor(async (request) => {
@@ -264,10 +234,7 @@ describe("AuthenticatedFetch", () => {
 
     it("should allow interceptors to modify headers", async () => {
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
       authFetch.addRequestInterceptor(async (request) => {
         const headers = new Headers(request.headers);
@@ -283,10 +250,7 @@ describe("AuthenticatedFetch", () => {
 
     it("should chain multiple request interceptors", async () => {
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
       const order: number[] = [];
 
@@ -307,10 +271,7 @@ describe("AuthenticatedFetch", () => {
 
     it("should allow removing request interceptors", async () => {
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
       let callCount = 0;
       const remove = authFetch.addRequestInterceptor(async (request) => {
@@ -331,10 +292,7 @@ describe("AuthenticatedFetch", () => {
   describe("response interceptors", () => {
     it("should run response interceptors after fetch", async () => {
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
       let interceptorCalled = false;
       authFetch.addResponseInterceptor(async (response) => {
@@ -349,10 +307,7 @@ describe("AuthenticatedFetch", () => {
 
     it("should allow interceptors to transform responses", async () => {
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
       authFetch.addResponseInterceptor(async (response) => {
         const body = await response.text();
@@ -372,10 +327,7 @@ describe("AuthenticatedFetch", () => {
 
     it("should receive both response and request in interceptor", async () => {
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
       let capturedRequest: Request | undefined;
 
@@ -391,10 +343,7 @@ describe("AuthenticatedFetch", () => {
 
     it("should chain multiple response interceptors", async () => {
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
       const order: number[] = [];
 
@@ -417,10 +366,7 @@ describe("AuthenticatedFetch", () => {
   describe("error handling in interceptors", () => {
     it("should propagate errors from request interceptors", async () => {
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
       authFetch.addRequestInterceptor(async () => {
         throw new Error("Request interceptor error");
@@ -433,10 +379,7 @@ describe("AuthenticatedFetch", () => {
 
     it("should propagate errors from response interceptors", async () => {
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
       authFetch.addResponseInterceptor(async () => {
         throw new Error("Response interceptor error");
@@ -482,10 +425,7 @@ describe("AuthenticatedFetch", () => {
         const logger = (message: string) => logs.push(message);
 
         const client = createMockClient({});
-        const authFetch = new AuthenticatedFetch({
-          client,
-          fetch: mockFetch,
-        });
+        const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
         const { request: reqInterceptor, response: resInterceptor } =
           createLoggingInterceptors(logger);
@@ -520,10 +460,7 @@ describe("AuthenticatedFetch", () => {
         });
 
         const client = createMockClient({});
-        const authFetch = new AuthenticatedFetch({
-          client,
-          fetch: retryFetch,
-        });
+        const authFetch = new AuthenticatedFetch({ client, fetch: retryFetch });
 
         authFetch.addResponseInterceptor(retryInterceptor);
 
@@ -534,9 +471,9 @@ describe("AuthenticatedFetch", () => {
       });
 
       it("should respect max retries limit", async () => {
-        const retryFetch = vi.fn().mockResolvedValue(
-          new Response("Service Unavailable", { status: 503 }),
-        );
+        const retryFetch = vi
+          .fn()
+          .mockResolvedValue(new Response("Service Unavailable", { status: 503 }));
 
         const retryInterceptor = createRetryInterceptor({
           maxRetries: 2,
@@ -547,10 +484,7 @@ describe("AuthenticatedFetch", () => {
         });
 
         const client = createMockClient({});
-        const authFetch = new AuthenticatedFetch({
-          client,
-          fetch: retryFetch,
-        });
+        const authFetch = new AuthenticatedFetch({ client, fetch: retryFetch });
 
         authFetch.addResponseInterceptor(retryInterceptor);
 
@@ -571,10 +505,7 @@ describe("AuthenticatedFetch", () => {
         });
 
         const client = createMockClient({});
-        const authFetch = new AuthenticatedFetch({
-          client,
-          fetch: retryFetch,
-        });
+        const authFetch = new AuthenticatedFetch({ client, fetch: retryFetch });
 
         authFetch.addResponseInterceptor(retryInterceptor);
 
@@ -608,10 +539,7 @@ describe("AuthenticatedFetch", () => {
         });
 
         const client = createMockClient({});
-        const authFetch = new AuthenticatedFetch({
-          client,
-          fetch: trackingFetch,
-        });
+        const authFetch = new AuthenticatedFetch({ client, fetch: trackingFetch });
 
         authFetch.addResponseInterceptor(retryInterceptor);
 
@@ -644,10 +572,7 @@ describe("AuthenticatedFetch", () => {
         });
 
         const client = createMockClient({});
-        const authFetch = new AuthenticatedFetch({
-          client,
-          fetch: retryFetch,
-        });
+        const authFetch = new AuthenticatedFetch({ client, fetch: retryFetch });
 
         authFetch.addResponseInterceptor(retryInterceptor);
 
@@ -677,11 +602,7 @@ describe("AuthenticatedFetch", () => {
       });
 
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-        autoRetry: true,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch, autoRetry: true });
 
       // Make two concurrent requests
       const [response1, response2] = await Promise.all([
@@ -699,10 +620,7 @@ describe("AuthenticatedFetch", () => {
   describe("Request object handling", () => {
     it("should accept Request object as input", async () => {
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
       const request = new Request("https://api.example.com/data", {
         method: "POST",
@@ -718,10 +636,7 @@ describe("AuthenticatedFetch", () => {
 
     it("should accept URL object as input", async () => {
       const client = createMockClient({});
-      const authFetch = new AuthenticatedFetch({
-        client,
-        fetch: mockFetch,
-      });
+      const authFetch = new AuthenticatedFetch({ client, fetch: mockFetch });
 
       const url = new URL("https://api.example.com/data");
       await authFetch.fetch(url);

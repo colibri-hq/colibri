@@ -12,18 +12,10 @@ export function adminProcedure() {
       const user = await findUserByIdentifier(ctx.database, ctx.userId);
 
       if (!user || user.role !== "admin") {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "Admin access required",
-        });
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
       }
 
-      return next({
-        ctx: {
-          ...ctx,
-          user,
-        },
-      });
+      return next({ ctx: { ...ctx, user } });
     }),
   );
 }
@@ -31,6 +23,4 @@ export function adminProcedure() {
 /**
  * Extended context type with user information available after admin check.
  */
-export type AdminContext = {
-  user: User;
-};
+export type AdminContext = { user: User };

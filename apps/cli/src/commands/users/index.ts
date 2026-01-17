@@ -25,10 +25,7 @@ export default class List extends BaseCommand<typeof List> {
 
   async run() {
     //const filters = this.flags.filter ?? [];
-    const spinner = ora({
-      stream: process.stderr,
-      text: "Loading users…",
-    }).start();
+    const spinner = ora({ stream: process.stderr, text: "Loading users…" }).start();
 
     try {
       const users = await listUsers(
@@ -47,37 +44,13 @@ export default class List extends BaseCommand<typeof List> {
 
       this.log(
         table(users, [
-          {
-            accessor: "id",
-            justify: "end",
-            name: "ID",
-          },
-          {
-            accessor: "email",
-            justify: "start",
-            name: "Email Address",
-          },
-          {
-            accessor: "verified",
-            name: "Verified",
-          },
-          {
-            accessor: "name",
-            justify: "start",
-            name: "Name",
-          },
-          {
-            accessor: "role",
-            name: "Role",
-          },
-          {
-            accessor: "created_at",
-            name: "Created",
-          },
-          {
-            accessor: "updated_at",
-            name: "Last Updated",
-          },
+          { accessor: "id", justify: "end", name: "ID" },
+          { accessor: "email", justify: "start", name: "Email Address" },
+          { accessor: "verified", name: "Verified" },
+          { accessor: "name", justify: "start", name: "Name" },
+          { accessor: "role", name: "Role" },
+          { accessor: "created_at", name: "Created" },
+          { accessor: "updated_at", name: "Last Updated" },
         ]),
       );
 

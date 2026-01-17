@@ -69,8 +69,7 @@ Text three.
     });
 
     it("strips inline code", () => {
-      const markdown =
-        "Use the `calculateReadingTime` function to get `reading` time.";
+      const markdown = "Use the `calculateReadingTime` function to get `reading` time.";
       // "Use the function to get time." = 6 words
       expect(calculateReadingTime(markdown)).toBe(1);
     });
@@ -85,8 +84,7 @@ Text three.
     });
 
     it("handles multiple links", () => {
-      const markdown =
-        "[First](url1) and [Second](url2) and [Third](url3) links.";
+      const markdown = "[First](url1) and [Second](url2) and [Third](url3) links.";
       // "First and Second and Third links." = 6 words
       expect(calculateReadingTime(markdown)).toBe(1);
     });
@@ -94,15 +92,13 @@ Text three.
 
   describe("image removal", () => {
     it("removes image syntax completely", () => {
-      const markdown =
-        "Here is an image: ![alt text](image.png) and some text.";
+      const markdown = "Here is an image: ![alt text](image.png) and some text.";
       // "Here is an image: and some text." = 7 words
       expect(calculateReadingTime(markdown)).toBe(1);
     });
 
     it("removes multiple images", () => {
-      const markdown =
-        "![img1](a.png) Text ![img2](b.png) more text ![img3](c.png)";
+      const markdown = "![img1](a.png) Text ![img2](b.png) more text ![img3](c.png)";
       // "Text more text" = 3 words
       expect(calculateReadingTime(markdown)).toBe(1);
     });
@@ -152,8 +148,7 @@ Actual content here.
     });
 
     it("removes bold and italic markers", () => {
-      const markdown =
-        "This is **bold** and *italic* and ***both*** and __also__ and _this_.";
+      const markdown = "This is **bold** and *italic* and ***both*** and __also__ and _this_.";
       // "This is bold and italic and both and also and this." = 11 words
       expect(calculateReadingTime(markdown)).toBe(1);
     });
@@ -232,8 +227,7 @@ Start testing today!
 
     it("calculates reading time for a long article", () => {
       // Generate ~1000 words of content
-      const paragraph =
-        "This is a sample paragraph with about ten words in it. ".repeat(20);
+      const paragraph = "This is a sample paragraph with about ten words in it. ".repeat(20);
       const longArticle = `
 # Long Article
 

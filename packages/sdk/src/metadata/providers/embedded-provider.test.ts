@@ -10,12 +10,9 @@
  */
 
 import { beforeEach, describe, expect, it } from "vitest";
-import {
-  DEFAULT_EMBEDDED_PROVIDER_CONFIG,
-  EmbeddedMetadataProvider,
-} from "./embedded-provider.js";
-import { MetadataType } from "./provider.js";
 import type { Metadata as EbookMetadata } from "../../ebooks/metadata.js";
+import { DEFAULT_EMBEDDED_PROVIDER_CONFIG, EmbeddedMetadataProvider } from "./embedded-provider.js";
+import { MetadataType } from "./provider.js";
 
 describe("EmbeddedMetadataProvider", () => {
   let provider: EmbeddedMetadataProvider;
@@ -37,33 +34,19 @@ describe("EmbeddedMetadataProvider", () => {
       expect(provider.supportsDataType(MetadataType.AUTHORS)).toBe(true);
       expect(provider.supportsDataType(MetadataType.ISBN)).toBe(true);
       expect(provider.supportsDataType(MetadataType.COVER_IMAGE)).toBe(true);
-      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(
-        false,
-      );
+      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(false);
     });
 
     it("should provide high reliability scores for file-based metadata", () => {
-      expect(provider.getReliabilityScore(MetadataType.TITLE)).toBeGreaterThan(
-        0.9,
-      );
-      expect(
-        provider.getReliabilityScore(MetadataType.AUTHORS),
-      ).toBeGreaterThan(0.85);
-      expect(provider.getReliabilityScore(MetadataType.ISBN)).toBeGreaterThan(
-        0.9,
-      );
-      expect(
-        provider.getReliabilityScore(MetadataType.PAGE_COUNT),
-      ).toBeGreaterThan(0.9);
+      expect(provider.getReliabilityScore(MetadataType.TITLE)).toBeGreaterThan(0.9);
+      expect(provider.getReliabilityScore(MetadataType.AUTHORS)).toBeGreaterThan(0.85);
+      expect(provider.getReliabilityScore(MetadataType.ISBN)).toBeGreaterThan(0.9);
+      expect(provider.getReliabilityScore(MetadataType.PAGE_COUNT)).toBeGreaterThan(0.9);
     });
 
     it("should provide lower reliability scores for potentially inaccurate metadata", () => {
-      expect(
-        provider.getReliabilityScore(MetadataType.PUBLICATION_DATE),
-      ).toBeLessThan(0.7);
-      expect(
-        provider.getReliabilityScore(MetadataType.PHYSICAL_DIMENSIONS),
-      ).toBeLessThan(0.5);
+      expect(provider.getReliabilityScore(MetadataType.PUBLICATION_DATE)).toBeLessThan(0.7);
+      expect(provider.getReliabilityScore(MetadataType.PHYSICAL_DIMENSIONS)).toBeLessThan(0.5);
     });
   });
 
@@ -72,11 +55,7 @@ describe("EmbeddedMetadataProvider", () => {
       const ebookMetadata: EbookMetadata = {
         title: "The Great Gatsby",
         contributors: [
-          {
-            name: "F. Scott Fitzgerald",
-            roles: ["aut"],
-            sortingKey: "Fitzgerald, F. Scott",
-          },
+          { name: "F. Scott Fitzgerald", roles: ["aut"], sortingKey: "Fitzgerald, F. Scott" },
         ],
         identifiers: [{ type: "isbn", value: "978-0-7432-7356-5" }],
         datePublished: new Date("1925-04-10"),
@@ -98,14 +77,8 @@ describe("EmbeddedMetadataProvider", () => {
       expect(record.isbn).toContain("9780743273565"); // Normalized
       expect(record.publicationDate).toBeInstanceOf(Date);
       expect(record.language).toBe("en");
-      expect(record.description).toBe(
-        "A novel about the American Dream in the 1920s",
-      );
-      expect(record.subjects).toEqual([
-        "Fiction",
-        "Classic Literature",
-        "American Literature",
-      ]);
+      expect(record.description).toBe("A novel about the American Dream in the 1920s");
+      expect(record.subjects).toEqual(["Fiction", "Classic Literature", "American Literature"]);
       expect(record.pageCount).toBe(180);
       expect(record.confidence).toBeGreaterThan(0.8);
     });
@@ -113,44 +86,24 @@ describe("EmbeddedMetadataProvider", () => {
     it("should normalize author names when configured", () => {
       const ebookMetadata: EbookMetadata = {
         title: "1984",
-        contributors: [
-          {
-            name: "Orwell, George",
-            roles: ["aut"],
-            sortingKey: "Orwell, George",
-          },
-        ],
+        contributors: [{ name: "Orwell, George", roles: ["aut"], sortingKey: "Orwell, George" }],
       };
 
-      const record = (provider as any).convertToMetadataRecord(
-        ebookMetadata,
-        "epub",
-      );
+      const record = (provider as any).convertToMetadataRecord(ebookMetadata, "epub");
 
       // Should convert "Last, First" to "First Last" format
       expect(record.authors).toEqual(["George Orwell"]);
     });
 
     it("should not normalize author names when disabled", () => {
-      const customProvider = new EmbeddedMetadataProvider({
-        normalizeAuthorNames: false,
-      });
+      const customProvider = new EmbeddedMetadataProvider({ normalizeAuthorNames: false });
 
       const ebookMetadata: EbookMetadata = {
         title: "1984",
-        contributors: [
-          {
-            name: "Orwell, George",
-            roles: ["aut"],
-            sortingKey: "Orwell, George",
-          },
-        ],
+        contributors: [{ name: "Orwell, George", roles: ["aut"], sortingKey: "Orwell, George" }],
       };
 
-      const record = (customProvider as any).convertToMetadataRecord(
-        ebookMetadata,
-        "epub",
-      );
+      const record = (customProvider as any).convertToMetadataRecord(ebookMetadata, "epub");
 
       // Should keep original format
       expect(record.authors).toEqual(["Orwell, George"]);
@@ -160,23 +113,12 @@ describe("EmbeddedMetadataProvider", () => {
       const ebookMetadata: EbookMetadata = {
         title: "Test Book",
         contributors: [
-          {
-            name: "Test Author",
-            roles: ["aut"],
-            sortingKey: "Author, Test",
-          },
-          {
-            name: "Penguin Random House",
-            roles: ["bkp"],
-            sortingKey: "Penguin Random House",
-          },
+          { name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" },
+          { name: "Penguin Random House", roles: ["bkp"], sortingKey: "Penguin Random House" },
         ],
       };
 
-      const record = (provider as any).convertToMetadataRecord(
-        ebookMetadata,
-        "epub",
-      );
+      const record = (provider as any).convertToMetadataRecord(ebookMetadata, "epub");
 
       expect(record.publisher).toBe("Penguin Random House");
     });
@@ -184,48 +126,24 @@ describe("EmbeddedMetadataProvider", () => {
     it("should extract series information", () => {
       const ebookMetadata: EbookMetadata = {
         title: "The Two Towers",
-        contributors: [
-          {
-            name: "J.R.R. Tolkien",
-            roles: ["aut"],
-            sortingKey: "Tolkien, J.R.R.",
-          },
-        ],
-        series: {
-          name: "The Lord of the Rings",
-          position: 2,
-        },
+        contributors: [{ name: "J.R.R. Tolkien", roles: ["aut"], sortingKey: "Tolkien, J.R.R." }],
+        series: { name: "The Lord of the Rings", position: 2 },
       };
 
-      const record = (provider as any).convertToMetadataRecord(
-        ebookMetadata,
-        "epub",
-      );
+      const record = (provider as any).convertToMetadataRecord(ebookMetadata, "epub");
 
-      expect(record.series).toEqual({
-        name: "The Lord of the Rings",
-        volume: 2,
-      });
+      expect(record.series).toEqual({ name: "The Lord of the Rings", volume: 2 });
     });
 
     it("should handle cover images", () => {
       const coverBlob = new Blob(["fake-image-data"], { type: "image/jpeg" });
       const ebookMetadata: EbookMetadata = {
         title: "Test Book",
-        contributors: [
-          {
-            name: "Test Author",
-            roles: ["aut"],
-            sortingKey: "Author, Test",
-          },
-        ],
+        contributors: [{ name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" }],
         cover: coverBlob,
       };
 
-      const record = (provider as any).convertToMetadataRecord(
-        ebookMetadata,
-        "epub",
-      );
+      const record = (provider as any).convertToMetadataRecord(ebookMetadata, "epub");
 
       expect(record.coverImage).toBeDefined();
       expect(record.coverImage?.url).toMatch(/^blob:/);
@@ -236,21 +154,12 @@ describe("EmbeddedMetadataProvider", () => {
     it("should normalize ISBN-10 to ISBN-13 by default", () => {
       const ebookMetadata: EbookMetadata = {
         title: "Test Book",
-        contributors: [
-          {
-            name: "Test Author",
-            roles: ["aut"],
-            sortingKey: "Author, Test",
-          },
-        ],
+        contributors: [{ name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" }],
         // Valid ISBN-10 with correct checksum
         identifiers: [{ type: "isbn", value: "0306406152" }],
       };
 
-      const record = (provider as any).convertToMetadataRecord(
-        ebookMetadata,
-        "epub",
-      );
+      const record = (provider as any).convertToMetadataRecord(ebookMetadata, "epub");
 
       expect(record.isbn).toBeDefined();
       expect(record.isbn?.[0]).toHaveLength(13);
@@ -262,20 +171,11 @@ describe("EmbeddedMetadataProvider", () => {
     it("should preserve ISBN-13 format", () => {
       const ebookMetadata: EbookMetadata = {
         title: "Test Book",
-        contributors: [
-          {
-            name: "Test Author",
-            roles: ["aut"],
-            sortingKey: "Author, Test",
-          },
-        ],
+        contributors: [{ name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" }],
         identifiers: [{ type: "isbn", value: "978-0-7432-7356-5" }],
       };
 
-      const record = (provider as any).convertToMetadataRecord(
-        ebookMetadata,
-        "epub",
-      );
+      const record = (provider as any).convertToMetadataRecord(ebookMetadata, "epub");
 
       expect(record.isbn).toEqual(["9780743273565"]);
     });
@@ -283,13 +183,7 @@ describe("EmbeddedMetadataProvider", () => {
     it("should handle multiple ISBNs", () => {
       const ebookMetadata: EbookMetadata = {
         title: "Test Book",
-        contributors: [
-          {
-            name: "Test Author",
-            roles: ["aut"],
-            sortingKey: "Author, Test",
-          },
-        ],
+        contributors: [{ name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" }],
         identifiers: [
           // Valid ISBNs with correct checksums
           { type: "isbn", value: "978-0-306-40615-7" },
@@ -297,10 +191,7 @@ describe("EmbeddedMetadataProvider", () => {
         ],
       };
 
-      const record = (provider as any).convertToMetadataRecord(
-        ebookMetadata,
-        "epub",
-      );
+      const record = (provider as any).convertToMetadataRecord(ebookMetadata, "epub");
 
       expect(record.isbn).toHaveLength(2);
       expect(record.isbn).toContain("9780306406157");
@@ -310,23 +201,14 @@ describe("EmbeddedMetadataProvider", () => {
     it("should skip invalid ISBNs", () => {
       const ebookMetadata: EbookMetadata = {
         title: "Test Book",
-        contributors: [
-          {
-            name: "Test Author",
-            roles: ["aut"],
-            sortingKey: "Author, Test",
-          },
-        ],
+        contributors: [{ name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" }],
         identifiers: [
           { type: "isbn", value: "invalid-isbn" },
           { type: "isbn", value: "978-0-7432-7356-5" },
         ],
       };
 
-      const record = (provider as any).convertToMetadataRecord(
-        ebookMetadata,
-        "epub",
-      );
+      const record = (provider as any).convertToMetadataRecord(ebookMetadata, "epub");
 
       // Should filter out invalid ISBN but keep the valid one
       expect(record.isbn).toContain("9780743273565");
@@ -337,13 +219,7 @@ describe("EmbeddedMetadataProvider", () => {
     it("should assign high confidence to complete EPUB metadata", () => {
       const ebookMetadata: EbookMetadata = {
         title: "Complete Book",
-        contributors: [
-          {
-            name: "Author Name",
-            roles: ["aut"],
-            sortingKey: "Name, Author",
-          },
-        ],
+        contributors: [{ name: "Author Name", roles: ["aut"], sortingKey: "Name, Author" }],
         identifiers: [{ type: "isbn", value: "978-0-123-45678-9" }],
         datePublished: new Date("2020-01-01"),
         language: "en",
@@ -352,10 +228,7 @@ describe("EmbeddedMetadataProvider", () => {
         numberOfPages: 300,
       };
 
-      const confidence = (provider as any).calculateConfidence(
-        ebookMetadata,
-        "epub",
-      );
+      const confidence = (provider as any).calculateConfidence(ebookMetadata, "epub");
 
       expect(confidence).toBeGreaterThan(0.9);
     });
@@ -363,23 +236,11 @@ describe("EmbeddedMetadataProvider", () => {
     it("should assign lower confidence to PDF metadata", () => {
       const ebookMetadata: EbookMetadata = {
         title: "PDF Book",
-        contributors: [
-          {
-            name: "Author Name",
-            roles: ["aut"],
-            sortingKey: "Name, Author",
-          },
-        ],
+        contributors: [{ name: "Author Name", roles: ["aut"], sortingKey: "Name, Author" }],
       };
 
-      const pdfConfidence = (provider as any).calculateConfidence(
-        ebookMetadata,
-        "pdf",
-      );
-      const epubConfidence = (provider as any).calculateConfidence(
-        ebookMetadata,
-        "epub",
-      );
+      const pdfConfidence = (provider as any).calculateConfidence(ebookMetadata, "pdf");
+      const epubConfidence = (provider as any).calculateConfidence(ebookMetadata, "epub");
 
       expect(pdfConfidence).toBeLessThan(epubConfidence);
     });
@@ -387,31 +248,16 @@ describe("EmbeddedMetadataProvider", () => {
     it("should penalize missing title", () => {
       const withTitle: EbookMetadata = {
         title: "Test Book",
-        contributors: [
-          {
-            name: "Author Name",
-            roles: ["aut"],
-            sortingKey: "Name, Author",
-          },
-        ],
+        contributors: [{ name: "Author Name", roles: ["aut"], sortingKey: "Name, Author" }],
       };
 
       const withoutTitle: EbookMetadata = {
         title: undefined,
-        contributors: [
-          {
-            name: "Author Name",
-            roles: ["aut"],
-            sortingKey: "Name, Author",
-          },
-        ],
+        contributors: [{ name: "Author Name", roles: ["aut"], sortingKey: "Name, Author" }],
       };
 
       const confWith = (provider as any).calculateConfidence(withTitle, "epub");
-      const confWithout = (provider as any).calculateConfidence(
-        withoutTitle,
-        "epub",
-      );
+      const confWithout = (provider as any).calculateConfidence(withoutTitle, "epub");
 
       expect(confWithout).toBeLessThan(confWith);
       expect(confWith - confWithout).toBeGreaterThan(0.15);
@@ -420,28 +266,13 @@ describe("EmbeddedMetadataProvider", () => {
     it("should penalize missing authors", () => {
       const withAuthor: EbookMetadata = {
         title: "Test Book",
-        contributors: [
-          {
-            name: "Author Name",
-            roles: ["aut"],
-            sortingKey: "Name, Author",
-          },
-        ],
+        contributors: [{ name: "Author Name", roles: ["aut"], sortingKey: "Name, Author" }],
       };
 
-      const withoutAuthor: EbookMetadata = {
-        title: "Test Book",
-        contributors: [],
-      };
+      const withoutAuthor: EbookMetadata = { title: "Test Book", contributors: [] };
 
-      const confWith = (provider as any).calculateConfidence(
-        withAuthor,
-        "epub",
-      );
-      const confWithout = (provider as any).calculateConfidence(
-        withoutAuthor,
-        "epub",
-      );
+      const confWith = (provider as any).calculateConfidence(withAuthor, "epub");
+      const confWithout = (provider as any).calculateConfidence(withoutAuthor, "epub");
 
       expect(confWithout).toBeLessThan(confWith);
       expect(confWith - confWithout).toBeGreaterThan(0.1);
@@ -451,54 +282,30 @@ describe("EmbeddedMetadataProvider", () => {
       // Use minimal metadata to avoid hitting 1.0 ceiling
       const withIsbn: EbookMetadata = {
         title: "Test Book",
-        contributors: [
-          {
-            name: "Author Name",
-            roles: ["aut"],
-            sortingKey: "Name, Author",
-          },
-        ],
+        contributors: [{ name: "Author Name", roles: ["aut"], sortingKey: "Name, Author" }],
         // Valid ISBN
         identifiers: [{ type: "isbn", value: "978-0-306-40615-7" }],
       };
 
       const withoutIsbn: EbookMetadata = {
         title: "Test Book",
-        contributors: [
-          {
-            name: "Author Name",
-            roles: ["aut"],
-            sortingKey: "Name, Author",
-          },
-        ],
+        contributors: [{ name: "Author Name", roles: ["aut"], sortingKey: "Name, Author" }],
       };
 
       // Use PDF format to get lower base confidence and avoid ceiling
       const confWith = (provider as any).calculateConfidence(withIsbn, "pdf");
-      const confWithout = (provider as any).calculateConfidence(
-        withoutIsbn,
-        "pdf",
-      );
+      const confWithout = (provider as any).calculateConfidence(withoutIsbn, "pdf");
 
       expect(confWith).toBeGreaterThan(confWithout);
       expect(confWith - confWithout).toBeGreaterThanOrEqual(0.09); // ISBN boost (~0.1, accounting for floating point)
     });
 
     it("should keep confidence in valid range", () => {
-      const minimal: EbookMetadata = {
-        title: undefined,
-        contributors: [],
-      };
+      const minimal: EbookMetadata = { title: undefined, contributors: [] };
 
       const maximal: EbookMetadata = {
         title: "Complete Book",
-        contributors: [
-          {
-            name: "Author Name",
-            roles: ["aut"],
-            sortingKey: "Name, Author",
-          },
-        ],
+        contributors: [{ name: "Author Name", roles: ["aut"], sortingKey: "Name, Author" }],
         identifiers: [{ type: "isbn", value: "978-0-123-45678-9" }],
         datePublished: new Date("2020-01-01"),
         language: "en",
@@ -521,13 +328,7 @@ describe("EmbeddedMetadataProvider", () => {
     it("should generate consistent IDs based on ISBN", () => {
       const metadata1: EbookMetadata = {
         title: "Book Title",
-        contributors: [
-          {
-            name: "Author",
-            roles: ["aut"],
-            sortingKey: "Author",
-          },
-        ],
+        contributors: [{ name: "Author", roles: ["aut"], sortingKey: "Author" }],
         // Valid ISBN
         identifiers: [{ type: "isbn", value: "978-0-306-40615-7" }],
       };
@@ -535,11 +336,7 @@ describe("EmbeddedMetadataProvider", () => {
       const metadata2: EbookMetadata = {
         title: "Different Title",
         contributors: [
-          {
-            name: "Different Author",
-            roles: ["aut"],
-            sortingKey: "Author, Different",
-          },
+          { name: "Different Author", roles: ["aut"], sortingKey: "Author, Different" },
         ],
         // Same valid ISBN
         identifiers: [{ type: "isbn", value: "978-0-306-40615-7" }],
@@ -555,13 +352,7 @@ describe("EmbeddedMetadataProvider", () => {
     it("should generate IDs based on title when ISBN is missing", () => {
       const metadata: EbookMetadata = {
         title: "Unique Book Title",
-        contributors: [
-          {
-            name: "Author",
-            roles: ["aut"],
-            sortingKey: "Author",
-          },
-        ],
+        contributors: [{ name: "Author", roles: ["aut"], sortingKey: "Author" }],
       };
 
       const id = (provider as any).generateRecordId(metadata, "epub");
@@ -570,16 +361,9 @@ describe("EmbeddedMetadataProvider", () => {
     });
 
     it("should generate IDs based on filename when title and ISBN are missing", () => {
-      const metadata: EbookMetadata = {
-        title: undefined,
-        contributors: [],
-      };
+      const metadata: EbookMetadata = { title: undefined, contributors: [] };
 
-      const id = (provider as any).generateRecordId(
-        metadata,
-        "epub",
-        "mybook.epub",
-      );
+      const id = (provider as any).generateRecordId(metadata, "epub", "mybook.epub");
 
       expect(id).toMatch(/^embedded-[a-z0-9]+-epub$/);
     });
@@ -597,21 +381,15 @@ describe("EmbeddedMetadataProvider", () => {
     });
 
     it("should merge custom config with defaults", () => {
-      const customProvider = new EmbeddedMetadataProvider({
-        baseConfidence: 0.7,
-      });
+      const customProvider = new EmbeddedMetadataProvider({ baseConfidence: 0.7 });
 
       const config = customProvider.getConfig();
       expect(config.baseConfidence).toBe(0.7);
-      expect(config.normalizeIsbn13).toBe(
-        DEFAULT_EMBEDDED_PROVIDER_CONFIG.normalizeIsbn13,
-      );
+      expect(config.normalizeIsbn13).toBe(DEFAULT_EMBEDDED_PROVIDER_CONFIG.normalizeIsbn13);
     });
 
     it("should allow runtime configuration updates", () => {
-      provider.updateConfig({
-        baseConfidence: 0.6,
-      });
+      provider.updateConfig({ baseConfidence: 0.6 });
 
       expect(provider.getConfig().baseConfidence).toBe(0.6);
     });
@@ -634,10 +412,7 @@ describe("EmbeddedMetadataProvider", () => {
     });
 
     it("should return empty results for multi-criteria search", async () => {
-      const results = await provider.searchMultiCriteria({
-        title: "Test",
-        authors: ["Author"],
-      });
+      const results = await provider.searchMultiCriteria({ title: "Test", authors: ["Author"] });
       expect(results).toEqual([]);
     });
   });

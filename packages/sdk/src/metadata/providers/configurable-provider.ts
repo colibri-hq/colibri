@@ -1,13 +1,5 @@
-import {
-  BaseMetadataProvider,
-  type RateLimitConfig,
-  type TimeoutConfig,
-} from "./provider.js";
-import {
-  globalConfigManager,
-  type MetadataConfigManager,
-  type ProviderConfig,
-} from "../config.js";
+import { globalConfigManager, type MetadataConfigManager, type ProviderConfig } from "../config.js";
+import { BaseMetadataProvider, type RateLimitConfig, type TimeoutConfig } from "./provider.js";
 
 /**
  * Base class for configurable metadata providers
@@ -34,10 +26,7 @@ export abstract class ConfigurableMetadataProvider extends BaseMetadataProvider 
    * Get effective priority for this provider
    */
   get priority(): number {
-    return this.configManager.getEffectivePriority(
-      this.name,
-      this.getDefaultPriority(),
-    );
+    return this.configManager.getEffectivePriority(this.name, this.getDefaultPriority());
   }
 
   /**
@@ -95,10 +84,7 @@ export abstract class ConfigurableMetadataProvider extends BaseMetadataProvider 
   /**
    * Get provider-specific options from configuration
    */
-  protected getOption<T = unknown>(
-    key: string,
-    defaultValue?: T,
-  ): T | undefined {
+  protected getOption<T = unknown>(key: string, defaultValue?: T): T | undefined {
     const config = this.getProviderConfig();
     return (config?.options?.[key] as T) ?? defaultValue;
   }
@@ -113,10 +99,7 @@ export abstract class ConfigurableMetadataProvider extends BaseMetadataProvider 
   /**
    * Get endpoint configuration
    */
-  protected getEndpoint(
-    key: string,
-    defaultValue?: string,
-  ): string | undefined {
+  protected getEndpoint(key: string, defaultValue?: string): string | undefined {
     const config = this.getProviderConfig();
     return config?.endpoints?.[key] ?? defaultValue;
   }
@@ -124,10 +107,7 @@ export abstract class ConfigurableMetadataProvider extends BaseMetadataProvider 
   /**
    * Check if a feature is enabled for this provider
    */
-  protected isFeatureEnabled(
-    feature: string,
-    defaultValue: boolean = false,
-  ): boolean {
+  protected isFeatureEnabled(feature: string, defaultValue: boolean = false): boolean {
     const config = this.getProviderConfig();
     return config?.features?.[feature] ?? defaultValue;
   }

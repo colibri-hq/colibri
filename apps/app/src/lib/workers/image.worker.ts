@@ -18,10 +18,7 @@ onmessage = async ({ data }: MessageEvent<WorkerMessage>) => {
       break;
 
     case "blurhash":
-      response = {
-        type: "blurhash",
-        payload: await blurhash(data.payload as BlurhashRequest),
-      };
+      response = { type: "blurhash", payload: await blurhash(data.payload as BlurhashRequest) };
       break;
 
     default:
@@ -31,13 +28,8 @@ onmessage = async ({ data }: MessageEvent<WorkerMessage>) => {
   postMessage(response, { transfer });
 };
 
-async function dimensions({
-  image,
-}: DimensionsRequest): Promise<DimensionsResponse> {
-  const data =
-    image instanceof ReadableStream
-      ? await createArrayBufferFromStream(image)
-      : image;
+async function dimensions({ image }: DimensionsRequest): Promise<DimensionsResponse> {
+  const data = image instanceof ReadableStream ? await createArrayBufferFromStream(image) : image;
   const { width, height } = await getImageDimensions(data);
 
   return { width, height };
@@ -52,10 +44,7 @@ export interface DimensionsResponse {
   height: number;
 }
 
-async function blurhash({
-  canvas,
-  data,
-}: BlurhashRequest): Promise<BlurhashResponse> {
+async function blurhash({ canvas, data }: BlurhashRequest): Promise<BlurhashResponse> {
   const context = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D;
   const hash = await encodeImageToBlurHash(data, context);
 

@@ -3,12 +3,7 @@ import type { Database } from "../database.js";
 
 // region Types
 
-export const searchTypes = [
-  "edition",
-  "creator",
-  "publisher",
-  "collection",
-] as const;
+export const searchTypes = ["edition", "creator", "publisher", "collection"] as const;
 export type SearchType = (typeof searchTypes)[number];
 
 export type SearchResult = {
@@ -19,10 +14,7 @@ export type SearchResult = {
   rank: number;
 };
 
-export type SearchOptions = {
-  types?: SearchType[];
-  limit?: number;
-};
+export type SearchOptions = { types?: SearchType[]; limit?: number };
 
 // endregion
 
@@ -94,9 +86,7 @@ async function searchTable(
         "rank",
       ),
     ])
-    .where(
-      sql<boolean>`${sql.ref(table)}.search_vector @@ to_tsquery('simple', ${tsQuery})`,
-    )
+    .where(sql<boolean>`${sql.ref(table)}.search_vector @@ to_tsquery('simple', ${tsQuery})`)
     .orderBy("rank", "desc")
     .limit(limit)
     .execute();
@@ -136,9 +126,7 @@ export async function searchAll(
   }
 
   // Run searches in parallel for better performance
-  const searches = types.map((type) =>
-    searchTable(database, type, tsQuery, limit),
-  );
+  const searches = types.map((type) => searchTable(database, type, tsQuery, limit));
   const searchResults = await Promise.all(searches);
 
   // Flatten, sort by rank, and limit

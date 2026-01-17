@@ -11,11 +11,7 @@ export const GET = function GET({ url }) {
   // Sort by date, most recent first, and filter to pages with dates
   const sortedPages = Array.from(pages.values())
     .filter((page) => page.metadata.date)
-    .sort(
-      (a, b) =>
-        new Date(b.metadata.date).getTime() -
-        new Date(a.metadata.date).getTime(),
-    )
+    .sort((a, b) => new Date(b.metadata.date).getTime() - new Date(a.metadata.date).getTime())
     .slice(0, 20); // Limit to 20 most recent
 
   const items = sortedPages
@@ -48,10 +44,7 @@ ${items}
 </rss>`;
 
   return new Response(rss, {
-    headers: {
-      "Content-Type": "application/xml",
-      "Cache-Control": "max-age=3600",
-    },
+    headers: { "Content-Type": "application/xml", "Cache-Control": "max-age=3600" },
   });
 } satisfies RequestHandler;
 

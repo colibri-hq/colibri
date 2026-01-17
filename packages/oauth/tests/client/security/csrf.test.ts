@@ -7,13 +7,13 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import { AuthorizationCodeClient } from "../../../src/client/authorization-code.js";
 import { StateMismatchError, OAuthClientError } from "../../../src/client/errors.js";
+import { randomString } from "../__helpers__/crypto.js";
 import {
   createFullMockFetch,
   createMockTokenStore,
   mockMetadata,
   createJsonResponse,
 } from "../__helpers__/mock-server.js";
-import { randomString } from "../__helpers__/crypto.js";
 
 describe("CSRF Protection (State Parameter)", () => {
   let mockFetch: ReturnType<typeof createFullMockFetch>;

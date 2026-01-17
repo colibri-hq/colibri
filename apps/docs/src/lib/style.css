@@ -4,155 +4,133 @@
 @source "../";
 
 :root {
-    color-scheme: light dark;
+  color-scheme: light dark;
 }
 
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 @utility column-span-* {
-    column-span: --value("all", "none");
-    column-span: --value([integer], integer);
+  column-span: --value("all", "none");
+  column-span: --value([integer], integer);
 }
 
 @layer components {
-    /* region Code Blocks */
-    .code-block {
-        @apply relative my-4;
+  /* region Code Blocks */
+  .code-block {
+    @apply relative my-4;
 
-        .code-block__title + .code-block__inner .shiki {
-            @apply pt-4 rounded-t-xs mt-0.5;
-        }
-
-        .code-block__title {
-            @apply bg-white dark:bg-[#24292e] flex items-center gap-2 px-4 py-2 text-sm font-medium
-            text-gray-700 dark:text-gray-300 rounded-t-lg transition-colors duration-200 rounded-b-xs;
-        }
-
-        .code-block__caption {
-            @apply px-2 py-2 text-sm text-gray-600 dark:text-gray-400;
-        }
-
-        .code-block__inner {
-            @apply relative;
-
-            .shiki {
-                @apply rounded-lg overflow-x-auto p-6 font-mono text-sm transition-colors duration-200
-                focus-within:ring-3 focus-within:ring-blue-500 outline-hidden;
-            }
-
-            .shiki-language {
-                @apply absolute top-1 right-1 text-gray-500 dark:text-gray-400
-                px-2 py-0.5 rounded-md text-xs font-medium;
-            }
-        }
+    .code-block__title + .code-block__inner .shiki {
+      @apply mt-0.5 rounded-t-xs pt-4;
     }
 
-    /* endregion */
-    /* region Callouts/Admonitions */
-    .callout {
-        @apply relative flex flex-col gap-2 my-6 border border-s-4 px-4 pb-4 pt-2 rounded-r-xs before:absolute
-        before:-top-px before:-left-1 before:w-1 before:h-[calc(100%+2px)] bg-linear-to-br to-80%
-        data-[type=note]:from-blue-100 data-[type=note]:to-blue-200 dark:data-[type=note]:from-blue-900/30
-        dark:data-[type=note]:to-blue-950/30 data-[type=note]:border-blue-500/10
-        data-[type=note]:before:bg-blue-500
-        data-[type=tip]:from-green-50 data-[type=tip]:to-green-100 dark:data-[type=tip]:from-green-900/30
-        dark:data-[type=tip]:to-green-950/30 data-[type=tip]:border-green-500/20
-        dark:data-[type=tip]:border-green-500/10 data-[type=tip]:before:bg-green-500
-        data-[type=warning]:from-amber-50 data-[type=warning]:to-amber-100
-        dark:data-[type=warning]:from-amber-900/30 dark:data-[type=warning]:to-amber-950/30
-        data-[type=warning]:border-amber-500/20 dark:data-[type=warning]:border-amber-500/10
-        data-[type=warning]:before:bg-amber-500
-        data-[type=danger]:from-red-50 data-[type=danger]:to-red-100 dark:data-[type=danger]:from-red-900/30
-        dark:data-[type=danger]:to-red-950/30 data-[type=danger]:border-red-500/10
-        data-[type=danger]:before:bg-red-500;
-
-        .callout__title {
-            @apply in-data-[type=note]:text-blue-700 dark:in-data-[type=note]:text-blue-400
-            in-data-[type=tip]:text-green-700 dark:in-data-[type=tip]:text-green-400
-            in-data-[type=warning]:text-amber-700 dark:in-data-[type=warning]:text-amber-400
-            in-data-[type=danger]:text-red-700 dark:in-data-[type=danger]:text-red-400;
-        }
+    .code-block__title {
+      @apply flex items-center gap-2 rounded-t-lg rounded-b-xs bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 dark:bg-[#24292e] dark:text-gray-300;
     }
 
-    /* endregion */
-    /* region Mermaid diagrams */
-    .mermaid-diagram {
-        @apply my-6 flex justify-center dark:invert-100 dark:hue-rotate-180;
-
-        svg {
-            @apply max-w-full h-auto;
-        }
+    .code-block__caption {
+      @apply px-2 py-2 text-sm text-gray-600 dark:text-gray-400;
     }
 
-    /* endregion */
-    /* region Link Preview Popover */
+    .code-block__inner {
+      @apply relative;
+
+      .shiki {
+        @apply overflow-x-auto rounded-lg p-6 font-mono text-sm outline-hidden transition-colors duration-200 focus-within:ring-3 focus-within:ring-blue-500;
+      }
+
+      .shiki-language {
+        @apply absolute top-1 right-1 rounded-md px-2 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400;
+      }
+    }
+  }
+
+  /* endregion */
+  /* region Callouts/Admonitions */
+  .callout {
+    @apply relative my-6 flex flex-col gap-2 rounded-r-xs border border-s-4 bg-linear-to-br to-80% px-4 pt-2 pb-4 before:absolute before:-top-px before:-left-1 before:h-[calc(100%+2px)] before:w-1 data-[type=danger]:border-red-500/10 data-[type=danger]:from-red-50 data-[type=danger]:to-red-100 data-[type=danger]:before:bg-red-500 data-[type=note]:border-blue-500/10 data-[type=note]:from-blue-100 data-[type=note]:to-blue-200 data-[type=note]:before:bg-blue-500 data-[type=tip]:border-green-500/20 data-[type=tip]:from-green-50 data-[type=tip]:to-green-100 data-[type=tip]:before:bg-green-500 data-[type=warning]:border-amber-500/20 data-[type=warning]:from-amber-50 data-[type=warning]:to-amber-100 data-[type=warning]:before:bg-amber-500 dark:data-[type=danger]:from-red-900/30 dark:data-[type=danger]:to-red-950/30 dark:data-[type=note]:from-blue-900/30 dark:data-[type=note]:to-blue-950/30 dark:data-[type=tip]:border-green-500/10 dark:data-[type=tip]:from-green-900/30 dark:data-[type=tip]:to-green-950/30 dark:data-[type=warning]:border-amber-500/10 dark:data-[type=warning]:from-amber-900/30 dark:data-[type=warning]:to-amber-950/30;
+
+    .callout__title {
+      @apply in-data-[type=danger]:text-red-700 in-data-[type=note]:text-blue-700 in-data-[type=tip]:text-green-700 in-data-[type=warning]:text-amber-700 dark:in-data-[type=danger]:text-red-400 dark:in-data-[type=note]:text-blue-400 dark:in-data-[type=tip]:text-green-400 dark:in-data-[type=warning]:text-amber-400;
+    }
+  }
+
+  /* endregion */
+  /* region Mermaid diagrams */
+  .mermaid-diagram {
+    @apply my-6 flex justify-center dark:hue-rotate-180 dark:invert-100;
+
+    svg {
+      @apply h-auto max-w-full;
+    }
+  }
+
+  /* endregion */
+  /* region Link Preview Popover */
+  .link-preview-popover {
+    @apply z-50 w-80 max-w-sm -translate-y-1 rounded-lg border border-gray-200 bg-white p-4 text-sm opacity-0 shadow-lg transition-all transition-discrete duration-150 ease-out open:translate-y-0 open:opacity-100 dark:border-gray-700 dark:bg-gray-900 starting:open:-translate-y-1 starting:open:opacity-0;
+  }
+
+  .link-preview-content {
+    @apply flex flex-col gap-1;
+  }
+
+  .link-preview-breadcrumb {
+    @apply flex flex-wrap items-center gap-1 text-xs text-gray-500 dark:text-gray-500;
+  }
+
+  .link-preview-breadcrumb-separator {
+    @apply text-gray-400 dark:text-gray-600;
+  }
+
+  .link-preview-title {
+    @apply font-semibold text-gray-900 dark:text-gray-100;
+  }
+
+  .link-preview-description {
+    @apply line-clamp-3 text-gray-600 dark:text-gray-400;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
     .link-preview-popover {
-        @apply rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg p-4
-        max-w-sm w-80 text-sm z-50 opacity-0 duration-150 transition-all -translate-y-1 ease-out transition-discrete
-        open:opacity-100 open:translate-y-0 starting:open:opacity-0 starting:open:-translate-y-1;
+      @apply transform-none transition-none open:transform-none;
+    }
+  }
+  /* endregion */
+  /* Footnotes */
+  .footnote-ref a {
+    @apply font-medium text-blue-500 no-underline hover:underline;
+  }
+
+  .footnotes {
+    @apply mt-12 border-t border-gray-200 pt-6 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-400;
+
+    hr {
+      @apply hidden;
     }
 
-    .link-preview-content {
-        @apply flex flex-col gap-1;
+    ol {
+      @apply m-0 ps-2;
+      counter-reset: footnote-counter;
     }
 
-    .link-preview-breadcrumb {
-        @apply text-xs text-gray-500 dark:text-gray-500 flex items-center gap-1 flex-wrap;
-    }
+    li {
+      @apply mb-2;
+      counter-increment: footnote-counter;
 
-    .link-preview-breadcrumb-separator {
-        @apply text-gray-400 dark:text-gray-600;
-    }
+      p {
+        @apply m-0;
 
-    .link-preview-title {
-        @apply font-semibold text-gray-900 dark:text-gray-100;
-    }
-
-    .link-preview-description {
-        @apply text-gray-600 dark:text-gray-400 line-clamp-3;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .link-preview-popover {
-            @apply transform-none transition-none open:transform-none;
+        &::before {
+          content: counter(footnote-counter) ". ";
+          @apply inline font-semibold;
         }
+      }
     }
-    /* endregion */
-    /* Footnotes */
-    .footnote-ref a {
-        @apply text-blue-500 no-underline font-medium hover:underline;
-    }
+  }
 
-    .footnotes {
-        @apply mt-12 pt-6 border-t border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400;
-
-        hr {
-            @apply hidden;
-        }
-
-        ol {
-            @apply ps-2 m-0;
-            counter-reset: footnote-counter;
-        }
-
-        li {
-            @apply mb-2;
-            counter-increment: footnote-counter;
-
-            p {
-                @apply m-0;
-
-                &::before {
-                    content: counter(footnote-counter) ". ";
-                    @apply inline font-semibold;
-                }
-            }
-        }
-    }
-
-    .footnote-backref {
-        @apply text-blue-500 hover:underline no-underline ms-1;
-    }
+  .footnote-backref {
+    @apply ms-1 text-blue-500 no-underline hover:underline;
+  }
 }

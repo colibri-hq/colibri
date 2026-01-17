@@ -89,29 +89,13 @@ export interface MetadataRecord {
   description?: string | undefined;
   language?: string | undefined;
   publisher?: string | undefined;
-  series?:
-    | {
-        name: string;
-        volume?: number;
-      }
-    | undefined;
+  series?: { name: string; volume?: number } | undefined;
   edition?: string | undefined;
   pageCount?: number | undefined;
   physicalDimensions?:
-    | {
-        width?: number;
-        height?: number;
-        depth?: number;
-        unit: "mm" | "cm" | "in";
-      }
+    | { width?: number; height?: number; depth?: number; unit: "mm" | "cm" | "in" }
     | undefined;
-  coverImage?:
-    | {
-        url: string;
-        width?: number;
-        height?: number;
-      }
-    | undefined;
+  coverImage?: { url: string; width?: number; height?: number } | undefined;
 
   // Provider-specific data
   providerData?: Record<string, unknown>;
@@ -197,9 +181,7 @@ export abstract class BaseMetadataProvider implements MetadataProvider {
   abstract searchByTitle(query: TitleQuery): Promise<MetadataRecord[]>;
   abstract searchByISBN(isbn: string): Promise<MetadataRecord[]>;
   abstract searchByCreator(query: CreatorQuery): Promise<MetadataRecord[]>;
-  abstract searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]>;
+  abstract searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]>;
 
   /**
    * Default reliability scores - subclasses should override
@@ -251,12 +233,6 @@ export abstract class BaseMetadataProvider implements MetadataProvider {
     data: Partial<Omit<MetadataRecord, "id" | "source" | "timestamp">>,
     confidence: number = 0.8,
   ): MetadataRecord {
-    return {
-      id,
-      source: this.name,
-      confidence,
-      timestamp: new Date(),
-      ...data,
-    };
+    return { id, source: this.name, confidence, timestamp: new Date(), ...data };
   }
 }

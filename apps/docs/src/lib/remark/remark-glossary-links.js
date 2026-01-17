@@ -48,10 +48,7 @@ export function remarkGlossaryLinks() {
       const html = `<GlossaryTerm term="${termId}">${escapedText}</GlossaryTerm>`;
 
       // Replace link node with HTML node
-      parent.children[index] = {
-        type: "html",
-        value: html,
-      };
+      parent.children[index] = { type: "html", value: html };
     });
   };
 }

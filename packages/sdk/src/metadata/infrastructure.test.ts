@@ -1,3 +1,4 @@
+import { sleep } from "@colibri-hq/shared";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   BaseMetadataProvider,
@@ -7,10 +8,9 @@ import {
   type MultiCriteriaQuery,
   type TitleQuery,
 } from "./providers/provider.js";
-import { MetadataProviderRegistry } from "./registry.js";
 import { RateLimiter } from "./rate-limiter.js";
+import { MetadataProviderRegistry } from "./registry.js";
 import { TimeoutError, TimeoutManager } from "./timeout-manager.js";
-import { sleep } from "@colibri-hq/shared";
 
 // Mock provider for testing
 class MockMetadataProvider extends BaseMetadataProvider {
@@ -55,9 +55,7 @@ class MockMetadataProvider extends BaseMetadataProvider {
     return this.mockResults;
   }
 
-  async searchMultiCriteria(
-    _query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(_query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     if (this.delay > 0) {
       await sleep(this.delay);
     }
@@ -99,10 +97,7 @@ describe("MetadataProvider Infrastructure", () => {
       const provider = new MockMetadataProvider();
       const record = (provider as any).createMetadataRecord(
         "test-id",
-        {
-          title: "Test Book",
-          authors: ["Test Author"],
-        },
+        { title: "Test Book", authors: ["Test Author"] },
         0.9,
       );
 
@@ -124,9 +119,7 @@ describe("MetadataProvider Infrastructure", () => {
       const provider = new MockMetadataProvider();
       expect(provider.supportsDataType(MetadataType.TITLE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.AUTHORS)).toBe(true);
-      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(
-        false,
-      );
+      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(false);
     });
   });
 
@@ -141,14 +134,10 @@ describe("MetadataProvider Infrastructure", () => {
         isProviderEnabled: vi.fn().mockReturnValue(true),
         getEffectivePriority: vi
           .fn()
-          .mockImplementation(
-            (_name: string, defaultPriority: number) => defaultPriority,
-          ),
-        getEffectiveRateLimit: vi.fn().mockReturnValue({
-          maxRequests: 100,
-          windowMs: 60000,
-          requestDelay: 100,
-        }),
+          .mockImplementation((_name: string, defaultPriority: number) => defaultPriority),
+        getEffectiveRateLimit: vi
+          .fn()
+          .mockReturnValue({ maxRequests: 100, windowMs: 60000, requestDelay: 100 }),
         getEffectiveTimeout: vi
           .fn()
           .mockReturnValue({ requestTimeout: 10000, operationTimeout: 30000 }),
@@ -216,9 +205,8 @@ describe("MetadataProvider Infrastructure", () => {
       // Override to only support ISBN
       (specialProvider as any).supportsDataType = (dataType: MetadataType) =>
         dataType === MetadataType.ISBN;
-      (specialProvider as any).getReliabilityScore = (
-        dataType: MetadataType,
-      ) => (dataType === MetadataType.ISBN ? 0.99 : 0.1);
+      (specialProvider as any).getReliabilityScore = (dataType: MetadataType) =>
+        dataType === MetadataType.ISBN ? 0.99 : 0.1;
 
       registry.register(mockProvider);
       registry.register(specialProvider);
@@ -227,9 +215,7 @@ describe("MetadataProvider Infrastructure", () => {
       expect(isbnProviders[0]).toBe(specialProvider); // Higher reliability score
       expect(isbnProviders[1]).toBe(mockProvider);
 
-      const titleProviders = registry.getProvidersForDataType(
-        MetadataType.TITLE,
-      );
+      const titleProviders = registry.getProvidersForDataType(MetadataType.TITLE);
       expect(titleProviders).toHaveLength(1);
       expect(titleProviders[0]).toBe(mockProvider);
     });
@@ -251,11 +237,7 @@ describe("MetadataProvider Infrastructure", () => {
     let rateLimiter: RateLimiter;
 
     beforeEach(() => {
-      rateLimiter = new RateLimiter({
-        maxRequests: 3,
-        windowMs: 1000,
-        requestDelay: 50,
-      });
+      rateLimiter = new RateLimiter({ maxRequests: 3, windowMs: 1000, requestDelay: 50 });
     });
 
     it("should allow requests within limit", () => {
@@ -301,10 +283,7 @@ describe("MetadataProvider Infrastructure", () => {
     let timeoutManager: TimeoutManager;
 
     beforeEach(() => {
-      timeoutManager = new TimeoutManager({
-        requestTimeout: 100,
-        operationTimeout: 200,
-      });
+      timeoutManager = new TimeoutManager({ requestTimeout: 100, operationTimeout: 200 });
     });
 
     afterEach(() => {
@@ -318,33 +297,25 @@ describe("MetadataProvider Infrastructure", () => {
     });
 
     it("should reject promises that exceed timeout", async () => {
-      const promise = new Promise((resolve) =>
-        setTimeout(() => resolve("late"), 200),
-      );
+      const promise = new Promise((resolve) => setTimeout(() => resolve("late"), 200));
 
-      await expect(timeoutManager.withTimeout(promise, 100)).rejects.toThrow(
-        TimeoutError,
-      );
+      await expect(timeoutManager.withTimeout(promise, 100)).rejects.toThrow(TimeoutError);
     });
 
     it("should handle request timeouts", async () => {
-      const slowPromise = new Promise((resolve) =>
-        setTimeout(() => resolve("slow"), 200),
-      );
+      const slowPromise = new Promise((resolve) => setTimeout(() => resolve("slow"), 200));
 
-      await expect(
-        timeoutManager.withRequestTimeout(slowPromise),
-      ).rejects.toThrow("Request timed out after 100ms");
+      await expect(timeoutManager.withRequestTimeout(slowPromise)).rejects.toThrow(
+        "Request timed out after 100ms",
+      );
     });
 
     it("should handle operation timeouts", async () => {
-      const slowPromise = new Promise((resolve) =>
-        setTimeout(() => resolve("slow"), 300),
-      );
+      const slowPromise = new Promise((resolve) => setTimeout(() => resolve("slow"), 300));
 
-      await expect(
-        timeoutManager.withOperationTimeout(slowPromise),
-      ).rejects.toThrow("Operation timed out after 200ms");
+      await expect(timeoutManager.withOperationTimeout(slowPromise)).rejects.toThrow(
+        "Operation timed out after 200ms",
+      );
     });
 
     it("should create abort controllers with timeout", async () => {
@@ -382,14 +353,10 @@ describe("MetadataProvider Infrastructure", () => {
         isProviderEnabled: vi.fn().mockReturnValue(true),
         getEffectivePriority: vi
           .fn()
-          .mockImplementation(
-            (_name: string, defaultPriority: number) => defaultPriority,
-          ),
-        getEffectiveRateLimit: vi.fn().mockReturnValue({
-          maxRequests: 100,
-          windowMs: 60000,
-          requestDelay: 100,
-        }),
+          .mockImplementation((_name: string, defaultPriority: number) => defaultPriority),
+        getEffectiveRateLimit: vi
+          .fn()
+          .mockReturnValue({ maxRequests: 100, windowMs: 60000, requestDelay: 100 }),
         getEffectiveTimeout: vi
           .fn()
           .mockReturnValue({ requestTimeout: 10000, operationTimeout: 30000 }),

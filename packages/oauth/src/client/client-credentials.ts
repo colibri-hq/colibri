@@ -1,8 +1,8 @@
 import type { TokenPayload } from "../types.js";
 import type { ClientCredentialsClientConfig } from "./types.js";
 import { OAuthClientBase } from "./base.js";
-import { ConfigurationError } from "./errors.js";
 import { getTokenEndpoint } from "./discovery.js";
+import { ConfigurationError } from "./errors.js";
 
 /**
  * Default buffer time before token expiry to trigger refresh (seconds)
@@ -50,9 +50,7 @@ export class ClientCredentialsClient extends OAuthClientBase {
     super(config);
 
     if (!config.clientSecret) {
-      throw new ConfigurationError(
-        "clientSecret is required for client credentials flow",
-      );
+      throw new ConfigurationError("clientSecret is required for client credentials flow");
     }
 
     this.#autoRefresh = config.autoRefresh ?? true;

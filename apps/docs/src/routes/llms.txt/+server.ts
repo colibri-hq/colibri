@@ -1,4 +1,3 @@
-import { text } from "@sveltejs/kit";
 import {
   type Directory,
   getContentTree,
@@ -6,6 +5,7 @@ import {
   isPage,
   type Page,
 } from "$lib/content/content.js";
+import { text } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types.js";
 
 export const prerender = true;
@@ -53,9 +53,7 @@ export const GET = async function GET({ url }) {
   // Add MCP information
   lines.push("## AI Integration");
   lines.push("");
-  lines.push(
-    "This documentation is also available via the Model Context Protocol (MCP):",
-  );
+  lines.push("This documentation is also available via the Model Context Protocol (MCP):");
   lines.push("");
   lines.push(
     `- [MCP Server Discovery](${baseUrl}/.well-known/mcp.json): Server capabilities and endpoint info`,
@@ -82,10 +80,7 @@ function buildSections(tree: (Page | Directory)[], baseUrl: string) {
 
   for (const item of tree) {
     if (isDirectory(item)) {
-      const section: Section = {
-        title: item.title,
-        items: [],
-      };
+      const section: Section = { title: item.title, items: [] };
 
       // Add index page if exists
       if (item.indexPage && !item.indexPage.metadata.hideFromMenu) {
@@ -172,7 +167,4 @@ function formatSection({ items, title }: Section) {
  * - Optional section for less important content
  */
 
-type Section = {
-  title: string;
-  items: { name: string; url: string; description?: string }[];
-};
+type Section = { title: string; items: { name: string; url: string; description?: string }[] };

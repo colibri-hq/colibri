@@ -10,62 +10,42 @@ import {
 describe("parseAuthor", () => {
   it("parses author with name and email", () => {
     const result = parseAuthor("John Doe <john@example.com>");
-    expect(result).toEqual({
-      name: "John Doe",
-      email: "john@example.com",
-    });
+    expect(result).toEqual({ name: "John Doe", email: "john@example.com" });
   });
 
   it("parses author with name only", () => {
     const result = parseAuthor("John Doe");
-    expect(result).toEqual({
-      name: "John Doe",
-    });
+    expect(result).toEqual({ name: "John Doe" });
   });
 
   it("handles extra whitespace in name", () => {
     const result = parseAuthor("  John Doe  ");
-    expect(result).toEqual({
-      name: "John Doe",
-    });
+    expect(result).toEqual({ name: "John Doe" });
   });
 
   it("handles extra whitespace around email", () => {
     const result = parseAuthor("John Doe < john@example.com >");
-    expect(result).toEqual({
-      name: "John Doe",
-      email: "john@example.com",
-    });
+    expect(result).toEqual({ name: "John Doe", email: "john@example.com" });
   });
 
   it("normalizes email to lowercase", () => {
     const result = parseAuthor("John Doe <John@Example.COM>");
-    expect(result).toEqual({
-      name: "John Doe",
-      email: "john@example.com",
-    });
+    expect(result).toEqual({ name: "John Doe", email: "john@example.com" });
   });
 
   it("handles empty string", () => {
     const result = parseAuthor("");
-    expect(result).toEqual({
-      name: "",
-    });
+    expect(result).toEqual({ name: "" });
   });
 
   it("handles name with special characters", () => {
     const result = parseAuthor("José García-López <jose@example.com>");
-    expect(result).toEqual({
-      name: "José García-López",
-      email: "jose@example.com",
-    });
+    expect(result).toEqual({ name: "José García-López", email: "jose@example.com" });
   });
 
   it("handles unclosed angle bracket as plain name", () => {
     const result = parseAuthor("John Doe <broken");
-    expect(result).toEqual({
-      name: "John Doe <broken",
-    });
+    expect(result).toEqual({ name: "John Doe <broken" });
   });
 });
 
@@ -118,9 +98,7 @@ describe("getAuthorWithGravatar", () => {
     expect(result.name).toBe("John Doe");
     expect(result.email).toBe("john@example.com");
     expect(result.gravatarUrl).toBeDefined();
-    expect(result.gravatarUrl).toMatch(
-      /^https:\/\/www\.gravatar\.com\/avatar\//,
-    );
+    expect(result.gravatarUrl).toMatch(/^https:\/\/www\.gravatar\.com\/avatar\//);
   });
 
   it("returns author without gravatar URL when no email", async () => {
@@ -131,22 +109,13 @@ describe("getAuthorWithGravatar", () => {
   });
 
   it("respects custom size parameter", async () => {
-    const result = await getAuthorWithGravatar(
-      "John Doe <john@example.com>",
-      150,
-    );
+    const result = await getAuthorWithGravatar("John Doe <john@example.com>", 150);
     expect(result.gravatarUrl).toContain("s=150");
   });
 
   it("caches results for same author string and size", async () => {
-    const result1 = await getAuthorWithGravatar(
-      "Cache Test <cache@example.com>",
-      100,
-    );
-    const result2 = await getAuthorWithGravatar(
-      "Cache Test <cache@example.com>",
-      100,
-    );
+    const result1 = await getAuthorWithGravatar("Cache Test <cache@example.com>", 100);
+    const result2 = await getAuthorWithGravatar("Cache Test <cache@example.com>", 100);
     expect(result1).toBe(result2); // Same object reference due to caching
   });
 });

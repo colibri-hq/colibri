@@ -3,23 +3,11 @@ import type { PageServerLoad } from "./$types.js";
 
 export const prerender = true;
 
-export type ArchiveYear = {
-  year: number;
-  months: ArchiveMonth[];
-};
+export type ArchiveYear = { year: number; months: ArchiveMonth[] };
 
-export type ArchiveMonth = {
-  month: number;
-  monthName: string;
-  posts: ArchivePost[];
-};
+export type ArchiveMonth = { month: number; monthName: string; posts: ArchivePost[] };
 
-export type ArchivePost = {
-  title: string;
-  urlSlug: string;
-  date: string;
-  day: number;
-};
+export type ArchivePost = { title: string; urlSlug: string; date: string; day: number };
 
 export const load: PageServerLoad = () => {
   const posts = getBlogPosts();
@@ -37,11 +25,7 @@ export const load: PageServerLoad = () => {
 
   for (const { metadata, urlSlug } of posts) {
     const date = normalizeDate(metadata.date);
-    const [year, month, day] = date.split("-").map(Number) as [
-      number,
-      number,
-      number,
-    ];
+    const [year, month, day] = date.split("-").map(Number) as [number, number, number];
 
     if (!yearMap.has(year)) {
       yearMap.set(year, new Map());
@@ -53,12 +37,7 @@ export const load: PageServerLoad = () => {
       monthMap.set(month, []);
     }
 
-    monthMap.get(month)!.push({
-      title: metadata.title,
-      urlSlug,
-      date,
-      day,
-    });
+    monthMap.get(month)!.push({ title: metadata.title, urlSlug, date, day });
   }
 
   // Convert to sorted array structure (newest first)
@@ -78,18 +57,11 @@ export const load: PageServerLoad = () => {
       // Sort posts within month by day (newest first)
       monthPosts.sort(({ day: a }, { day: b }) => b - a);
 
-      months.push({
-        month,
-        monthName: MONTH_NAMES[month - 1]!,
-        posts: monthPosts,
-      });
+      months.push({ month, monthName: MONTH_NAMES[month - 1]!, posts: monthPosts });
     }
 
     years.push({ year, months });
   }
 
-  return {
-    years,
-    totalPosts: posts.length,
-  };
+  return { years, totalPosts: posts.length };
 };

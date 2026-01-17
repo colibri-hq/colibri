@@ -1,4 +1,6 @@
+import { subtle } from "node:crypto";
 import type { Database } from "../database.js";
+import type { ContributionRole, JsonObject } from "../schema.js";
 import type {
   IngestWorkOptions,
   IngestWorkResult,
@@ -11,48 +13,39 @@ import type {
   BatchImportOptions,
   BatchImportResult,
 } from "./types.js";
-import { detectDuplicates } from "./detect-duplicates.js";
 import { loadMetadata } from "../ebooks/index.js";
-import { createWork, updateWork, createEdition } from "../resources/work.js";
 import { createAsset } from "../resources/asset.js";
-import { createImage } from "../resources/image.js";
 import {
   createCreator,
   findCreatorByName,
   findSimilarCreators,
   createContribution,
 } from "../resources/creator.js";
-import {
-  createPublisher,
-  findPublisherByName,
-  findSimilarPublishers,
-} from "../resources/publisher.js";
-import { normalizeCreatorName, normalizePublisherName } from "./normalize.js";
-import { enrichMetadata, mergeEnrichedMetadata } from "./enrich.js";
+import { createImage } from "../resources/image.js";
 import { loadLanguage } from "../resources/language.js";
-import { findOrCreateSeries, addWorkToSeries } from "../resources/series.js";
-import { findOrCreateTags, addTagsToWork } from "../resources/tag.js";
 import {
   createPendingIngestion,
   getPendingIngestion,
   deletePendingIngestion,
   deleteExpiredIngestions,
 } from "../resources/pending-ingestion.js";
-import { subtle } from "node:crypto";
-import type { ContributionRole, JsonObject } from "../schema.js";
+import {
+  createPublisher,
+  findPublisherByName,
+  findSimilarPublishers,
+} from "../resources/publisher.js";
+import { findOrCreateSeries, addWorkToSeries } from "../resources/series.js";
+import { findOrCreateTags, addTagsToWork } from "../resources/tag.js";
+import { createWork, updateWork, createEdition } from "../resources/work.js";
+import { detectDuplicates } from "./detect-duplicates.js";
+import { enrichMetadata, mergeEnrichedMetadata } from "./enrich.js";
+import { normalizeCreatorName, normalizePublisherName } from "./normalize.js";
 
 // Re-export types and functions
 export * from "./types.js";
-export {
-  detectDuplicates,
-  isPossibleFormatVariant,
-} from "./detect-duplicates.js";
+export { detectDuplicates, isPossibleFormatVariant } from "./detect-duplicates.js";
 export { normalizeCreatorName, normalizePublisherName } from "./normalize.js";
-export {
-  enrichMetadata,
-  mergeEnrichedMetadata,
-  type EnrichMetadataOptions,
-} from "./enrich.js";
+export { enrichMetadata, mergeEnrichedMetadata, type EnrichMetadataOptions } from "./enrich.js";
 export {
   createPendingIngestion,
   getPendingIngestion,
@@ -179,9 +172,7 @@ export async function ingestWork(
       subjects: rawMetadata.tags,
     };
   } catch (error) {
-    throw new Error(`Failed to extract metadata from file: ${error}`, {
-      cause: error,
-    });
+    throw new Error(`Failed to extract metadata from file: ${error}`, { cause: error });
   }
 
   // Enrich metadata if requested
@@ -192,19 +183,12 @@ export async function ingestWork(
         timeout: number;
         minConfidence: number;
         providers?: string[];
-      } = {
-        fillMissingOnly: true,
-        timeout: 30000,
-        minConfidence: 0.6,
-      };
+      } = { fillMissingOnly: true, timeout: 30000, minConfidence: 0.6 };
       if (options.enrichProviders) {
         enrichmentOptions.providers = options.enrichProviders;
       }
 
-      const enrichmentResult = await enrichMetadata(
-        metadata,
-        enrichmentOptions,
-      );
+      const enrichmentResult = await enrichMetadata(metadata, enrichmentOptions);
 
       // Merge enriched data into metadata using the helper
       metadata = mergeEnrichedMetadata(metadata, enrichmentResult);
@@ -213,9 +197,7 @@ export async function ingestWork(
       if (enrichmentResult.sources.length > 0) {
         enrichmentSources = enrichmentResult.sources;
         enrichmentConfidence = enrichmentResult.confidence;
-        warnings.push(
-          `Enriched metadata from: ${enrichmentResult.sources.join(", ")}`,
-        );
+        warnings.push(`Enriched metadata from: ${enrichmentResult.sources.join(", ")}`);
       }
     } catch (error) {
       warnings.push(`Metadata enrichment failed: ${error}`);
@@ -268,10 +250,7 @@ export async function ingestWork(
           status: "needs-confirmation",
           duplicateInfo,
           pendingId: pending.id,
-          warnings: [
-            duplicateInfo.description ??
-              "Duplicate detected, awaiting confirmation",
-          ],
+          warnings: [duplicateInfo.description ?? "Duplicate detected, awaiting confirmation"],
           enrichmentSources,
           enrichmentConfidence,
         };
@@ -432,19 +411,11 @@ async function createNewWork(
 ): Promise<IngestWorkResult> {
   return await database.transaction().execute(async (trx) => {
     // Process contributors (creators and publishers)
-    const { contributions, publisherIds } = await processContributors(
-      trx,
-      metadata,
-      warnings,
-    );
+    const { contributions, publisherIds } = await processContributors(trx, metadata, warnings);
 
     // Process cover image
     const coverId = metadata.cover
-      ? await processCoverImage(
-          trx,
-          metadata.cover,
-          metadata.title ?? "Untitled",
-        )
+      ? await processCoverImage(trx, metadata.cover, metadata.title ?? "Untitled")
       : undefined;
 
     // Resolve language
@@ -504,12 +475,7 @@ async function createNewWork(
           userId: options.userId,
         });
 
-        await addWorkToSeries(
-          trx,
-          work.id,
-          series.id,
-          metadata.series.position,
-        );
+        await addWorkToSeries(trx, work.id, series.id, metadata.series.position);
       } catch (error) {
         warnings.push(`Failed to link series: ${error}`);
       }
@@ -518,9 +484,7 @@ async function createNewWork(
     // Process subjects/tags
     if (metadata.subjects && metadata.subjects.length > 0) {
       try {
-        const tags = await findOrCreateTags(trx, metadata.subjects, {
-          userId: options.userId,
-        });
+        const tags = await findOrCreateTags(trx, metadata.subjects, { userId: options.userId });
 
         await addTagsToWork(
           trx,
@@ -560,19 +524,11 @@ async function createNewEdition(
 ): Promise<IngestWorkResult> {
   return await database.transaction().execute(async (trx) => {
     // Process contributors
-    const { contributions, publisherIds } = await processContributors(
-      trx,
-      metadata,
-      warnings,
-    );
+    const { contributions, publisherIds } = await processContributors(trx, metadata, warnings);
 
     // Process cover image
     const coverId = metadata.cover
-      ? await processCoverImage(
-          trx,
-          metadata.cover,
-          metadata.title ?? "Untitled",
-        )
+      ? await processCoverImage(trx, metadata.cover, metadata.title ?? "Untitled")
       : undefined;
 
     // Resolve language
@@ -608,13 +564,7 @@ async function createNewEdition(
     // Create contributions
     for (const [role, creatorIds] of contributions.entries()) {
       for (const creatorId of creatorIds) {
-        await createContribution(
-          trx,
-          creatorId,
-          edition.id,
-          role,
-          role === "aut",
-        );
+        await createContribution(trx, creatorId, edition.id, role, role === "aut");
       }
     }
 
@@ -635,12 +585,7 @@ async function createNewEdition(
           .executeTakeFirst();
 
         if (!existingEntry) {
-          await addWorkToSeries(
-            trx,
-            workId,
-            series.id,
-            metadata.series.position,
-          );
+          await addWorkToSeries(trx, workId, series.id, metadata.series.position);
         }
       } catch (error) {
         warnings.push(`Failed to link series: ${error}`);
@@ -658,9 +603,7 @@ async function createNewEdition(
           .where("work_tag.work_id", "=", workId)
           .execute();
 
-        const existingTagValues = new Set(
-          existingTags.map((t) => t.value.toLowerCase()),
-        );
+        const existingTagValues = new Set(existingTags.map((t) => t.value.toLowerCase()));
 
         // Filter out tags that already exist on this work
         const newSubjects = metadata.subjects.filter(
@@ -669,9 +612,7 @@ async function createNewEdition(
 
         if (newSubjects.length > 0) {
           // Batch create/find tags
-          const tags = await findOrCreateTags(trx, newSubjects, {
-            userId: options.userId,
-          });
+          const tags = await findOrCreateTags(trx, newSubjects, { userId: options.userId });
 
           // Batch add to work
           await addTagsToWork(
@@ -711,10 +652,7 @@ async function processContributors(
   database: Database,
   metadata: ExtractedMetadata,
   _warnings: string[],
-): Promise<{
-  contributions: Map<ContributionRole, string[]>;
-  publisherIds: Set<string>;
-}> {
+): Promise<{ contributions: Map<ContributionRole, string[]>; publisherIds: Set<string> }> {
   const contributions = new Map<ContributionRole, string[]>();
   const publisherIds = new Set<string>();
 
@@ -752,11 +690,7 @@ async function processContributors(
  * 3. If similar publisher found, auto-merge by returning existing publisher
  * 4. Otherwise, create new publisher
  */
-async function findOrCreatePublisher(
-  database: Database,
-  name: string,
-  sortingKey?: string,
-) {
+async function findOrCreatePublisher(database: Database, name: string, sortingKey?: string) {
   // Try exact match first
   const exact = await findPublisherByName(database, name);
   if (exact) {
@@ -777,9 +711,7 @@ async function findOrCreatePublisher(
   }
 
   // No match found, create new publisher
-  return await createPublisher(database, name, {
-    sortingKey: sortingKey ?? name,
-  });
+  return await createPublisher(database, name, { sortingKey: sortingKey ?? name });
 }
 
 /**
@@ -791,11 +723,7 @@ async function findOrCreatePublisher(
  * 3. If similar creator found, auto-merge by returning existing creator
  * 4. Otherwise, create new creator
  */
-async function findOrCreateCreator(
-  database: Database,
-  name: string,
-  sortingKey?: string,
-) {
+async function findOrCreateCreator(database: Database, name: string, sortingKey?: string) {
   // Try exact match first
   const exact = await findCreatorByName(database, name);
   if (exact) {
@@ -816,9 +744,7 @@ async function findOrCreateCreator(
   }
 
   // No match found, create new creator
-  return await createCreator(database, name, {
-    sortingKey: sortingKey ?? name,
-  });
+  return await createCreator(database, name, { sortingKey: sortingKey ?? name });
 }
 
 /**
@@ -855,14 +781,8 @@ async function processCoverImage(
   // Create image record
   const imageRecord = await createImage(
     database,
-    new File([cover], `${title}.${format ?? "jpg"}`, {
-      type: `image/${format ?? "jpeg"}`,
-    }),
-    {
-      width: width ?? 0,
-      height: height ?? 0,
-      blurhash,
-    },
+    new File([cover], `${title}.${format ?? "jpg"}`, { type: `image/${format ?? "jpeg"}` }),
+    { width: width ?? 0, height: height ?? 0, blurhash },
   );
 
   return imageRecord.id;
@@ -886,11 +806,7 @@ export async function batchImport(
 ): Promise<BatchImportResult> {
   const startTime = Date.now();
   const successful: Array<{ file: string; result: IngestWorkResult }> = [];
-  const skipped: Array<{
-    file: string;
-    reason: string;
-    duplicateInfo?: DuplicateCheckResult;
-  }> = [];
+  const skipped: Array<{ file: string; reason: string; duplicateInfo?: DuplicateCheckResult }> = [];
   const failed: Array<{ file: string; error: Error }> = [];
 
   for (let i = 0; i < files.length; i++) {
@@ -908,9 +824,7 @@ export async function batchImport(
       if (options.dryRun) {
         // Dry run mode: extract metadata only, don't persist
         const fileBytes = await file.bytes();
-        const checksum = new Uint8Array(
-          await subtle.digest("SHA-256", fileBytes),
-        );
+        const checksum = new Uint8Array(await subtle.digest("SHA-256", fileBytes));
         const rawMetadata = await loadMetadata(file);
         const metadata: ExtractedMetadata = {
           title: rawMetadata.title,
@@ -929,11 +843,7 @@ export async function batchImport(
         };
 
         // Check for duplicates
-        const duplicateInfo = await detectDuplicates(
-          database,
-          checksum,
-          metadata,
-        );
+        const duplicateInfo = await detectDuplicates(database, checksum, metadata);
 
         if (duplicateInfo.hasDuplicate) {
           result = {
@@ -942,15 +852,10 @@ export async function batchImport(
             edition: duplicateInfo.existingEdition,
             asset: duplicateInfo.existingAsset,
             duplicateInfo,
-            warnings: [
-              duplicateInfo.description ?? "Duplicate found (dry run)",
-            ],
+            warnings: [duplicateInfo.description ?? "Duplicate found (dry run)"],
           };
         } else {
-          result = {
-            status: "created",
-            warnings: ["Would create new work (dry run)"],
-          };
+          result = { status: "created", warnings: ["Would create new work (dry run)"] };
         }
       } else {
         // Normal mode: full ingestion
@@ -965,11 +870,7 @@ export async function batchImport(
       // Categorize result
       if (result.status === "needs-confirmation") {
         // In batch mode, treat needs-confirmation as a skip
-        const entry: {
-          file: string;
-          reason: string;
-          duplicateInfo?: DuplicateCheckResult;
-        } = {
+        const entry: { file: string; reason: string; duplicateInfo?: DuplicateCheckResult } = {
           file: fileName,
           reason: "Requires manual confirmation",
         };
@@ -978,11 +879,7 @@ export async function batchImport(
         }
         skipped.push(entry);
       } else if (result.status === "skipped") {
-        const entry: {
-          file: string;
-          reason: string;
-          duplicateInfo?: DuplicateCheckResult;
-        } = {
+        const entry: { file: string; reason: string; duplicateInfo?: DuplicateCheckResult } = {
           file: fileName,
           reason: result.warnings[0] ?? "Skipped",
         };
@@ -994,8 +891,7 @@ export async function batchImport(
         successful.push({ file: fileName, result });
       }
     } catch (error) {
-      const errorObj =
-        error instanceof Error ? error : new Error(String(error));
+      const errorObj = error instanceof Error ? error : new Error(String(error));
       failed.push({ file: fileName, error: errorObj });
 
       // Stop on first error if continueOnError is false
@@ -1007,11 +903,5 @@ export async function batchImport(
 
   const duration = Date.now() - startTime;
 
-  return {
-    total: files.length,
-    successful,
-    skipped,
-    failed,
-    duration,
-  };
+  return { total: files.length, successful, skipped, failed, duration };
 }

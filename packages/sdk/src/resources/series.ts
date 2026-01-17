@@ -1,18 +1,14 @@
-import type { Database, Schema } from "../database.js";
-import type { Series as $Series } from "../schema.js";
 import type { Selectable } from "kysely";
 import { sql } from "kysely";
+import type { Database, Schema } from "../database.js";
+import type { Series as $Series } from "../schema.js";
 
 const table = "series" as const;
 
 /**
  * Load all series with pagination
  */
-export function loadSeries(
-  database: Database,
-  page?: number,
-  perPage: number = 50,
-) {
+export function loadSeries(database: Database, page?: number, perPage: number = 50) {
   let query = database.selectFrom(table).selectAll().orderBy("name", "asc");
 
   if (page !== undefined && page > 0) {
@@ -26,11 +22,7 @@ export function loadSeries(
  * Load a single series by ID
  */
 export function loadSeriesById(database: Database, id: string) {
-  return database
-    .selectFrom(table)
-    .where("id", "=", id)
-    .selectAll()
-    .executeTakeFirstOrThrow();
+  return database.selectFrom(table).where("id", "=", id).selectAll().executeTakeFirstOrThrow();
 }
 
 /**
@@ -54,10 +46,7 @@ export function loadSeriesWorks(database: Database, seriesId: string) {
 /**
  * Create a new series
  */
-type NewSeries = {
-  language?: string | undefined;
-  userId?: string | undefined;
-};
+type NewSeries = { language?: string | undefined; userId?: string | undefined };
 
 export function createSeries(
   database: Database,
@@ -66,11 +55,7 @@ export function createSeries(
 ) {
   return database
     .insertInto(table)
-    .values({
-      name,
-      language,
-      updated_by: userId ? userId.toString() : undefined,
-    })
+    .values({ name, language, updated_by: userId ? userId.toString() : undefined })
     .returningAll()
     .executeTakeFirstOrThrow();
 }
@@ -128,17 +113,9 @@ export async function findSeriesByFuzzyName(
     .selectFrom(table)
     .selectAll()
     .select((eb) =>
-      eb
-        .fn<number>("similarity", [eb.ref("name"), eb.val(name)])
-        .as("similarity_score"),
+      eb.fn<number>("similarity", [eb.ref("name"), eb.val(name)]).as("similarity_score"),
     )
-    .where((eb) =>
-      eb(
-        eb.fn<number>("similarity", [eb.ref("name"), eb.val(name)]),
-        ">",
-        threshold,
-      ),
-    )
+    .where((eb) => eb(eb.fn<number>("similarity", [eb.ref("name"), eb.val(name)]), ">", threshold))
     .orderBy("similarity_score", "desc")
     .limit(5)
     .execute();
@@ -183,11 +160,7 @@ export function addWorkToSeries(
 ) {
   return database
     .insertInto("series_entry")
-    .values({
-      work_id: workId,
-      series_id: seriesId,
-      position,
-    })
+    .values({ work_id: workId, series_id: seriesId, position })
     .returningAll()
     .executeTakeFirstOrThrow();
 }
@@ -195,11 +168,7 @@ export function addWorkToSeries(
 /**
  * Remove a work from a series
  */
-export function removeWorkFromSeries(
-  database: Database,
-  workId: string,
-  seriesId: string,
-) {
+export function removeWorkFromSeries(database: Database, workId: string, seriesId: string) {
   return database
     .deleteFrom("series_entry")
     .where("work_id", "=", workId)
@@ -249,11 +218,7 @@ export function loadSeriesForWork(database: Database, workId: string) {
 /**
  * Load series with work counts for list views
  */
-export function loadSeriesWithWorkCount(
-  database: Database,
-  page?: number,
-  perPage: number = 50,
-) {
+export function loadSeriesWithWorkCount(database: Database, page?: number, perPage: number = 50) {
   let query = database
     .selectFrom(table)
     .leftJoin("series_entry", "series_entry.series_id", "series.id")

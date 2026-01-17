@@ -57,25 +57,19 @@ describe("settings registry", () => {
     });
 
     it("should have correct types for each setting", () => {
-      expect(
-        SETTINGS_REGISTRY["urn:colibri:settings:general:instance-name"].type,
-      ).toBe("string");
-      expect(
-        SETTINGS_REGISTRY["urn:colibri:settings:security:registration-enabled"]
-          .type,
-      ).toBe("boolean");
-      expect(
-        SETTINGS_REGISTRY["urn:colibri:settings:metadata:provider-priority"]
-          .type,
-      ).toBe("string[]");
+      expect(SETTINGS_REGISTRY["urn:colibri:settings:general:instance-name"].type).toBe("string");
+      expect(SETTINGS_REGISTRY["urn:colibri:settings:security:registration-enabled"].type).toBe(
+        "boolean",
+      );
+      expect(SETTINGS_REGISTRY["urn:colibri:settings:metadata:provider-priority"].type).toBe(
+        "string[]",
+      );
     });
   });
 
   describe("getSettingDefinition", () => {
     it("should return the correct definition for a valid key", () => {
-      const definition = getSettingDefinition(
-        "urn:colibri:settings:general:instance-name",
-      );
+      const definition = getSettingDefinition("urn:colibri:settings:general:instance-name");
 
       expect(definition.key).toBe("urn:colibri:settings:general:instance-name");
       expect(definition.category).toBe("general");
@@ -134,12 +128,8 @@ describe("settings registry", () => {
 
   describe("isValidSettingKey", () => {
     it("should return true for valid keys", () => {
-      expect(
-        isValidSettingKey("urn:colibri:settings:general:instance-name"),
-      ).toBe(true);
-      expect(
-        isValidSettingKey("urn:colibri:settings:security:registration-enabled"),
-      ).toBe(true);
+      expect(isValidSettingKey("urn:colibri:settings:general:instance-name")).toBe(true);
+      expect(isValidSettingKey("urn:colibri:settings:security:registration-enabled")).toBe(true);
     });
 
     it("should return false for invalid keys", () => {
@@ -151,9 +141,7 @@ describe("settings registry", () => {
 
   describe("validation schemas", () => {
     it("should validate string settings correctly", () => {
-      const definition = getSettingDefinition(
-        "urn:colibri:settings:general:instance-name",
-      );
+      const definition = getSettingDefinition("urn:colibri:settings:general:instance-name");
 
       expect(definition.validation.safeParse("My Library").success).toBe(true);
       expect(definition.validation.safeParse("").success).toBe(false); // min length 1
@@ -161,9 +149,7 @@ describe("settings registry", () => {
     });
 
     it("should validate boolean settings correctly", () => {
-      const definition = getSettingDefinition(
-        "urn:colibri:settings:security:registration-enabled",
-      );
+      const definition = getSettingDefinition("urn:colibri:settings:security:registration-enabled");
 
       expect(definition.validation.safeParse(true).success).toBe(true);
       expect(definition.validation.safeParse(false).success).toBe(true);
@@ -172,23 +158,15 @@ describe("settings registry", () => {
     });
 
     it("should validate string[] settings correctly", () => {
-      const definition = getSettingDefinition(
-        "urn:colibri:settings:metadata:provider-priority",
-      );
+      const definition = getSettingDefinition("urn:colibri:settings:metadata:provider-priority");
 
-      expect(
-        definition.validation.safeParse(["open-library", "wikidata"]).success,
-      ).toBe(true);
+      expect(definition.validation.safeParse(["open-library", "wikidata"]).success).toBe(true);
       expect(definition.validation.safeParse([]).success).toBe(true);
-      expect(definition.validation.safeParse("open-library").success).toBe(
-        false,
-      ); // wrong type
+      expect(definition.validation.safeParse("open-library").success).toBe(false); // wrong type
     });
 
     it("should validate enum settings correctly", () => {
-      const definition = getSettingDefinition(
-        "urn:colibri:settings:content:default-visibility",
-      );
+      const definition = getSettingDefinition("urn:colibri:settings:content:default-visibility");
 
       expect(definition.validation.safeParse("private").success).toBe(true);
       expect(definition.validation.safeParse("shared").success).toBe(true);
@@ -197,9 +175,7 @@ describe("settings registry", () => {
     });
 
     it("should validate number settings correctly", () => {
-      const widthDefinition = getSettingDefinition(
-        "urn:colibri:settings:metadata:cover-min-width",
-      );
+      const widthDefinition = getSettingDefinition("urn:colibri:settings:metadata:cover-min-width");
       const heightDefinition = getSettingDefinition(
         "urn:colibri:settings:metadata:cover-min-height",
       );
@@ -217,21 +193,15 @@ describe("settings registry", () => {
 
   describe("metadata provider settings", () => {
     it("should mark API keys as secret", () => {
-      const googleKey = getSettingDefinition(
-        "urn:colibri:settings:metadata:google-books-api-key",
-      );
+      const googleKey = getSettingDefinition("urn:colibri:settings:metadata:google-books-api-key");
       const amazonAccessKey = getSettingDefinition(
         "urn:colibri:settings:metadata:amazon-access-key",
       );
       const amazonSecretKey = getSettingDefinition(
         "urn:colibri:settings:metadata:amazon-secret-key",
       );
-      const isbndbKey = getSettingDefinition(
-        "urn:colibri:settings:metadata:isbndb-api-key",
-      );
-      const springerKey = getSettingDefinition(
-        "urn:colibri:settings:metadata:springer-api-key",
-      );
+      const isbndbKey = getSettingDefinition("urn:colibri:settings:metadata:isbndb-api-key");
+      const springerKey = getSettingDefinition("urn:colibri:settings:metadata:springer-api-key");
       const librarythingKey = getSettingDefinition(
         "urn:colibri:settings:metadata:librarything-api-key",
       );
@@ -251,9 +221,7 @@ describe("settings registry", () => {
       const googleEnabled = getSettingDefinition(
         "urn:colibri:settings:metadata:google-books-enabled",
       );
-      const amazonRegion = getSettingDefinition(
-        "urn:colibri:settings:metadata:amazon-region",
-      );
+      const amazonRegion = getSettingDefinition("urn:colibri:settings:metadata:amazon-region");
       const coverFallback = getSettingDefinition(
         "urn:colibri:settings:metadata:cover-fallback-enabled",
       );

@@ -164,24 +164,15 @@ export class ConflictDetector {
     conflicts.push(...formatConflicts);
 
     // Check for precision differences
-    const precisionConflicts = this.detectPrecisionDifferences(
-      rawValues,
-      fieldName,
-    );
+    const precisionConflicts = this.detectPrecisionDifferences(rawValues, fieldName);
     conflicts.push(...precisionConflicts);
 
     // Check for completeness differences
-    const completenessConflicts = this.detectCompletenessDifferences(
-      rawValues,
-      fieldName,
-    );
+    const completenessConflicts = this.detectCompletenessDifferences(rawValues, fieldName);
     conflicts.push(...completenessConflicts);
 
     // Check for quality differences
-    const qualityConflicts = this.detectQualityDifferences(
-      rawValues,
-      fieldName,
-    );
+    const qualityConflicts = this.detectQualityDifferences(rawValues, fieldName);
     conflicts.push(...qualityConflicts);
 
     // Limit the number of conflicts reported
@@ -200,11 +191,7 @@ export class ConflictDetector {
     // Detect conflicts in each field
     for (const [fieldName, field] of Object.entries(fields)) {
       const rawValues = rawMetadata[fieldName] || [];
-      const fieldConflicts = this.detectFieldConflicts(
-        field,
-        fieldName,
-        rawValues,
-      );
+      const fieldConflicts = this.detectFieldConflicts(field, fieldName, rawValues);
       allConflicts.push(...fieldConflicts);
     }
 
@@ -256,45 +243,35 @@ export class ConflictDetector {
   /**
    * Check if two values are similar enough to be considered the same
    */
-  private areValuesSimilar<T>(
-    value1: T,
-    value2: T,
-    fieldName: string,
-  ): boolean {
+  private areValuesSimilar<T>(value1: T, value2: T, fieldName: string): boolean {
     if (value1 === value2) return true;
     if (value1 == null || value2 == null) return value1 === value2;
 
     // Handle different types based on field name and value type
     if (typeof value1 === "string" && typeof value2 === "string") {
       return (
-        this.calculateStringSimilarity(value1, value2) >=
-        this.config.stringSimilarityThreshold
+        this.calculateStringSimilarity(value1, value2) >= this.config.stringSimilarityThreshold
       );
     }
 
     if (typeof value1 === "number" && typeof value2 === "number") {
       const diff = Math.abs(value1 - value2);
       const avg = (value1 + value2) / 2;
-      return avg === 0
-        ? diff === 0
-        : diff / avg <= this.config.numericThreshold;
+      return avg === 0 ? diff === 0 : diff / avg <= this.config.numericThreshold;
     }
 
     // Handle dates
     if (this.isDate(value1) && this.isDate(value2)) {
       const date1 = new Date(value1 as any);
       const date2 = new Date(value2 as any);
-      const diffDays =
-        Math.abs(date1.getTime() - date2.getTime()) / (1000 * 60 * 60 * 24);
+      const diffDays = Math.abs(date1.getTime() - date2.getTime()) / (1000 * 60 * 60 * 24);
       return diffDays <= this.config.dateDifferenceThreshold;
     }
 
     // Handle arrays
     if (Array.isArray(value1) && Array.isArray(value2)) {
       if (value1.length !== value2.length) return false;
-      return value1.every((item, index) =>
-        this.areValuesSimilar(item, value2[index], fieldName),
-      );
+      return value1.every((item, index) => this.areValuesSimilar(item, value2[index], fieldName));
     }
 
     // Handle objects
@@ -314,10 +291,7 @@ export class ConflictDetector {
 
     // Handle specific object types
     if (fieldName === "publicationDate") {
-      return this.arePublicationDatesSimilar(
-        obj1 as PublicationDate,
-        obj2 as PublicationDate,
-      );
+      return this.arePublicationDatesSimilar(obj1 as PublicationDate, obj2 as PublicationDate);
     }
 
     if (fieldName === "publisher") {
@@ -341,10 +315,7 @@ export class ConflictDetector {
   /**
    * Check if two publication dates are similar
    */
-  private arePublicationDatesSimilar(
-    date1: PublicationDate,
-    date2: PublicationDate,
-  ): boolean {
+  private arePublicationDatesSimilar(date1: PublicationDate, date2: PublicationDate): boolean {
     // If both have years, compare years
     if (date1.year && date2.year) {
       return Math.abs(date1.year - date2.year) <= 1; // Allow 1 year difference
@@ -374,8 +345,7 @@ export class ConflictDetector {
 
     // Compare regular names
     return (
-      this.calculateStringSimilarity(pub1.name, pub2.name) >=
-      this.config.stringSimilarityThreshold
+      this.calculateStringSimilarity(pub1.name, pub2.name) >= this.config.stringSimilarityThreshold
     );
   }
 
@@ -435,38 +405,24 @@ export class ConflictDetector {
 
     return {
       field: fieldName,
-      values: allValues.map((item) => ({
-        value: item.value,
-        source: item.source,
-      })),
+      values: allValues.map((item) => ({ value: item.value, source: item.source })),
       resolution,
       type: "value_mismatch",
       severity,
       confidence: this.calculateConflictConfidence(valueGroups),
-      explanation: this.generateConflictExplanation(
-        fieldName,
-        valueGroups,
-        "value_mismatch",
-      ),
+      explanation: this.generateConflictExplanation(fieldName, valueGroups, "value_mismatch"),
       resolutionSuggestions: this.generateResolutionSuggestions(
         fieldName,
         valueGroups,
         "value_mismatch",
       ),
       impact,
-      autoResolvable: this.isAutoResolvable(
-        fieldName,
-        valueGroups,
-        "value_mismatch",
-      ),
+      autoResolvable: this.isAutoResolvable(fieldName, valueGroups, "value_mismatch"),
       detectionMetadata: {
         detectedAt: new Date(),
         detectionMethod: "value_grouping",
         algorithmVersion: this.algorithmVersion,
-        context: {
-          groupCount: valueGroups.length,
-          totalValues: allValues.length,
-        },
+        context: { groupCount: valueGroups.length, totalValues: allValues.length },
       },
     };
   }
@@ -485,20 +441,14 @@ export class ConflictDetector {
     // Check for common format differences based on field type
     if (fieldName === "isbn") {
       const isbnConflicts = this.detectISBNFormatDifferences(
-        rawValues as Array<{
-          value: string | string[];
-          source: MetadataSource;
-        }>,
+        rawValues as Array<{ value: string | string[]; source: MetadataSource }>,
       );
       conflicts.push(...isbnConflicts);
     }
 
     if (fieldName === "publicationDate") {
       const dateConflicts = this.detectDateFormatDifferences(
-        rawValues as Array<{
-          value: PublicationDate | string;
-          source: MetadataSource;
-        }>,
+        rawValues as Array<{ value: PublicationDate | string; source: MetadataSource }>,
       );
       conflicts.push(...dateConflicts);
     }
@@ -539,9 +489,7 @@ export class ConflictDetector {
           sources.map((s) => {
             const isbns = Array.isArray(s.value) ? s.value : [s.value];
             return isbns.find(
-              (isbn) =>
-                typeof isbn === "string" &&
-                isbn.replace(/[-\s]/g, "") === normalizedISBN,
+              (isbn) => typeof isbn === "string" && isbn.replace(/[-\s]/g, "") === normalizedISBN,
             );
           }),
         );
@@ -563,8 +511,7 @@ export class ConflictDetector {
             impact: {
               score: 0.2,
               affectedAreas: ["identification", "deduplication"],
-              description:
-                "Minor formatting inconsistency that could affect book identification",
+              description: "Minor formatting inconsistency that could affect book identification",
               affectsCoreMetadata: false,
             },
             autoResolvable: true,
@@ -586,10 +533,7 @@ export class ConflictDetector {
    * Detect date format differences
    */
   private detectDateFormatDifferences(
-    rawValues: Array<{
-      value: PublicationDate | string;
-      source: MetadataSource;
-    }>,
+    rawValues: Array<{ value: PublicationDate | string; source: MetadataSource }>,
   ): DetailedConflict[] {
     const conflicts: DetailedConflict[] = [];
     const datesByYear = new Map<
@@ -605,11 +549,7 @@ export class ConflictDetector {
         if (!isNaN(parsed.getTime())) {
           year = parsed.getFullYear();
         }
-      } else if (
-        item.value &&
-        typeof item.value === "object" &&
-        "year" in item.value
-      ) {
+      } else if (item.value && typeof item.value === "object" && "year" in item.value) {
         year = item.value.year;
       }
 
@@ -627,11 +567,7 @@ export class ConflictDetector {
         const precisions = new Set(
           sources.map((s) => {
             if (typeof s.value === "string") return "string";
-            if (
-              s.value &&
-              typeof s.value === "object" &&
-              "precision" in s.value
-            ) {
+            if (s.value && typeof s.value === "object" && "precision" in s.value) {
               return s.value.precision;
             }
             return "unknown";
@@ -655,8 +591,7 @@ export class ConflictDetector {
             impact: {
               score: 0.3,
               affectedAreas: ["chronology", "sorting"],
-              description:
-                "Different date precision levels may affect chronological ordering",
+              description: "Different date precision levels may affect chronological ordering",
               affectsCoreMetadata: false,
             },
             autoResolvable: true,
@@ -696,18 +631,10 @@ export class ConflictDetector {
     const conflicts: DetailedConflict[] = [];
 
     // Check for cases where some sources have more complete data
-    if (
-      fieldName === "authors" ||
-      fieldName === "subjects" ||
-      fieldName === "identifiers"
-    ) {
+    if (fieldName === "authors" || fieldName === "subjects" || fieldName === "identifiers") {
       const lengthsBySource = rawValues.map((item) => ({
         source: item.source,
-        length: Array.isArray(item.value)
-          ? item.value.length
-          : item.value
-            ? 1
-            : 0,
+        length: Array.isArray(item.value) ? item.value.length : item.value ? 1 : 0,
       }));
 
       const maxLength = Math.max(...lengthsBySource.map((l) => l.length));
@@ -717,10 +644,7 @@ export class ConflictDetector {
         // Significant difference in completeness
         conflicts.push({
           field: fieldName,
-          values: rawValues.map((item) => ({
-            value: item.value,
-            source: item.source,
-          })),
+          values: rawValues.map((item) => ({ value: item.value, source: item.source })),
           resolution: "Combined data from all sources to maximize completeness",
           type: "completeness_difference",
           severity: "minor",
@@ -734,8 +658,7 @@ export class ConflictDetector {
           impact: {
             score: 0.4,
             affectedAreas: ["completeness", "discovery"],
-            description:
-              "Some sources provide significantly more complete data",
+            description: "Some sources provide significantly more complete data",
             affectsCoreMetadata: false,
           },
           autoResolvable: true,
@@ -768,23 +691,13 @@ export class ConflictDetector {
 
     if (reliabilityDiff > 0.3) {
       // Significant reliability difference
-      const highReliabilitySources = rawValues.filter(
-        (v) => v.source.reliability > 0.8,
-      );
-      const lowReliabilitySources = rawValues.filter(
-        (v) => v.source.reliability < 0.5,
-      );
+      const highReliabilitySources = rawValues.filter((v) => v.source.reliability > 0.8);
+      const lowReliabilitySources = rawValues.filter((v) => v.source.reliability < 0.5);
 
-      if (
-        highReliabilitySources.length > 0 &&
-        lowReliabilitySources.length > 0
-      ) {
+      if (highReliabilitySources.length > 0 && lowReliabilitySources.length > 0) {
         conflicts.push({
           field: fieldName,
-          values: rawValues.map((item) => ({
-            value: item.value,
-            source: item.source,
-          })),
+          values: rawValues.map((item) => ({ value: item.value, source: item.source })),
           resolution: "Prioritized data from more reliable sources",
           type: "quality_difference",
           severity: "minor",
@@ -798,8 +711,7 @@ export class ConflictDetector {
           impact: {
             score: 0.3,
             affectedAreas: ["accuracy", "confidence"],
-            description:
-              "Quality differences between sources may affect data accuracy",
+            description: "Quality differences between sources may affect data accuracy",
             affectsCoreMetadata: false,
           },
           autoResolvable: true,
@@ -836,12 +748,8 @@ export class ConflictDetector {
 
     // Source reliability affects severity
     const allSources = valueGroups.flat().map((v) => v.source);
-    const hasHighReliabilitySources = allSources.some(
-      (s) => s.reliability > 0.8,
-    );
-    const hasLowReliabilitySources = allSources.some(
-      (s) => s.reliability < 0.5,
-    );
+    const hasHighReliabilitySources = allSources.some((s) => s.reliability > 0.8);
+    const hasLowReliabilitySources = allSources.some((s) => s.reliability < 0.5);
 
     if (isCore && groupCount > 2 && hasHighReliabilitySources) {
       return "critical";
@@ -894,18 +802,9 @@ export class ConflictDetector {
       affectedAreas.push("deduplication", "external_linking");
     }
 
-    const description = this.generateImpactDescription(
-      fieldName,
-      groupCount,
-      isCore,
-    );
+    const description = this.generateImpactDescription(fieldName, groupCount, isCore);
 
-    return {
-      score: Math.min(1, score),
-      affectedAreas,
-      description,
-      affectsCoreMetadata: isCore,
-    };
+    return { score: Math.min(1, score), affectedAreas, description, affectsCoreMetadata: isCore };
   }
 
   /**
@@ -986,9 +885,7 @@ export class ConflictDetector {
 
     switch (conflictType) {
       case "value_mismatch":
-        suggestions.push(
-          "Review source reliability and prioritize most trustworthy sources",
-        );
+        suggestions.push("Review source reliability and prioritize most trustworthy sources");
         suggestions.push("Consider manual verification of conflicting values");
         suggestions.push("Look for additional sources to break ties");
         if (fieldName === "title") {
@@ -1003,23 +900,17 @@ export class ConflictDetector {
 
       case "precision_difference":
         suggestions.push("Use the most precise value available");
-        suggestions.push(
-          "Combine information from multiple sources when possible",
-        );
+        suggestions.push("Combine information from multiple sources when possible");
         break;
 
       case "completeness_difference":
-        suggestions.push(
-          "Merge data from all sources to maximize completeness",
-        );
+        suggestions.push("Merge data from all sources to maximize completeness");
         suggestions.push("Prioritize sources with more complete information");
         break;
 
       case "quality_difference":
         suggestions.push("Weight values by source reliability");
-        suggestions.push(
-          "Use high-quality sources as primary, others as fallback",
-        );
+        suggestions.push("Use high-quality sources as primary, others as fallback");
         break;
     }
 
@@ -1044,12 +935,8 @@ export class ConflictDetector {
       case "value_mismatch":
         // Auto-resolvable if there's a clear reliability winner
         const allSources = valueGroups.flat().map((v) => v.source);
-        const maxReliability = Math.max(
-          ...allSources.map((s) => s.reliability),
-        );
-        const highReliabilitySources = allSources.filter(
-          (s) => s.reliability === maxReliability,
-        );
+        const maxReliability = Math.max(...allSources.map((s) => s.reliability));
+        const highReliabilitySources = allSources.filter((s) => s.reliability === maxReliability);
         return highReliabilitySources.length === 1 && maxReliability > 0.8;
 
       default:
@@ -1060,9 +947,7 @@ export class ConflictDetector {
   /**
    * Create a comprehensive conflict summary
    */
-  private createConflictSummary(
-    conflicts: DetailedConflict[],
-  ): ConflictSummary {
+  private createConflictSummary(conflicts: DetailedConflict[]): ConflictSummary {
     const bySeverity: Record<ConflictSeverity, DetailedConflict[]> = {
       critical: [],
       major: [],
@@ -1095,28 +980,15 @@ export class ConflictDetector {
     }
 
     // Calculate overall score
-    const severityWeights = {
-      critical: 1.0,
-      major: 0.7,
-      minor: 0.4,
-      informational: 0.1,
-    };
-    const weightedScore = conflicts.reduce(
-      (sum, c) => sum + severityWeights[c.severity],
-      0,
-    );
+    const severityWeights = { critical: 1.0, major: 0.7, minor: 0.4, informational: 0.1 };
+    const weightedScore = conflicts.reduce((sum, c) => sum + severityWeights[c.severity], 0);
     const overallScore = Math.min(1, weightedScore / 10); // Normalize to 0-1
 
     // Find most problematic fields
-    const fieldScores = Object.entries(byField).map(
-      ([field, fieldConflicts]) => ({
-        field,
-        score: fieldConflicts.reduce(
-          (sum, c) => sum + severityWeights[c.severity],
-          0,
-        ),
-      }),
-    );
+    const fieldScores = Object.entries(byField).map(([field, fieldConflicts]) => ({
+      field,
+      score: fieldConflicts.reduce((sum, c) => sum + severityWeights[c.severity], 0),
+    }));
     const problematicFields = fieldScores
       .sort((a, b) => b.score - a.score)
       .slice(0, 5)
@@ -1165,9 +1037,7 @@ export class ConflictDetector {
 
     const autoResolvable = conflicts.filter((c) => c.autoResolvable).length;
     if (autoResolvable > 0) {
-      recommendations.push(
-        `${autoResolvable} conflicts can be automatically resolved`,
-      );
+      recommendations.push(`${autoResolvable} conflicts can be automatically resolved`);
     }
 
     const manualCount = conflicts.filter((c) => !c.autoResolvable).length;
@@ -1176,9 +1046,7 @@ export class ConflictDetector {
     }
 
     if (conflicts.length === 0) {
-      recommendations.push(
-        "No conflicts detected - metadata appears consistent across sources",
-      );
+      recommendations.push("No conflicts detected - metadata appears consistent across sources");
     }
 
     return recommendations;

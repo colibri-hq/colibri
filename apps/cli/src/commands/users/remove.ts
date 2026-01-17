@@ -24,19 +24,13 @@ export class Remove extends BaseCommand<typeof Remove> {
       command: "<%= config.bin %> <%= command.id %> jane@doe.com",
       description: "Remove a user by email address:",
     },
+    { command: "<%= config.bin %> <%= command.id %> 42", description: "Remove a user by ID:" },
     {
-      command: "<%= config.bin %> <%= command.id %> 42",
-      description: "Remove a user by ID:",
-    },
-    {
-      command:
-        "<%= config.bin %> <%= command.id %> 42 --instance https://colibri.example.com",
+      command: "<%= config.bin %> <%= command.id %> 42 --instance https://colibri.example.com",
       description: "Remove a user by ID from a specific Colibri instance:",
     },
   ];
-  static flags = {
-    force: force({ description: "Force the removal without confirmation." }),
-  };
+  static flags = { force: force({ description: "Force the removal without confirmation." }) };
 
   async run() {
     const { user } = this.args;
@@ -54,15 +48,10 @@ export class Remove extends BaseCommand<typeof Remove> {
           this.logToStderr(`${error.name}: ${error.message}`);
         }
 
-        this.error(
-          `User not found: ${"email" in user ? user.email : user.id}`,
-          {
-            exit: 1,
-            suggestions: [
-              "Make sure you've entered the correct email address or ID.",
-            ],
-          },
-        );
+        this.error(`User not found: ${"email" in user ? user.email : user.id}`, {
+          exit: 1,
+          suggestions: ["Make sure you've entered the correct email address or ID."],
+        });
       }
 
       if (!(error instanceof Error)) {
@@ -72,10 +61,7 @@ export class Remove extends BaseCommand<typeof Remove> {
       this.error("An error occurred while fetching the user.", {
         exit: 1,
         message: error.message,
-        suggestions: [
-          "Make sure the user exists.",
-          "Check your network connection.",
-        ],
+        suggestions: ["Make sure the user exists.", "Check your network connection."],
       });
     }
 

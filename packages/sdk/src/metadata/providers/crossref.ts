@@ -25,6 +25,7 @@
  * - Abstract (when available)
  */
 
+import { cleanIsbn } from "../utils/normalization.js";
 import {
   type CreatorQuery,
   type MetadataRecord,
@@ -35,7 +36,6 @@ import {
   type TitleQuery,
 } from "./provider.js";
 import { RetryableMetadataProvider } from "./retryable-provider.js";
-import { cleanIsbn } from "../utils/normalization.js";
 
 /**
  * Crossref API response types
@@ -149,16 +149,9 @@ export class CrossrefMetadataProvider extends RetryableMetadataProvider {
   async searchByISBN(isbn: string): Promise<MetadataRecord[]> {
     const cleanedIsbn = cleanIsbn(isbn);
 
-    const params: Record<string, string> = {
-      filter: `isbn:${cleanedIsbn}`,
-      rows: "10",
-    };
+    const params: Record<string, string> = { filter: `isbn:${cleanedIsbn}`, rows: "10" };
 
-    const response = await this.executeRequest(
-      "/works",
-      params,
-      `ISBN search for "${isbn}"`,
-    );
+    const response = await this.executeRequest("/works", params, `ISBN search for "${isbn}"`);
 
     if (!response?.message?.items) {
       return [];
@@ -179,10 +172,7 @@ export class CrossrefMetadataProvider extends RetryableMetadataProvider {
 
       const fetchResponse = await this.fetch(url, {
         method: "GET",
-        headers: {
-          Accept: "application/json",
-          "User-Agent": this.userAgent,
-        },
+        headers: { Accept: "application/json", "User-Agent": this.userAgent },
       });
 
       if (!fetchResponse.ok) {
@@ -233,9 +223,7 @@ export class CrossrefMetadataProvider extends RetryableMetadataProvider {
   /**
    * Search using multiple criteria
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     // Prioritize ISBN
     if (query.isbn) {
       return this.searchByISBN(query.isbn);
@@ -264,11 +252,7 @@ export class CrossrefMetadataProvider extends RetryableMetadataProvider {
       return [];
     }
 
-    const response = await this.executeRequest(
-      "/works",
-      params,
-      "multi-criteria search",
-    );
+    const response = await this.executeRequest("/works", params, "multi-criteria search");
 
     if (!response?.message?.items) {
       return [];
@@ -328,25 +312,17 @@ export class CrossrefMetadataProvider extends RetryableMetadataProvider {
     operationName: string,
   ): Promise<CrossrefResponse | null> {
     const result = await this.executeWithRetry(async () => {
-      const queryParams = new URLSearchParams({
-        ...params,
-        mailto: this.mailto,
-      });
+      const queryParams = new URLSearchParams({ ...params, mailto: this.mailto });
 
       const url = `${this.baseUrl}${endpoint}?${queryParams.toString()}`;
 
       const response = await this.fetch(url, {
         method: "GET",
-        headers: {
-          Accept: "application/json",
-          "User-Agent": this.userAgent,
-        },
+        headers: { Accept: "application/json", "User-Agent": this.userAgent },
       });
 
       if (!response.ok) {
-        throw new Error(
-          `Crossref API request failed: ${response.status} ${response.statusText}`,
-        );
+        throw new Error(`Crossref API request failed: ${response.status} ${response.statusText}`);
       }
 
       return (await response.json()) as CrossrefResponse;
@@ -362,21 +338,12 @@ export class CrossrefMetadataProvider extends RetryableMetadataProvider {
   /**
    * Process Crossref works into MetadataRecords
    */
-  private processWorks(
-    works: CrossrefWork[],
-    searchType: string,
-  ): MetadataRecord[] {
+  private processWorks(works: CrossrefWork[], searchType: string): MetadataRecord[] {
     const records: MetadataRecord[] = [];
 
     for (const work of works) {
       // Filter for book-related types
-      const bookTypes = [
-        "book",
-        "monograph",
-        "book-chapter",
-        "edited-book",
-        "reference-book",
-      ];
+      const bookTypes = ["book", "monograph", "book-chapter", "edited-book", "reference-book"];
       if (!bookTypes.includes(work.type)) {
         continue;
       }
@@ -422,10 +389,7 @@ export class CrossrefMetadataProvider extends RetryableMetadataProvider {
   /**
    * Build title from title and subtitle arrays
    */
-  private buildTitle(
-    title?: string[],
-    subtitle?: string[],
-  ): string | undefined {
+  private buildTitle(title?: string[], subtitle?: string[]): string | undefined {
     if (!title || title.length === 0) return undefined;
 
     let fullTitle = title[0];
@@ -488,11 +452,7 @@ export class CrossrefMetadataProvider extends RetryableMetadataProvider {
   /**
    * Calculate confidence score
    */
-  private calculateConfidence(
-    searchType: string,
-    work: CrossrefWork,
-    isbns: string[],
-  ): number {
+  private calculateConfidence(searchType: string, work: CrossrefWork, isbns: string[]): number {
     let confidence = 0.7; // Base confidence for Crossref
 
     // DOI search is very reliable

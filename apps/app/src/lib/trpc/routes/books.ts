@@ -1,7 +1,5 @@
-import { relatorRoles } from "@colibri-hq/sdk/ebooks";
-import { indexAsset } from "@colibri-hq/sdk/jobs";
-import { downloadUrl, uploadUrl, read } from "$lib/server/storage";
 import { emitImportEvent } from "$lib/server/import-events";
+import { downloadUrl, uploadUrl, read } from "$lib/server/storage";
 import { procedure, t, unguardedProcedure } from "$lib/trpc/t";
 import {
   createEdition,
@@ -17,11 +15,9 @@ import {
   loadWorks,
   updateRating,
 } from "@colibri-hq/sdk";
-import {
-  ingestWork,
-  confirmIngestion,
-  type ConfirmAction,
-} from "@colibri-hq/sdk/ingestion";
+import { relatorRoles } from "@colibri-hq/sdk/ebooks";
+import { ingestWork, confirmIngestion, type ConfirmAction } from "@colibri-hq/sdk/ingestion";
+import { indexAsset } from "@colibri-hq/sdk/jobs";
 import {
   initializeMetadataProviders,
   globalProviderRegistry,
@@ -34,11 +30,7 @@ import { z } from "zod";
 
 export const books = t.router({
   list: unguardedProcedure()
-    .input(
-      z.object({
-        query: z.string().optional(),
-      }),
-    )
+    .input(z.object({ query: z.string().optional() }))
     .query(({ input, ctx: { database } }) => loadWorks(database, input.query)),
 
   load: procedure()
@@ -59,15 +51,12 @@ export const books = t.router({
 
   loadRatings: procedure()
     .input(z.object({ workId: z.string() }))
-    .query(async ({ input: { workId }, ctx: { database } }) =>
-      loadRatings(database, workId),
-    ),
+    .query(async ({ input: { workId }, ctx: { database } }) => loadRatings(database, workId)),
 
   updateRating: procedure()
     .input(z.object({ workId: z.string(), rating: z.number() }))
-    .mutation(
-      async ({ input: { workId, rating }, ctx: { database, userId } }) =>
-        updateRating(database, workId, userId, rating),
+    .mutation(async ({ input: { workId, rating }, ctx: { database, userId } }) =>
+      updateRating(database, workId, userId, rating),
     ),
 
   loadReviews: procedure()
@@ -148,42 +137,38 @@ export const books = t.router({
           return null;
         }
 
-        const language = languageCode
-          ? await loadLanguage(database, languageCode)
-          : undefined;
+        const language = languageCode ? await loadLanguage(database, languageCode) : undefined;
 
-        const { workId, editionId } = await database
-          .transaction()
-          .execute(async (trx) => {
-            // TODO: Check if contributors exist
-            // TODO: Create contributors, one by one
+        const { workId, editionId } = await database.transaction().execute(async (trx) => {
+          // TODO: Check if contributors exist
+          // TODO: Create contributors, one by one
 
-            // TODO: Check if book exists
-            const { id: workId } = await createWork(trx, userId);
+          // TODO: Check if book exists
+          const { id: workId } = await createWork(trx, userId);
 
-            // TODO: Check if edition exists, by comparing unique identifiers like
-            //       the ISBN. If we don't have an ISBN, we will import the book as
-            //       a duplicate and rely on the suggestion queue to merge them.
-            const { id: editionId } = await createEdition(trx, workId, {
-              title,
-              synopsis: synopsis,
-              language: language?.iso_639_3,
-              legalInformation,
-              pages: numberOfPages,
-              sortingKey: sortingKey ?? title,
-            });
-
-            // TODO: Update main edition for book
-            // TODO: Create rating
-
-            // TODO: Create publisher
-
-            if (rating) {
-              await updateRating(trx, workId, userId, rating);
-            }
-
-            return { workId, editionId };
+          // TODO: Check if edition exists, by comparing unique identifiers like
+          //       the ISBN. If we don't have an ISBN, we will import the book as
+          //       a duplicate and rely on the suggestion queue to merge them.
+          const { id: editionId } = await createEdition(trx, workId, {
+            title,
+            synopsis: synopsis,
+            language: language?.iso_639_3,
+            legalInformation,
+            pages: numberOfPages,
+            sortingKey: sortingKey ?? title,
           });
+
+          // TODO: Update main edition for book
+          // TODO: Create rating
+
+          // TODO: Create publisher
+
+          if (rating) {
+            await updateRating(trx, workId, userId, rating);
+          }
+
+          return { workId, editionId };
+        });
 
         const assetUrl = await uploadUrl(
           await storage,
@@ -231,17 +216,12 @@ export const books = t.router({
             reason: "Exact duplicate file already exists in library",
           });
 
-          return {
-            duplicate: true as const,
-            existingAssetId: existingAsset.id,
-          };
+          return { duplicate: true as const, existingAssetId: existingAsset.id };
         }
 
         // Generate a unique S3 key for this upload
         // Sanitize filename for S3 key (remove/replace problematic characters)
-        const extension = filename.includes(".")
-          ? filename.slice(filename.lastIndexOf("."))
-          : "";
+        const extension = filename.includes(".") ? filename.slice(filename.lastIndexOf(".")) : "";
         const sanitizedFilename =
           filename
             .slice(0, filename.length - extension.length)
@@ -261,11 +241,7 @@ export const books = t.router({
           { originalFilename: filename },
         );
 
-        return {
-          duplicate: false as const,
-          uploadUrl: url,
-          s3Key,
-        };
+        return { duplicate: false as const, uploadUrl: url, s3Key };
       },
     ),
 
@@ -275,25 +251,12 @@ export const books = t.router({
    * contributor processing, and cover handling.
    */
   ingest: procedure()
-    .input(
-      z.object({
-        uploadId: z.string(),
-        s3Key: z.string(),
-        filename: z.string(),
-      }),
-    )
+    .input(z.object({ uploadId: z.string(), s3Key: z.string(), filename: z.string() }))
     .mutation(
-      async ({
-        input: { uploadId, s3Key, filename },
-        ctx: { userId, database, storage },
-      }) => {
+      async ({ input: { uploadId, s3Key, filename }, ctx: { userId, database, storage } }) => {
         try {
           // Emit progress event
-          emitImportEvent(userId, {
-            type: "progress",
-            uploadId,
-            stage: "ingesting",
-          });
+          emitImportEvent(userId, { type: "progress", uploadId, stage: "ingesting" });
 
           // Download the file from S3
           const fileBuffer = await read(await storage, s3Key);
@@ -336,14 +299,11 @@ export const books = t.router({
               // Trigger async content indexing for full-text search (fire and forget)
               // We have the file already loaded, so we can index directly
               if (result.asset) {
-                indexAsset(
-                  database,
-                  result.asset.id,
-                  file,
-                  result.asset.media_type,
-                ).catch((err) => {
-                  console.warn("Background content indexing failed:", err);
-                });
+                indexAsset(database, result.asset.id, file, result.asset.media_type).catch(
+                  (err) => {
+                    console.warn("Background content indexing failed:", err);
+                  },
+                );
               }
               break;
 
@@ -373,13 +333,8 @@ export const books = t.router({
             warnings: result.warnings,
           };
         } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          emitImportEvent(userId, {
-            type: "failed",
-            uploadId,
-            error: message,
-          });
+          const message = error instanceof Error ? error.message : "Unknown error";
+          emitImportEvent(userId, { type: "failed", uploadId, error: message });
           throw error;
         }
       },
@@ -398,16 +353,9 @@ export const books = t.router({
       }),
     )
     .mutation(
-      async ({
-        input: { uploadId, pendingId, action },
-        ctx: { userId, database, storage },
-      }) => {
+      async ({ input: { uploadId, pendingId, action }, ctx: { userId, database, storage } }) => {
         try {
-          const result = await confirmIngestion(
-            database,
-            pendingId,
-            action as ConfirmAction,
-          );
+          const result = await confirmIngestion(database, pendingId, action as ConfirmAction);
 
           // Emit appropriate event based on result
           switch (result.status) {
@@ -446,11 +394,7 @@ export const books = t.router({
               break;
 
             case "skipped":
-              emitImportEvent(userId, {
-                type: "skipped",
-                uploadId,
-                reason: "Skipped by user",
-              });
+              emitImportEvent(userId, { type: "skipped", uploadId, reason: "Skipped by user" });
               break;
           }
 
@@ -461,13 +405,8 @@ export const books = t.router({
             warnings: result.warnings,
           };
         } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          emitImportEvent(userId, {
-            type: "failed",
-            uploadId,
-            error: message,
-          });
+          const message = error instanceof Error ? error.message : "Unknown error";
+          emitImportEvent(userId, { type: "failed", uploadId, error: message });
           throw error;
         }
       },
@@ -510,93 +449,72 @@ export const books = t.router({
    * Updates the edition with selected field improvements.
    */
   applyEnrichment: procedure()
-    .input(
-      z.object({
-        enrichmentId: z.string(),
-        selectedFields: z.array(z.string()).optional(),
-      }),
-    )
-    .mutation(
-      async ({
-        input: { enrichmentId, selectedFields },
-        ctx: { database, userId },
-      }) => {
-        // Load enrichment result
-        const enrichment = await database
-          .selectFrom("enrichment_result")
-          .selectAll()
-          .where("id", "=", enrichmentId)
-          .where("status", "=", "pending")
-          .executeTakeFirstOrThrow();
+    .input(z.object({ enrichmentId: z.string(), selectedFields: z.array(z.string()).optional() }))
+    .mutation(async ({ input: { enrichmentId, selectedFields }, ctx: { database, userId } }) => {
+      // Load enrichment result
+      const enrichment = await database
+        .selectFrom("enrichment_result")
+        .selectAll()
+        .where("id", "=", enrichmentId)
+        .where("status", "=", "pending")
+        .executeTakeFirstOrThrow();
 
-        const preview = enrichment.preview as MetadataPreview;
-        const improvements = enrichment.improvements as Record<string, unknown>;
+      const preview = enrichment.preview as MetadataPreview;
+      const improvements = enrichment.improvements as Record<string, unknown>;
 
-        // Build update object based on selected fields (or all if not specified)
-        const fieldsToApply = selectedFields ?? Object.keys(improvements);
-        const updates: Record<string, unknown> = {};
+      // Build update object based on selected fields (or all if not specified)
+      const fieldsToApply = selectedFields ?? Object.keys(improvements);
+      const updates: Record<string, unknown> = {};
 
-        for (const field of fieldsToApply) {
-          if (field in improvements) {
-            updates[field] = improvements[field];
+      for (const field of fieldsToApply) {
+        if (field in improvements) {
+          updates[field] = improvements[field];
+        }
+      }
+
+      // Load work to get edition ID
+      const work = await loadWork(database, enrichment.work_id);
+
+      // Apply updates to edition
+      if (Object.keys(updates).length > 0) {
+        const editionUpdates: Record<string, unknown> = {};
+
+        // Map preview fields to edition columns
+        if (updates.title) editionUpdates.title = updates.title;
+        if (updates.synopsis) editionUpdates.synopsis = updates.synopsis;
+        if (updates.description)
+          editionUpdates.synopsis = (updates.description as { text?: string })?.text;
+        if (updates.pages) editionUpdates.pages = updates.pages;
+        if (updates.language) editionUpdates.language = updates.language;
+
+        // Handle ISBN updates
+        if (updates.isbn) {
+          const isbns = updates.isbn as string[];
+          for (const isbn of isbns) {
+            const clean = isbn.replace(/[-\s]/g, "");
+            if (clean.length === 10) editionUpdates.isbn_10 = clean;
+            if (clean.length === 13) editionUpdates.isbn_13 = clean;
           }
         }
 
-        // Load work to get edition ID
-        const work = await loadWork(database, enrichment.work_id);
-
-        // Apply updates to edition
-        if (Object.keys(updates).length > 0) {
-          const editionUpdates: Record<string, unknown> = {};
-
-          // Map preview fields to edition columns
-          if (updates.title) editionUpdates.title = updates.title;
-          if (updates.synopsis) editionUpdates.synopsis = updates.synopsis;
-          if (updates.description)
-            editionUpdates.synopsis = (
-              updates.description as { text?: string }
-            )?.text;
-          if (updates.pages) editionUpdates.pages = updates.pages;
-          if (updates.language) editionUpdates.language = updates.language;
-
-          // Handle ISBN updates
-          if (updates.isbn) {
-            const isbns = updates.isbn as string[];
-            for (const isbn of isbns) {
-              const clean = isbn.replace(/[-\s]/g, "");
-              if (clean.length === 10) editionUpdates.isbn_10 = clean;
-              if (clean.length === 13) editionUpdates.isbn_13 = clean;
-            }
-          }
-
-          if (Object.keys(editionUpdates).length > 0) {
-            await database
-              .updateTable("edition")
-              .set({
-                ...editionUpdates,
-                updated_at: new Date(),
-              })
-              .where("id", "=", work.edition_id)
-              .execute();
-          }
+        if (Object.keys(editionUpdates).length > 0) {
+          await database
+            .updateTable("edition")
+            .set({ ...editionUpdates, updated_at: new Date() })
+            .where("id", "=", work.edition_id)
+            .execute();
         }
+      }
 
-        // Mark enrichment as applied
-        await database
-          .updateTable("enrichment_result")
-          .set({
-            status: "applied",
-            applied_at: new Date(),
-          })
-          .where("id", "=", enrichmentId)
-          .execute();
+      // Mark enrichment as applied
+      await database
+        .updateTable("enrichment_result")
+        .set({ status: "applied", applied_at: new Date() })
+        .where("id", "=", enrichmentId)
+        .execute();
 
-        return {
-          success: true,
-          appliedFields: fieldsToApply,
-        };
-      },
-    ),
+      return { success: true, appliedFields: fieldsToApply };
+    }),
 
   /**
    * Dismiss enrichment without applying.
@@ -606,10 +524,7 @@ export const books = t.router({
     .mutation(async ({ input: { enrichmentId }, ctx: { database } }) => {
       await database
         .updateTable("enrichment_result")
-        .set({
-          status: "dismissed",
-          dismissed_at: new Date(),
-        })
+        .set({ status: "dismissed", dismissed_at: new Date() })
         .where("id", "=", enrichmentId)
         .where("status", "=", "pending")
         .execute();
@@ -647,9 +562,7 @@ export const books = t.router({
         }
 
         // Build query from work data
-        const authorNames = creators
-          .filter((c) => c.essential)
-          .map((c) => c.name);
+        const authorNames = creators.filter((c) => c.essential).map((c) => c.name);
 
         const query = {
           title: work.title ?? undefined,
@@ -716,20 +629,10 @@ export const books = t.router({
           sources,
         });
 
-        return {
-          success: true,
-          improvementCount,
-          hasConflicts,
-          sources,
-        };
+        return { success: true, improvementCount, hasConflicts, sources };
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
-        emitImportEvent(userId, {
-          type: "enrichment-failed",
-          workId,
-          error: message,
-        });
+        const message = error instanceof Error ? error.message : "Unknown error";
+        emitImportEvent(userId, { type: "enrichment-failed", workId, error: message });
         throw error;
       }
     }),
@@ -745,10 +648,7 @@ export const books = t.router({
         .select(["id", "created_at", "sources"])
         .select((eb) =>
           eb
-            .cast<number>(
-              eb.fn("jsonb_object_length", [eb.ref("improvements")]),
-              "integer",
-            )
+            .cast<number>(eb.fn("jsonb_object_length", [eb.ref("improvements")]), "integer")
             .as("improvement_count"),
         )
         .where("work_id", "=", workId)
@@ -791,11 +691,7 @@ async function triggerAsyncEnrichment(
   }
 
   // Emit start event
-  emitImportEvent(userId, {
-    type: "enrichment-started",
-    workId,
-    title,
-  });
+  emitImportEvent(userId, { type: "enrichment-started", workId, title });
 
   try {
     // Initialize metadata providers (registers them to global registry)
@@ -882,11 +778,7 @@ async function triggerAsyncEnrichment(
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    emitImportEvent(userId, {
-      type: "enrichment-failed",
-      workId,
-      error: message,
-    });
+    emitImportEvent(userId, { type: "enrichment-failed", workId, error: message });
     // Don't throw - this is background enrichment
     console.error("Async enrichment failed:", error);
   }
@@ -906,11 +798,7 @@ function calculateImprovements(
     improvements.title = preview.title.value;
   }
 
-  if (
-    preview.description.value?.text &&
-    preview.description.confidence > 0.7 &&
-    !work.synopsis
-  ) {
+  if (preview.description.value?.text && preview.description.confidence > 0.7 && !work.synopsis) {
     improvements.description = preview.description.value;
   }
 
@@ -922,11 +810,7 @@ function calculateImprovements(
     improvements.publicationDate = preview.publicationDate.value;
   }
 
-  if (
-    preview.language.value &&
-    preview.language.confidence > 0.8 &&
-    !work.language
-  ) {
+  if (preview.language.value && preview.language.confidence > 0.8 && !work.language) {
     improvements.language = preview.language.value;
   }
 
@@ -956,11 +840,7 @@ function calculateImprovements(
   }
 
   // Add series if we have high confidence
-  if (
-    preview.series.value &&
-    preview.series.value.length > 0 &&
-    preview.series.confidence > 0.7
-  ) {
+  if (preview.series.value && preview.series.value.length > 0 && preview.series.confidence > 0.7) {
     improvements.series = preview.series.value;
   }
 
@@ -998,9 +878,7 @@ async function triggerAsyncIndexing(
       fileBuffer.byteOffset,
       fileBuffer.byteOffset + fileBuffer.byteLength,
     ) as ArrayBuffer;
-    const file = new File([arrayBuffer], asset.filename ?? "ebook", {
-      type: mediaType,
-    });
+    const file = new File([arrayBuffer], asset.filename ?? "ebook", { type: mediaType });
 
     // Index the asset
     await indexAsset(database, assetId, file, mediaType);

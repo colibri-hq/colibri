@@ -19,15 +19,11 @@ describe("normalizeSlug", () => {
   });
 
   it("handles nested paths", () => {
-    expect(normalizeSlug("getting-started/quick-start")).toBe(
-      "/getting-started/quick-start",
-    );
+    expect(normalizeSlug("getting-started/quick-start")).toBe("/getting-started/quick-start");
   });
 
   it("handles deeply nested paths", () => {
-    expect(normalizeSlug("packages/sdk/database/")).toBe(
-      "/packages/sdk/database",
-    );
+    expect(normalizeSlug("packages/sdk/database/")).toBe("/packages/sdk/database");
   });
 
   it("handles root slash", () => {

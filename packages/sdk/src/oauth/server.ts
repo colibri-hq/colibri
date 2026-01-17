@@ -1,3 +1,6 @@
+import { createAuthorizationServer, type Entities } from "@colibri-hq/oauth";
+import jwt from "jsonwebtoken";
+import { z } from "zod";
 import type { Database } from "../database.js";
 import {
   createAccessToken,
@@ -17,9 +20,6 @@ import {
   scopeValidationRegex,
   storeAuthorizationRequest,
 } from "../resources/authentication/oauth.js";
-import { createAuthorizationServer, type Entities } from "@colibri-hq/oauth";
-import jwt from "jsonwebtoken";
-import { z } from "zod";
 
 export function server(
   database: Database,
@@ -28,12 +28,7 @@ export function server(
     jwtSecret,
     accessTokenTtl = 3600,
     refreshTokenTtl = 3600,
-  }: {
-    issuer: string;
-    jwtSecret: string;
-    accessTokenTtl?: number;
-    refreshTokenTtl?: number;
-  },
+  }: { issuer: string; jwtSecret: string; accessTokenTtl?: number; refreshTokenTtl?: number },
 ) {
   function createIdToken(
     clientId: string,
@@ -56,9 +51,7 @@ export function server(
     issuer,
     baseUri: "/auth/oauth/",
     jwtSecret,
-    token: {
-      endpoint: "./token",
-    },
+    token: { endpoint: "./token" },
     authorizationCode: {
       endpoint: "./authorize",
       ttl: 300,
@@ -86,9 +79,7 @@ export function server(
         );
       },
     },
-    clientCredentials: {
-      includeRefreshToken: false,
-    },
+    clientCredentials: { includeRefreshToken: false },
     refreshToken: {
       loadRefreshToken(token) {
         return loadRefreshToken(database, token);
@@ -146,31 +137,14 @@ export function server(
         return revokeRefreshToken(database, clientId, token);
       },
     },
-    tokenIntrospection: {
-      endpoint: "./tokeninfo",
-    },
+    tokenIntrospection: { endpoint: "./tokeninfo" },
     serverMetadata: {},
-    userInfo: {
-      endpoint: "./userinfo",
-    },
-    clientRegistration: {
-      endpoint: "./register",
-    },
-    async issueTokens({
-      accessToken,
-      refreshToken,
-      idToken,
-      clientId,
-      scopes,
-      userIdentifier,
-    }) {
+    userInfo: { endpoint: "./userinfo" },
+    clientRegistration: { endpoint: "./register" },
+    async issueTokens({ accessToken, refreshToken, idToken, clientId, scopes, userIdentifier }) {
       return await database.transaction().execute(async (trx) => {
         const [
-          {
-            scopes: effectiveScopes,
-            token: pendingAccessToken,
-            expires_at: expiresAt,
-          },
+          { scopes: effectiveScopes, token: pendingAccessToken, expires_at: expiresAt },
           { token: pendingRefreshToken },
         ] = await Promise.all([
           accessToken
@@ -181,20 +155,10 @@ export function server(
                 accessToken.scopes ?? scopes,
                 accessToken.ttl ?? accessTokenTtl,
               )
-            : {
-                token: undefined,
-                scopes: [],
-                expires_at: new Date(0),
-              },
+            : { token: undefined, scopes: [], expires_at: new Date(0) },
 
           refreshToken
-            ? createRefreshToken(
-                trx,
-                clientId,
-                userIdentifier ?? null,
-                scopes,
-                refreshTokenTtl,
-              )
+            ? createRefreshToken(trx, clientId, userIdentifier ?? null, scopes, refreshTokenTtl)
             : { token: undefined },
         ]);
 

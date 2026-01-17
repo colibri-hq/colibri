@@ -6,13 +6,13 @@
  */
 import { describe, expect, it, beforeEach } from "vitest";
 import { AuthorizationCodeClient } from "../../../src/client/authorization-code.js";
+import { sha256, base64UrlEncode, createCodeVerifier } from "../__helpers__/crypto.js";
 import {
   createFullMockFetch,
   createMockTokenStore,
   mockMetadata,
   createJsonResponse,
 } from "../__helpers__/mock-server.js";
-import { sha256, base64UrlEncode, createCodeVerifier } from "../__helpers__/crypto.js";
 
 describe("PKCE Security (RFC 9700 Section 4.8)", () => {
   let mockFetch: ReturnType<typeof createFullMockFetch>;
@@ -86,10 +86,7 @@ describe("PKCE Security (RFC 9700 Section 4.8)", () => {
         redirectUri: "https://app.example.com/callback",
         fetch: mockFetch,
         tokenStore: mockTokenStore,
-        serverMetadata: {
-          ...mockMetadata,
-          code_challenge_methods_supported: ["S256", "plain"],
-        },
+        serverMetadata: { ...mockMetadata, code_challenge_methods_supported: ["S256", "plain"] },
       });
 
       const result = await client.createAuthorizationUrl();
@@ -120,11 +117,7 @@ describe("PKCE Security (RFC 9700 Section 4.8)", () => {
         if (urlString.includes("/token")) {
           capturedBody = new URLSearchParams(init?.body as string);
           return createJsonResponse(
-            {
-              access_token: "access_token",
-              token_type: "Bearer",
-              expires_in: 3600,
-            },
+            { access_token: "access_token", token_type: "Bearer", expires_in: 3600 },
             200,
           );
         }
@@ -166,11 +159,7 @@ describe("PKCE Security (RFC 9700 Section 4.8)", () => {
           const body = new URLSearchParams(init?.body as string);
           capturedVerifiers.push(body.get("code_verifier") || "");
           return createJsonResponse(
-            {
-              access_token: "access_token",
-              token_type: "Bearer",
-              expires_in: 3600,
-            },
+            { access_token: "access_token", token_type: "Bearer", expires_in: 3600 },
             200,
           );
         }
@@ -217,10 +206,7 @@ describe("PKCE Security (RFC 9700 Section 4.8)", () => {
         redirectUri: "https://app.example.com/callback",
         fetch: mockFetch,
         tokenStore: mockTokenStore,
-        serverMetadata: {
-          ...mockMetadata,
-          code_challenge_methods_supported: ["S256"],
-        },
+        serverMetadata: { ...mockMetadata, code_challenge_methods_supported: ["S256"] },
       });
 
       const result = await client.createAuthorizationUrl();
@@ -236,10 +222,7 @@ describe("PKCE Security (RFC 9700 Section 4.8)", () => {
         redirectUri: "https://app.example.com/callback",
         fetch: mockFetch,
         tokenStore: mockTokenStore,
-        serverMetadata: {
-          ...mockMetadata,
-          code_challenge_methods_supported: undefined,
-        },
+        serverMetadata: { ...mockMetadata, code_challenge_methods_supported: undefined },
       });
 
       const result = await client.createAuthorizationUrl();

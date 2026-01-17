@@ -1,6 +1,4 @@
-import { jsonResponse, parseRequestBody, timeOffset } from "../utilities.js";
 import { z, ZodError } from "zod";
-import { OAuthError } from "../errors.js";
 import type {
   AuthorizationServerOptions,
   Entities,
@@ -8,7 +6,9 @@ import type {
   PersistedTokensInfo,
   TokenPayload,
 } from "../types.js";
+import { OAuthError } from "../errors.js";
 import { GrantType } from "../grantTypes/grantType.js";
+import { jsonResponse, parseRequestBody, timeOffset } from "../utilities.js";
 
 /**
  * Token Endpoint
@@ -54,20 +54,13 @@ export async function handleTokenRequest<
       issueTokens,
       loadClient,
     },
-  }: {
-    grantTypes: Map<OAuthGrantType, GrantType>;
-    options: T;
-  },
+  }: { grantTypes: Map<OAuthGrantType, GrantType>; options: T },
 ) {
   const body = await parseRequestBody(request);
 
   // region Resolve the client
   const params = z
-    .object({
-      client_id: z.string({
-        message: "The client ID is missing or invalid",
-      }),
-    })
+    .object({ client_id: z.string({ message: "The client ID is missing or invalid" }) })
     .safeParse(body);
 
   if (!params.success) {
@@ -80,25 +73,16 @@ export async function handleTokenRequest<
   try {
     client = await loadClient(clientId);
   } catch {
-    throw new OAuthError(
-      "invalid_client",
-      "The client ID is missing or invalid",
-    );
+    throw new OAuthError("invalid_client", "The client ID is missing or invalid");
   }
 
   if (!client || !client.active || client.revoked) {
-    throw new OAuthError(
-      "invalid_client",
-      "The client ID is missing or invalid",
-    );
+    throw new OAuthError("invalid_client", "The client ID is missing or invalid");
   }
   // endregion
 
   // region Validate the request
-  const supportedGrantTyeps = [...grantTypes.keys()] as [
-    OAuthGrantType,
-    ...OAuthGrantType[],
-  ];
+  const supportedGrantTyeps = [...grantTypes.keys()] as [OAuthGrantType, ...OAuthGrantType[]];
   const tokenRequestSchema = z.intersection(
     z.object({
       grant_type: z.enum(supportedGrantTyeps, {
@@ -112,15 +96,8 @@ export async function handleTokenRequest<
   // endregion
 
   // region Token issuance helpers
-  function issueRefreshToken(
-    userIdentifier: string | undefined,
-    scopes: string[],
-  ) {
-    return (
-      userIdentifier &&
-      scopes.includes("offline_access") &&
-      grantTypes.has("refresh_token")
-    );
+  function issueRefreshToken(userIdentifier: string | undefined, scopes: string[]) {
+    return userIdentifier && scopes.includes("offline_access") && grantTypes.has("refresh_token");
   }
 
   function issueIdToken(userIdentifier: string | undefined, scopes: string[]) {
@@ -145,8 +122,10 @@ export async function handleTokenRequest<
     const params = await grantType.validate(data, client);
 
     // Finally, let the grant handle the request.
-    const { accessToken, idToken, refreshToken, scopes, userIdentifier } =
-      await grantType.handle(params, client);
+    const { accessToken, idToken, refreshToken, scopes, userIdentifier } = await grantType.handle(
+      params,
+      client,
+    );
 
     // Let the persistence layer issue the tokens at once, ideally in a single atomic transaction
     const tokenInfo = await issueTokens({
@@ -157,9 +136,7 @@ export async function handleTokenRequest<
       refreshToken: issueRefreshToken(userIdentifier, scopes)
         ? { ttl: refreshTokenTtl, ...refreshToken }
         : undefined,
-      idToken: issueIdToken(userIdentifier, scopes)
-        ? { ttl: idTokenTtl, ...idToken }
-        : undefined,
+      idToken: issueIdToken(userIdentifier, scopes) ? { ttl: idTokenTtl, ...idToken } : undefined,
     });
 
     return tokenResponse(tokenInfo);

@@ -52,10 +52,7 @@ export function createTestIdToken(claims: {
   at_hash?: string;
   c_hash?: string;
 }): string {
-  const header = {
-    alg: "none",
-    typ: "JWT",
-  };
+  const header = { alg: "none", typ: "JWT" };
 
   const now = Math.floor(Date.now() / 1000);
   const payload = {
@@ -131,11 +128,7 @@ export function createCodeVerifier(length: number = 43): string {
  * Generate test encryption key for SecureTokenStore testing
  */
 export async function generateTestEncryptionKey(): Promise<CryptoKey> {
-  return crypto.subtle.generateKey(
-    { name: "AES-GCM", length: 256 },
-    true,
-    ["encrypt", "decrypt"],
-  );
+  return crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
 }
 
 /**

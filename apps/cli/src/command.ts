@@ -15,9 +15,7 @@ export type Args<T extends typeof Command> = Interfaces.InferredArgs<T["args"]>;
 
 export abstract class BaseCommand<T extends typeof Command> extends Command {
   static baseFlags = {
-    "config-file": config({
-      helpGroup: "GLOBAL",
-    }),
+    "config-file": config({ helpGroup: "GLOBAL" }),
     displayLocale: Flags.string({
       async default() {
         return (process.env.LC_TIME ?? process.env.LC_ALL ?? process.env.TZ)
@@ -43,11 +41,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
         return input;
       },
     }),
-    verbose: Flags.boolean({
-      char: "v",
-      description: "Show verbose output.",
-      helpGroup: "GLOBAL",
-    }),
+    verbose: Flags.boolean({ char: "v", description: "Show verbose output.", helpGroup: "GLOBAL" }),
   };
   static enableJsonFlag = true;
   protected args!: Args<T>;
@@ -82,9 +76,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
         logger: {
           debug: (...args) => {
             if (this.flags.verbose) {
-              this.logToStderr(
-                box(args.join(" "), { title: "Storage: Debug" }),
-              );
+              this.logToStderr(box(args.join(" "), { title: "Storage: Debug" }));
             }
           },
           error: (...args) => {
@@ -98,9 +90,7 @@ export abstract class BaseCommand<T extends typeof Command> extends Command {
           trace() {},
           warn: (...args) => {
             if (this.flags.verbose) {
-              this.logToStderr(
-                box(args.join(" "), { title: "Storage: Warning" }),
-              );
+              this.logToStderr(box(args.join(" "), { title: "Storage: Warning" }));
             }
           },
         },

@@ -1,9 +1,9 @@
 import type { Entities, OAuthErrorCode } from "@colibri-hq/oauth";
 import type { Database } from "@colibri-hq/sdk";
+import type { APIRequestContext } from "playwright";
 import { storeAuthorizationCode } from "@colibri-hq/sdk";
 import { type APIResponse, expect, type Page } from "@playwright/test";
 import { type Server } from "node:http";
-import type { APIRequestContext } from "playwright";
 import { test } from "../base";
 import {
   createHttpResponder,
@@ -31,9 +31,7 @@ test.describe("OAuth Endpoints", () => {
     });
 
     test("Reject missing response type [RFC 6749]", async ({ page }) => {
-      await testAuthorizationFailure(page, "invalid_request", {
-        response_type: undefined,
-      });
+      await testAuthorizationFailure(page, "invalid_request", { response_type: undefined });
     });
 
     test("Reject invalid response type [RFC 6749]", async ({ page }) => {
@@ -42,27 +40,19 @@ test.describe("OAuth Endpoints", () => {
       });
     });
 
-    test("Reject invalid code challenge method [RFC 6749]", async ({
-      page,
-    }) => {
-      await testAuthorizationFailure(page, "invalid_request", {
-        code_challenge_method: "S257",
-      });
+    test("Reject invalid code challenge method [RFC 6749]", async ({ page }) => {
+      await testAuthorizationFailure(page, "invalid_request", { code_challenge_method: "S257" });
     });
 
     test("Accept bogus code challenge [RFC 6749]", async ({ page }) => {
-      await testAuthorizationSuccess(page, {
-        code_challenge: "broken",
-      });
+      await testAuthorizationSuccess(page, { code_challenge: "broken" });
     });
 
     test("Reject missing client ID [RFC 6749]", async ({ page }) => {
       await testAuthorization(
         page,
         async (_url, page) => {
-          const text = await page
-            .locator('[data-testid="oauthErrorType"]')
-            .textContent();
+          const text = await page.locator('[data-testid="oauthErrorType"]').textContent();
 
           expect(text).toContain("invalid_request");
         },
@@ -74,9 +64,7 @@ test.describe("OAuth Endpoints", () => {
       await testAuthorization(
         page,
         async (_url, page) => {
-          const text = await page
-            .locator('[data-testid="oauthErrorType"]')
-            .textContent();
+          const text = await page.locator('[data-testid="oauthErrorType"]').textContent();
 
           expect(text).toContain("invalid_request");
         },
@@ -88,9 +76,7 @@ test.describe("OAuth Endpoints", () => {
       await testAuthorization(
         page,
         async (_url, page) => {
-          const text = await page
-            .locator('[data-testid="oauthErrorType"]')
-            .textContent();
+          const text = await page.locator('[data-testid="oauthErrorType"]').textContent();
 
           expect(text).toContain("invalid_request");
         },
@@ -98,15 +84,11 @@ test.describe("OAuth Endpoints", () => {
       );
     });
 
-    test("Reject correct, but invalid redirect URI [RFC 6749]", async ({
-      page,
-    }) => {
+    test("Reject correct, but invalid redirect URI [RFC 6749]", async ({ page }) => {
       await testAuthorization(
         page,
         async (_url, page) => {
-          const text = await page
-            .locator('[data-testid="oauthErrorType"]')
-            .textContent();
+          const text = await page.locator('[data-testid="oauthErrorType"]').textContent();
 
           expect(text).toContain("invalid_request");
         },
@@ -163,10 +145,7 @@ test.describe("OAuth Endpoints", () => {
 
     // https://datatracker.ietf.org/doc/html/rfc9126#section-4-3
     // "An expired request_uri MUST be rejected as invalid."
-    test("Reject expired request URI [RFC 9126]", async ({
-      page,
-      database,
-    }) => {
+    test("Reject expired request URI [RFC 9126]", async ({ page, database }) => {
       const { identifier } = await database
         .insertInto("authentication.authorization_request")
         .values({
@@ -231,10 +210,7 @@ test.describe("OAuth Endpoints", () => {
 
   test.describe("Token Endpoint", () => {
     test.describe("Grant Type: authorization_code [RFC 6749]", () => {
-      test("Exchange Authorization Code for Access Token", async ({
-        request,
-        database,
-      }) => {
+      test("Exchange Authorization Code for Access Token", async ({ request, database }) => {
         await testAuthorizationCodeExchangeSuccess(request, database);
       });
 
@@ -250,74 +226,39 @@ test.describe("OAuth Endpoints", () => {
       });
 
       // https://datatracker.ietf.org/doc/html/rfc6749.html#section-5.2
-      test("Reject previously used authorization code", async ({
-        request,
-        database,
-      }) => {
-        await testAuthorizationCodeExchangeFailure(
-          request,
-          database,
-          "invalid_grant",
-          {
-            used_at: new Date(),
-            challenge: "previously-used",
-          },
-        );
+      test("Reject previously used authorization code", async ({ request, database }) => {
+        await testAuthorizationCodeExchangeFailure(request, database, "invalid_grant", {
+          used_at: new Date(),
+          challenge: "previously-used",
+        });
       });
 
       // https://datatracker.ietf.org/doc/html/rfc6749.html#section-5.2
-      test("Reject expired authorization code", async ({
-        request,
-        database,
-      }) => {
-        await testAuthorizationCodeExchangeFailure(
-          request,
-          database,
-          "invalid_grant",
-          {
-            expires_at: new Date(new Date().getTime() - 100),
-          },
-        );
+      test("Reject expired authorization code", async ({ request, database }) => {
+        await testAuthorizationCodeExchangeFailure(request, database, "invalid_grant", {
+          expires_at: new Date(new Date().getTime() - 100),
+        });
       });
 
       // https://datatracker.ietf.org/doc/html/rfc6749.html#section-5.2
-      test("Reject revoked authorization code", async ({
-        request,
-        database,
-      }) => {
-        await testAuthorizationCodeExchangeFailure(
-          request,
-          database,
-          "invalid_grant",
-          {
-            revoked: true,
-          },
-        );
+      test("Reject revoked authorization code", async ({ request, database }) => {
+        await testAuthorizationCodeExchangeFailure(request, database, "invalid_grant", {
+          revoked: true,
+        });
       });
 
       // https://datatracker.ietf.org/doc/html/rfc6749.html#section-5.2
       test("Reject invalid challenge", async ({ request, database }) => {
-        await testAuthorizationCodeExchangeFailure(
-          request,
-          database,
-          "invalid_grant",
-          {
-            challenge: "invalid",
-          },
-        );
+        await testAuthorizationCodeExchangeFailure(request, database, "invalid_grant", {
+          challenge: "invalid",
+        });
       });
 
       // https://datatracker.ietf.org/doc/html/rfc6749.html#section-5.2
       test("Reject invalid client ID", async ({ request, database }) => {
-        await testAuthorizationCodeExchangeFailure(
-          request,
-          database,
-          "invalid_client",
-          undefined,
-          {
-            form: { client_id: "invalid" },
-          },
-        );
+        await testAuthorizationCodeExchangeFailure(request, database, "invalid_client", undefined, {
+          form: { client_id: "invalid" },
+        });
       });
 
       // https://datatracker.ietf.org/doc/html/rfc6749.html#section-5.2
@@ -326,14 +267,8 @@ test.describe("OAuth Endpoints", () => {
           request,
           database,
           "invalid_client",
-          {
-            client_id: "test-client-confidential",
-          },
-          {
-            form: {
-              client_id: "test-client-confidential",
-            },
-          },
+          { client_id: "test-client-confidential" },
+          { form: { client_id: "test-client-confidential" } },
         );
       });
 
@@ -353,11 +288,7 @@ test.describe("OAuth Endpoints", () => {
             ).toHaveProperty("refresh_token");
           },
           undefined,
-          {
-            form: {
-              scope: "profile offline_access",
-            },
-          },
+          { form: { scope: "profile offline_access" } },
         );
       });
 
@@ -378,16 +309,11 @@ test.describe("OAuth Endpoints", () => {
             ).not.toHaveProperty("refresh_token");
           },
           undefined,
-          {
-            form: { scope: "profile" },
-          },
+          { form: { scope: "profile" } },
         );
       });
 
-      test('Includes ID token if "openid" scope is used', async ({
-        request,
-        database,
-      }) => {
+      test('Includes ID token if "openid" scope is used', async ({ request, database }) => {
         await testAuthorizationCodeExchange(
           request,
           database,
@@ -400,18 +326,11 @@ test.describe("OAuth Endpoints", () => {
             ).toHaveProperty("id_token");
           },
           undefined,
-          {
-            form: {
-              scope: "profile openid",
-            },
-          },
+          { form: { scope: "profile openid" } },
         );
       });
 
-      test('Includes no ID token if "openid" scope is not used', async ({
-        request,
-        database,
-      }) => {
+      test('Includes no ID token if "openid" scope is not used', async ({ request, database }) => {
         await testAuthorizationCodeExchange(
           request,
           database,
@@ -424,27 +343,19 @@ test.describe("OAuth Endpoints", () => {
             ).not.toHaveProperty("id_token");
           },
           undefined,
-          {
-            form: {
-              scope: "profile",
-            },
-          },
+          { form: { scope: "profile" } },
         );
       });
     });
 
     test.describe("Grant Type: client_credentials [RFC 6749]", () => {
-      test("Obtain an Access Token using Client Credentials", async ({
-        request,
-      }) => {
+      test("Obtain an Access Token using Client Credentials", async ({ request }) => {
         await testClientCredentialsSuccess(request);
       });
 
       test("Reject invalid client secret", async ({ request }) => {
         await testClientCredentialsError(request, "invalid_request", {
-          form: {
-            client_secret: "invalid",
-          },
+          form: { client_secret: "invalid" },
         });
       });
 
@@ -459,9 +370,7 @@ test.describe("OAuth Endpoints", () => {
 
       test("Reject invalid client ID", async ({ request }) => {
         await testClientCredentialsError(request, "invalid_client", {
-          form: {
-            client_id: "invalid",
-          },
+          form: { client_id: "invalid" },
         });
       });
 
@@ -474,41 +383,27 @@ test.describe("OAuth Endpoints", () => {
         });
       });
 
-      test("Reject public (non-confidential) client ID", async ({
-        request,
-      }) => {
+      test("Reject public (non-confidential) client ID", async ({ request }) => {
         await testClientCredentialsError(request, "invalid_client", {
-          form: {
-            client_id: "test-client",
-          },
+          form: { client_id: "test-client" },
         });
       });
 
       test("Reject invalid scope", async ({ request }) => {
-        await testClientCredentialsError(request, "invalid_scope", {
-          form: {
-            scope: "invalid",
-          },
-        });
+        await testClientCredentialsError(request, "invalid_scope", { form: { scope: "invalid" } });
       });
 
       for (const scope of ["profile", "email", "offline_access", "openid"]) {
         test(`Reject user-specific scope "${scope}"`, async ({ request }) => {
-          await testClientCredentialsError(request, "invalid_scope", {
-            form: { scope },
-          });
+          await testClientCredentialsError(request, "invalid_scope", { form: { scope } });
         });
       }
     });
 
     test.describe("Grant Type: refresh_token [RFC 6749]", () => {
-      test("Refresh an Access Token using a Refresh Token", async ({
-        request,
-      }) => {
+      test("Refresh an Access Token using a Refresh Token", async ({ request }) => {
         const initialResponse = await request.post("/auth/oauth/token", {
-          headers: {
-            accept: "application/json",
-          },
+          headers: { accept: "application/json" },
           form: {
             grant_type: "client_credentials",
             client_id: "test-client-confidential",
@@ -520,9 +415,7 @@ test.describe("OAuth Endpoints", () => {
         expect(initialResponseBody).toHaveProperty("refresh_token");
 
         const response = await request.post("/auth/oauth/token", {
-          headers: {
-            accept: "application/json",
-          },
+          headers: { accept: "application/json" },
           form: {
             grant_type: "refresh_token",
             refresh_token: initialResponseBody.refresh_token,
@@ -541,10 +434,7 @@ test.describe("OAuth Endpoints", () => {
   });
 
   test.describe("Pushed Authorization Request Endpoint [RFC 9126]", () => {
-    test("Accept Pushed Authorization Request", async ({
-      request,
-      database,
-    }) => {
+    test("Accept Pushed Authorization Request", async ({ request, database }) => {
       const response = await request.post("/auth/oauth/par", {
         form: {
           client_id: "test-client",
@@ -658,9 +548,7 @@ function testAuthorizationFailure(
       const { searchParams } = url;
 
       if (url.pathname === "/auth/oauth/authorize") {
-        const text = await page
-          .locator('[data-testid="oauthErrorType"]')
-          .textContent();
+        const text = await page.locator('[data-testid="oauthErrorType"]').textContent();
         const description = await page
           .locator('[data-testid="oauthErrorDescription"]')
           .textContent();
@@ -685,20 +573,14 @@ function testAuthorizationFailure(
         )
         .toBeFalsy();
       expect
-        .soft(
-          searchParams.get("error"),
-          `Error code must be "${expectedError}"`,
-        )
+        .soft(searchParams.get("error"), `Error code must be "${expectedError}"`)
         .toEqual(expectedError);
     },
     overrideParams,
   );
 }
 
-function testAuthorizationSuccess(
-  page: Page,
-  overrideParams?: Record<string, string>,
-) {
+function testAuthorizationSuccess(page: Page, overrideParams?: Record<string, string>) {
   return testAuthorization(
     page,
     (url) => {
@@ -708,10 +590,7 @@ function testAuthorizationSuccess(
       ).toBe("http://localhost:3000/oauth/callback");
 
       expect
-        .soft(
-          url.searchParams.get("error"),
-          "Authorization response URL must not include an error",
-        )
+        .soft(url.searchParams.get("error"), "Authorization response URL must not include an error")
         .toBeFalsy();
       expect
         .soft(
@@ -720,10 +599,7 @@ function testAuthorizationSuccess(
         )
         .toBeTruthy();
       expect
-        .soft(
-          url.searchParams.get("code")?.length ?? 0,
-          "Authorization code must not be empty",
-        )
+        .soft(url.searchParams.get("code")?.length ?? 0, "Authorization code must not be empty")
         .toBeGreaterThan(0);
     },
     overrideParams,
@@ -737,15 +613,10 @@ async function testAuthorizationCodeExchange(
   request: APIRequestContext,
   database: Database,
   assertion: (response: APIResponse, body: Record<string, unknown>) => unknown,
-  authCodeOverrides?: OverrideOption<
-    AuthCodeOptions,
-    AuthorizationCodeExchangeConfigContext
-  >,
+  authCodeOverrides?: OverrideOption<AuthCodeOptions, AuthorizationCodeExchangeConfigContext>,
   requestOverrides?: OverrideOption<
     ApiRequestOptions<"post">,
-    AuthorizationCodeExchangeConfigContext & {
-      authCode: Entities.AuthorizationCode;
-    }
+    AuthorizationCodeExchangeConfigContext & { authCode: Entities.AuthorizationCode }
   >,
 ) {
   const [codeVerifier, codeChallenge] = generateCodeVerifierAndChallenge();
@@ -784,12 +655,7 @@ async function testAuthorizationCodeExchange(
       },
     } satisfies ApiRequestOptions<"post">,
     requestOverrides,
-    {
-      authCode: authCode as Entities.AuthorizationCode,
-      codeVerifier,
-      codeChallenge,
-      code,
-    },
+    { authCode: authCode as Entities.AuthorizationCode, codeVerifier, codeChallenge, code },
   );
   const response = await request.post("/auth/oauth/token", requestOptions);
   const responseBody = await response.json();
@@ -800,22 +666,16 @@ async function testAuthorizationCodeExchange(
 function testAuthorizationCodeExchangeSuccess(
   request: APIRequestContext,
   database: Database,
-  authCodeOverrides?: OverrideOption<
-    AuthCodeOptions,
-    AuthorizationCodeExchangeConfigContext
-  >,
+  authCodeOverrides?: OverrideOption<AuthCodeOptions, AuthorizationCodeExchangeConfigContext>,
   requestOverrides?: OverrideOption<
     ApiRequestOptions<"post">,
-    AuthorizationCodeExchangeConfigContext & {
-      authCode: Entities.AuthorizationCode;
-    }
+    AuthorizationCodeExchangeConfigContext & { authCode: Entities.AuthorizationCode }
   >,
 ) {
   return testAuthorizationCodeExchange(
     request,
     database,
-    (response, responseBody) =>
-      expectTokenSuccessResponse(response, responseBody),
+    (response, responseBody) => expectTokenSuccessResponse(response, responseBody),
     authCodeOverrides,
     requestOverrides,
   );
@@ -825,22 +685,16 @@ function testAuthorizationCodeExchangeFailure(
   request: APIRequestContext,
   database: Database,
   error: OAuthErrorCode,
-  authCodeOverrides?: OverrideOption<
-    AuthCodeOptions,
-    AuthorizationCodeExchangeConfigContext
-  >,
+  authCodeOverrides?: OverrideOption<AuthCodeOptions, AuthorizationCodeExchangeConfigContext>,
   requestOverrides?: OverrideOption<
     ApiRequestOptions<"post">,
-    AuthorizationCodeExchangeConfigContext & {
-      authCode: Entities.AuthorizationCode;
-    }
+    AuthorizationCodeExchangeConfigContext & { authCode: Entities.AuthorizationCode }
   >,
 ) {
   return testAuthorizationCodeExchange(
     request,
     database,
-    (response, responseBody) =>
-      expectTokenErrorResponse(response, responseBody, error),
+    (response, responseBody) => expectTokenErrorResponse(response, responseBody, error),
     authCodeOverrides,
     requestOverrides,
   );
@@ -877,8 +731,7 @@ async function testClientCredentialsSuccess(
 ) {
   return testClientCredentials(
     request,
-    (response, responseBody) =>
-      expectTokenSuccessResponse(response, responseBody),
+    (response, responseBody) => expectTokenSuccessResponse(response, responseBody),
     requestOverrides,
   );
 }
@@ -890,8 +743,7 @@ async function testClientCredentialsError(
 ) {
   return testClientCredentials(
     request,
-    (response, responseBody) =>
-      expectTokenErrorResponse(response, responseBody, error),
+    (response, responseBody) => expectTokenErrorResponse(response, responseBody, error),
     requestOverrides,
   );
 }
@@ -899,48 +751,29 @@ async function testClientCredentialsError(
 // endregion
 
 // region Token Response Validation Helpers
-function expectTokenSuccessResponse(
-  response: APIResponse,
-  responseBody: Record<string, unknown>,
-) {
+function expectTokenSuccessResponse(response: APIResponse, responseBody: Record<string, unknown>) {
   expect
     .soft(response.headers(), `Content-Type must be set to "application/json"`)
     .toHaveProperty("content-type", "application/json");
   expect
-    .soft(
-      responseBody,
-      "Successful response body must not contain an error code",
-    )
+    .soft(responseBody, "Successful response body must not contain an error code")
     .not.toHaveProperty("error");
   expect
-    .soft(
-      responseBody,
-      "Successful response body must not contain an error description",
-    )
+    .soft(responseBody, "Successful response body must not contain an error description")
     .not.toHaveProperty("error_description");
   expect
-    .soft(
-      responseBody,
-      "Successful response body must not contain an error URI",
-    )
+    .soft(responseBody, "Successful response body must not contain an error URI")
     .not.toHaveProperty("error_uri");
-  expect(
-    response.status(),
-    'Successful response must have status code "200: OK"',
-  ).toBe(200);
+  expect(response.status(), 'Successful response must have status code "200: OK"').toBe(200);
   expect
-    .soft(
-      responseBody,
-      'Successful response must have token_type set to "Bearer"',
-    )
+    .soft(responseBody, 'Successful response must have token_type set to "Bearer"')
     .toHaveProperty("token_type", "Bearer");
   expect
     .soft(responseBody, "Successful response must contain an access token")
     .toHaveProperty("access_token");
-  expect(
-    responseBody,
-    "Successful response must contain an expiration time",
-  ).toHaveProperty("expires_in");
+  expect(responseBody, "Successful response must contain an expiration time").toHaveProperty(
+    "expires_in",
+  );
   expect
     .soft(
       responseBody.expires_in,
@@ -974,10 +807,7 @@ function expectTokenErrorResponse(
     .soft(responseBody, "Error response body must not contain a refresh token")
     .not.toHaveProperty("refresh_token");
   expect
-    .soft(
-      responseBody,
-      "Error response body must not contain an expiration duration",
-    )
+    .soft(responseBody, "Error response body must not contain an expiration duration")
     .not.toHaveProperty("expires_in");
   expect
     .soft(responseBody, "Error response body must not contain a token type")

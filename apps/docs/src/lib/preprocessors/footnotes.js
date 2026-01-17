@@ -70,9 +70,7 @@ function transformFootnotes(markdown) {
 
   // Build the footnotes section
   if (footnoteNumbers.size > 0) {
-    const sortedFootnotes = [...footnoteNumbers.entries()].sort(
-      (a, b) => a[1] - b[1],
-    );
+    const sortedFootnotes = [...footnoteNumbers.entries()].sort((a, b) => a[1] - b[1]);
 
     let footnotesHtml = `
       <section class="footnotes" role="doc-endnotes">

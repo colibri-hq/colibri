@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from "vitest";
-import { SecureTokenStore } from "../../../src/client/storage/secure.js";
 import type { StoredTokens } from "../../../src/client/types.js";
+import { SecureTokenStore } from "../../../src/client/storage/secure.js";
 import { generateTestEncryptionKey, generateTestKeyBytes } from "../__helpers__/crypto.js";
 
 /**
@@ -53,28 +53,19 @@ describe("SecureTokenStore", () => {
 
   describe("constructor", () => {
     it("should create store with string key", () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       expect(store).toBeInstanceOf(SecureTokenStore);
     });
 
     it("should create store with CryptoKey", async () => {
       const cryptoKey = await generateTestEncryptionKey();
-      const store = new SecureTokenStore({
-        key: cryptoKey,
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: cryptoKey, storage: mockStorage });
       expect(store).toBeInstanceOf(SecureTokenStore);
     });
 
     it("should create store with Uint8Array key bytes", () => {
       const keyBytes = generateTestKeyBytes();
-      const store = new SecureTokenStore({
-        key: keyBytes,
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: keyBytes, storage: mockStorage });
       expect(store).toBeInstanceOf(SecureTokenStore);
     });
 
@@ -105,10 +96,7 @@ describe("SecureTokenStore", () => {
 
   describe("encryption and decryption", () => {
     it("should encrypt tokens before storage", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       const tokens = createSampleTokens();
 
       await store.set("test-client", tokens);
@@ -122,10 +110,7 @@ describe("SecureTokenStore", () => {
     });
 
     it("should decrypt tokens on retrieval", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       const tokens = createSampleTokens();
 
       await store.set("test-client", tokens);
@@ -138,14 +123,8 @@ describe("SecureTokenStore", () => {
     });
 
     it("should produce different ciphertext with different keys", async () => {
-      const store1 = new SecureTokenStore({
-        key: "password-1",
-        storage: mockStorage,
-      });
-      const store2 = new SecureTokenStore({
-        key: "password-2",
-        storage: createMockStorage(),
-      });
+      const store1 = new SecureTokenStore({ key: "password-1", storage: mockStorage });
+      const store2 = new SecureTokenStore({ key: "password-2", storage: createMockStorage() });
       const tokens = createSampleTokens();
 
       await store1.set("test-client", tokens);
@@ -157,10 +136,7 @@ describe("SecureTokenStore", () => {
       // by trying to decrypt with the wrong key
 
       // Create a new store with wrong key pointing to same storage
-      const wrongKeyStore = new SecureTokenStore({
-        key: "wrong-password",
-        storage: mockStorage,
-      });
+      const wrongKeyStore = new SecureTokenStore({ key: "wrong-password", storage: mockStorage });
 
       // Should not be able to decrypt with wrong key
       const result = await wrongKeyStore.get("test-client");
@@ -168,10 +144,7 @@ describe("SecureTokenStore", () => {
     });
 
     it("should use unique IV for each encryption", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       const tokens = createSampleTokens();
 
       await store.set("client-1", tokens);
@@ -187,10 +160,7 @@ describe("SecureTokenStore", () => {
 
   describe("key types", () => {
     it("should work with string key (PBKDF2 derivation)", async () => {
-      const store = new SecureTokenStore({
-        key: "my-secure-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "my-secure-password", storage: mockStorage });
       const tokens = createSampleTokens();
 
       await store.set("test-client", tokens);
@@ -201,10 +171,7 @@ describe("SecureTokenStore", () => {
 
     it("should work with CryptoKey directly", async () => {
       const cryptoKey = await generateTestEncryptionKey();
-      const store = new SecureTokenStore({
-        key: cryptoKey,
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: cryptoKey, storage: mockStorage });
       const tokens = createSampleTokens();
 
       await store.set("test-client", tokens);
@@ -215,10 +182,7 @@ describe("SecureTokenStore", () => {
 
     it("should work with Uint8Array key bytes", async () => {
       const keyBytes = generateTestKeyBytes();
-      const store = new SecureTokenStore({
-        key: keyBytes,
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: keyBytes, storage: mockStorage });
       const tokens = createSampleTokens();
 
       await store.set("test-client", tokens);
@@ -228,10 +192,7 @@ describe("SecureTokenStore", () => {
     });
 
     it("should cache derived CryptoKey for performance", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       const tokens = createSampleTokens();
 
       // Multiple operations should reuse the same derived key
@@ -249,19 +210,13 @@ describe("SecureTokenStore", () => {
 
   describe("get", () => {
     it("should return null for missing tokens", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       const result = await store.get("non-existent");
       expect(result).toBeNull();
     });
 
     it("should return null and clear corrupted data", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
 
       // Set corrupted data directly
       mockStorage.setItem("oauth_secure_test-client", "not-valid-encrypted-data");
@@ -274,29 +229,20 @@ describe("SecureTokenStore", () => {
     });
 
     it("should return null for data encrypted with different key", async () => {
-      const store1 = new SecureTokenStore({
-        key: "password-1",
-        storage: mockStorage,
-      });
+      const store1 = new SecureTokenStore({ key: "password-1", storage: mockStorage });
       const tokens = createSampleTokens();
 
       await store1.set("test-client", tokens);
 
       // Try to read with different key
-      const store2 = new SecureTokenStore({
-        key: "password-2",
-        storage: mockStorage,
-      });
+      const store2 = new SecureTokenStore({ key: "password-2", storage: mockStorage });
 
       const result = await store2.get("test-client");
       expect(result).toBeNull();
     });
 
     it("should convert ISO date string back to Date object", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       const expiresAt = new Date("2025-06-15T12:00:00.000Z");
       const tokens = createSampleTokens({ expiresAt });
 
@@ -310,10 +256,7 @@ describe("SecureTokenStore", () => {
 
   describe("set", () => {
     it("should store tokens with correct key prefix", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       const tokens = createSampleTokens();
 
       await store.set("test-client", tokens);
@@ -336,10 +279,7 @@ describe("SecureTokenStore", () => {
     });
 
     it("should overwrite existing tokens", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       const oldTokens = createSampleTokens({ accessToken: "old_token" });
       const newTokens = createSampleTokens({ accessToken: "new_token" });
 
@@ -351,10 +291,7 @@ describe("SecureTokenStore", () => {
     });
 
     it("should store all token properties", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       const tokens: StoredTokens = {
         accessToken: "access_123",
         tokenType: "Bearer",
@@ -377,10 +314,7 @@ describe("SecureTokenStore", () => {
 
   describe("clear", () => {
     it("should remove tokens for specific client", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       const tokens = createSampleTokens();
 
       await store.set("client-1", tokens);
@@ -393,10 +327,7 @@ describe("SecureTokenStore", () => {
     });
 
     it("should not throw for non-existent client", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
 
       await expect(store.clear("non-existent")).resolves.not.toThrow();
     });
@@ -404,10 +335,7 @@ describe("SecureTokenStore", () => {
 
   describe("clearAll", () => {
     it("should remove all tokens with the prefix", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       const tokens = createSampleTokens();
 
       await store.set("client-1", tokens);
@@ -422,10 +350,7 @@ describe("SecureTokenStore", () => {
     });
 
     it("should not remove keys with different prefix", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       const tokens = createSampleTokens();
 
       await store.set("test-client", tokens);
@@ -437,10 +362,7 @@ describe("SecureTokenStore", () => {
     });
 
     it("should handle empty storage", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
 
       await expect(store.clearAll()).resolves.not.toThrow();
     });
@@ -449,10 +371,7 @@ describe("SecureTokenStore", () => {
   describe("sessionStorage support", () => {
     it("should work with sessionStorage-like implementation", async () => {
       const sessionStorage = createMockStorage();
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: sessionStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: sessionStorage });
       const tokens = createSampleTokens();
 
       await store.set("test-client", tokens);
@@ -464,10 +383,7 @@ describe("SecureTokenStore", () => {
 
   describe("edge cases", () => {
     it("should handle empty string client ID", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       const tokens = createSampleTokens();
 
       await store.set("", tokens);
@@ -477,10 +393,7 @@ describe("SecureTokenStore", () => {
     });
 
     it("should handle tokens without optional fields", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       const minimalTokens: StoredTokens = {
         accessToken: "token",
         tokenType: "Bearer",
@@ -495,10 +408,7 @@ describe("SecureTokenStore", () => {
     });
 
     it("should handle very long tokens", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
       const longToken = "a".repeat(10000);
       const tokens = createSampleTokens({ accessToken: longToken });
 
@@ -509,13 +419,8 @@ describe("SecureTokenStore", () => {
     });
 
     it("should handle tokens with unicode characters", async () => {
-      const store = new SecureTokenStore({
-        key: "test-password",
-        storage: mockStorage,
-      });
-      const tokens = createSampleTokens({
-        scope: "read write 日本語 emoji:🔐",
-      });
+      const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
+      const tokens = createSampleTokens({ scope: "read write 日本語 emoji:🔐" });
 
       await store.set("test-client", tokens);
       const result = await store.get("test-client");

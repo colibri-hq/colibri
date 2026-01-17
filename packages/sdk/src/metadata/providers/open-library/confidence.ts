@@ -70,10 +70,7 @@ export function calculateAggregatedConfidence(
     logConfidenceCalculation(results, factors);
   }
 
-  return {
-    confidence: factors.finalConfidence,
-    factors,
-  };
+  return { confidence: factors.finalConfidence, factors };
 }
 
 /**
@@ -109,10 +106,7 @@ function createSingleSourceFactors(
   result: MetadataRecord,
   config: Required<ConfidenceConfig>,
 ): ConfidenceFactors {
-  const singleResultConfidence = Math.min(
-    config.maxConfidence,
-    result.confidence,
-  );
+  const singleResultConfidence = Math.min(config.maxConfidence, result.confidence);
   return {
     baseConfidence: result.confidence,
     consensusBoost: 0,
@@ -145,39 +139,26 @@ function calculateMultiSourceFactors(
   // Base confidence is the weighted average (higher confidence results have more weight)
   const totalWeight = results.reduce((sum, r) => sum + r.confidence, 0);
   const baseConfidence =
-    results.reduce((sum, r) => sum + r.confidence * r.confidence, 0) /
-    totalWeight;
+    results.reduce((sum, r) => sum + r.confidence * r.confidence, 0) / totalWeight;
 
   // Consensus boost: more results agreeing increases confidence
-  const consensusBoost = Math.min(
-    config.maxConsensusBoost,
-    (results.length - 1) * 0.03,
-  );
+  const consensusBoost = Math.min(config.maxConsensusBoost, (results.length - 1) * 0.03);
 
   // Agreement boost: check how much the results agree on key fields
-  const agreementBoost = calculateAgreementBoost(
-    results,
-    config.maxAgreementBoost,
-  );
+  const agreementBoost = calculateAgreementBoost(results, config.maxAgreementBoost);
 
   // Quality boost: higher average confidence of sources
   const avgQuality = totalWeight / results.length;
   const qualityBoost = Math.max(0, (avgQuality - 0.7) * 0.1);
 
   // Source count boost: additional boost for having many agreeing sources
-  const sourceCountBoost = Math.min(
-    0.05,
-    Math.max(0, (results.length - 3) * 0.01),
-  );
+  const sourceCountBoost = Math.min(0.05, Math.max(0, (results.length - 3) * 0.01));
 
   // Reliability boost: boost based on source reliability scores
   const reliabilityBoost = calculateReliabilityBoost(results);
 
   // Calculate penalties for source disagreement
-  const disagreementPenalty = calculateDisagreementPenalty(
-    results,
-    config.maxDisagreementPenalty,
-  );
+  const disagreementPenalty = calculateDisagreementPenalty(results, config.maxDisagreementPenalty);
 
   // Collect penalty reasons
   const penalties: string[] = [];
@@ -198,10 +179,7 @@ function calculateMultiSourceFactors(
   // Apply confidence differentiation based on consensus strength
   const agreementScore = calculateOverallAgreementScore(results);
   const consensusStrength = calculateConsensusStrength(results);
-  preliminaryConfidence = applyConsensusThresholds(
-    preliminaryConfidence,
-    results,
-  );
+  preliminaryConfidence = applyConsensusThresholds(preliminaryConfidence, results);
 
   // Apply confidence caps and tiers
   const { finalConfidence, additionalPenalties } = applyConfidenceCaps(
@@ -238,19 +216,14 @@ function calculateMultiSourceFactors(
 /**
  * Calculate agreement boost based on field-level consensus
  */
-export function calculateAgreementBoost(
-  results: MetadataRecord[],
-  maxBoost: number = 0.1,
-): number {
+export function calculateAgreementBoost(results: MetadataRecord[], maxBoost: number = 0.1): number {
   if (results.length < 2) return 0;
 
   let agreementScore = 0;
   let fieldsChecked = 0;
 
   // Check title agreement
-  const titles = results
-    .filter((r) => r.title)
-    .map((r) => normalizeForComparison(r.title!));
+  const titles = results.filter((r) => r.title).map((r) => normalizeForComparison(r.title!));
   if (titles.length >= 2) {
     const uniqueTitles = new Set(titles);
     agreementScore += uniqueTitles.size === 1 ? 1 : 0.5 / uniqueTitles.size;
@@ -268,8 +241,7 @@ export function calculateAgreementBoost(
     );
   if (authorSets.length >= 2) {
     const uniqueAuthorSets = new Set(authorSets);
-    agreementScore +=
-      uniqueAuthorSets.size === 1 ? 1 : 0.5 / uniqueAuthorSets.size;
+    agreementScore += uniqueAuthorSets.size === 1 ? 1 : 0.5 / uniqueAuthorSets.size;
     fieldsChecked++;
   }
 
@@ -317,9 +289,7 @@ export function calculateDisagreementPenalty(
   let fieldsChecked = 0;
 
   // Check title disagreement
-  const titles = results
-    .filter((r) => r.title)
-    .map((r) => normalizeForComparison(r.title!));
+  const titles = results.filter((r) => r.title).map((r) => normalizeForComparison(r.title!));
   if (titles.length >= 2) {
     const uniqueTitles = new Set(titles);
     if (uniqueTitles.size > 1) {
@@ -329,9 +299,7 @@ export function calculateDisagreementPenalty(
   }
 
   // Check author disagreement
-  const authorCounts = results
-    .filter((r) => r.authors)
-    .map((r) => r.authors!.length);
+  const authorCounts = results.filter((r) => r.authors).map((r) => r.authors!.length);
   if (authorCounts.length >= 2) {
     const maxAuthors = Math.max(...authorCounts);
     const minAuthors = Math.min(...authorCounts);
@@ -377,9 +345,7 @@ export function calculateReliabilityBoost(results: MetadataRecord[]): number {
 /**
  * Calculate average source reliability score
  */
-export function calculateSourceReliabilityScore(
-  results: MetadataRecord[],
-): number {
+export function calculateSourceReliabilityScore(results: MetadataRecord[]): number {
   if (results.length === 0) return 0;
 
   // Calculate weighted reliability based on confidence and data completeness
@@ -434,18 +400,14 @@ export function calculateConsensusStrength(results: MetadataRecord[]): number {
 /**
  * Calculate overall agreement score across all comparable fields
  */
-export function calculateOverallAgreementScore(
-  results: MetadataRecord[],
-): number {
+export function calculateOverallAgreementScore(results: MetadataRecord[]): number {
   if (results.length < 2) return 1.0;
 
   let totalScore = 0;
   let comparisons = 0;
 
   // Title comparison
-  const titles = results
-    .filter((r) => r.title)
-    .map((r) => normalizeForComparison(r.title!));
+  const titles = results.filter((r) => r.title).map((r) => normalizeForComparison(r.title!));
   if (titles.length >= 2) {
     const uniqueTitles = new Set(titles);
     totalScore += 1 - (uniqueTitles.size - 1) / titles.length;
@@ -456,9 +418,7 @@ export function calculateOverallAgreementScore(
   const authorLists = results.filter((r) => r.authors && r.authors.length > 0);
   if (authorLists.length >= 2) {
     // Compare first author as primary indicator
-    const firstAuthors = authorLists.map((r) =>
-      normalizeForComparison(r.authors![0]),
-    );
+    const firstAuthors = authorLists.map((r) => normalizeForComparison(r.authors![0]));
     const uniqueFirstAuthors = new Set(firstAuthors);
     totalScore += 1 - (uniqueFirstAuthors.size - 1) / firstAuthors.length;
     comparisons++;
@@ -488,10 +448,7 @@ export function calculateOverallAgreementScore(
 /**
  * Apply consensus thresholds to adjust confidence
  */
-function applyConsensusThresholds(
-  confidence: number,
-  results: MetadataRecord[],
-): number {
+function applyConsensusThresholds(confidence: number, results: MetadataRecord[]): number {
   const agreementScore = calculateOverallAgreementScore(results);
   const sourceCount = results.length;
 
@@ -596,10 +553,7 @@ function normalizeForComparison(value: string): string {
 /**
  * Log confidence calculation for debugging
  */
-function logConfidenceCalculation(
-  results: MetadataRecord[],
-  factors: ConfidenceFactors,
-): void {
+function logConfidenceCalculation(results: MetadataRecord[], factors: ConfidenceFactors): void {
   console.log("=== OpenLibrary Confidence Calculation ===");
   console.log(`Sources: ${results.length}`);
   console.log(`Base confidence: ${factors.baseConfidence.toFixed(3)}`);
@@ -608,9 +562,7 @@ function logConfidenceCalculation(
   console.log(`Quality boost: +${factors.qualityBoost.toFixed(3)}`);
   console.log(`Reliability boost: +${factors.reliabilityBoost.toFixed(3)}`);
   console.log(`Source count boost: +${factors.sourceCountBoost.toFixed(3)}`);
-  console.log(
-    `Disagreement penalty: -${factors.disagreementPenalty.toFixed(3)}`,
-  );
+  console.log(`Disagreement penalty: -${factors.disagreementPenalty.toFixed(3)}`);
   console.log(`Final confidence: ${factors.finalConfidence.toFixed(3)}`);
   console.log(`Tier: ${factors.tier}`);
   if (factors.penalties.length > 0) {

@@ -7,10 +7,10 @@
  * @see https://openid.net/specs/openid-connect-core-1_0.html
  */
 import { describe, expect, it, beforeEach, vi } from "vitest";
+import type { AuthorizationServerMetadata } from "../../../src/types.js";
 import { AuthorizationCodeClient } from "../../../src/client/authorization-code.js";
 import { getUserInfoEndpoint } from "../../../src/client/discovery.js";
 import { generateNonce } from "../../../src/client/pkce.js";
-import type { AuthorizationServerMetadata } from "../../../src/types.js";
 import {
   createFullMockFetch,
   createMockTokenStore,
@@ -64,9 +64,7 @@ describe("OpenID Connect", () => {
         serverMetadata: mockMetadata,
       });
 
-      const result = await client.createAuthorizationUrl({
-        scopes: ["openid", "profile"],
-      });
+      const result = await client.createAuthorizationUrl({ scopes: ["openid", "profile"] });
 
       const nonce = result.url.searchParams.get("nonce");
       expect(nonce).not.toBeNull();
@@ -84,9 +82,7 @@ describe("OpenID Connect", () => {
         serverMetadata: mockMetadata,
       });
 
-      const result = await client.createAuthorizationUrl({
-        scopes: ["read", "write"],
-      });
+      const result = await client.createAuthorizationUrl({ scopes: ["read", "write"] });
 
       const nonce = result.url.searchParams.get("nonce");
       expect(nonce).toBeNull();
@@ -121,10 +117,7 @@ describe("OpenID Connect", () => {
         if (urlString.includes("/par")) {
           capturedBody = new URLSearchParams(init?.body as string);
           return createJsonResponse(
-            {
-              request_uri: "urn:example:request_uri_12345",
-              expires_in: 60,
-            },
+            { request_uri: "urn:example:request_uri_12345", expires_in: 60 },
             201,
           );
         }
@@ -149,9 +142,7 @@ describe("OpenID Connect", () => {
         tokenStore: mockTokenStore,
       });
 
-      await client.pushAuthorizationRequest({
-        scopes: ["openid", "profile"],
-      });
+      await client.pushAuthorizationRequest({ scopes: ["openid", "profile"] });
 
       // Verify nonce was included in the PAR request body
       expect(capturedBody).not.toBeNull();
@@ -364,10 +355,9 @@ describe("OpenID Connect", () => {
         userinfo_signing_alg_values_supported: ["RS256", "none"],
       };
 
-      const mockFetch = vi.fn().mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(oidcMetadata),
-      });
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(oidcMetadata) });
 
       const client = new AuthorizationCodeClient({
         issuer: "https://auth.example.com",
@@ -389,11 +379,7 @@ describe("OpenID Connect", () => {
     it("should handle OIDC discovery fallback path", async () => {
       const mockFetchWithFallback = vi
         .fn()
-        .mockResolvedValueOnce({
-          ok: false,
-          status: 404,
-          statusText: "Not Found",
-        })
+        .mockResolvedValueOnce({ ok: false, status: 404, statusText: "Not Found" })
         .mockResolvedValueOnce({
           ok: true,
           json: () =>
@@ -435,9 +421,7 @@ describe("OpenID Connect", () => {
         serverMetadata: mockMetadata,
       });
 
-      const result = await client.createAuthorizationUrl({
-        scopes: ["openid", "profile"],
-      });
+      const result = await client.createAuthorizationUrl({ scopes: ["openid", "profile"] });
 
       expect(result.url.searchParams.get("response_type")).toBe("code");
     });
@@ -459,17 +443,12 @@ describe("OpenID Connect", () => {
         additionalParams: {
           acr_values: "urn:mace:incommon:iap:silver",
           claims: JSON.stringify({
-            userinfo: {
-              given_name: { essential: true },
-              family_name: { essential: true },
-            },
+            userinfo: { given_name: { essential: true }, family_name: { essential: true } },
           }),
         },
       });
 
-      expect(result.url.searchParams.get("acr_values")).toBe(
-        "urn:mace:incommon:iap:silver",
-      );
+      expect(result.url.searchParams.get("acr_values")).toBe("urn:mace:incommon:iap:silver");
       expect(result.url.searchParams.get("claims")).toContain("given_name");
     });
 
@@ -485,9 +464,7 @@ describe("OpenID Connect", () => {
 
       const result = await client.createAuthorizationUrl({
         scopes: ["openid"],
-        additionalParams: {
-          prompt: "consent",
-        },
+        additionalParams: { prompt: "consent" },
       });
 
       expect(result.url.searchParams.get("prompt")).toBe("consent");
@@ -505,9 +482,7 @@ describe("OpenID Connect", () => {
 
       const result = await client.createAuthorizationUrl({
         scopes: ["openid"],
-        additionalParams: {
-          login_hint: "user@example.com",
-        },
+        additionalParams: { login_hint: "user@example.com" },
       });
 
       expect(result.url.searchParams.get("login_hint")).toBe("user@example.com");

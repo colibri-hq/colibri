@@ -7,13 +7,13 @@
 
 import type { Kysely } from "kysely";
 import type { Schema } from "../database.js";
+import { extractChunks } from "../ebooks/extract-text.js";
 import {
   insertChunks,
   deleteChunksByAsset,
   updateAssetIndexStatus,
   getUnindexedAssets,
 } from "../resources/chunk.js";
-import { extractChunks } from "../ebooks/extract-text.js";
 
 /**
  * Result of indexing a single asset.
@@ -65,11 +65,7 @@ export async function indexAsset(
     if (chunks.length === 0) {
       // No text content extracted - might be image-only PDF, etc.
       await updateAssetIndexStatus(database, assetId, { success: true });
-      return {
-        assetId,
-        success: true,
-        chunksIndexed: 0,
-      };
+      return { assetId, success: true, chunksIndexed: 0 };
     }
 
     // Insert chunks into the database with language-aware FTS config
@@ -78,26 +74,14 @@ export async function indexAsset(
     // Mark asset as successfully indexed
     await updateAssetIndexStatus(database, assetId, { success: true });
 
-    return {
-      assetId,
-      success: true,
-      chunksIndexed: inserted,
-    };
+    return { assetId, success: true, chunksIndexed: inserted };
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error during indexing";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error during indexing";
 
     // Record the error in the asset
-    await updateAssetIndexStatus(database, assetId, {
-      success: false,
-      error: errorMessage,
-    });
+    await updateAssetIndexStatus(database, assetId, { success: false, error: errorMessage });
 
-    return {
-      assetId,
-      success: false,
-      error: errorMessage,
-    };
+    return { assetId, success: false, error: errorMessage };
   }
 }
 
@@ -150,20 +134,12 @@ export async function processUnindexedAssets(
         onProgress(result);
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to fetch file";
+      const errorMessage = error instanceof Error ? error.message : "Failed to fetch file";
 
-      const result: IndexAssetResult = {
-        assetId: asset.id,
-        success: false,
-        error: errorMessage,
-      };
+      const result: IndexAssetResult = { assetId: asset.id, success: false, error: errorMessage };
 
       // Record the error
-      await updateAssetIndexStatus(database, asset.id, {
-        success: false,
-        error: errorMessage,
-      });
+      await updateAssetIndexStatus(database, asset.id, { success: false, error: errorMessage });
 
       results.push(result);
 
@@ -196,42 +172,22 @@ export async function reindexAsset(
     .selectFrom("asset")
     .innerJoin("edition", "edition.id", "asset.edition_id")
     .leftJoin("language", "language.iso_639_3", "edition.language")
-    .select([
-      "asset.id",
-      "asset.storage_reference",
-      "asset.media_type",
-      "language.fts_config",
-    ])
+    .select(["asset.id", "asset.storage_reference", "asset.media_type", "language.fts_config"])
     .where("asset.id", "=", assetId)
     .executeTakeFirst();
 
   if (!asset) {
-    return {
-      assetId,
-      success: false,
-      error: "Asset not found",
-    };
+    return { assetId, success: false, error: "Asset not found" };
   }
 
   try {
     const buffer = await fetchFile(asset.storage_reference);
     const file = new File([buffer], "ebook", { type: asset.media_type });
 
-    return indexAsset(
-      database,
-      assetId,
-      file,
-      asset.media_type,
-      asset.fts_config ?? "simple",
-    );
+    return indexAsset(database, assetId, file, asset.media_type, asset.fts_config ?? "simple");
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Failed to fetch file";
+    const errorMessage = error instanceof Error ? error.message : "Failed to fetch file";
 
-    return {
-      assetId,
-      success: false,
-      error: errorMessage,
-    };
+    return { assetId, success: false, error: errorMessage };
   }
 }

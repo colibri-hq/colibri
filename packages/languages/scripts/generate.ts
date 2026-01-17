@@ -6,65 +6,58 @@
  * Prerequisites: Run `pnpm download` first to get the source data.
  */
 
-import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = join(__dirname, '..', 'data');
-const GENERATED_DIR = join(__dirname, '..', 'src', 'generated');
-const SUPABASE_SEEDS_DIR = join(
-  __dirname,
-  '..',
-  '..',
-  '..',
-  'supabase',
-  'seeds',
-);
+const DATA_DIR = join(__dirname, "..", "data");
+const GENERATED_DIR = join(__dirname, "..", "src", "generated");
+const SUPABASE_SEEDS_DIR = join(__dirname, "..", "..", "..", "supabase", "seeds");
 
 // Map SIL language types to our enum values
 const TYPE_MAP: Record<string, string> = {
-  L: 'living',
-  H: 'historical',
-  E: 'extinct',
-  C: 'constructed',
-  S: 'special',
-  A: 'living', // Ancient (mapped to historical would be more accurate, but using living for compatibility)
+  L: "living",
+  H: "historical",
+  E: "extinct",
+  C: "constructed",
+  S: "special",
+  A: "living", // Ancient (mapped to historical would be more accurate, but using living for compatibility)
 };
 
 // PostgreSQL full-text search configurations mapped to ISO 639-3 codes
 // See: https://www.postgresql.org/docs/current/textsearch-configuration.html
 const FTS_CONFIG_MAP: Record<string, string> = {
-  ara: 'arabic',
-  hye: 'armenian',
-  eus: 'basque',
-  cat: 'catalan',
-  dan: 'danish',
-  nld: 'dutch',
-  eng: 'english',
-  fin: 'finnish',
-  fra: 'french',
-  deu: 'german',
-  ell: 'greek',
-  hin: 'hindi',
-  hun: 'hungarian',
-  ind: 'indonesian',
-  gle: 'irish',
-  ita: 'italian',
-  lit: 'lithuanian',
-  npi: 'nepali',
-  nor: 'norwegian',
-  nob: 'norwegian', // Norwegian Bokmål
-  nno: 'norwegian', // Norwegian Nynorsk
-  por: 'portuguese',
-  ron: 'romanian',
-  rus: 'russian',
-  srp: 'serbian',
-  spa: 'spanish',
-  swe: 'swedish',
-  tam: 'tamil',
-  tur: 'turkish',
-  yid: 'yiddish',
+  ara: "arabic",
+  hye: "armenian",
+  eus: "basque",
+  cat: "catalan",
+  dan: "danish",
+  nld: "dutch",
+  eng: "english",
+  fin: "finnish",
+  fra: "french",
+  deu: "german",
+  ell: "greek",
+  hin: "hindi",
+  hun: "hungarian",
+  ind: "indonesian",
+  gle: "irish",
+  ita: "italian",
+  lit: "lithuanian",
+  npi: "nepali",
+  nor: "norwegian",
+  nob: "norwegian", // Norwegian Bokmål
+  nno: "norwegian", // Norwegian Nynorsk
+  por: "portuguese",
+  ron: "romanian",
+  rus: "russian",
+  srp: "serbian",
+  spa: "spanish",
+  swe: "swedish",
+  tam: "tamil",
+  tur: "turkish",
+  yid: "yiddish",
 };
 
 interface RawLanguage {
@@ -93,9 +86,9 @@ interface NameIndex {
 }
 
 function parseTSV<T>(content: string, parser: (row: string[]) => T): T[] {
-  const lines = content.trim().split('\n');
+  const lines = content.trim().split("\n");
   // Skip header row
-  return lines.slice(1).map((line) => parser(line.split('\t')));
+  return lines.slice(1).map((line) => parser(line.split("\t")));
 }
 
 function parseLanguageRow(row: string[]): RawLanguage {
@@ -112,11 +105,7 @@ function parseLanguageRow(row: string[]): RawLanguage {
 }
 
 function parseNameIndexRow(row: string[]): NameIndex {
-  return {
-    id: row[0],
-    printName: row[1],
-    invertedName: row[2],
-  };
+  return { id: row[0], printName: row[1], invertedName: row[2] };
 }
 
 function escapeSQL(str: string): string {
@@ -124,27 +113,19 @@ function escapeSQL(str: string): string {
 }
 
 function escapeTS(str: string): string {
-  return str.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  return str.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
 async function main(): Promise<void> {
-  console.log('Reading source data...');
+  console.log("Reading source data...");
 
-  const languagesContent = await readFile(
-    join(DATA_DIR, 'iso-639-3.tab'),
-    'utf-8',
-  );
-  const nameIndexContent = await readFile(
-    join(DATA_DIR, 'iso-639-3_Name_Index.tab'),
-    'utf-8',
-  );
+  const languagesContent = await readFile(join(DATA_DIR, "iso-639-3.tab"), "utf-8");
+  const nameIndexContent = await readFile(join(DATA_DIR, "iso-639-3_Name_Index.tab"), "utf-8");
 
   const rawLanguages = parseTSV(languagesContent, parseLanguageRow);
   const nameIndex = parseTSV(nameIndexContent, parseNameIndexRow);
 
-  console.log(
-    `Parsed ${rawLanguages.length} languages and ${nameIndex.length} name entries`,
-  );
+  console.log(`Parsed ${rawLanguages.length} languages and ${nameIndex.length} name entries`);
 
   // Build name lookup map (ID -> list of alternative names)
   const alternativeNames = new Map<string, string[]>();
@@ -164,15 +145,15 @@ async function main(): Promise<void> {
   const languages: Language[] = rawLanguages.map((raw) => ({
     iso3: raw.id.toLowerCase(),
     iso1: raw.part1?.toLowerCase() ?? null,
-    type: TYPE_MAP[raw.languageType] ?? 'living',
+    type: TYPE_MAP[raw.languageType] ?? "living",
     name: raw.refName,
-    ftsConfig: FTS_CONFIG_MAP[raw.id.toLowerCase()] ?? 'simple',
+    ftsConfig: FTS_CONFIG_MAP[raw.id.toLowerCase()] ?? "simple",
   }));
 
   // Sort by ISO 639-3 code for consistent output
   languages.sort((a, b) => a.iso3.localeCompare(b.iso3));
 
-  console.log('Generating TypeScript...');
+  console.log("Generating TypeScript...");
   await mkdir(GENERATED_DIR, { recursive: true });
 
   // Build indexes
@@ -209,7 +190,7 @@ async function main(): Promise<void> {
  *
  * Generated from ISO 639-3 data from SIL International.
  * Source: https://iso639-3.sil.org/code_tables/download_tables
- * Generated: ${new Date().toISOString().split('T')[0]}
+ * Generated: ${new Date().toISOString().split("T")[0]}
  *
  * Regenerate with: pnpm --filter @colibri-hq/languages run update
  */
@@ -223,16 +204,16 @@ export const LANGUAGES: readonly Language[] = Object.freeze([
 ${languages
   .map(
     (l) =>
-      `  { iso3: "${l.iso3}", iso1: ${l.iso1 ? `"${l.iso1}"` : 'null'}, type: "${l.type}" as LanguageType, name: "${escapeTS(l.name)}", ftsConfig: "${l.ftsConfig}" }`,
+      `  { iso3: "${l.iso3}", iso1: ${l.iso1 ? `"${l.iso1}"` : "null"}, type: "${l.type}" as LanguageType, name: "${escapeTS(l.name)}", ftsConfig: "${l.ftsConfig}" }`,
   )
-  .join(',\n')}
+  .join(",\n")}
 ]);
 
 /**
  * Index: ISO 639-3 code (lowercase) -> array index
  */
 export const ISO3_INDEX: ReadonlyMap<string, number> = new Map([
-${iso3Entries.join(',\n')}
+${iso3Entries.join(",\n")}
 ]);
 
 /**
@@ -240,7 +221,7 @@ ${iso3Entries.join(',\n')}
  * Only includes languages that have an ISO 639-1 code assigned.
  */
 export const ISO1_INDEX: ReadonlyMap<string, number> = new Map([
-${iso1Entries.join(',\n')}
+${iso1Entries.join(",\n")}
 ]);
 
 /**
@@ -248,23 +229,23 @@ ${iso1Entries.join(',\n')}
  * Includes reference names and alternative names from the ISO 639-3 Name Index.
  */
 export const NAME_INDEX: ReadonlyMap<string, number> = new Map([
-${nameEntries.join(',\n')}
+${nameEntries.join(",\n")}
 ]);
 `;
 
-  await writeFile(join(GENERATED_DIR, 'languages.ts'), tsContent, 'utf-8');
+  await writeFile(join(GENERATED_DIR, "languages.ts"), tsContent, "utf-8");
   console.log(
     `Generated languages.ts (${languages.length} languages, ${iso1Entries.length} ISO 639-1 codes, ${nameEntries.length} name entries)`,
   );
 
   // Generate SQL seed
-  console.log('Generating SQL seed...');
+  console.log("Generating SQL seed...");
 
   const sqlContent = `-- AUTO-GENERATED FILE - DO NOT EDIT
 --
 -- Generated from ISO 639-3 data from SIL International.
 -- Source: https://iso639-3.sil.org/code_tables/download_tables
--- Generated: ${new Date().toISOString().split('T')[0]}
+-- Generated: ${new Date().toISOString().split("T")[0]}
 --
 -- Regenerate with: pnpm --filter @colibri-hq/languages run update
 
@@ -272,26 +253,23 @@ insert into public.language (iso_639_3, iso_639_1, type, name, fts_config) value
 ${languages
   .map(
     (l) =>
-      `('${l.iso3}', ${l.iso1 ? `'${l.iso1}'` : 'null'}, '${l.type}', '${escapeSQL(l.name)}', '${l.ftsConfig}')`,
+      `('${l.iso3}', ${l.iso1 ? `'${l.iso1}'` : "null"}, '${l.type}', '${escapeSQL(l.name)}', '${l.ftsConfig}')`,
   )
-  .join(',\n')};
+  .join(",\n")};
 `;
 
-  await writeFile(join(GENERATED_DIR, 'languages.sql'), sqlContent, 'utf-8');
+  await writeFile(join(GENERATED_DIR, "languages.sql"), sqlContent, "utf-8");
   console.log(`Generated languages.sql`);
 
   // Copy SQL seed to supabase/seeds/
-  console.log('Copying SQL seed to supabase/seeds/...');
-  await copyFile(
-    join(GENERATED_DIR, 'languages.sql'),
-    join(SUPABASE_SEEDS_DIR, 'languages.sql'),
-  );
-  console.log('Copied to supabase/seeds/languages.sql');
+  console.log("Copying SQL seed to supabase/seeds/...");
+  await copyFile(join(GENERATED_DIR, "languages.sql"), join(SUPABASE_SEEDS_DIR, "languages.sql"));
+  console.log("Copied to supabase/seeds/languages.sql");
 
-  console.log('\nGeneration complete!');
+  console.log("\nGeneration complete!");
 }
 
 main().catch((error) => {
-  console.error('Generation failed:', error);
+  console.error("Generation failed:", error);
   process.exit(1);
 });

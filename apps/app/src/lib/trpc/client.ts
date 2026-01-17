@@ -1,5 +1,5 @@
-import { browser } from "$app/environment";
 import type { Router } from "$lib/trpc/router";
+import { browser } from "$app/environment";
 import { createTRPCClient, type TRPCClientInit } from "trpc-sveltekit";
 
 let browserClient: ReturnType<typeof createTRPCClient<Router>>;
@@ -9,9 +9,7 @@ export function trpc(init: TRPCClientInit) {
     return browserClient;
   }
 
-  const client = createTRPCClient<Router>({
-    init,
-  });
+  const client = createTRPCClient<Router>({ init });
 
   if (browser) {
     browserClient = client;
@@ -34,11 +32,7 @@ export function savable<T extends Record<string, unknown>>(obj: T): T {
   ) as T;
 }
 
-export function extractPaginationParametersFromUrl(
-  url: URL,
-  defaultPerPage = 10,
-  defaultPage = 1,
-) {
+export function extractPaginationParametersFromUrl(url: URL, defaultPerPage = 10, defaultPage = 1) {
   const page = Number(url.searchParams.get("page") || defaultPage);
   const perPage = Number(url.searchParams.get("per_page") || defaultPerPage);
 

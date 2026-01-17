@@ -106,11 +106,7 @@ export class QueryStrategyBuilder {
       }
     }
 
-    return {
-      primary: query,
-      fallbacks,
-      relaxationRules: applicableRules,
-    };
+    return { primary: query, fallbacks, relaxationRules: applicableRules };
   }
 
   /**
@@ -132,10 +128,8 @@ export class QueryStrategyBuilder {
       };
     }
 
-    const averageConfidence =
-      results.reduce((sum, r) => sum + r.confidence, 0) / resultCount;
-    const meetsThreshold =
-      resultCount >= minResults && averageConfidence >= minConfidence;
+    const averageConfidence = results.reduce((sum, r) => sum + r.confidence, 0) / resultCount;
+    const meetsThreshold = resultCount >= minResults && averageConfidence >= minConfidence;
 
     return {
       resultCount,
@@ -202,10 +196,7 @@ export class QueryStrategyBuilder {
         name: "enable-fuzzy",
         description: "Enable fuzzy matching for title and authors",
         priority: 1,
-        apply: (query) => ({
-          ...query,
-          fuzzy: true,
-        }),
+        apply: (query) => ({ ...query, fuzzy: true }),
       });
     }
 
@@ -280,10 +271,7 @@ export class QueryStrategyBuilder {
 
             return {
               ...query,
-              yearRange: [start - expansion, end + expansion] as [
-                number,
-                number,
-              ],
+              yearRange: [start - expansion, end + expansion] as [number, number],
             };
           }
           return query;
@@ -309,10 +297,7 @@ export class QueryStrategyBuilder {
       priority: 8,
       apply: (query) => {
         if (query.title) {
-          return {
-            title: query.title,
-            fuzzy: true,
-          };
+          return { title: query.title, fuzzy: true };
         }
         return query;
       },
@@ -324,10 +309,7 @@ export class QueryStrategyBuilder {
   /**
    * Check if a relaxation rule is applicable to a query
    */
-  private isRuleApplicable(
-    rule: RelaxationRule,
-    query: MultiCriteriaQuery,
-  ): boolean {
+  private isRuleApplicable(rule: RelaxationRule, query: MultiCriteriaQuery): boolean {
     switch (rule.name) {
       case "enable-fuzzy":
         return !query.fuzzy && (!!query.title || !!query.authors);
@@ -353,11 +335,7 @@ export class QueryStrategyBuilder {
       case "title-only":
         return !!(
           query.title &&
-          (query.authors ||
-            query.publisher ||
-            query.subjects ||
-            query.language ||
-            query.yearRange)
+          (query.authors || query.publisher || query.subjects || query.language || query.yearRange)
         );
 
       default:
@@ -368,13 +346,9 @@ export class QueryStrategyBuilder {
   /**
    * Compare two queries for equality
    */
-  private queriesEqual(
-    query1: MultiCriteriaQuery,
-    query2: MultiCriteriaQuery,
-  ): boolean {
+  private queriesEqual(query1: MultiCriteriaQuery, query2: MultiCriteriaQuery): boolean {
     return (
-      JSON.stringify(this.normalizeQuery(query1)) ===
-      JSON.stringify(this.normalizeQuery(query2))
+      JSON.stringify(this.normalizeQuery(query1)) === JSON.stringify(this.normalizeQuery(query2))
     );
   }
 

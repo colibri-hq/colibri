@@ -22,17 +22,8 @@ describe("Series and Tag Ingestion", () => {
       // Create a mock file with series metadata
       const _mockMetadata: Partial<Metadata> = {
         title: "The Fellowship of the Ring",
-        series: {
-          name: "The Lord of the Rings",
-          position: 1,
-        },
-        contributors: [
-          {
-            name: "J.R.R. Tolkien",
-            roles: ["aut"],
-            sortingKey: "Tolkien, J.R.R.",
-          },
-        ],
+        series: { name: "The Lord of the Rings", position: 1 },
+        contributors: [{ name: "J.R.R. Tolkien", roles: ["aut"], sortingKey: "Tolkien, J.R.R." }],
         language: "en",
       };
 
@@ -90,13 +81,7 @@ describe("Series and Tag Ingestion", () => {
       const _mockMetadata: Partial<Metadata> = {
         title: "A Fantasy Novel",
         tags: ["Fiction", "Fantasy", "Epic Fantasy"],
-        contributors: [
-          {
-            name: "Test Author",
-            roles: ["aut"],
-            sortingKey: "Author, Test",
-          },
-        ],
+        contributors: [{ name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" }],
       };
 
       // Expected behavior:
@@ -191,13 +176,7 @@ describe("Series and Tag Ingestion", () => {
         title: "Simple Book",
         // No series
         // No tags
-        contributors: [
-          {
-            name: "Test Author",
-            roles: ["aut"],
-            sortingKey: "Author, Test",
-          },
-        ],
+        contributors: [{ name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" }],
       };
 
       // Should complete successfully without errors
@@ -212,13 +191,7 @@ describe("Series and Tag Ingestion", () => {
       const _mockMetadata: Partial<Metadata> = {
         title: "Over-Tagged Book",
         tags: manyTags,
-        contributors: [
-          {
-            name: "Test Author",
-            roles: ["aut"],
-            sortingKey: "Author, Test",
-          },
-        ],
+        contributors: [{ name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" }],
       };
 
       // Should create all tags (or impose a reasonable limit)
@@ -228,10 +201,7 @@ describe("Series and Tag Ingestion", () => {
     it("should handle special characters in series names", async () => {
       const _mockMetadata: Partial<Metadata> = {
         title: "Book One",
-        series: {
-          name: "The Hitchhiker's Guide to the Galaxy",
-          position: 1,
-        },
+        series: { name: "The Hitchhiker's Guide to the Galaxy", position: 1 },
       };
 
       // Should handle apostrophes and other special characters correctly

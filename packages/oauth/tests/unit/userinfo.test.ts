@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import type { createMockPersistence } from "../utilities";
 import {
   type AuthorizationServerOptions,
   type Entities,
   createAuthorizationServer,
 } from "../../src";
-import type { createMockPersistence } from "../utilities";
 
 describe("User Info Endpoint Unit Tests", () => {
   let options: AuthorizationServerOptions;
@@ -13,11 +13,7 @@ describe("User Info Endpoint Unit Tests", () => {
   beforeEach(() => {
     persistence = createMockPersistence();
 
-    options = {
-      issuer: "http://localhost:3000",
-      jwtSecret: "test-secret",
-      persistence,
-    };
+    options = { issuer: "http://localhost:3000", jwtSecret: "test-secret", persistence };
   });
 
   describe("User Info", () => {
@@ -47,11 +43,7 @@ describe("User Info Endpoint Unit Tests", () => {
 
       persistence.loadUserInfo.mockResolvedValue(mockUser);
 
-      const request = {
-        headers: {
-          authorization: "Bearer test-token",
-        },
-      };
+      const request = { headers: { authorization: "Bearer test-token" } };
 
       const result = await server.handleUserInfoRequest(request);
       expect(result).toEqual({
@@ -91,18 +83,10 @@ describe("User Info Endpoint Unit Tests", () => {
 
       persistence.loadUserInfo.mockResolvedValue(mockUser);
 
-      const request = {
-        headers: {
-          authorization: "Bearer test-token",
-        },
-      };
+      const request = { headers: { authorization: "Bearer test-token" } };
 
       const result = await server.handleUserInfoRequest(request);
-      expect(result).toEqual({
-        sub: "test-user",
-        email: "test@example.com",
-        email_verified: true,
-      });
+      expect(result).toEqual({ sub: "test-user", email: "test@example.com", email_verified: true });
     });
 
     it("should reject invalid token", async () => {
@@ -110,11 +94,7 @@ describe("User Info Endpoint Unit Tests", () => {
 
       persistence.loadTokenInfo.mockResolvedValue(undefined);
 
-      const request = {
-        headers: {
-          authorization: "Bearer invalid-token",
-        },
-      };
+      const request = { headers: { authorization: "Bearer invalid-token" } };
 
       await expect(server.handleUserInfoRequest(request)).rejects.toThrow();
     });
@@ -133,11 +113,7 @@ describe("User Info Endpoint Unit Tests", () => {
 
       persistence.loadTokenInfo.mockResolvedValue(mockToken);
 
-      const request = {
-        headers: {
-          authorization: "Bearer test-token",
-        },
-      };
+      const request = { headers: { authorization: "Bearer test-token" } };
 
       await expect(server.handleUserInfoRequest(request)).rejects.toThrow();
     });

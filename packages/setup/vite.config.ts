@@ -5,11 +5,5 @@ import { defineConfig, searchForWorkspaceRoot } from "vite";
 
 export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
-  server: {
-    fs: {
-      allow: [searchForWorkspaceRoot(cwd())],
-    },
-    port: 3333,
-    strictPort: false,
-  },
+  server: { fs: { allow: [searchForWorkspaceRoot(cwd())] }, port: 3333, strictPort: false },
 });

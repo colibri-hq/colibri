@@ -1,4 +1,7 @@
+import { sleep } from "@colibri-hq/shared";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { ExtractedMetadata } from "./types.js";
+import { TimeoutError } from "../metadata/timeout-manager.js";
 import {
   createEnrichmentSummary,
   executeProviderQueries,
@@ -9,9 +12,6 @@ import {
   withTimeout,
   withTimeoutError,
 } from "./enrichment-utilities.js";
-import { TimeoutError } from "../metadata/timeout-manager.js";
-import type { ExtractedMetadata } from "./types.js";
-import { sleep } from "@colibri-hq/shared";
 
 describe("enrichment-utilities", () => {
   beforeEach(() => {
@@ -45,9 +45,9 @@ describe("enrichment-utilities", () => {
     });
 
     it("should handle promise rejection", async () => {
-      await expect(
-        withTimeout(Promise.reject(new Error("failed")), 1000),
-      ).rejects.toThrow("failed");
+      await expect(withTimeout(Promise.reject(new Error("failed")), 1000)).rejects.toThrow(
+        "failed",
+      );
     });
   });
 
@@ -63,9 +63,9 @@ describe("enrichment-utilities", () => {
         setTimeout(() => resolve("too-late"), 200);
       });
 
-      await expect(
-        withTimeoutError(slowPromise, 50, "Custom timeout message"),
-      ).rejects.toThrow(TimeoutError);
+      await expect(withTimeoutError(slowPromise, 50, "Custom timeout message")).rejects.toThrow(
+        TimeoutError,
+      );
     });
 
     it("should include timeout duration in error", async () => {
@@ -86,14 +86,8 @@ describe("enrichment-utilities", () => {
   describe("executeProviderQueries", () => {
     it("should execute all queries in parallel", async () => {
       const queries = [
-        {
-          provider: "provider1",
-          query: async () => ({ title: "Title from provider 1" }),
-        },
-        {
-          provider: "provider2",
-          query: async () => ({ title: "Title from provider 2" }),
-        },
+        { provider: "provider1", query: async () => ({ title: "Title from provider 1" }) },
+        { provider: "provider2", query: async () => ({ title: "Title from provider 2" }) },
       ];
 
       const results = await executeProviderQueries(queries);
@@ -107,20 +101,14 @@ describe("enrichment-utilities", () => {
 
     it("should handle provider failures without failing entire operation", async () => {
       const queries = [
-        {
-          provider: "provider1",
-          query: async () => ({ title: "Success" }),
-        },
+        { provider: "provider1", query: async () => ({ title: "Success" }) },
         {
           provider: "provider2",
           query: async () => {
             throw new Error("Provider 2 failed");
           },
         },
-        {
-          provider: "provider3",
-          query: async () => ({ title: "Also success" }),
-        },
+        { provider: "provider3", query: async () => ({ title: "Also success" }) },
       ];
 
       const results = await executeProviderQueries(queries);
@@ -134,10 +122,7 @@ describe("enrichment-utilities", () => {
 
     it("should handle provider timeouts", async () => {
       const queries = [
-        {
-          provider: "fast-provider",
-          query: async () => ({ title: "Fast" }),
-        },
+        { provider: "fast-provider", query: async () => ({ title: "Fast" }) },
         {
           provider: "slow-provider",
           query: async () => {
@@ -227,20 +212,14 @@ describe("enrichment-utilities", () => {
         {
           provider: "provider1",
           success: true,
-          metadata: {
-            title: "Book Title",
-            language: "en",
-          },
+          metadata: { title: "Book Title", language: "en" },
           confidence: 0.8,
           duration: 100,
         },
         {
           provider: "provider2",
           success: true,
-          metadata: {
-            synopsis: "A great book",
-            numberOfPages: 300,
-          },
+          metadata: { synopsis: "A great book", numberOfPages: 300 },
           confidence: 0.7,
           duration: 150,
         },
@@ -260,18 +239,14 @@ describe("enrichment-utilities", () => {
         {
           provider: "provider1",
           success: true,
-          metadata: {
-            title: "Low Confidence Title",
-          },
+          metadata: { title: "Low Confidence Title" },
           confidence: 0.5,
           duration: 100,
         },
         {
           provider: "provider2",
           success: true,
-          metadata: {
-            title: "High Confidence Title",
-          },
+          metadata: { title: "High Confidence Title" },
           confidence: 0.9,
           duration: 150,
         },
@@ -314,15 +289,9 @@ describe("enrichment-utilities", () => {
       const merged = mergeEnrichmentResults(results);
 
       expect(merged.enriched.contributors).toHaveLength(3);
-      expect(merged.enriched.contributors?.map((c) => c.name)).toContain(
-        "John Doe",
-      );
-      expect(merged.enriched.contributors?.map((c) => c.name)).toContain(
-        "Jane Smith",
-      );
-      expect(merged.enriched.contributors?.map((c) => c.name)).toContain(
-        "Bob Johnson",
-      );
+      expect(merged.enriched.contributors?.map((c) => c.name)).toContain("John Doe");
+      expect(merged.enriched.contributors?.map((c) => c.name)).toContain("Jane Smith");
+      expect(merged.enriched.contributors?.map((c) => c.name)).toContain("Bob Johnson");
     });
 
     it("should merge and deduplicate subjects", () => {
@@ -330,9 +299,7 @@ describe("enrichment-utilities", () => {
         {
           provider: "provider1",
           success: true,
-          metadata: {
-            subjects: ["Fiction", "Mystery"],
-          },
+          metadata: { subjects: ["Fiction", "Mystery"] },
           confidence: 0.8,
           duration: 100,
         },
@@ -393,18 +360,11 @@ describe("enrichment-utilities", () => {
         {
           provider: "provider1",
           success: true,
-          metadata: {
-            title: "Success",
-          },
+          metadata: { title: "Success" },
           confidence: 0.8,
           duration: 100,
         },
-        {
-          provider: "provider2",
-          success: false,
-          error: new Error("Failed"),
-          duration: 50,
-        },
+        { provider: "provider2", success: false, error: new Error("Failed"), duration: 50 },
       ];
 
       const merged = mergeEnrichmentResults(results);
@@ -415,18 +375,8 @@ describe("enrichment-utilities", () => {
 
     it("should return empty result when all providers fail", () => {
       const results: ProviderEnrichmentResult[] = [
-        {
-          provider: "provider1",
-          success: false,
-          error: new Error("Failed"),
-          duration: 50,
-        },
-        {
-          provider: "provider2",
-          success: false,
-          error: new Error("Also failed"),
-          duration: 50,
-        },
+        { provider: "provider1", success: false, error: new Error("Failed"), duration: 50 },
+        { provider: "provider2", success: false, error: new Error("Also failed"), duration: 50 },
       ];
 
       const merged = mergeEnrichmentResults(results);
@@ -446,11 +396,7 @@ describe("enrichment-utilities", () => {
           language: "en",
         } as Partial<ExtractedMetadata>,
         sources: ["provider1"],
-        confidence: {
-          title: 0.9,
-          synopsis: 0.3,
-          language: 0.7,
-        },
+        confidence: { title: 0.9, synopsis: 0.3, language: 0.7 },
       };
 
       const filtered = filterByConfidence(enrichment, 0.5);
@@ -462,15 +408,9 @@ describe("enrichment-utilities", () => {
 
     it("should keep all fields when confidence is above threshold", () => {
       const enrichment = {
-        enriched: {
-          title: "Book Title",
-          language: "en",
-        } as Partial<ExtractedMetadata>,
+        enriched: { title: "Book Title", language: "en" } as Partial<ExtractedMetadata>,
         sources: ["provider1"],
-        confidence: {
-          title: 0.9,
-          language: 0.8,
-        },
+        confidence: { title: 0.9, language: 0.8 },
       };
 
       const filtered = filterByConfidence(enrichment, 0.5);
@@ -489,12 +429,7 @@ describe("enrichment-utilities", () => {
           confidence: 0.8,
           duration: 100,
         },
-        {
-          provider: "provider2",
-          success: false,
-          error: new Error("Network error"),
-          duration: 50,
-        },
+        { provider: "provider2", success: false, error: new Error("Network error"), duration: 50 },
         {
           provider: "provider3",
           success: false,
@@ -504,15 +439,9 @@ describe("enrichment-utilities", () => {
       ];
 
       const enrichment = {
-        enriched: {
-          title: "Title",
-          language: "en",
-        } as Partial<ExtractedMetadata>,
+        enriched: { title: "Title", language: "en" } as Partial<ExtractedMetadata>,
         sources: ["provider1"],
-        confidence: {
-          title: 0.8,
-          language: 0.6,
-        },
+        confidence: { title: 0.8, language: 0.6 },
       };
 
       const summary = createEnrichmentSummary(results, enrichment);

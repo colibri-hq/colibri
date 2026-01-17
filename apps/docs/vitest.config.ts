@@ -1,7 +1,7 @@
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import tailwindcss from "@tailwindcss/vite";
-import { defineConfig } from "vitest/config";
 import { resolve } from "path";
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   plugins: [tailwindcss(), svelte()],
@@ -61,12 +61,7 @@ export default defineConfig({
         "src/build/**",
         "scripts/**",
       ],
-      thresholds: {
-        statements: 70,
-        branches: 65,
-        functions: 70,
-        lines: 70,
-      },
+      thresholds: { statements: 70, branches: 65, functions: 70, lines: 70 },
     },
   },
 });

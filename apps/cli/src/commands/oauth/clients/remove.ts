@@ -6,12 +6,7 @@ import ora from "ora";
 import { BaseCommand } from "../../../command.ts";
 
 export default class Remove extends BaseCommand<typeof Remove> {
-  static args = {
-    id: Args.string({
-      description: "Client ID to remove",
-      required: true,
-    }),
-  };
+  static args = { id: Args.string({ description: "Client ID to remove", required: true }) };
   static description = "Remove an OAuth client.";
   static examples = [
     {
@@ -23,23 +18,16 @@ export default class Remove extends BaseCommand<typeof Remove> {
       description: "Force remove an OAuth client without confirmation:",
     },
     {
-      command:
-        "<%= config.bin %> <%= command.id %> myapp --instance https://colibri.example.com",
+      command: "<%= config.bin %> <%= command.id %> myapp --instance https://colibri.example.com",
       description: "Remove an OAuth client from a specific Colibri instance:",
     },
   ];
   static flags = {
-    force: Flags.boolean({
-      char: "f",
-      description: "Force the removal without confirmation.",
-    }),
+    force: Flags.boolean({ char: "f", description: "Force the removal without confirmation." }),
   };
 
   async run() {
-    const spinner = ora({
-      stream: process.stderr,
-      text: "Loading OAuth client…",
-    }).start();
+    const spinner = ora({ stream: process.stderr, text: "Loading OAuth client…" }).start();
     const { id } = this.args;
     const { force, verbose } = this.flags;
 

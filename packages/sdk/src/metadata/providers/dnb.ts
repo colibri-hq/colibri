@@ -25,6 +25,14 @@
  */
 
 import {
+  extractBibliographicData,
+  extractSruRecordCount,
+  type MarcBibliographicData,
+  type MarcRecord,
+  parseMarcXmlRecords,
+} from "../utils/marc-parser.js";
+import { cleanIsbn } from "../utils/normalization.js";
+import {
   type CreatorQuery,
   type MetadataRecord,
   MetadataType,
@@ -34,14 +42,6 @@ import {
   type TitleQuery,
 } from "./provider.js";
 import { RetryableMetadataProvider } from "./retryable-provider.js";
-import {
-  extractBibliographicData,
-  extractSruRecordCount,
-  type MarcBibliographicData,
-  type MarcRecord,
-  parseMarcXmlRecords,
-} from "../utils/marc-parser.js";
-import { cleanIsbn } from "../utils/normalization.js";
 
 /**
  * DNB metadata provider using SRU protocol
@@ -65,9 +65,7 @@ export class DNBMetadataProvider extends RetryableMetadataProvider {
     "Colibri-Metadata-Discovery/1.0 (https://github.com/colibri-hq/colibri)";
   private readonly baseUrl = "https://services.dnb.de/sru";
 
-  constructor(
-    private readonly fetch: typeof globalThis.fetch = globalThis.fetch,
-  ) {
+  constructor(private readonly fetch: typeof globalThis.fetch = globalThis.fetch) {
     super();
   }
 
@@ -75,9 +73,7 @@ export class DNBMetadataProvider extends RetryableMetadataProvider {
    * Search by title
    */
   async searchByTitle(query: TitleQuery): Promise<MetadataRecord[]> {
-    const cqlQuery = query.exactMatch
-      ? `tit="${query.title}"`
-      : `tit=${query.title}`;
+    const cqlQuery = query.exactMatch ? `tit="${query.title}"` : `tit=${query.title}`;
 
     return this.executeSruQuery(cqlQuery, `title search for "${query.title}"`);
   }
@@ -89,25 +85,17 @@ export class DNBMetadataProvider extends RetryableMetadataProvider {
     const cleanedIsbn = cleanIsbn(isbn);
     const cqlQuery = `num=${cleanedIsbn}`;
 
-    const results = await this.executeSruQuery(
-      cqlQuery,
-      `ISBN search for "${isbn}"`,
-    );
+    const results = await this.executeSruQuery(cqlQuery, `ISBN search for "${isbn}"`);
 
     // Update confidence for ISBN search
-    return results.map((record) => ({
-      ...record,
-      confidence: Math.max(record.confidence, 0.9),
-    }));
+    return results.map((record) => ({ ...record, confidence: Math.max(record.confidence, 0.9) }));
   }
 
   /**
    * Search by creator/author
    */
   async searchByCreator(query: CreatorQuery): Promise<MetadataRecord[]> {
-    const cqlQuery = query.fuzzy
-      ? `atr any ${query.name}`
-      : `atr="${query.name}"`;
+    const cqlQuery = query.fuzzy ? `atr any ${query.name}` : `atr="${query.name}"`;
 
     return this.executeSruQuery(cqlQuery, `creator search for "${query.name}"`);
   }
@@ -115,9 +103,7 @@ export class DNBMetadataProvider extends RetryableMetadataProvider {
   /**
    * Search using multiple criteria
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     // Prioritize ISBN search
     if (query.isbn) {
       return this.searchByISBN(query.isbn);
@@ -220,16 +206,11 @@ export class DNBMetadataProvider extends RetryableMetadataProvider {
 
       const response = await this.fetch(url, {
         method: "GET",
-        headers: {
-          Accept: "application/xml, text/xml",
-          "User-Agent": this.userAgent,
-        },
+        headers: { Accept: "application/xml, text/xml", "User-Agent": this.userAgent },
       });
 
       if (!response.ok) {
-        throw new Error(
-          `DNB API error: ${response.status} ${response.statusText}`,
-        );
+        throw new Error(`DNB API error: ${response.status} ${response.statusText}`);
       }
 
       const xmlText = await response.text();
@@ -255,10 +236,7 @@ export class DNBMetadataProvider extends RetryableMetadataProvider {
 
       return marcRecords
         .map((record, index) =>
-          this.#mapMarcRecordToMetadata(
-            record,
-            `${this.name}-${Date.now()}-${index}`,
-          ),
+          this.#mapMarcRecordToMetadata(record, `${this.name}-${Date.now()}-${index}`),
         )
         .filter((r): r is MetadataRecord => r !== null);
     } catch (error) {
@@ -270,10 +248,7 @@ export class DNBMetadataProvider extends RetryableMetadataProvider {
   /**
    * Map a parsed MARC record to MetadataRecord format
    */
-  #mapMarcRecordToMetadata(
-    record: MarcRecord,
-    id: string,
-  ): MetadataRecord | null {
+  #mapMarcRecordToMetadata(record: MarcRecord, id: string): MetadataRecord | null {
     // Use the shared extraction utility
     const bibData = extractBibliographicData(record);
 
@@ -282,14 +257,11 @@ export class DNBMetadataProvider extends RetryableMetadataProvider {
     }
 
     // Build the metadata object
-    const metadata: Partial<
-      Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">
-    > = {};
+    const metadata: Partial<Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">> =
+      {};
 
     // Combine title and subtitle
-    metadata.title = bibData.subtitle
-      ? `${bibData.title}: ${bibData.subtitle}`
-      : bibData.title;
+    metadata.title = bibData.subtitle ? `${bibData.title}: ${bibData.subtitle}` : bibData.title;
 
     if (bibData.authors.length > 0) {
       metadata.authors = bibData.authors;
@@ -321,10 +293,7 @@ export class DNBMetadataProvider extends RetryableMetadataProvider {
 
     if (bibData.seriesName) {
       const volume = this.#parseSeriesVolume(bibData.seriesPosition);
-      metadata.series = {
-        name: bibData.seriesName,
-        ...(volume !== undefined && { volume }),
-      };
+      metadata.series = { name: bibData.seriesName, ...(volume !== undefined && { volume }) };
     }
 
     if (bibData.edition) {

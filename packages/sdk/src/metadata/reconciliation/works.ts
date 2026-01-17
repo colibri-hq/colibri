@@ -49,11 +49,7 @@ export interface WorkCluster {
   /** Confidence in the work identification */
   confidence: number;
   /** How the work was identified */
-  identificationMethod:
-    | "external_id"
-    | "title_author_match"
-    | "isbn_family"
-    | "fuzzy_match";
+  identificationMethod: "external_id" | "title_author_match" | "isbn_family" | "fuzzy_match";
 }
 
 /**
@@ -161,11 +157,7 @@ export class WorkReconciler {
       inputs,
     );
 
-    return {
-      work,
-      edition,
-      relatedWorks,
-    };
+    return { work, edition, relatedWorks };
   }
 
   /**
@@ -204,10 +196,7 @@ export class WorkReconciler {
 
         if (comparison.isSameWork) {
           cluster.editions.push(editions[j]);
-          cluster.confidence = Math.min(
-            cluster.confidence,
-            comparison.confidence,
-          );
+          cluster.confidence = Math.min(cluster.confidence, comparison.confidence);
           processed.add(j);
 
           // Update identification method based on evidence
@@ -242,10 +231,7 @@ export class WorkReconciler {
    */
   compareEditions(edition1: Edition, edition2: Edition): EditionComparison {
     const evidence = {
-      titleSimilarity: this.calculateTitleSimilarity(
-        edition1.title || "",
-        edition2.title || "",
-      ),
+      titleSimilarity: this.calculateTitleSimilarity(edition1.title || "", edition2.title || ""),
       authorOverlap: this.calculateAuthorOverlap(edition1, edition2),
       externalIdMatch: this.checkExternalIdMatch(edition1, edition2),
       languageMatch: edition1.language === edition2.language,
@@ -254,20 +240,12 @@ export class WorkReconciler {
 
     // External ID match is strongest signal
     if (evidence.externalIdMatch) {
-      return {
-        isSameWork: true,
-        confidence: 0.95,
-        evidence,
-      };
+      return { isSameWork: true, confidence: 0.95, evidence };
     }
 
     // ISBN family match (different formats of same work)
     if (evidence.isbnFamily) {
-      return {
-        isSameWork: true,
-        confidence: 0.9,
-        evidence,
-      };
+      return { isSameWork: true, confidence: 0.9, evidence };
     }
 
     // Title + author match with language consideration
@@ -278,36 +256,18 @@ export class WorkReconciler {
       // Different language = translation
       if (!evidence.languageMatch) {
         if (this.config.translationsAreSeparateWorks) {
-          return {
-            isSameWork: false,
-            confidence: 0.85,
-            evidence,
-            relationship: "translation",
-          };
+          return { isSameWork: false, confidence: 0.85, evidence, relationship: "translation" };
         } else {
-          return {
-            isSameWork: true,
-            confidence: 0.85,
-            evidence,
-          };
+          return { isSameWork: true, confidence: 0.85, evidence };
         }
       }
 
       // Same language = likely same work (different edition)
-      return {
-        isSameWork: true,
-        confidence: 0.8,
-        evidence,
-      };
+      return { isSameWork: true, confidence: 0.8, evidence };
     }
 
     // Not enough evidence for same work
-    return {
-      isSameWork: false,
-      confidence: 0.3,
-      evidence,
-      relationship: "unrelated",
-    };
+    return { isSameWork: false, confidence: 0.3, evidence, relationship: "unrelated" };
   }
 
   /**
@@ -328,9 +288,7 @@ export class WorkReconciler {
    * Extract editions from work/edition inputs
    */
   private extractEditions(inputs: WorkEditionInput[]): Edition[] {
-    return inputs
-      .filter((input) => input.edition)
-      .map((input) => input.edition!);
+    return inputs.filter((input) => input.edition).map((input) => input.edition!);
   }
 
   /**
@@ -370,10 +328,7 @@ export class WorkReconciler {
   /**
    * Reconcile work-level metadata from edition metadata
    */
-  private reconcileWork(
-    editions: Edition[],
-    sources: MetadataSource[],
-  ): ReconciledField<Work> {
+  private reconcileWork(editions: Edition[], sources: MetadataSource[]): ReconciledField<Work> {
     // Use earliest edition for original publication info
     const sortedByDate = [...editions].sort((a, b) => {
       if (!a.publicationDate || !b.publicationDate) return 0;
@@ -444,10 +399,7 @@ export class WorkReconciler {
 
     // Check other clusters for relationships
     for (const cluster of otherClusters) {
-      const relationship = this.determineWorkRelationship(
-        primaryCluster,
-        cluster,
-      );
+      const relationship = this.determineWorkRelationship(primaryCluster, cluster);
 
       if (relationship) {
         relatedWorks.push({
@@ -543,10 +495,7 @@ export class WorkReconciler {
     return edition1.workId === edition2.workId;
   }
 
-  private checkIsbnFamily(
-    isbn1: string[] | undefined,
-    isbn2: string[] | undefined,
-  ): boolean {
+  private checkIsbnFamily(isbn1: string[] | undefined, isbn2: string[] | undefined): boolean {
     if (!isbn1 || !isbn2) return false;
 
     // Check for ISBN-10/ISBN-13 pairs
@@ -566,15 +515,11 @@ export class WorkReconciler {
 
     // ISBN-10 and ISBN-13 are family if they share the same base
     if (clean1.length === 10 && clean2.length === 13) {
-      return (
-        clean2.startsWith("978") && clean2.slice(3, 12) === clean1.slice(0, 9)
-      );
+      return clean2.startsWith("978") && clean2.slice(3, 12) === clean1.slice(0, 9);
     }
 
     if (clean2.length === 10 && clean1.length === 13) {
-      return (
-        clean1.startsWith("978") && clean1.slice(3, 12) === clean2.slice(0, 9)
-      );
+      return clean1.startsWith("978") && clean1.slice(3, 12) === clean2.slice(0, 9);
     }
 
     return false;
@@ -605,13 +550,9 @@ export class WorkReconciler {
     return identifiers;
   }
 
-  private calculateWorkConfidence(
-    editions: Edition[],
-    sources: MetadataSource[],
-  ): number {
+  private calculateWorkConfidence(editions: Edition[], sources: MetadataSource[]): number {
     // Higher confidence with more sources and editions
-    const sourceConfidence =
-      sources.reduce((sum, s) => sum + s.reliability, 0) / sources.length;
+    const sourceConfidence = sources.reduce((sum, s) => sum + s.reliability, 0) / sources.length;
     const editionBonus = Math.min(0.1, editions.length * 0.02);
 
     return Math.min(1.0, sourceConfidence + editionBonus);
@@ -637,8 +578,7 @@ export class WorkReconciler {
     if (edition.publisher) score += weights.publisher;
     if (edition.isbn && edition.isbn.length > 0) score += weights.isbn;
     if (edition.pageCount) score += weights.pageCount;
-    if (edition.identifiers && edition.identifiers.length > 0)
-      score += weights.identifiers;
+    if (edition.identifiers && edition.identifiers.length > 0) score += weights.identifiers;
 
     return score;
   }
@@ -646,11 +586,7 @@ export class WorkReconciler {
   private determineWorkRelationship(
     cluster1: WorkCluster,
     cluster2: WorkCluster,
-  ): {
-    type: RelatedWork["relationshipType"];
-    description: string;
-    confidence: number;
-  } | null {
+  ): { type: RelatedWork["relationshipType"]; description: string; confidence: number } | null {
     // Compare first editions from each cluster
     const edition1 = cluster1.editions[0];
     const edition2 = cluster2.editions[0];

@@ -19,36 +19,22 @@ export const accounts = t.router({
     .query(({ input, ctx: { database } }) => userExists(database, input)),
 
   create: procedure()
-    .input(
-      z.object({
-        name: z.string().optional(),
-        emailAddress: z.string(),
-      }),
-    )
-    .mutation(
-      async ({
-        input: { emailAddress, name },
-        ctx: { database, platform },
-      }) => {
-        const user = await createUser(database, {
-          name: name || inferNameFromEmailAddress(emailAddress),
-          email: emailAddress,
-        });
+    .input(z.object({ name: z.string().optional(), emailAddress: z.string() }))
+    .mutation(async ({ input: { emailAddress, name }, ctx: { database, platform } }) => {
+      const user = await createUser(database, {
+        name: name || inferNameFromEmailAddress(emailAddress),
+        email: emailAddress,
+      });
 
-        const { code } = await createPasscode(database, user);
+      const { code } = await createPasscode(database, user);
 
-        await dispatchPasscode(platform, user, code);
+      await dispatchPasscode(platform, user, code);
 
-        return user.id;
-      },
-    ),
+      return user.id;
+    }),
 
   requestPassCode: procedure()
-    .input(
-      z.object({
-        emailAddress: z.string(),
-      }),
-    )
+    .input(z.object({ emailAddress: z.string() }))
     .mutation(async ({ input, ctx: { database, platform } }) => {
       const emailAddress = input.emailAddress;
       let user;
@@ -75,38 +61,23 @@ export const accounts = t.router({
    * Block a user (hide their comments from you)
    */
   blockUser: procedure()
-    .input(
-      z.object({
-        userId: z.string(),
-      }),
-    )
-    .mutation(
-      async ({ input: { userId: blockedId }, ctx: { database, userId } }) => {
-        if (blockedId === userId) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "You cannot block yourself",
-          });
-        }
+    .input(z.object({ userId: z.string() }))
+    .mutation(async ({ input: { userId: blockedId }, ctx: { database, userId } }) => {
+      if (blockedId === userId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "You cannot block yourself" });
+      }
 
-        await blockUser(database, userId, blockedId);
-      },
-    ),
+      await blockUser(database, userId, blockedId);
+    }),
 
   /**
    * Unblock a user
    */
   unblockUser: procedure()
-    .input(
-      z.object({
-        userId: z.string(),
-      }),
-    )
-    .mutation(
-      async ({ input: { userId: blockedId }, ctx: { database, userId } }) => {
-        await unblockUser(database, userId, blockedId);
-      },
-    ),
+    .input(z.object({ userId: z.string() }))
+    .mutation(async ({ input: { userId: blockedId }, ctx: { database, userId } }) => {
+      await unblockUser(database, userId, blockedId);
+    }),
 
   /**
    * Get list of blocked users

@@ -50,44 +50,27 @@ export const actions = {
     const validated = z
       .object({
         user_code: z
-          .string({
-            required_error: "Code is missing",
-            invalid_type_error: "Code is invalid",
-          })
-          .regex(/[A-Z0-9]{3}-?[A-Z0-9]{3}/, {
-            message: "Code is invalid",
-          })
+          .string({ required_error: "Code is missing", invalid_type_error: "Code is invalid" })
+          .regex(/[A-Z0-9]{3}-?[A-Z0-9]{3}/, { message: "Code is invalid" })
           .toLowerCase()
           .transform((value) => value.replace("-", "")),
       })
       .safeParse(payload);
 
     if (!validated.success) {
-      return fail(400, {
-        errors: validated.error.formErrors.fieldErrors,
-      });
+      return fail(400, { errors: validated.error.formErrors.fieldErrors });
     }
 
     const { user_code: userCode } = validated.data;
-    let deviceChallenge: Awaited<
-      ReturnType<typeof loadDeviceChallengeByUserCode>
-    >;
+    let deviceChallenge: Awaited<ReturnType<typeof loadDeviceChallengeByUserCode>>;
 
     try {
       deviceChallenge = await loadDeviceChallengeByUserCode(database, userCode);
     } catch {
-      return fail(400, {
-        errors: {
-          user_code: ["The device code is invalid or unknown."],
-        },
-      });
+      return fail(400, { errors: { user_code: ["The device code is invalid or unknown."] } });
     }
 
-    const consent = await loadUserConsent(
-      database,
-      deviceChallenge.client_id,
-      user.id,
-    );
+    const consent = await loadUserConsent(database, deviceChallenge.client_id, user.id);
 
     if (consent) {
       await invalidateDeviceChallenge(database, deviceChallenge.id, true);
@@ -95,36 +78,22 @@ export const actions = {
       return { consented: true };
     }
 
-    const client = await loadClientWithScopes(
-      database,
-      deviceChallenge.client_id,
-    );
+    const client = await loadClientWithScopes(database, deviceChallenge.client_id);
     // TODO: Check if user has previously given consent to this client. If yes, ...
 
     if (!client.active || client.revoked) {
       return fail(400, {
-        errors: {
-          consent: [
-            "The application is currently suspended and cannot be connected.",
-          ],
-        },
+        errors: { consent: ["The application is currently suspended and cannot be connected."] },
       });
     }
 
     if (client.personal && client.user_id !== user.id) {
-      return fail(400, {
-        errors: {
-          consent: ["You don't have permission to use this client."],
-        },
-      });
+      return fail(400, { errors: { consent: ["You don't have permission to use this client."] } });
     }
 
     const { name, description, scopes } = client;
     const { nonce, signature } = await signPayload(
-      {
-        userCode,
-        deviceChallenge: deviceChallenge.id,
-      },
+      { userCode, deviceChallenge: deviceChallenge.id },
       env.APP_SECRET_KEY,
     );
     cookies.set("device", `${nonce}.${signature}`, {
@@ -157,9 +126,7 @@ export const actions = {
       .safeParse(payload);
 
     if (!validated.success) {
-      return fail(400, {
-        errors: validated.error.formErrors.fieldErrors,
-      });
+      return fail(400, { errors: validated.error.formErrors.fieldErrors });
     }
 
     const device = cookies.get("device");
@@ -178,16 +145,9 @@ export const actions = {
 
     const { userCode, deviceChallenge } = validated.data;
 
-    await verifySignedPayload(
-      { userCode, deviceChallenge, signature, nonce },
-      env.APP_SECRET_KEY,
-    );
+    await verifySignedPayload({ userCode, deviceChallenge, signature, nonce }, env.APP_SECRET_KEY);
     await database.transaction().execute(async (trx) => {
-      const { client_id, scopes } = await invalidateDeviceChallenge(
-        trx,
-        deviceChallenge,
-        true,
-      );
+      const { client_id, scopes } = await invalidateDeviceChallenge(trx, deviceChallenge, true);
 
       await grantUserConsent(
         trx,
@@ -217,9 +177,7 @@ export const actions = {
       .safeParse(payload);
 
     if (!validated.success) {
-      return fail(400, {
-        errors: validated.error.formErrors.fieldErrors,
-      });
+      return fail(400, { errors: validated.error.formErrors.fieldErrors });
     }
 
     const device = cookies.get("device");
@@ -238,10 +196,7 @@ export const actions = {
 
     const { userCode, deviceChallenge } = validated.data;
 
-    await verifySignedPayload(
-      { userCode, deviceChallenge, signature, nonce },
-      env.APP_SECRET_KEY,
-    );
+    await verifySignedPayload({ userCode, deviceChallenge, signature, nonce }, env.APP_SECRET_KEY);
     await invalidateDeviceChallenge(database, deviceChallenge, false);
 
     return { rejected: true };

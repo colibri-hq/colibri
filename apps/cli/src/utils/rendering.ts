@@ -26,9 +26,9 @@ export async function image(
   const parameters = Object.entries({
     height: height === "auto" ? "auto" : `${height}`,
     inline: download ? "0" : "1",
-    name: Buffer.from(
-      filename ?? (image instanceof File ? image.name : "Unnamed Image"),
-    ).toString("base64"),
+    name: Buffer.from(filename ?? (image instanceof File ? image.name : "Unnamed Image")).toString(
+      "base64",
+    ),
     preserveAspectRatio: preserveAspectRatio ? "1" : "0",
     size: image.size,
     width: width === "auto" ? "auto" : `${width}`,

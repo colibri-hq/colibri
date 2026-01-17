@@ -20,41 +20,23 @@ export function table<T extends Row>(
   columns: Column<T>[],
   options?: TableOptions<T>,
 ): string {
-  const { displayHeader, format, interiorBorders, theme, width } =
-    mergeOptions(options);
+  const { displayHeader, format, interiorBorders, theme, width } = mergeOptions(options);
 
   // Format all header cells first, so we can determine the column widths
   const headerRow = columns.map(({ name }) => bold(name));
 
   // Format all rows and their cells; again so we can determine the column widths
   const rows = data.map((row) =>
-    row === divider
-      ? divider
-      : columns.map((column) => formatValue(row, column, format)),
+    row === divider ? divider : columns.map((column) => formatValue(row, column, format)),
   );
 
   // Create a memoized text wrapping function to avoid recalculating it for each cell
   const wrapText = textWrapping();
 
-  const layout = generateLayout(
-    columns,
-    headerRow,
-    rows,
-    { theme, width },
-    wrapText,
-  );
+  const layout = generateLayout(columns, headerRow, rows, { theme, width }, wrapText);
 
-  const header = renderHeader(headerRow, columns, layout, {
-    displayHeader,
-    theme,
-  });
-  const body = renderBody(
-    rows,
-    columns,
-    layout,
-    { interiorBorders, theme },
-    wrapText,
-  );
+  const header = renderHeader(headerRow, columns, layout, { displayHeader, theme });
+  const body = renderBody(rows, columns, layout, { interiorBorders, theme }, wrapText);
 
   return [
     renderSeparator(layout, theme, "top"),
@@ -313,14 +295,9 @@ function mergeOptions<T extends Row>(options: TableOptions<T> | undefined) {
     ...options,
     format: {
       ...defaultOptions.format,
-      ...(typeof options?.format === "function"
-        ? { format: options.format }
-        : {}),
+      ...(typeof options?.format === "function" ? { format: options.format } : {}),
     },
-    theme: {
-      ...defaultOptions.theme,
-      ...options?.theme,
-    },
+    theme: { ...defaultOptions.theme, ...options?.theme },
   } satisfies Required<TableOptions<T>>;
 }
 
@@ -338,9 +315,7 @@ function generateLayout<T extends Row>(
   const naturalWidths = columns.map((_column, index) =>
     Math.max(
       ansis.strip(header[index]).length,
-      ...rows
-        .filter((row) => row !== divider)
-        .map((row) => ansis.strip(row[index]).length),
+      ...rows.filter((row) => row !== divider).map((row) => ansis.strip(row[index]).length),
     ),
   );
 
@@ -353,20 +328,15 @@ function generateLayout<T extends Row>(
     // available, or 80 characters as a fallback. This way, the table should not grow larger than
     // the terminal width.
     // Finally, subtract the decorations to avoid pushing content to the next line.
-    (!widthOption || widthOption === "auto"
-      ? (process.stdout.columns ?? 80)
-      : widthOption) -
+    (!widthOption || widthOption === "auto" ? (process.stdout.columns ?? 80) : widthOption) -
       padding.length * 2 -
       verticalOutsideBorder.length * 2,
   );
 
   // Calculate the spacing needed for the table, based on the theme
-  const totalSpacing =
-    (padding.length * 2 + verticalInsideBorder.length) * columns.length;
+  const totalSpacing = (padding.length * 2 + verticalInsideBorder.length) * columns.length;
 
-  const columnWidths = naturalWidths.map((width) =>
-    Math.min(width, maxWidth - totalSpacing),
-  );
+  const columnWidths = naturalWidths.map((width) => Math.min(width, maxWidth - totalSpacing));
 
   function tableWidth(widths: number[]) {
     return widths.reduce((a, b) => a + b, 0) + totalSpacing;
@@ -380,10 +350,7 @@ function generateLayout<T extends Row>(
     const minColumnWidth = 5;
 
     const candidates = columns
-      .filter(
-        (column, index) =>
-          column.wrap !== false && columnWidths[index] > minColumnWidth,
-      )
+      .filter((column, index) => column.wrap !== false && columnWidths[index] > minColumnWidth)
       .map((column) => columns.indexOf(column));
 
     while (tableWidth(columnWidths) > maxWidth) {
@@ -395,10 +362,7 @@ function generateLayout<T extends Row>(
         const width = columnWidths[index];
         const height = rows
           .filter((row) => row !== divider)
-          .reduce(
-            (sum, row) => sum + wrapText(row[index], width - 2).length,
-            0,
-          );
+          .reduce((sum, row) => sum + wrapText(row[index], width - 2).length, 0);
 
         if (height < minHeight) {
           minHeight = height;
@@ -424,9 +388,7 @@ function renderHeader<T extends Row>(
   {
     displayHeader,
     theme,
-  }: Required<
-    Pick<TableOptions<Row>, "displayHeader" | "theme"> & { theme: TableTheme }
-  >,
+  }: Required<Pick<TableOptions<Row>, "displayHeader" | "theme"> & { theme: TableTheme }>,
 ) {
   if (!displayHeader) {
     return [];
@@ -434,9 +396,7 @@ function renderHeader<T extends Row>(
 
   return [
     renderRow(
-      header.map((cell, index) =>
-        justify(cell, widths[index], columns[index], theme),
-      ),
+      header.map((cell, index) => justify(cell, widths[index], columns[index], theme)),
       theme,
     ),
     renderSeparator(widths, theme, "head"),
@@ -450,9 +410,7 @@ function renderBody<T extends Row>(
   {
     interiorBorders,
     theme,
-  }: Required<Pick<TableOptions<T>, "interiorBorders" | "theme">> & {
-    theme: TableTheme;
-  },
+  }: Required<Pick<TableOptions<T>, "interiorBorders" | "theme">> & { theme: TableTheme },
   wrapText: TextWrapper,
 ) {
   return rows.flatMap((row, rowIndex) => {
@@ -460,9 +418,7 @@ function renderBody<T extends Row>(
       return [renderSeparator(widths, theme, "mid")];
     }
 
-    const wrappedColumns = row.map((cell, index) =>
-      wrapText(cell, widths[index]),
-    );
+    const wrappedColumns = row.map((cell, index) => wrapText(cell, widths[index]));
     const maxLines = Math.max(...wrappedColumns.map(({ length }) => length));
 
     const aligned = wrappedColumns.map((lines, index) =>
@@ -635,11 +591,7 @@ function justify<T extends Row>(
   return pad(width - padding) + value + pad(plainValue.length + padding);
 }
 
-function align(
-  lines: string[],
-  maxLines: number,
-  align: "bottom" | "center" | "top",
-): string[] {
+function align(lines: string[], maxLines: number, align: "bottom" | "center" | "top"): string[] {
   const padCount = maxLines - lines.length;
 
   if (padCount <= 0) {
@@ -648,18 +600,12 @@ function align(
 
   // Content at top, blanks at bottom
   if (align === "top") {
-    return [
-      ...lines,
-      ...(Array.from({ length: padCount }).fill("") as string[]),
-    ];
+    return [...lines, ...(Array.from({ length: padCount }).fill("") as string[])];
   }
 
   // Blanks at top, content at bottom
   if (align === "bottom") {
-    return [
-      ...(Array.from({ length: padCount }).fill("") as string[]),
-      ...lines,
-    ];
+    return [...(Array.from({ length: padCount }).fill("") as string[]), ...lines];
   }
 
   const topPad = Math.floor(padCount / 2);
@@ -680,11 +626,7 @@ function textWrapping() {
     let wrapped = wrapCache.get(key);
 
     if (!wrapped) {
-      wrapped = wrapAnsi(content, width, {
-        hard: true,
-        trim: true,
-        wordWrap: true,
-      }).split("\n");
+      wrapped = wrapAnsi(content, width, { hard: true, trim: true, wordWrap: true }).split("\n");
       wrapCache.set(key, wrapped);
     }
 
@@ -715,11 +657,7 @@ type Column<
     ? R
     : TAccessor extends K
       ? T[K]
-      : never = TAccessor extends AccessorFn<T, infer R>
-    ? R
-    : TAccessor extends K
-      ? T[K]
-      : never,
+      : never = TAccessor extends AccessorFn<T, infer R> ? R : TAccessor extends K ? T[K] : never,
 > = {
   /**
    * A function that returns the value to be displayed in the column. If not

@@ -36,15 +36,7 @@ export const series = t.router({
 
         const lastPage = Math.ceil(total / perPage);
 
-        return [
-          items,
-          {
-            page,
-            per_page: perPage,
-            total,
-            last_page: lastPage,
-          },
-        ];
+        return [items, { page, per_page: perPage, total, last_page: lastPage }];
       },
     ),
 
@@ -53,9 +45,7 @@ export const series = t.router({
    */
   get: procedure()
     .input(z.object({ id: z.string() }))
-    .query(async ({ input: { id }, ctx: { database } }) =>
-      loadSeriesById(database, id),
-    ),
+    .query(async ({ input: { id }, ctx: { database } }) => loadSeriesById(database, id)),
 
   /**
    * Load all works in a series, ordered by position
@@ -71,9 +61,7 @@ export const series = t.router({
    */
   getForWork: procedure()
     .input(z.object({ workId: z.string() }))
-    .query(async ({ input: { workId }, ctx: { database } }) =>
-      loadSeriesForWork(database, workId),
-    ),
+    .query(async ({ input: { workId }, ctx: { database } }) => loadSeriesForWork(database, workId)),
 
   /**
    * Search series by name for autocomplete

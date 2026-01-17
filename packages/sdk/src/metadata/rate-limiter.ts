@@ -1,5 +1,5 @@
-import type { RateLimitConfig } from "./providers/provider.js";
 import { sleep } from "@colibri-hq/shared";
+import type { RateLimitConfig } from "./providers/provider.js";
 
 /**
  * Request tracking for rate limiting
@@ -58,9 +58,7 @@ export class RateLimiter {
       const windowStart = now - this.config.windowMs;
       const keyRequests = this.requests.get(key) || [];
 
-      const oldestRequest = keyRequests.find(
-        (req) => req.timestamp > windowStart,
-      );
+      const oldestRequest = keyRequests.find((req) => req.timestamp > windowStart);
       const waitTime = oldestRequest
         ? Math.max(0, oldestRequest.timestamp + this.config.windowMs - now)
         : this.config.requestDelay || 1000;
@@ -82,13 +80,8 @@ export class RateLimiter {
     const windowStart = now - this.config.windowMs;
     const keyRequests = this.requests.get(key) || [];
 
-    const validRequests = keyRequests.filter(
-      (req) => req.timestamp > windowStart,
-    );
-    const totalRequests = validRequests.reduce(
-      (sum, req) => sum + req.count,
-      0,
-    );
+    const validRequests = keyRequests.filter((req) => req.timestamp > windowStart);
+    const totalRequests = validRequests.reduce((sum, req) => sum + req.count, 0);
 
     return Math.max(0, this.config.maxRequests - totalRequests);
   }
@@ -101,9 +94,7 @@ export class RateLimiter {
     const windowStart = now - this.config.windowMs;
     const keyRequests = this.requests.get(key) || [];
 
-    const validRequests = keyRequests.filter(
-      (req) => req.timestamp > windowStart,
-    );
+    const validRequests = keyRequests.filter((req) => req.timestamp > windowStart);
     if (validRequests.length === 0) {
       return 0;
     }
@@ -162,10 +153,7 @@ export class RateLimiterRegistry {
   /**
    * Update rate limiter configuration for a provider
    */
-  updateLimiterConfig(
-    providerName: string,
-    config: Partial<RateLimitConfig>,
-  ): boolean {
+  updateLimiterConfig(providerName: string, config: Partial<RateLimitConfig>): boolean {
     const limiter = this.limiters.get(providerName);
     if (limiter) {
       limiter.updateConfig(config);
@@ -201,11 +189,7 @@ export class RateLimiterRegistry {
    */
   getStats(): Record<
     string,
-    {
-      remainingRequests: number;
-      timeUntilReset: number;
-      config: RateLimitConfig;
-    }
+    { remainingRequests: number; timeUntilReset: number; config: RateLimitConfig }
   > {
     const stats: Record<string, any> = {};
 

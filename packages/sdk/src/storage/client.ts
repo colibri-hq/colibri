@@ -1,7 +1,7 @@
-import packageJson from "../../package.json" with { type: "json" };
 import { S3Client } from "@aws-sdk/client-s3";
-import type { Storage } from "./types.js";
 import type { Database } from "../database.js";
+import type { Storage } from "./types.js";
+import packageJson from "../../package.json" with { type: "json" };
 import { getSecret, removeSecret, storeSecret } from "../resources/index.js";
 
 const { version } = packageJson;
@@ -30,10 +30,7 @@ export async function getStorageDsn(database: Database): Promise<string> {
   return dsn;
 }
 
-export async function updateStorageDsn(
-  database: Database,
-  dsn: string,
-): Promise<void> {
+export async function updateStorageDsn(database: Database, dsn: string): Promise<void> {
   if (!dsn) {
     throw new Error("Storage DSN cannot be empty");
   }
@@ -46,12 +43,7 @@ export async function updateStorageDsn(
 
   await database.transaction().execute(async (trx) => {
     await removeSecret(trx, "storage.dsn");
-    await storeSecret(
-      trx,
-      "storage.dsn",
-      dsn,
-      "Connection String for the Storage Provider",
-    );
+    await storeSecret(trx, "storage.dsn", dsn, "Connection String for the Storage Provider");
   });
 }
 
@@ -78,14 +70,7 @@ function parseStorageDsn(dsn: string): StorageConnection | undefined {
   const defaultBucket = searchParams.get("defaultBucket") ?? undefined;
   const region = searchParams.get("region") ?? "local";
 
-  return {
-    accessKeyId,
-    secretAccessKey,
-    endpoint,
-    forcePathStyle,
-    defaultBucket,
-    region,
-  };
+  return { accessKeyId, secretAccessKey, endpoint, forcePathStyle, defaultBucket, region };
 }
 
 export function client({
@@ -107,10 +92,7 @@ export function client({
     region,
   });
 
-  return {
-    client,
-    defaultBucket,
-  };
+  return { client, defaultBucket };
 }
 
 type StorageConnection = {
@@ -122,6 +104,4 @@ type StorageConnection = {
   region?: string | undefined;
 };
 
-type StorageOptions = {
-  clientOptions?: ConstructorParameters<typeof S3Client>[0];
-};
+type StorageOptions = { clientOptions?: ConstructorParameters<typeof S3Client>[0] };

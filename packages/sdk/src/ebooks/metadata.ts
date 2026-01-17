@@ -1,10 +1,6 @@
 import type { Relator } from "./contributions.js";
 
-export type Contributor = {
-  name: string;
-  roles: Relator[];
-  sortingKey: string;
-};
+export type Contributor = { name: string; roles: Relator[]; sortingKey: string };
 
 export type Identifier = {
   type:
@@ -44,15 +40,8 @@ export type Metadata = {
   legalInformation?: string | undefined;
   numberOfPages?: number | undefined;
   pageProgression?: "ltr" | "rtl" | undefined;
-  properties?: {
-    [key: string]: unknown;
-  };
-  series?:
-    | {
-        name: string;
-        position?: number | undefined;
-      }
-    | undefined;
+  properties?: { [key: string]: unknown };
+  series?: { name: string; position?: number | undefined } | undefined;
   sortingKey?: string | undefined;
   synopsis?: string | undefined;
   tags?: string[] | undefined;

@@ -1,6 +1,6 @@
-import { json } from "@sveltejs/kit";
-import { type AuthorInfo, getBlogAuthors } from "$lib/content/blog.js";
 import { authorNameToSlug } from "$lib/content/author.js";
+import { type AuthorInfo, getBlogAuthors } from "$lib/content/blog.js";
+import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types.js";
 
 export const prerender = true;
@@ -18,10 +18,7 @@ export const GET = async function GET({ url }) {
     type: "author-listing",
     authors: authorList,
     total: authorList.length,
-    links: {
-      html: `${baseUrl}/blog/author`,
-      json: `${baseUrl}/blog/author.json`,
-    },
+    links: { html: `${baseUrl}/blog/author`, json: `${baseUrl}/blog/author.json` },
   };
 
   return json(response, {
@@ -36,13 +33,7 @@ function summarizeAuthor({
   author: { email, gravatarUrl, name },
   count,
 }: AuthorInfo): AuthorSummary {
-  return {
-    name,
-    email,
-    slug: authorNameToSlug(name),
-    gravatarUrl: gravatarUrl,
-    postCount: count,
-  };
+  return { name, email, slug: authorNameToSlug(name), gravatarUrl: gravatarUrl, postCount: count };
 }
 
 type AuthorSummary = {
@@ -57,8 +48,5 @@ type AuthorListingResponse = {
   type: "author-listing";
   authors: AuthorSummary[];
   total: number;
-  links: {
-    html: string;
-    json: string;
-  };
+  links: { html: string; json: string };
 };

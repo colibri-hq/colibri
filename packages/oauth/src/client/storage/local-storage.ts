@@ -85,10 +85,7 @@ export class LocalStorageTokenStore implements TokenStore {
       const parsed = JSON.parse(data) as StoredTokensJson;
 
       // Convert ISO date strings back to Date objects
-      return {
-        ...parsed,
-        expiresAt: new Date(parsed.expiresAt),
-      };
+      return { ...parsed, expiresAt: new Date(parsed.expiresAt) };
     } catch {
       // Invalid data, clear it
       this.#storage.removeItem(key);
@@ -100,10 +97,7 @@ export class LocalStorageTokenStore implements TokenStore {
     const key = this.#getKey(clientId);
 
     // Convert Date to ISO string for JSON serialization
-    const data: StoredTokensJson = {
-      ...tokens,
-      expiresAt: tokens.expiresAt.toISOString(),
-    };
+    const data: StoredTokensJson = { ...tokens, expiresAt: tokens.expiresAt.toISOString() };
 
     this.#storage.setItem(key, JSON.stringify(data));
   }
@@ -137,6 +131,4 @@ export class LocalStorageTokenStore implements TokenStore {
 /**
  * Internal type for JSON serialization (Date as ISO string)
  */
-type StoredTokensJson = Omit<StoredTokens, "expiresAt"> & {
-  expiresAt: string;
-};
+type StoredTokensJson = Omit<StoredTokens, "expiresAt"> & { expiresAt: string };

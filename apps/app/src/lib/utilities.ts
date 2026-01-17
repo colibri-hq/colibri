@@ -3,16 +3,8 @@ import type { Action } from "svelte/action";
 /** Dispatch event on click outside of node */
 export const clickOutside: Action = function clickOutside(node: HTMLElement) {
   const handleClick = (event: Event) => {
-    if (
-      node &&
-      !node.contains(event.target as HTMLElement) &&
-      !event.defaultPrevented
-    ) {
-      node.dispatchEvent(
-        new CustomEvent("clickOutside", {
-          detail: { node },
-        }),
-      );
+    if (node && !node.contains(event.target as HTMLElement) && !event.defaultPrevented) {
+      node.dispatchEvent(new CustomEvent("clickOutside", { detail: { node } }));
     }
   };
 
@@ -25,10 +17,7 @@ export const clickOutside: Action = function clickOutside(node: HTMLElement) {
   };
 };
 
-export const sticky: Action<
-  HTMLElement,
-  { stickToTop: boolean; top?: number }
-> = function sticky(
+export const sticky: Action<HTMLElement, { stickToTop: boolean; top?: number }> = function sticky(
   node,
   { stickToTop, top = 0 }: { stickToTop: boolean; top?: number },
 ) {
@@ -68,24 +57,15 @@ export const sticky: Action<
     if (!entry) return;
     node.dispatchEvent(
       new CustomEvent("stuck", {
-        detail: {
-          isStuck: !entry.isIntersecting && isValidYPosition(entry),
-        },
+        detail: { isStuck: !entry.isIntersecting && isValidYPosition(entry) },
       }),
     );
   });
 
-  const isValidYPosition = ({
-    target,
-    boundingClientRect,
-  }: IntersectionObserverEntry) =>
-    target === stickySentinelTop
-      ? boundingClientRect.y < 0
-      : boundingClientRect.y > 0;
+  const isValidYPosition = ({ target, boundingClientRect }: IntersectionObserverEntry) =>
+    target === stickySentinelTop ? boundingClientRect.y < 0 : boundingClientRect.y > 0;
 
-  intersectionObserver.observe(
-    stickToTop ? stickySentinelTop : stickySentinelBottom,
-  );
+  intersectionObserver.observe(stickToTop ? stickySentinelTop : stickySentinelBottom);
 
   return {
     update() {

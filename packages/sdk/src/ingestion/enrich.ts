@@ -1,6 +1,6 @@
-import { globalProviderRegistry } from "../metadata/registry.js";
-import type { ExtractedMetadata, EnrichmentResult } from "./types.js";
 import type { MetadataRecord } from "../metadata/providers/provider.js";
+import type { ExtractedMetadata, EnrichmentResult } from "./types.js";
+import { globalProviderRegistry } from "../metadata/registry.js";
 
 export interface EnrichMetadataOptions {
   /** Specific providers to use (default: all enabled) */
@@ -189,11 +189,7 @@ async function performEnrichment(
   }
 
   // Enrich subjects (merge from all high-confidence records)
-  if (
-    shouldEnrich(metadata.subjects) ||
-    !metadata.subjects ||
-    metadata.subjects.length === 0
-  ) {
+  if (shouldEnrich(metadata.subjects) || !metadata.subjects || metadata.subjects.length === 0) {
     const subjectSet = new Set<string>();
     let maxConfidence = 0;
 
@@ -217,10 +213,7 @@ async function performEnrichment(
       .map(({ provider, record }) => {
         if (!record.series) return undefined;
         return {
-          value: {
-            name: record.series.name,
-            position: record.series.volume,
-          },
+          value: { name: record.series.name, position: record.series.volume },
           confidence: record.confidence,
           provider,
         };
@@ -252,9 +245,7 @@ async function performEnrichment(
         confidence: record.confidence,
         provider,
       }))
-      .filter(
-        (c) => c.value && c.value.length > 0 && c.confidence >= minConfidence,
-      )
+      .filter((c) => c.value && c.value.length > 0 && c.confidence >= minConfidence)
       .sort((a, b) => b.confidence - a.confidence);
 
     if (authorCandidates.length > 0) {
@@ -264,26 +255,22 @@ async function performEnrichment(
     }
   }
 
-  return {
-    enriched,
-    sources: Array.from(sources),
-    confidence,
-  };
+  return { enriched, sources: Array.from(sources), confidence };
 }
 
 /**
  * Build a search query from extracted metadata
  */
-function buildSearchQuery(metadata: ExtractedMetadata): {
+function buildSearchQuery(
+  metadata: ExtractedMetadata,
+): {
   isbn?: string | undefined;
   title?: string | undefined;
   authors?: string[] | undefined;
 } | null {
   const isbn = metadata.identifiers?.find((id) => id.type === "isbn")?.value;
   const title = metadata.title;
-  const authors = metadata.contributors
-    ?.filter((c) => c.roles.includes("aut"))
-    .map((c) => c.name);
+  const authors = metadata.contributors?.filter((c) => c.roles.includes("aut")).map((c) => c.name);
 
   if (!isbn && !title) {
     return null;
@@ -321,9 +308,7 @@ export function mergeEnrichedMetadata(
     if (field === "subjects" && Array.isArray(value)) {
       // Merge arrays and deduplicate (value is already string[] due to validation)
       const existing = merged.subjects ?? [];
-      const stringValues = value.filter(
-        (v): v is string => typeof v === "string",
-      );
+      const stringValues = value.filter((v): v is string => typeof v === "string");
       merged.subjects = Array.from(new Set([...existing, ...stringValues]));
     } else if (field === "series" && value) {
       // Prefer enriched series if present

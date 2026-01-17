@@ -1,7 +1,7 @@
-/// <reference lib="dom" />
-import { type Relator, relatorRoles } from "../contributions.js";
 import { wrapArray } from "@colibri-hq/shared";
 import { DOMParser } from "xmldom";
+/// <reference lib="dom" />
+import { type Relator, relatorRoles } from "../contributions.js";
 import {
   cfiToElement,
   cfiToRange,
@@ -27,11 +27,7 @@ export class Epub {
   #sections: SectionItem[] | undefined = undefined;
   #loader: Loader | undefined;
 
-  constructor(
-    loadBlob: BlobLoader,
-    loadText: TextLoader,
-    getSize: (href: string) => number,
-  ) {
+  constructor(loadBlob: BlobLoader, loadText: TextLoader, getSize: (href: string) => number) {
     this.loadText = cached(loadText);
     this.loadBlob = cached(loadBlob);
     this.getSize = getSize;
@@ -101,9 +97,8 @@ export class Epub {
       const document = (await this.#loadXml(navPath))!;
 
       try {
-        const { landmarks, pageList, toc } = parseNav(
-          document,
-          (url: string | URL) => resolveURL(url, navPath).toString(),
+        const { landmarks, pageList, toc } = parseNav(document, (url: string | URL) =>
+          resolveURL(url, navPath).toString(),
         );
         this.toc = toc;
         this.pageList = pageList;
@@ -117,9 +112,7 @@ export class Epub {
       const document = (await this.#loadXml(ncxPath))!;
 
       try {
-        const { pageList, toc } = parseNCX(document, (url) =>
-          resolveURL(url, ncxPath).toString(),
-        );
+        const { pageList, toc } = parseNCX(document, (url) => resolveURL(url, ncxPath).toString());
 
         this.toc = toc;
         this.pageList = pageList;
@@ -181,9 +174,7 @@ export class Epub {
     const index = this.#resources!.spine.findIndex(
       (spineItem) => "idref" in spineItem && spineItem.idref === item.id,
     );
-    const anchor = hash
-      ? (document: Document) => getHTMLFragment(document, hash)
-      : () => 0;
+    const anchor = hash ? (document: Document) => getHTMLFragment(document, hash) : () => 0;
 
     return { index, anchor };
   }
@@ -193,10 +184,7 @@ export class Epub {
   }
 
   getTocFragment(document: Document, id: string) {
-    return (
-      document.getElementById(id) ??
-      document.querySelector(`[name="${CSS.escape(id)}"]`)
-    );
+    return document.getElementById(id) ?? document.querySelector(`[name="${CSS.escape(id)}"]`);
   }
 
   isExternal(uri: string) {
@@ -228,14 +216,10 @@ export class Epub {
     let document: Document | undefined;
 
     try {
-      document = await this.#loadXml(
-        "META-INF/com.apple.ibooks.display-options.xml",
-      );
+      document = await this.#loadXml("META-INF/com.apple.ibooks.display-options.xml");
 
       if (!document) {
-        document = await this.#loadXml(
-          "META-INF/com.kobobooks.display-options.xml",
-        );
+        document = await this.#loadXml("META-INF/com.kobobooks.display-options.xml");
       }
     } catch {
       // No-op
@@ -257,10 +241,8 @@ export class Epub {
     ).filter(
       (
         file,
-      ): file is {
-        fullPath: string | undefined;
-        mediaType: "application/oebps-package+xml";
-      } => file && file.mediaType === "application/oebps-package+xml",
+      ): file is { fullPath: string | undefined; mediaType: "application/oebps-package+xml" } =>
+        file && file.mediaType === "application/oebps-package+xml",
     );
 
     if (!opfs.length) {
@@ -296,10 +278,7 @@ export class Epub {
 
   #loadSections(resources: Resources, loader: Loader) {
     return resources.spine
-      .filter(
-        (spineItem): spineItem is SpineItem & { idref: string } =>
-          !!spineItem.idref,
-      )
+      .filter((spineItem): spineItem is SpineItem & { idref: string } => !!spineItem.idref)
       .map(({ idref, linear, properties }, index) => {
         const item = resources.getItemByID(idref);
 
@@ -347,12 +326,8 @@ export class Epub {
     const sortAs = firstValue(extractMetadataValue(titleValues, "fileAs"));
     const language = extractMetadataValue(documentMetadata?.language);
     const identifier = getIdentifier(resources.opf);
-    const description = firstValue(
-      extractMetadataValue(documentMetadata?.description),
-    );
-    const publisher = wrapArray(
-      extractMetadataValue(documentMetadata?.publisher),
-    )
+    const description = firstValue(extractMetadataValue(documentMetadata?.description));
+    const publisher = wrapArray(extractMetadataValue(documentMetadata?.publisher))
       .filter((publisher): publisher is string => !!publisher)
       .map(
         (publisher): ContributorMetadata => ({
@@ -363,12 +338,8 @@ export class Epub {
         }),
       )
       .shift();
-    const published = parseDate(
-      firstValue(extractMetadataValue(documentMetadata?.date)),
-    );
-    const modified = parseDate(
-      firstValue(extractMetadataValue(documentMetadata?.dctermsModified)),
-    );
+    const published = parseDate(firstValue(extractMetadataValue(documentMetadata?.date)));
+    const modified = parseDate(firstValue(extractMetadataValue(documentMetadata?.dctermsModified)));
     const subject = wrapArray(documentMetadata?.subject ?? [])
       ?.filter(
         (
@@ -382,11 +353,7 @@ export class Epub {
             (subject.term || subject.value)
           ),
       )
-      ?.map(({ value, term, authority }) => ({
-        name: value ?? term ?? "",
-        term,
-        authority,
-      }));
+      ?.map(({ value, term, authority }) => ({ name: value ?? term ?? "", term, authority }));
     const rights = firstValue(extractMetadataValue(documentMetadata?.rights));
 
     function mapContributor(this: void, defaultRole: Relator) {
@@ -424,9 +391,7 @@ export class Epub {
 
     const contributors = [
       ...wrapArray(documentMetadata?.creator ?? []).map(mapContributor("aut")),
-      ...wrapArray(documentMetadata?.contributor ?? []).map(
-        mapContributor("ctb"),
-      ),
+      ...wrapArray(documentMetadata?.contributor ?? []).map(mapContributor("ctb")),
     ].filter((item): item is ContributorMetadata => !!item);
 
     // Extract series information
@@ -443,20 +408,13 @@ export class Epub {
       const seriesName = firstValue(extractMetadataValue([seriesCollection]));
       const positionValue = seriesCollection.groupPosition;
       const position =
-        positionValue !== undefined
-          ? Number.parseFloat(String(positionValue))
-          : undefined;
+        positionValue !== undefined ? Number.parseFloat(String(positionValue)) : undefined;
 
       if (seriesName) {
         if (position !== undefined && !Number.isNaN(position)) {
-          series = {
-            name: seriesName,
-            position,
-          };
+          series = { name: seriesName, position };
         } else {
-          series = {
-            name: seriesName,
-          };
+          series = { name: seriesName };
         }
       }
     }
@@ -484,14 +442,9 @@ export class Epub {
 
       if (calibreSeries) {
         if (calibreSeriesIndex !== undefined) {
-          series = {
-            name: calibreSeries,
-            position: calibreSeriesIndex,
-          };
+          series = { name: calibreSeries, position: calibreSeriesIndex };
         } else {
-          series = {
-            name: calibreSeries,
-          };
+          series = { name: calibreSeries };
         }
       }
     }
@@ -523,8 +476,7 @@ export class Epub {
     const document = this.#parser.parseFromString(plainText, MIME.XML);
 
     if (document.getElementsByTagName("parsererror").length > 0) {
-      const error =
-        document.getElementsByTagName("parsererror")[0]?.textContent;
+      const error = document.getElementsByTagName("parsererror")[0]?.textContent;
 
       throw new Error(`XML parsing error: ${uri}\n${error ?? "Unknown error"}`);
     }
@@ -557,9 +509,7 @@ const MIME = {
 
 // convert to camel case
 function camel<T extends string>(value: T) {
-  return value
-    .toLowerCase()
-    .replace(/[-:](.)/g, (_, g) => g.toUpperCase()) as CamelCase<T>;
+  return value.toLowerCase().replace(/[-:](.)/g, (_, g) => g.toUpperCase()) as CamelCase<T>;
 }
 
 // strip and collapse ASCII whitespace
@@ -577,10 +527,7 @@ function normalizeWhitespace(value: string) {
 
 function filterAttribute(
   attribute: string,
-  value:
-    | string
-    | undefined
-    | ((attribute: string | null) => boolean | string | undefined),
+  value: string | undefined | ((attribute: string | null) => boolean | string | undefined),
   isList?: boolean,
 ) {
   if (isList) {
@@ -590,9 +537,7 @@ function filterAttribute(
             element
               .getAttribute(attribute)
               ?.split(/\s/)
-              ?.includes(
-                value(element.getAttribute(attribute))?.toString() ?? "",
-              ) ?? false
+              ?.includes(value(element.getAttribute(attribute))?.toString() ?? "") ?? false
         : (element: Element) =>
             element
               .getAttribute(attribute)
@@ -613,10 +558,7 @@ function getAttributes<K extends string>(attributes: K[]) {
   return (element: Element) =>
     attributes.reduce(
       (values, attribute) => {
-        return {
-          ...values,
-          [camel(attribute)]: element.getAttribute(attribute),
-        };
+        return { ...values, [camel(attribute)]: element.getAttribute(attribute) };
       },
       {} as Record<CamelCase<K>, string | undefined>,
     );
@@ -629,29 +571,21 @@ function getElementText(element: Node | undefined) {
 function elementAccessor(document: Element | Document, namespace: string) {
   // Ignore the namespace if it doesn't appear in document at all
   const useNamespace = !!(
-    document.lookupNamespaceURI(null) === namespace ||
-    document.lookupPrefix(namespace)
+    document.lookupNamespaceURI(null) === namespace || document.lookupPrefix(namespace)
   );
   const predicate = useNamespace
     ? (_element: Element, name: string) => (element: Element) =>
         element.namespaceURI === namespace && element.localName === name
-    : (_element: Node, name: string) => (element: Element) =>
-        element.localName === name;
+    : (_element: Node, name: string) => (element: Element) => element.localName === name;
 
   return {
     $: (element: Element, name: string) =>
       Array.from(element.childNodes)
-        .filter(
-          (element): element is Element =>
-            element.nodeType === element.ELEMENT_NODE,
-        )
+        .filter((element): element is Element => element.nodeType === element.ELEMENT_NODE)
         .find(predicate(element, name)),
     $$: (element: Element, name: string) =>
       Array.from(element.childNodes)
-        .filter(
-          (element): element is Element =>
-            element.nodeType === element.ELEMENT_NODE,
-        )
+        .filter((element): element is Element => element.nodeType === element.ELEMENT_NODE)
         .filter(predicate(element, name)),
     $$$: useNamespace
       ? (element: Element | Document, name: string) =>
@@ -692,9 +626,7 @@ function pathRelative(from: string | undefined, to: string) {
 
   const as = from.replace(/\/$/, "").split("/");
   const bs = to.replace(/\/$/, "").split("/");
-  const i = (as.length > bs.length ? as : bs).findIndex(
-    (_, i) => as[i] !== bs[i],
-  );
+  const i = (as.length > bs.length ? as : bs).findIndex((_, i) => as[i] !== bs[i]);
 
   return i < 0
     ? ""
@@ -735,9 +667,7 @@ function regexEscape(value: string) {
   return value.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
 }
 
-const LANGS = {
-  attrs: ["dir", "xml:lang"],
-} satisfies Partial<MetadataDescriptor>;
+const LANGS = { attrs: ["dir", "xml:lang"] } satisfies Partial<MetadataDescriptor>;
 const ALTS = {
   name: "alternate-script",
   multiple: true,
@@ -749,11 +679,7 @@ const CONTRIB = {
   ...LANGS,
   props: [{ name: "role", multiple: true, attrs: ["scheme"] }, "file-as", ALTS],
   setLegacyAttrs: (metadata, element) => {
-    if (
-      !("role" in metadata) ||
-      !Array.isArray(metadata.role) ||
-      !metadata.role?.length
-    ) {
+    if (!("role" in metadata) || !Array.isArray(metadata.role) || !metadata.role?.length) {
       const value = element.getAttributeNS(NS.OPF, "role");
 
       if (value) {
@@ -869,9 +795,7 @@ function getMetadata(opf: Document) {
     }
 
     const id = element.getAttribute("id");
-    const refines = id
-      ? elements.filter(filterAttribute("refines", `#${id}`))
-      : [];
+    const refines = id ? elements.filter(filterAttribute("refines", `#${id}`)) : [];
     const result: MetadataValue = {
       // Include the value
       value,
@@ -881,16 +805,12 @@ function getMetadata(opf: Document) {
         props
           .map((prop) => {
             const propertyData =
-              typeof prop === "string"
-                ? ({ name: prop } as MetadataDescriptorProp)
-                : prop;
+              typeof prop === "string" ? ({ name: prop } as MetadataDescriptorProp) : prop;
             const { name, multiple, recursive } = propertyData;
             const filter = filterAttribute("property", name);
             const subObject = recursive ? descriptor : propertyData;
             const value = multiple
-              ? refines
-                  .filter(filter)
-                  .map((element) => getValue(subObject, element))
+              ? refines.filter(filter).map((element) => getValue(subObject, element))
               : getValue(subObject, refines.find(filter));
 
             return [camel(name), value] as const;
@@ -903,10 +823,7 @@ function getMetadata(opf: Document) {
         attrs
           .map(
             (attribute) =>
-              [
-                camel(attribute),
-                element.getAttribute(attribute) ?? undefined,
-              ] as const,
+              [camel(attribute), element.getAttribute(attribute) ?? undefined] as const,
           )
           .filter(([, value]) => !!value),
       ),
@@ -917,9 +834,7 @@ function getMetadata(opf: Document) {
     return result;
   }
 
-  const refinedElements = elements.filter(
-    filterAttribute("refines", undefined),
-  );
+  const refinedElements = elements.filter(filterAttribute("refines", undefined));
 
   const metadata = Object.fromEntries(
     METADATA.map((obj) => {
@@ -927,10 +842,8 @@ function getMetadata(opf: Document) {
       const filter =
         type === "meta"
           ? (element: Element) =>
-              element.namespaceURI === NS.OPF &&
-              element.getAttribute("property") === name
-          : (element: Element) =>
-              element.namespaceURI === NS.DC && element.localName === name;
+              element.namespaceURI === NS.OPF && element.getAttribute("property") === name
+          : (element: Element) => element.namespaceURI === NS.DC && element.localName === name;
 
       const value = multiple
         ? refinedElements.filter(filter).map((el) => getValue(obj, el))
@@ -938,9 +851,7 @@ function getMetadata(opf: Document) {
 
       return [camel(name), value] as const;
     }).filter(
-      (
-        metadataProperty,
-      ): metadataProperty is readonly [Lowercase<string>, MetadataValue] =>
+      (metadataProperty): metadataProperty is readonly [Lowercase<string>, MetadataValue] =>
         !!metadataProperty[1],
     ),
   );
@@ -949,19 +860,8 @@ function getMetadata(opf: Document) {
 
   function getMetaElementsByPrefix(prefix: string) {
     return $$meta
-      .filter(
-        filterAttribute(
-          "property",
-          (value) => value?.startsWith(prefix) ?? false,
-        ),
-      )
-      .map(
-        (element) =>
-          [
-            element.getAttribute("property")?.replace(prefix, ""),
-            element,
-          ] as const,
-      )
+      .filter(filterAttribute("property", (value) => value?.startsWith(prefix) ?? false))
+      .map((element) => [element.getAttribute("property")?.replace(prefix, ""), element] as const)
       .filter((entry): entry is readonly [string, Element] => !!entry[0]);
   }
 
@@ -991,10 +891,7 @@ function getMetadata(opf: Document) {
   return { metadata, rendition, media };
 }
 
-function parseNav(
-  document: Element | Document,
-  resolve = (uri: string) => uri,
-) {
+function parseNav(document: Element | Document, resolve = (uri: string) => uri) {
   const { $, $$, $$$ } = elementAccessor(document, NS.XHTML);
 
   function resolveHref(href: string | undefined | undefined) {
@@ -1011,9 +908,7 @@ function parseNav(
         label: getElementText($a) ?? $a?.getAttribute("title") ?? undefined,
         href: resolveHref($a?.getAttribute("href") ?? undefined),
         subitems: parseOrderedList($ol),
-        type: getType
-          ? ($a?.getAttributeNS(NS.EPUB, "type")?.split(/\s/) ?? undefined)
-          : undefined,
+        type: getType ? ($a?.getAttributeNS(NS.EPUB, "type")?.split(/\s/) ?? undefined) : undefined,
       };
     };
   }
@@ -1069,11 +964,7 @@ function parseNCX(doc: Document, resolve = (url: string) => url) {
     if (element.localName === "navPoint") {
       const elements = $$(element, "navPoint");
 
-      return {
-        label,
-        href,
-        subitems: elements.length > 0 ? elements.map(parseItem) : undefined,
-      };
+      return { label, href, subitems: elements.length > 0 ? elements.map(parseItem) : undefined };
     }
 
     return { label, href };
@@ -1120,8 +1011,7 @@ function parseClock(value: string | undefined) {
 
   const [x, unit] = value.split(/(?=[^\d.])/);
   const n = parseFloat(x);
-  const f =
-    unit === "h" ? 60 * 60 : unit === "min" ? 60 : unit === "ms" ? 0.001 : 1;
+  const f = unit === "h" ? 60 * 60 : unit === "min" ? 60 : unit === "ms" ? 0.001 : 1;
 
   return n * f;
 }
@@ -1187,10 +1077,7 @@ class MediaOverlay extends EventTarget {
       const { items } = this.#entries[i];
 
       for (let j = 0; j < items.length; j++) {
-        if (
-          items[j].text.split("#")[0] === href &&
-          filter(items[j], j, items)
-        ) {
+        if (items[j].text.split("#")[0] === href && filter(items[j], j, items)) {
           return this.#play(i, j).catch((error: unknown) => this.#error(error));
         }
       }
@@ -1211,17 +1098,11 @@ class MediaOverlay extends EventTarget {
     }
 
     if (this.#audioIndex > 0) {
-      return this.#play(
-        this.#audioIndex - 1,
-        this.#entries[this.#audioIndex - 1].items.length - 1,
-      );
+      return this.#play(this.#audioIndex - 1, this.#entries[this.#audioIndex - 1].items.length - 1);
     }
 
     if (this.#sectionIndex > 0) {
-      return this.start(
-        this.#sectionIndex - 1,
-        (_, i, items) => i === items.length - 1,
-      );
+      return this.start(this.#sectionIndex - 1, (_, i, items) => i === items.length - 1);
     }
   }
 
@@ -1262,9 +1143,7 @@ class MediaOverlay extends EventTarget {
     this.#entries = $$$(document, "par").reduce<
       { src: string; items: { text: string; begin: number; end: number }[] }[]
     >((items, $par) => {
-      const text = resolve(
-        $($par, "text")?.getAttribute("src") ?? undefined,
-      )?.toString();
+      const text = resolve($($par, "text")?.getAttribute("src") ?? undefined)?.toString();
       const $audio = $($par, "audio");
 
       if (!text || !$audio) {
@@ -1293,15 +1172,11 @@ class MediaOverlay extends EventTarget {
   }
 
   #highlight() {
-    this.dispatchEvent(
-      new CustomEvent("highlight", { detail: this.#activeItem }),
-    );
+    this.dispatchEvent(new CustomEvent("highlight", { detail: this.#activeItem }));
   }
 
   #unhighlight() {
-    this.dispatchEvent(
-      new CustomEvent("unhighlight", { detail: this.#activeItem }),
-    );
+    this.dispatchEvent(new CustomEvent("unhighlight", { detail: this.#activeItem }));
   }
 
   async #play(audioIndex: number, itemIndex: number): Promise<void> {
@@ -1335,9 +1210,7 @@ class MediaOverlay extends EventTarget {
         this.#unhighlight();
 
         if (this.#itemIndex === items.length - 1) {
-          this.#play(this.#audioIndex + 1, 0).catch((error: unknown) =>
-            this.#error(error),
-          );
+          this.#play(this.#audioIndex + 1, 0).catch((error: unknown) => this.#error(error));
 
           return;
         }
@@ -1353,18 +1226,14 @@ class MediaOverlay extends EventTarget {
         this.#highlight();
       }
     });
-    audio.addEventListener("error", () =>
-      this.#error(new Error(`Failed to load ${src}`)),
-    );
+    audio.addEventListener("error", () => this.#error(new Error(`Failed to load ${src}`)));
     audio.addEventListener("playing", () => this.#highlight());
     audio.addEventListener("pause", () => this.#unhighlight());
     audio.addEventListener("ended", () => {
       this.#unhighlight();
       URL.revokeObjectURL(url);
       this.#audio = undefined;
-      this.#play(audioIndex + 1, 0).catch((error: unknown) =>
-        this.#error(error),
-      );
+      this.#play(audioIndex + 1, 0).catch((error: unknown) => this.#error(error));
     });
     audio.addEventListener("canplaythrough", () => {
       audio.currentTime = this.#activeItem.begin ?? 0;
@@ -1381,11 +1250,7 @@ function getUuid(opf: Document) {
   for (const element of elements) {
     const [id] = getElementText(element).split(":").slice(-1);
 
-    if (
-      /([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{12})/.test(
-        id,
-      )
-    ) {
+    if (/([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{4})-([0-9a-f]{12})/.test(id)) {
       return id;
     }
   }
@@ -1459,9 +1324,8 @@ function extractMetadataValue(
 
 function getIdentifier(opf: Document) {
   return getElementText(
-    opf.getElementById(
-      opf.documentElement.getAttribute("unique-identifier")!,
-    ) ?? opf.getElementsByTagNameNS(NS.DC, "identifier")[0],
+    opf.getElementById(opf.documentElement.getAttribute("unique-identifier")!) ??
+      opf.getElementsByTagNameNS(NS.DC, "identifier")[0],
   );
 }
 
@@ -1487,10 +1351,7 @@ async function sha1Hash(value: string) {
 function deobfuscators(): Record<string, Algorithm> {
   return {
     "http://www.idpf.org/2008/embedding": {
-      key: (opf) =>
-        sha1Hash(
-          getIdentifier(opf).replaceAll(/[\u0020\u0009\u000d\u000a]/g, ""),
-        ),
+      key: (opf) => sha1Hash(getIdentifier(opf).replaceAll(/[\u0020\u0009\u000d\u000a]/g, "")),
       decode: (key, blob) => deobfuscate(key, 1040, blob),
     },
     "http://ns.adobe.com/pdf/enc#RC": {
@@ -1523,9 +1384,7 @@ class Encryption {
         algorithm: element
           .getElementsByTagNameNS(NS.ENC, "EncryptionMethod")[0]
           ?.getAttribute("Algorithm")!,
-        uri: element
-          .getElementsByTagNameNS(NS.ENC, "CipherReference")[0]
-          ?.getAttribute("URI")!,
+        uri: element.getElementsByTagNameNS(NS.ENC, "CipherReference")[0]?.getAttribute("URI")!,
       }),
     );
 
@@ -1534,17 +1393,13 @@ class Encryption {
         const implementation = this.#algorithms[algorithm];
 
         if (!implementation) {
-          console.warn(
-            `Unknown encryption algorithm ${algorithm}: Cannot decrypt ${uri}`,
-          );
+          console.warn(`Unknown encryption algorithm ${algorithm}: Cannot decrypt ${uri}`);
 
           continue;
         }
 
         const key = await implementation.key(opf);
-        this.#decoders.set(algorithm, (blob) =>
-          implementation.decode(key, blob),
-        );
+        this.#decoders.set(algorithm, (blob) => implementation.decode(key, blob));
       }
 
       this.#uris.set(uri, algorithm);
@@ -1579,29 +1434,17 @@ class Resources {
     const $$itemRef = $$($spine, "itemref");
 
     this.manifest = $$($manifest, "item")
-      .map(
-        getAttributes([
-          "href",
-          "id",
-          "media-type",
-          "properties",
-          "media-overlay",
-        ]),
-      )
+      .map(getAttributes(["href", "id", "media-type", "properties", "media-overlay"]))
       .map((item) => ({
         ...item,
-        mediaType:
-          (item.mediaType as DOMParserSupportedType | undefined) ?? MIME.XML,
+        mediaType: (item.mediaType as DOMParserSupportedType | undefined) ?? MIME.XML,
         href: linkResolver(item?.href ?? ""),
         properties: item?.properties?.split(/\s/) ?? [],
       }));
 
     this.spine = $$itemRef
       .map(getAttributes(["idref", "id", "linear", "properties"]))
-      .map((item) => ({
-        ...item,
-        properties: item?.properties?.split(/\s/) ?? [],
-      }));
+      .map((item) => ({ ...item, properties: item?.properties?.split(/\s/) ?? [] }));
 
     const direction = $spine!.getAttribute("page-progression-direction") as
       | "ltr"
@@ -1632,13 +1475,9 @@ class Resources {
       this.getItemByProperty("cover-image") ??
       // EPUB 2 compatibility
       this.getItemByID(
-        $$$(opf, "meta")
-          .find(filterAttribute("name", "cover"))
-          ?.getAttribute("content") ?? "",
+        $$$(opf, "meta").find(filterAttribute("name", "cover"))?.getAttribute("content") ?? "",
       ) ??
-      this.getItemByHref(
-        this.guide?.find(({ type }) => type?.includes("cover"))?.href ?? "",
-      );
+      this.getItemByHref(this.guide?.find(({ type }) => type?.includes("cover"))?.href ?? "");
 
     this.cfis = parseCfiFromElements($$itemRef);
   }
@@ -1689,11 +1528,7 @@ class Loader {
   #children = new Map<string, string[]>();
   #refCount = new Map<string, number>();
 
-  public constructor(
-    loadText: TextLoader,
-    loadBlob: BlobLoader,
-    manifest: ManifestItem[],
-  ) {
+  public constructor(loadText: TextLoader, loadBlob: BlobLoader, manifest: ManifestItem[]) {
     this.loadText = loadText;
     this.loadBlob = loadBlob;
     this.manifest = manifest;
@@ -1786,8 +1621,7 @@ class Loader {
     }
 
     if (
-      (isScript ||
-        [MIME.XHTML, MIME.HTML, MIME.CSS, MIME.SVG].includes(mediaType)) &&
+      (isScript || [MIME.XHTML, MIME.HTML, MIME.CSS, MIME.SVG].includes(mediaType)) &&
       // prevent circular references
       parents.every((parent) => parent !== href)
     ) {
@@ -1835,12 +1669,8 @@ class Loader {
       let document = new DOMParser().parseFromString(value, mediaType);
 
       // change to HTML if it's not valid XHTML
-      if (
-        mediaType === MIME.XHTML &&
-        document.getElementsByTagName("parsererror").length > 0
-      ) {
-        const parserError =
-          document.getElementsByTagName("parsererror")[0]?.textContent;
+      if (mediaType === MIME.XHTML && document.getElementsByTagName("parsererror").length > 0) {
+        const parserError = document.getElementsByTagName("parsererror")[0]?.textContent;
         console.warn(`Could not parse XHTML: ${parserError}`);
 
         item.mediaType = MIME.HTML;
@@ -1857,15 +1687,10 @@ class Loader {
             const replacedData = await replaceSeries(
               child.data,
               /(?:^|\s*)(href\s*=\s*['"])([^'"]*)(['"])/i,
-              (_, p1, p2, p3) =>
-                this.loadHref(p2, href, parents).then(
-                  (p2) => `${p1}${p2}${p3}`,
-                ),
+              (_, p1, p2, p3) => this.loadHref(p2, href, parents).then((p2) => `${p1}${p2}${p3}`),
             );
 
-            child.replaceWith(
-              document.createProcessingInstruction(child.target, replacedData),
-            );
+            child.replaceWith(document.createProcessingInstruction(child.target, replacedData));
           }
 
           child = child.nextSibling;
@@ -1882,23 +1707,21 @@ class Loader {
       };
 
       await Promise.all([
-        ...Array.from(document.querySelectorAll("link[href]")).map(
-          async (element) => replace(element, "href"),
+        ...Array.from(document.querySelectorAll("link[href]")).map(async (element) =>
+          replace(element, "href"),
         ),
         ...Array.from(document.querySelectorAll("[src]")).map(async (element) =>
           replace(element, "src"),
         ),
-        ...Array.from(document.querySelectorAll("[poster]")).map(
-          async (element) => replace(element, "poster"),
+        ...Array.from(document.querySelectorAll("[poster]")).map(async (element) =>
+          replace(element, "poster"),
         ),
-        ...Array.from(document.querySelectorAll("object[data]")).map(
-          async (element) => replace(element, "data"),
+        ...Array.from(document.querySelectorAll("object[data]")).map(async (element) =>
+          replace(element, "data"),
         ),
       ]);
 
-      const links = Array.from(
-        document.querySelectorAll("[*|href]:not([href])"),
-      );
+      const links = Array.from(document.querySelectorAll("[*|href]:not([href])"));
 
       for (const element of links) {
         const link = element.getAttributeNS(NS.XLINK, "href") ?? "";
@@ -1909,32 +1732,21 @@ class Loader {
 
       // replace inline styles
       await Promise.all([
-        ...Array.from(document.getElementsByTagName("style")).map(
-          async (element) => {
-            if (element.textContent) {
-              element.textContent = await this.replaceCSS(
-                element.textContent,
-                href,
-                parents,
-              );
-            }
-          },
-        ),
+        ...Array.from(document.getElementsByTagName("style")).map(async (element) => {
+          if (element.textContent) {
+            element.textContent = await this.replaceCSS(element.textContent, href, parents);
+          }
+        }),
 
-        ...Array.from(document.querySelectorAll("[style]")).map(
-          async (element) => {
-            const styles = element.getAttribute("style");
+        ...Array.from(document.querySelectorAll("[style]")).map(async (element) => {
+          const styles = element.getAttribute("style");
 
-            if (!styles) {
-              return;
-            }
+          if (!styles) {
+            return;
+          }
 
-            element.setAttribute(
-              "style",
-              await this.replaceCSS(styles, href, parents),
-            );
-          },
-        ),
+          element.setAttribute("style", await this.replaceCSS(styles, href, parents));
+        }),
       ]);
 
       // TODO: replace inline scripts? probably not worth the trouble
@@ -1955,15 +1767,13 @@ class Loader {
     const replacedUrls = await replaceSeries(
       value,
       /url\(\s*["']?([^'"\n]*?)\s*["']?\s*\)/gi,
-      (_, url) =>
-        this.loadHref(url, href, parents).then((url) => `url("${url}")`),
+      (_, url) => this.loadHref(url, href, parents).then((url) => `url("${url}")`),
     );
     // apart from `url()`, strings can be used for `@import` (but why?!)
     const replacedImports = await replaceSeries(
       replacedUrls,
       /@import\s*["']([^"'\n]*?)["']/gi,
-      (_, url) =>
-        this.loadHref(url, href, parents).then((url) => `@import "${url}"`),
+      (_, url) => this.loadHref(url, href, parents).then((url) => `@import "${url}"`),
     );
     const width = window?.innerWidth ?? 800;
     const height = window?.innerHeight ?? 600;
@@ -1973,19 +1783,10 @@ class Loader {
         // un-prefix as most of the props are (only) supported unprefixed
         .replace(/(?<=[{\s;])-epub-/gi, "")
         // replace vw and vh as they cause problems with layout
-        .replace(
-          /(\d*\.?\d+)vw/gi,
-          (_, d) => (parseFloat(d) * width) / 100 + "px",
-        )
-        .replace(
-          /(\d*\.?\d+)vh/gi,
-          (_, d) => (parseFloat(d) * height) / 100 + "px",
-        )
+        .replace(/(\d*\.?\d+)vw/gi, (_, d) => (parseFloat(d) * width) / 100 + "px")
+        .replace(/(\d*\.?\d+)vh/gi, (_, d) => (parseFloat(d) * height) / 100 + "px")
         // `page-break-*` unsupported in columns; replace with `column-break-*`
-        .replace(
-          /page-break-(after|before|inside)\s*:/gi,
-          (_, x) => `-webkit-column-break-${x}:`,
-        )
+        .replace(/page-break-(after|before|inside)\s*:/gi, (_, x) => `-webkit-column-break-${x}:`)
         .replace(
           /break-(after|before|inside)\s*:\s*(avoid-)?page/gi,
           (_, x, y) => `break-${x}: ${y ?? ""}column`,
@@ -1996,11 +1797,7 @@ class Loader {
   /**
    * Find & replace all possible relative paths for all assets without parsing.
    */
-  replaceString(
-    value: string,
-    href: string,
-    parents: string[] = [],
-  ): Promise<string> {
+  replaceString(value: string, href: string, parents: string[] = []): Promise<string> {
     const assetMap = new Map();
     const urls = this.manifest
       .map((asset) => {
@@ -2014,12 +1811,7 @@ class Loader {
         const relativeEnc = encodeURI(relative);
         const rootRelative = "/" + asset.href;
         const rootRelativeEnc = encodeURI(rootRelative);
-        const set = new Set([
-          relative,
-          relativeEnc,
-          rootRelative,
-          rootRelativeEnc,
-        ]);
+        const set = new Set([relative, relativeEnc, rootRelative, rootRelativeEnc]);
 
         for (const url of set) {
           assetMap.set(url, asset);
@@ -2073,9 +1865,7 @@ function getPageSpread(properties: string[]) {
       return "left";
     }
 
-    if (
-      ["page-spread-right", "rendition:page-spread-right"].includes(property)
-    ) {
+    if (["page-spread-right", "rendition:page-spread-right"].includes(property)) {
       return "right";
     }
 
@@ -2100,10 +1890,7 @@ function getDisplayOptions(document: Document | undefined) {
       .find((option) => option.getAttribute("name") === "open-to-spread")
       ?.getAttribute("value") ?? undefined;
 
-  return {
-    fixedLayout,
-    openToSpread,
-  };
+  return { fixedLayout, openToSpread };
 }
 
 type IsGap<T extends string> = Uppercase<T> extends Lowercase<T> ? true : false;
@@ -2119,10 +1906,7 @@ type CamelCase<S extends string> =
 type MetadataDescriptor = {
   multiple?: boolean;
   name: string;
-  setLegacyAttrs?: (
-    obj: Extract<MetadataValue, Record<string, unknown>>,
-    element: Element,
-  ) => void;
+  setLegacyAttrs?: (obj: Extract<MetadataValue, Record<string, unknown>>, element: Element) => void;
   attrs?: string[];
   props?: (string | MetadataDescriptorProp)[];
   type?: string;
@@ -2138,10 +1922,7 @@ type MetadataValue = { [key: string]: MetadataValue } | string | string[];
 type LoadXml = (href: string) => Promise<Document | undefined>;
 
 type Decoder = (key: Uint8Array, blob: Blob) => Blob | Promise<Blob>;
-type Algorithm = {
-  key: (opf: Document) => Promise<Uint8Array> | Uint8Array;
-  decode: Decoder;
-};
+type Algorithm = { key: (opf: Document) => Promise<Uint8Array> | Uint8Array; decode: Decoder };
 
 type ManifestItem = {
   href: string;
@@ -2194,12 +1975,7 @@ type MediaDescriptor = {
   playbackActiveClass?: string;
 };
 
-type ContributorMetadata = {
-  roles: Relator[];
-  fileAs: string;
-  sortAs: string;
-  name: string;
-};
+type ContributorMetadata = { roles: Relator[]; fileAs: string; sortAs: string; name: string };
 
 type BookMetadata = {
   title: string | undefined;
@@ -2212,28 +1988,16 @@ type BookMetadata = {
   published: Date | undefined;
   modified: Date | undefined;
   subject:
-    | {
-        name: string;
-        term?: string | undefined;
-        authority?: string | undefined;
-      }[]
+    | { name: string; term?: string | undefined; authority?: string | undefined }[]
     | undefined;
   rights: string | undefined;
   contributors: ContributorMetadata[] | undefined;
-  series:
-    | {
-        name: string;
-        position?: number | undefined;
-      }
-    | undefined;
+  series: { name: string; position?: number | undefined } | undefined;
 };
 
 type _RelatorRoleSpec = Relator | { value: Relator; scheme?: string };
 
-function cached<T>(
-  resolver: (href: string) => Promise<T>,
-  cache: Map<string, T> = new Map(),
-) {
+function cached<T>(resolver: (href: string) => Promise<T>, cache: Map<string, T> = new Map()) {
   return async (href: string) => {
     if (!cache.has(href)) {
       cache.set(href, await resolver(href));

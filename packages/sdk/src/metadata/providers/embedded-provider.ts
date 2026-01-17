@@ -12,6 +12,7 @@
  * - Integration with the MetadataProvider interface
  */
 
+import type { Metadata as EbookMetadata } from "../../ebooks/metadata.js";
 import type {
   CreatorQuery,
   MetadataProvider,
@@ -21,11 +22,10 @@ import type {
   TimeoutConfig,
   TitleQuery,
 } from "./provider.js";
-import { BaseMetadataProvider, MetadataType } from "./provider.js";
-import type { Metadata as EbookMetadata } from "../../ebooks/metadata.js";
 import { detectType, loadMetadata } from "../../ebooks/index.js";
 import { normalizeISBN } from "../cache-keys.js";
 import { normalizeAuthorName } from "./open-library/name-utils.js";
+import { BaseMetadataProvider, MetadataType } from "./provider.js";
 
 /**
  * Configuration for the Embedded Metadata Provider
@@ -34,11 +34,7 @@ export interface EmbeddedProviderConfig {
   /** Base confidence score for embedded metadata (0.0 to 1.0) */
   baseConfidence: number;
   /** Confidence adjustments based on file format */
-  formatConfidence: {
-    epub: number;
-    mobi: number;
-    pdf: number;
-  };
+  formatConfidence: { epub: number; mobi: number; pdf: number };
   /** Confidence boost for having specific metadata fields */
   fieldConfidence: Partial<Record<MetadataType, number>>;
   /** Whether to normalize ISBNs to ISBN-13 */
@@ -78,10 +74,7 @@ export const DEFAULT_EMBEDDED_PROVIDER_CONFIG: EmbeddedProviderConfig = {
  * This allows embedded metadata to participate in the aggregation and reconciliation
  * pipeline alongside external metadata providers.
  */
-export class EmbeddedMetadataProvider
-  extends BaseMetadataProvider
-  implements MetadataProvider
-{
+export class EmbeddedMetadataProvider extends BaseMetadataProvider implements MetadataProvider {
   readonly name = "embedded";
   readonly priority = 100; // Highest priority - embedded metadata is authoritative
 
@@ -100,10 +93,7 @@ export class EmbeddedMetadataProvider
 
   constructor(config?: Partial<EmbeddedProviderConfig>) {
     super();
-    this.config = {
-      ...DEFAULT_EMBEDDED_PROVIDER_CONFIG,
-      ...config,
-    };
+    this.config = { ...DEFAULT_EMBEDDED_PROVIDER_CONFIG, ...config };
   }
 
   /**
@@ -151,9 +141,7 @@ export class EmbeddedMetadataProvider
    * Search using multiple criteria - not applicable for embedded provider
    * (Embedded provider works with files, not queries)
    */
-  async searchMultiCriteria(
-    _query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(_query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     return [];
   }
 
@@ -249,9 +237,7 @@ export class EmbeddedMetadataProvider
     if (ebookMetadata.contributors?.length) {
       const publishers = ebookMetadata.contributors
         .filter(
-          (contributor) =>
-            contributor.roles.includes("bkp") ||
-            contributor.roles.includes("pbl"),
+          (contributor) => contributor.roles.includes("bkp") || contributor.roles.includes("pbl"),
         )
         .map((contributor) => contributor.name);
 
@@ -364,9 +350,7 @@ export class EmbeddedMetadataProvider
     }
 
     // Penalty if authors are missing
-    const hasAuthors = ebookMetadata.contributors?.some((c) =>
-      c.roles.includes("aut"),
-    );
+    const hasAuthors = ebookMetadata.contributors?.some((c) => c.roles.includes("aut"));
     if (!hasAuthors) {
       confidence -= 0.15;
     }
@@ -378,9 +362,7 @@ export class EmbeddedMetadataProvider
   /**
    * Determine which metadata types are available in the embedded metadata
    */
-  private getAvailableMetadataTypes(
-    ebookMetadata: EbookMetadata,
-  ): MetadataType[] {
+  private getAvailableMetadataTypes(ebookMetadata: EbookMetadata): MetadataType[] {
     const types: MetadataType[] = [];
 
     if (ebookMetadata.title) {
@@ -439,9 +421,7 @@ export class EmbeddedMetadataProvider
     fileName?: string,
   ): string {
     // Use ISBN if available for consistent ID
-    const isbn = ebookMetadata.identifiers?.find(
-      (id) => id.type === "isbn",
-    )?.value;
+    const isbn = ebookMetadata.identifiers?.find((id) => id.type === "isbn")?.value;
     if (isbn) {
       const normalizedIsbn = this.config.normalizeIsbn13
         ? (normalizeISBN(isbn, true) ?? isbn)
@@ -491,9 +471,7 @@ export async function extractMetadataRecord(
   file: File,
   config?: Partial<EmbeddedProviderConfig>,
 ): Promise<MetadataRecord> {
-  const provider = config
-    ? new EmbeddedMetadataProvider(config)
-    : globalEmbeddedProvider;
+  const provider = config ? new EmbeddedMetadataProvider(config) : globalEmbeddedProvider;
 
   return provider.extractFromFile(file);
 }

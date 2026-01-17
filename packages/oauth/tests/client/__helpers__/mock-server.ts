@@ -2,8 +2,12 @@
  * Test helper utilities for mocking OAuth server responses
  */
 import { vi } from "vitest";
-import type { AuthorizationServerMetadata, OAuthErrorCode, TokenPayload } from "../../../src/types.js";
 import type { OAuthErrorResponse, StoredTokens } from "../../../src/client/types.js";
+import type {
+  AuthorizationServerMetadata,
+  OAuthErrorCode,
+  TokenPayload,
+} from "../../../src/types.js";
 
 /**
  * Mock authorization server metadata
@@ -52,10 +56,7 @@ export function mockErrorResponse(
   error: OAuthErrorCode | string,
   description?: string,
 ): OAuthErrorResponse {
-  return {
-    error,
-    error_description: description ?? `Error: ${error}`,
-  };
+  return { error, error_description: description ?? `Error: ${error}` };
 }
 
 /**
@@ -86,9 +87,7 @@ export function createExpiredTokens(overrides: Partial<StoredTokens> = {}): Stor
  * Create tokens that are about to expire
  */
 export function createExpiringTokens(secondsRemaining: number = 30): StoredTokens {
-  return createStoredTokens({
-    expiresAt: new Date(Date.now() + secondsRemaining * 1000),
-  });
+  return createStoredTokens({ expiresAt: new Date(Date.now() + secondsRemaining * 1000) });
 }
 
 /**
@@ -122,18 +121,22 @@ export function createErrorResponse(
 /**
  * Create a mock discovery response
  */
-export function createDiscoveryResponse(overrides: Partial<AuthorizationServerMetadata> = {}): Response {
+export function createDiscoveryResponse(
+  overrides: Partial<AuthorizationServerMetadata> = {},
+): Response {
   return createJsonResponse({ ...mockMetadata, ...overrides });
 }
 
 /**
  * Mock fetch that handles discovery and token endpoints
  */
-export function createFullMockFetch(options: {
-  tokenResponse?: TokenPayload | OAuthErrorResponse;
-  discoveryResponse?: AuthorizationServerMetadata;
-  tokenStatus?: number;
-} = {}) {
+export function createFullMockFetch(
+  options: {
+    tokenResponse?: TokenPayload | OAuthErrorResponse;
+    discoveryResponse?: AuthorizationServerMetadata;
+    tokenStatus?: number;
+  } = {},
+) {
   const mockFetch = createMockFetch();
 
   mockFetch.mockImplementation(async (url: RequestInfo | URL) => {
@@ -147,7 +150,7 @@ export function createFullMockFetch(options: {
     // Handle token endpoint
     if (urlString.includes("/token")) {
       const response = options.tokenResponse ?? mockTokenResponse();
-      const status = options.tokenStatus ?? (("error" in response) ? 400 : 200);
+      const status = options.tokenStatus ?? ("error" in response ? 400 : 200);
       return createJsonResponse(response, status);
     }
 

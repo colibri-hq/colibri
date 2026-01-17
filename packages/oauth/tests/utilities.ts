@@ -1,19 +1,16 @@
+import type { Server as HttpServer } from "node:http";
+import type { Http2SecureServer, Http2Server } from "node:http2";
+import type { Server as HttpsServer } from "node:https";
+import cors from "@fastify/cors";
+import formBody from "@fastify/formbody";
 import fastify, {
   type FastifyReply,
   type FastifyRequest,
   type RouteGenericInterface,
 } from "fastify";
 import Stream, { Readable } from "node:stream";
-import cors from "@fastify/cors";
-import formBody from "@fastify/formbody";
 import { vi } from "vitest";
-import {
-  type AuthorizationServerOptions,
-  createAuthorizationServer,
-} from "../src";
-import type { Server as HttpServer } from "node:http";
-import type { Server as HttpsServer } from "node:https";
-import type { Http2SecureServer, Http2Server } from "node:http2";
+import { type AuthorizationServerOptions, createAuthorizationServer } from "../src";
 
 export async function createTestServer(options: AuthorizationServerOptions) {
   const app = fastify();
@@ -43,9 +40,7 @@ export async function createTestServer(options: AuthorizationServerOptions) {
     method: "POST",
     url: "/token",
     handler: async (request: FastifyRequest, reply: FastifyReply) => {
-      const response = await oauthServer.handleTokenRequest(
-        createRequest(request, reply),
-      );
+      const response = await oauthServer.handleTokenRequest(createRequest(request, reply));
 
       return sendResponse(reply, response);
     },
@@ -207,8 +202,7 @@ class StreamPump {
     },
   ) {
     this.highWaterMark =
-      stream.readableHighWaterMark ||
-      new Stream.Readable().readableHighWaterMark;
+      stream.readableHighWaterMark || new Stream.Readable().readableHighWaterMark;
 
     this.accumulatedSize = 0;
     this.#stream = stream;

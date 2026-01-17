@@ -16,16 +16,10 @@ export const GET = async function GET({ url }) {
     {
       name: "colibri-docs",
       version: "1.0.0",
-      description:
-        "Colibri documentation - Model Context Protocol server for AI agents",
+      description: "Colibri documentation - Model Context Protocol server for AI agents",
       mcpEndpoint: "/mcp",
       protocolVersion: "2025-03-26",
-      capabilities: {
-        resources: {
-          subscribe: false,
-          listChanged: false,
-        },
-      },
+      capabilities: { resources: { subscribe: false, listChanged: false } },
       resources: {
         uriScheme: "docs://colibri",
         description: "Documentation pages accessible via MCP resources/read",

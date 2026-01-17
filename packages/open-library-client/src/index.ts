@@ -1,3 +1,4 @@
+import { wrapArray } from "@colibri-hq/shared";
 import type {
   Author,
   AuthorId,
@@ -10,7 +11,6 @@ import type {
   WorkId,
 } from "./types.js";
 import packageJson from "../package.json" with { type: "json" };
-import { wrapArray } from "@colibri-hq/shared";
 import {
   type AuthorSearchField,
   type AuthorSearchSortFacet,
@@ -51,8 +51,7 @@ export class Client {
     this.#userAgentInfo = `${applicationName} (${contactInfo})`;
     this.#fetch = fetch;
     this.#baseUrl = baseUrl instanceof URL ? baseUrl : new URL(baseUrl);
-    this.#coversBaseUrl =
-      coversBaseUrl instanceof URL ? coversBaseUrl : new URL(coversBaseUrl);
+    this.#coversBaseUrl = coversBaseUrl instanceof URL ? coversBaseUrl : new URL(coversBaseUrl);
   }
 
   // region Books
@@ -63,12 +62,8 @@ export class Client {
     return await this.loadOne<Work>(`/works/${id}.json`);
   }
 
-  async loadBookshelveStatsByWorkId(
-    id: WorkId,
-  ): Promise<BookshelveStatsResponse | null> {
-    return await this.loadOne<BookshelveStatsResponse>(
-      `/works/${id}/bookshelves.json`,
-    );
+  async loadBookshelveStatsByWorkId(id: WorkId): Promise<BookshelveStatsResponse | null> {
+    return await this.loadOne<BookshelveStatsResponse>(`/works/${id}/bookshelves.json`);
   }
 
   async loadRatingsByWorkId(id: WorkId): Promise<RatingsResponse | null> {
@@ -94,10 +89,7 @@ export class Client {
   }
 
   async *loadEditionsByWorkId(id: WorkId, options?: ListOptions) {
-    const response = this.loadMany<Edition>(
-      `/works/${id}/editions.json`,
-      options,
-    );
+    const response = this.loadMany<Edition>(`/works/${id}/editions.json`, options);
 
     for await (const { entries } of response) {
       for (const edition of entries) {
@@ -111,9 +103,7 @@ export class Client {
   // region ISBNs
 
   async loadEditionByIsbn(isbn: string): Promise<Edition | null> {
-    return await this.loadOne<Edition>(`/isbn/${isbn}.json`, {
-      redirect: "follow",
-    });
+    return await this.loadOne<Edition>(`/isbn/${isbn}.json`, { redirect: "follow" });
   }
 
   // endregion
@@ -148,17 +138,13 @@ export class Client {
       offset?: number;
     } = {},
   ): AsyncGenerator<BookSearchResult, void, unknown> {
-    return this.#search<BookSearchResult, BookSearchResults>(
-      "/search.json",
-      query,
-      {
-        fields: fields ? wrapArray(fields).join(",") : undefined,
-        limit: typeof limit !== "undefined" ? Math.max(1, limit) : undefined,
-        offset: typeof offset !== "undefined" ? Math.max(0, offset) : undefined,
-        sort: sortBy,
-        lang: language,
-      },
-    );
+    return this.#search<BookSearchResult, BookSearchResults>("/search.json", query, {
+      fields: fields ? wrapArray(fields).join(",") : undefined,
+      limit: typeof limit !== "undefined" ? Math.max(1, limit) : undefined,
+      offset: typeof offset !== "undefined" ? Math.max(0, offset) : undefined,
+      sort: sortBy,
+      lang: language,
+    });
   }
 
   // endregion
@@ -198,35 +184,20 @@ export class Client {
     {
       size = "M",
       type = "olid",
-    }: {
-      size?: "S" | "M" | "L";
-      type?: "olid" | "isbn" | "oclc" | "lccn" | "id";
-    } = {},
+    }: { size?: "S" | "M" | "L"; type?: "olid" | "isbn" | "oclc" | "lccn" | "id" } = {},
   ): Promise<File | null> {
     const filename = `${identifier}-${size}.jpg`;
-    const url = new URL(
-      `/b/${type}/${filename}?default=false`,
-      this.#coversBaseUrl,
-    );
+    const url = new URL(`/b/${type}/${filename}?default=false`, this.#coversBaseUrl);
 
     return this.#loadImage(url, filename);
   }
 
   loadAuthorPhoto(
     identifier: string,
-    {
-      size = "M",
-      type = "olid",
-    }: {
-      size?: "S" | "M" | "L";
-      type?: "olid" | "id";
-    } = {},
+    { size = "M", type = "olid" }: { size?: "S" | "M" | "L"; type?: "olid" | "id" } = {},
   ): Promise<File | null> {
     const filename = `${identifier}-${size}.jpg`;
-    const url = new URL(
-      `/a/${type}/${filename}?default=false`,
-      this.#coversBaseUrl,
-    );
+    const url = new URL(`/a/${type}/${filename}?default=false`, this.#coversBaseUrl);
 
     return this.#loadImage(url, filename);
   }
@@ -285,9 +256,7 @@ export class Client {
     const payload = await this.#request<ListResponsePayload<T>>(request);
 
     if (payload === null) {
-      throw new Error(
-        `OpenLibrary API Request failed: No data found for endpoint "${endpoint}"`,
-      );
+      throw new Error(`OpenLibrary API Request failed: No data found for endpoint "${endpoint}"`);
     }
 
     yield payload;
@@ -316,10 +285,7 @@ export class Client {
         ? new Date(response.headers.get("last-modified") as string).getTime()
         : Date.now();
 
-      return new File([blob], filename, {
-        lastModified,
-        type,
-      });
+      return new File([blob], filename, { lastModified, type });
     });
   }
 
@@ -329,10 +295,7 @@ export class Client {
   >(
     endpoint: string | URL,
     query: string | SearchQuery<string>,
-    params: {
-      limit?: number | undefined;
-      [key: string]: string | number | undefined;
-    },
+    params: { limit?: number | undefined; [key: string]: string | number | undefined },
   ) {
     const url = new URL(endpoint, this.#baseUrl);
 
@@ -344,9 +307,7 @@ export class Client {
 
     url.searchParams.set(
       "q",
-      typeof query !== "string"
-        ? buildSearchQuery(query)
-        : `"${query.replace(/"/g, "").trim()}"`,
+      typeof query !== "string" ? buildSearchQuery(query) : `"${query.replace(/"/g, "").trim()}"`,
     );
 
     const results = this.#loadSearchResults<T, P>(url);
@@ -381,9 +342,7 @@ export class Client {
       const response = await this.#request<P>(request);
 
       if (response === null) {
-        throw new Error(
-          `OpenLibrary API Request failed: No data found for endpoint "${endpoint}"`,
-        );
+        throw new Error(`OpenLibrary API Request failed: No data found for endpoint "${endpoint}"`);
       }
 
       resultCount = response.docs.length;
@@ -394,8 +353,7 @@ export class Client {
 
   async #request<T>(
     request: Request,
-    readResponse: ResponseReader<T> = (response) =>
-      response.json() as Promise<T>,
+    readResponse: ResponseReader<T> = (response) => response.json() as Promise<T>,
   ): Promise<T | null> {
     let response: Response;
 
@@ -403,17 +361,10 @@ export class Client {
       response = await this.#fetch(request);
     } catch (cause) {
       if (!(cause instanceof Error)) {
-        cause = new Error(`Unknown Error: ${String(cause)}`, {
-          cause,
-        });
+        cause = new Error(`Unknown Error: ${String(cause)}`, { cause });
       }
 
-      throw new Error(
-        `OpenLibrary API Request failed: ${(cause as Error).message}`,
-        {
-          cause,
-        },
-      );
+      throw new Error(`OpenLibrary API Request failed: ${(cause as Error).message}`, { cause });
     }
 
     if (response.status === 404) {
@@ -440,9 +391,7 @@ export class Client {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
 
-      throw new Error(
-        `OpenLibrary API Request failed: Invalid response format: ${message}`,
-      );
+      throw new Error(`OpenLibrary API Request failed: Invalid response format: ${message}`);
     }
 
     return payload;
@@ -461,36 +410,21 @@ type Fetch = typeof globalThis.fetch;
 
 type ResponseReader<T> = (response: Response) => Promise<T>;
 
-type ListOptions = {
-  limit?: number;
-  offset?: number;
-};
+type ListOptions = { limit?: number; offset?: number };
 
 type ListResponsePayload<T> = {
-  links?: {
-    self: string;
-    next: string;
-    [key: string]: string;
-  };
+  links?: { self: string; next: string; [key: string]: string };
   size: number;
   entries: T[];
 };
 
 type RatingsResponse = {
-  summary: {
-    average: number;
-    count: number;
-    sortable: number;
-  };
+  summary: { average: number; count: number; sortable: number };
   counts: { "1": number; "2": number; "3": number; "4": number; "5": number };
 };
 
 type BookshelveStatsResponse = {
-  counts: {
-    want_to_read: number;
-    currently_reading: number;
-    already_read: number;
-  };
+  counts: { want_to_read: number; currently_reading: number; already_read: number };
 };
 
 type ImageMetadata = {

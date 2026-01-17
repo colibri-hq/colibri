@@ -44,9 +44,7 @@ for await (const book of client.searchBook("The Great Gatsby")) {
 
 // You can also use Array.fromAsync to collect all results into an array, although this foregoes the
 // benefits of streaming results:
-const authors = await Array.fromAsync(
-  client.searchAuthor("F. Scott Fitzgerald"),
-);
+const authors = await Array.fromAsync(client.searchAuthor("F. Scott Fitzgerald"));
 ```
 
 ### Missing Items

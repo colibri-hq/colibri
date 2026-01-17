@@ -1,24 +1,14 @@
 import type { Database } from "@colibri-hq/sdk";
 import * as p from "@clack/prompts";
-import {
-  createUser,
-  initialize,
-  setSetting,
-  storeSecret,
-} from "@colibri-hq/sdk";
+import { createUser, initialize, setSetting, storeSecret } from "@colibri-hq/sdk";
 import { updateStorageDsn } from "@colibri-hq/sdk/storage";
 import { Command, Flags } from "@oclif/core";
 import { buildStorageDsn } from "../core/state.js";
-import {
-  validateDatabaseDsn,
-  validateEmail,
-  validateStorageEndpoint,
-} from "../core/validation.js";
+import { validateDatabaseDsn, validateEmail, validateStorageEndpoint } from "../core/validation.js";
 import { startGuiServer } from "../lib/server.js";
 
 export default class Setup extends Command {
-  static override description =
-    "Interactive setup wizard for new Colibri instances";
+  static override description = "Interactive setup wizard for new Colibri instances";
 
   static override examples = [
     "<%= config.bin %> <%= command.id %>",
@@ -31,10 +21,7 @@ export default class Setup extends Command {
       default: false,
       description: "Launch web-based setup wizard instead of CLI",
     }),
-    port: Flags.integer({
-      default: 3333,
-      description: "Port for web GUI server",
-    }),
+    port: Flags.integer({ default: 3333, description: "Port for web GUI server" }),
   };
 
   async run(): Promise<void> {
@@ -71,10 +58,7 @@ export default class Setup extends Command {
 
         // Step 5: SMTP (optional)
         configureSmtp: () =>
-          p.confirm({
-            initialValue: false,
-            message: "Configure SMTP for email notifications?",
-          }),
+          p.confirm({ initialValue: false, message: "Configure SMTP for email notifications?" }),
 
         // Test database connection
         database: async ({ results }) => {
@@ -84,29 +68,18 @@ export default class Setup extends Command {
           try {
             const db = initialize(results.databaseDsn!);
             // Test connection by running a simple query
-            await db
-              .selectFrom("authentication.user")
-              .select("id")
-              .limit(1)
-              .execute();
+            await db.selectFrom("authentication.user").select("id").limit(1).execute();
             s.stop("Database connected successfully");
             database = db;
             return db;
           } catch (error) {
             s.stop("Connection failed");
 
-            if (
-              error instanceof Error &&
-              error.message.includes("does not exist")
-            ) {
-              p.log.error(
-                "The database schema is not initialized. Please run migrations first.",
-              );
+            if (error instanceof Error && error.message.includes("does not exist")) {
+              p.log.error("The database schema is not initialized. Please run migrations first.");
               p.log.info("Run: pnpx supabase db push");
             } else {
-              p.log.error(
-                error instanceof Error ? error.message : "Unknown error",
-              );
+              p.log.error(error instanceof Error ? error.message : "Unknown error");
             }
 
             throw error;
@@ -128,29 +101,18 @@ export default class Setup extends Command {
           }),
 
         // Step 3: Instance settings
-        instanceName: () =>
-          p.text({
-            initialValue: "Colibri",
-            message: "Instance name:",
-          }),
+        instanceName: () => p.text({ initialValue: "Colibri", message: "Instance name:" }),
 
         smtpFrom: ({ results }) =>
           results.configureSmtp
-            ? p.text({
-                message: "SMTP from address:",
-                placeholder: "noreply@example.com",
-              })
+            ? p.text({ message: "SMTP from address:", placeholder: "noreply@example.com" })
             : Promise.resolve(),
 
         smtpHost: ({ results }) =>
-          results.configureSmtp
-            ? p.text({ message: "SMTP host:" })
-            : Promise.resolve(),
+          results.configureSmtp ? p.text({ message: "SMTP host:" }) : Promise.resolve(),
 
         smtpPassword: ({ results }) =>
-          results.configureSmtp
-            ? p.password({ message: "SMTP password:" })
-            : Promise.resolve(),
+          results.configureSmtp ? p.password({ message: "SMTP password:" }) : Promise.resolve(),
 
         smtpPort: ({ results }) =>
           results.configureSmtp
@@ -158,14 +120,9 @@ export default class Setup extends Command {
             : Promise.resolve(),
 
         smtpUsername: ({ results }) =>
-          results.configureSmtp
-            ? p.text({ message: "SMTP username:" })
-            : Promise.resolve(),
+          results.configureSmtp ? p.text({ message: "SMTP username:" }) : Promise.resolve(),
 
-        storageAccessKey: () =>
-          p.text({
-            message: "Storage access key ID:",
-          }),
+        storageAccessKey: () => p.text({ message: "Storage access key ID:" }),
 
         // Step 4: Storage configuration
         storageEndpoint: () =>
@@ -182,15 +139,9 @@ export default class Setup extends Command {
           }),
 
         storageRegion: () =>
-          p.text({
-            message: "Storage region (optional):",
-            placeholder: "us-east-1",
-          }),
+          p.text({ message: "Storage region (optional):", placeholder: "us-east-1" }),
 
-        storageSecretKey: () =>
-          p.password({
-            message: "Storage secret access key:",
-          }),
+        storageSecretKey: () => p.password({ message: "Storage secret access key:" }),
       },
       {
         onCancel: () => {
@@ -264,44 +215,19 @@ export default class Setup extends Command {
         enabled: results.configureSmtp === true,
         task: async () => {
           if (typeof results.smtpHost === "string") {
-            await storeSecret(
-              db,
-              "smtp.host",
-              results.smtpHost,
-              "SMTP server hostname",
-            );
+            await storeSecret(db, "smtp.host", results.smtpHost, "SMTP server hostname");
           }
           if (typeof results.smtpPort === "string") {
-            await storeSecret(
-              db,
-              "smtp.port",
-              results.smtpPort,
-              "SMTP server port",
-            );
+            await storeSecret(db, "smtp.port", results.smtpPort, "SMTP server port");
           }
           if (typeof results.smtpUsername === "string") {
-            await storeSecret(
-              db,
-              "smtp.username",
-              results.smtpUsername,
-              "SMTP username",
-            );
+            await storeSecret(db, "smtp.username", results.smtpUsername, "SMTP username");
           }
           if (typeof results.smtpPassword === "string") {
-            await storeSecret(
-              db,
-              "smtp.password",
-              results.smtpPassword,
-              "SMTP password",
-            );
+            await storeSecret(db, "smtp.password", results.smtpPassword, "SMTP password");
           }
           if (typeof results.smtpFrom === "string") {
-            await storeSecret(
-              db,
-              "smtp.from",
-              results.smtpFrom,
-              "SMTP from address",
-            );
+            await storeSecret(db, "smtp.from", results.smtpFrom, "SMTP from address");
           }
           return "SMTP configured";
         },

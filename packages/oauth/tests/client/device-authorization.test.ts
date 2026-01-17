@@ -1,10 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { DeviceAuthorizationClient } from "../../src/client/device-authorization.js";
-import {
-  AbortError,
-  OAuthClientError,
-  PollingTimeoutError,
-} from "../../src/client/errors.js";
+import { AbortError, OAuthClientError, PollingTimeoutError } from "../../src/client/errors.js";
 import {
   createMockFetch,
   createJsonResponse,
@@ -333,10 +329,7 @@ describe("DeviceAuthorizationClient", () => {
         if (urlString.includes("/token")) {
           pollCount++;
           if (pollCount === 1) {
-            return createJsonResponse(
-              { error: "slow_down", error_description: "Slow down" },
-              400,
-            );
+            return createJsonResponse({ error: "slow_down", error_description: "Slow down" }, 400);
           }
           return createJsonResponse(mockTokenResponse());
         }

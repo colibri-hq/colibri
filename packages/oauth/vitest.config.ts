@@ -2,9 +2,7 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    cache: {
-      dir: "node_modules/.vitest",
-    },
+    cache: { dir: "node_modules/.vitest" },
     coverage: {
       allowExternal: false,
       enabled: true,

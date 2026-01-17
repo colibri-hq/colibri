@@ -12,10 +12,7 @@ import type {
 export class PlaceReconciler {
   private readonly cityAliases = new Map([
     // Major publishing centers with common variations
-    [
-      "new york",
-      ["new york city", "nyc", "ny", "new york, ny", "manhattan", "brooklyn"],
-    ],
+    ["new york", ["new york city", "nyc", "ny", "new york, ny", "manhattan", "brooklyn"]],
     ["london", ["london, england", "london, uk", "london, great britain"]],
     ["paris", ["paris, france", "paris, fr"]],
     ["berlin", ["berlin, germany", "berlin, de"]],
@@ -24,27 +21,13 @@ export class PlaceReconciler {
     ["sydney", ["sydney, australia", "sydney, au"]],
     ["chicago", ["chicago, il", "chicago, illinois"]],
     ["boston", ["boston, ma", "boston, massachusetts"]],
-    [
-      "los angeles",
-      ["la", "l.a.", "los angeles, ca", "los angeles, california"],
-    ],
-    [
-      "san francisco",
-      ["sf", "s.f.", "san francisco, ca", "san francisco, california"],
-    ],
-    [
-      "philadelphia",
-      ["philly", "philadelphia, pa", "philadelphia, pennsylvania"],
-    ],
+    ["los angeles", ["la", "l.a.", "los angeles, ca", "los angeles, california"]],
+    ["san francisco", ["sf", "s.f.", "san francisco, ca", "san francisco, california"]],
+    ["philadelphia", ["philly", "philadelphia, pa", "philadelphia, pennsylvania"]],
     ["washington", ["washington, dc", "washington d.c.", "washington, d.c."]],
     [
       "cambridge",
-      [
-        "cambridge, ma",
-        "cambridge, massachusetts",
-        "cambridge, england",
-        "cambridge, uk",
-      ],
+      ["cambridge, ma", "cambridge, massachusetts", "cambridge, england", "cambridge, uk"],
     ],
     ["oxford", ["oxford, england", "oxford, uk"]],
     ["edinburgh", ["edinburgh, scotland", "edinburgh, uk"]],
@@ -62,10 +45,7 @@ export class PlaceReconciler {
     ["rome", ["roma", "rome, italy", "roma, italy"]],
     ["milan", ["milano", "milan, italy", "milano, italy"]],
     ["moscow", ["moscow, russia", "moscow, ru"]],
-    [
-      "st. petersburg",
-      ["saint petersburg", "st petersburg", "st. petersburg, russia"],
-    ],
+    ["st. petersburg", ["saint petersburg", "st petersburg", "st. petersburg, russia"]],
     ["beijing", ["peking", "beijing, china", "peking, china"]],
     ["shanghai", ["shanghai, china"]],
     ["hong kong", ["hong kong, china", "hk"]],
@@ -195,10 +175,7 @@ export class PlaceReconciler {
         "wyoming",
       ],
     ],
-    [
-      "united kingdom",
-      ["uk", "great britain", "britain", "england", "scotland", "wales"],
-    ],
+    ["united kingdom", ["uk", "great britain", "britain", "england", "scotland", "wales"]],
     ["germany", ["deutschland", "de"]],
     ["france", ["fr"]],
     ["italy", ["italia", "it"]],
@@ -234,19 +211,13 @@ export class PlaceReconciler {
     const normalized = this.normalizePlaceName(input);
     const country = this.extractCountry(input);
 
-    return {
-      name: input,
-      normalized,
-      country,
-    };
+    return { name: input, normalized, country };
   }
 
   /**
    * Reconcile multiple publication places using standardization and conflict resolution
    */
-  reconcilePlaces(
-    inputs: PublicationInfoInput[],
-  ): ReconciledField<PublicationPlace> {
+  reconcilePlaces(inputs: PublicationInfoInput[]): ReconciledField<PublicationPlace> {
     if (inputs.length === 0) {
       throw new Error("No publication places to reconcile");
     }
@@ -255,14 +226,10 @@ export class PlaceReconciler {
     const normalizedPlaces = inputs
       .filter((input) => {
         if (!input.place) return false;
-        const placeStr =
-          typeof input.place === "string" ? input.place : input.place.name;
+        const placeStr = typeof input.place === "string" ? input.place : input.place.name;
         return placeStr && placeStr.trim() !== "";
       })
-      .map((input) => ({
-        place: this.normalizePlace(input.place!),
-        source: input.source,
-      }));
+      .map((input) => ({ place: this.normalizePlace(input.place!), source: input.source }));
 
     if (normalizedPlaces.length === 0) {
       throw new Error("No valid publication places found");
@@ -295,10 +262,7 @@ export class PlaceReconciler {
         field: "publication_place",
         values: Array.from(placeGroups.values())
           .flat()
-          .map((item) => ({
-            value: item.place,
-            source: item.source,
-          })),
+          .map((item) => ({ value: item.place, source: item.source })),
         resolution: "Selected place from most reliable source",
       });
     }
@@ -309,10 +273,7 @@ export class PlaceReconciler {
       current.source.reliability > best.source.reliability ? current : best,
     );
 
-    const confidence = this.calculatePlaceConfidence(
-      bestCandidate.place,
-      bestCandidate.source,
-    );
+    const confidence = this.calculatePlaceConfidence(bestCandidate.place, bestCandidate.source);
 
     return {
       value: bestCandidate.place,
@@ -441,10 +402,7 @@ export class PlaceReconciler {
   /**
    * Calculate confidence score for a publication place
    */
-  private calculatePlaceConfidence(
-    place: PublicationPlace,
-    source: MetadataSource,
-  ): number {
+  private calculatePlaceConfidence(place: PublicationPlace, source: MetadataSource): number {
     let confidence = source.reliability;
 
     // Adjust based on place name quality

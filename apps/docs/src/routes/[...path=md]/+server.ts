@@ -1,5 +1,5 @@
-import { error } from "@sveltejs/kit";
 import { getAllPages } from "$lib/content/content.js";
+import { error } from "@sveltejs/kit";
 import type { EntryGenerator, RequestHandler } from "./$types.js";
 
 export const prerender = true;
@@ -28,9 +28,7 @@ for (const [path, content] of Object.entries(rawFiles)) {
 export const entries: EntryGenerator = () =>
   Array.from(getAllPages().keys())
     .filter((slug) => !slug.startsWith("/blog/"))
-    .map((slug) => ({
-      path: `${slug.replace(/^\//, "")}.md`,
-    }));
+    .map((slug) => ({ path: `${slug.replace(/^\//, "")}.md` }));
 
 export const GET = async function GET({ params }) {
   const path = params.path;
@@ -47,7 +45,5 @@ export const GET = async function GET({ params }) {
   // Strip frontmatter
   const markdown = content.replace(/^---[\s\S]*?---\n*/, "");
 
-  return new Response(markdown, {
-    headers: { "Content-Type": "text/markdown; charset=utf-8" },
-  });
+  return new Response(markdown, { headers: { "Content-Type": "text/markdown; charset=utf-8" } });
 } satisfies RequestHandler;

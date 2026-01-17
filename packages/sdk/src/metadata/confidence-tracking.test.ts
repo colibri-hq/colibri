@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { OpenLibraryMetadataProvider } from "./providers/open-library.js";
 import type { MetadataRecord } from "./providers/provider.js";
+import { OpenLibraryMetadataProvider } from "./providers/open-library.js";
 
 // Mock the OpenLibrary client
 vi.mock("@colibri-hq/open-library-client", () => ({
@@ -18,9 +18,7 @@ describe("OpenLibraryMetadataProvider - Confidence Factor Tracking", () => {
   });
 
   // Helper function to create mock metadata records
-  const createMockRecord = (
-    overrides: Partial<MetadataRecord> = {},
-  ): MetadataRecord => ({
+  const createMockRecord = (overrides: Partial<MetadataRecord> = {}): MetadataRecord => ({
     id: `test-${Date.now()}-${Math.random()}`,
     source: "OpenLibrary",
     confidence: 0.8,
@@ -48,12 +46,7 @@ describe("OpenLibraryMetadataProvider - Confidence Factor Tracking", () => {
         languagePreferenceBoost: 0,
         penalties: ["single-source-cap"],
         tier: "good",
-        factors: {
-          sourceCount: 1,
-          agreementScore: 1.0,
-          avgQuality: 0.85,
-          consensusStrength: 1.0,
-        },
+        factors: { sourceCount: 1, agreementScore: 1.0, avgQuality: 0.85, consensusStrength: 1.0 },
       });
 
       expect(analysis.finalConfidence).toBe(0.85);
@@ -161,14 +154,8 @@ describe("OpenLibraryMetadataProvider - Confidence Factor Tracking", () => {
 
     it("should enforce minimum confidence floor", () => {
       const results = [
-        createMockRecord({
-          confidence: 0.1,
-          title: "Poor Book A",
-        }),
-        createMockRecord({
-          confidence: 0.15,
-          title: "Poor Book B",
-        }),
+        createMockRecord({ confidence: 0.1, title: "Poor Book A" }),
+        createMockRecord({ confidence: 0.15, title: "Poor Book B" }),
       ];
 
       const analysis = provider.getConfidenceAnalysis(results);
@@ -181,21 +168,9 @@ describe("OpenLibraryMetadataProvider - Confidence Factor Tracking", () => {
 
     it("should apply weak consensus cap for poor agreement", () => {
       const results = [
-        createMockRecord({
-          confidence: 0.9,
-          title: "Book A",
-          authors: ["Author A"],
-        }),
-        createMockRecord({
-          confidence: 0.85,
-          title: "Book B",
-          authors: ["Author B"],
-        }),
-        createMockRecord({
-          confidence: 0.88,
-          title: "Book C",
-          authors: ["Author C"],
-        }),
+        createMockRecord({ confidence: 0.9, title: "Book A", authors: ["Author A"] }),
+        createMockRecord({ confidence: 0.85, title: "Book B", authors: ["Author B"] }),
+        createMockRecord({ confidence: 0.88, title: "Book C", authors: ["Author C"] }),
       ];
 
       const analysis = provider.getConfidenceAnalysis(results);
@@ -236,21 +211,9 @@ describe("OpenLibraryMetadataProvider - Confidence Factor Tracking", () => {
         {
           name: "High Quality",
           results: [
-            createMockRecord({
-              confidence: 0.9,
-              title: "Book",
-              authors: ["Author"],
-            }),
-            createMockRecord({
-              confidence: 0.95,
-              title: "Book",
-              authors: ["Author"],
-            }),
-            createMockRecord({
-              confidence: 0.88,
-              title: "Book",
-              authors: ["Author"],
-            }),
+            createMockRecord({ confidence: 0.9, title: "Book", authors: ["Author"] }),
+            createMockRecord({ confidence: 0.95, title: "Book", authors: ["Author"] }),
+            createMockRecord({ confidence: 0.88, title: "Book", authors: ["Author"] }),
           ],
         },
         {

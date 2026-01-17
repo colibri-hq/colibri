@@ -1,4 +1,3 @@
-import { json } from "@sveltejs/kit";
 import {
   type Directory,
   getContentTree,
@@ -6,6 +5,7 @@ import {
   isPage,
   type Page,
 } from "$lib/content/content.js";
+import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types.js";
 
 export const prerender = true;
@@ -25,16 +25,12 @@ export const GET = async function GET() {
     title: page.metadata.title,
     description: page.metadata.description,
     mimeType: "text/markdown",
-    annotations: {
-      audience: ["user", "assistant"],
-      priority: calculatePriority(page),
-    },
+    annotations: { audience: ["user", "assistant"], priority: calculatePriority(page) },
   }));
 
   // Sort by priority (highest first), then alphabetically by name
   resources.sort((a, b) => {
-    const priorityDiff =
-      (b.annotations?.priority ?? 0) - (a.annotations?.priority ?? 0);
+    const priorityDiff = (b.annotations?.priority ?? 0) - (a.annotations?.priority ?? 0);
 
     if (priorityDiff !== 0) {
       return priorityDiff;
@@ -110,8 +106,5 @@ type MCPResource = {
   title?: string;
   description?: string;
   mimeType: string;
-  annotations?: {
-    audience: ("user" | "assistant")[];
-    priority: number;
-  };
+  annotations?: { audience: ("user" | "assistant")[]; priority: number };
 };

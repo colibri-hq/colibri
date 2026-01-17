@@ -5,11 +5,7 @@
  * in a library by comparing metadata fields with configurable thresholds.
  */
 
-import type {
-  DuplicateMatch,
-  DuplicateMatchField,
-  LibraryEntry,
-} from "./types.js";
+import type { DuplicateMatch, DuplicateMatchField, LibraryEntry } from "./types.js";
 import { DUPLICATE_FIELD_WEIGHTS } from "./fields.js";
 import {
   calculateArraySimilarity,
@@ -68,10 +64,7 @@ export class DuplicateDetector {
    * @param existingLibrary - Array of existing library entries
    * @returns Array of potential matches sorted by similarity (highest first)
    */
-  detectDuplicates(
-    proposedEntry: LibraryEntry,
-    existingLibrary: LibraryEntry[],
-  ): DuplicateMatch[] {
+  detectDuplicates(proposedEntry: LibraryEntry, existingLibrary: LibraryEntry[]): DuplicateMatch[] {
     const matches: DuplicateMatch[] = [];
 
     for (const existingEntry of existingLibrary) {
@@ -88,10 +81,7 @@ export class DuplicateDetector {
   /**
    * Calculate duplicate match between two library entries
    */
-  calculateDuplicateMatch(
-    proposed: LibraryEntry,
-    existing: LibraryEntry,
-  ): DuplicateMatch {
+  calculateDuplicateMatch(proposed: LibraryEntry, existing: LibraryEntry): DuplicateMatch {
     const matchingFields: DuplicateMatchField[] = [];
     let totalSimilarity = 0;
     let totalWeight = 0;
@@ -99,10 +89,7 @@ export class DuplicateDetector {
     const fieldWeights = this.config.fieldWeights;
 
     // Compare title
-    const titleSimilarity = calculateStringSimilarity(
-      proposed.title,
-      existing.title,
-    );
+    const titleSimilarity = calculateStringSimilarity(proposed.title, existing.title);
     matchingFields.push({
       field: "title",
       similarity: titleSimilarity,
@@ -114,10 +101,7 @@ export class DuplicateDetector {
     totalWeight += fieldWeights.title;
 
     // Compare authors
-    const authorsSimilarity = calculateArraySimilarity(
-      proposed.authors,
-      existing.authors,
-    );
+    const authorsSimilarity = calculateArraySimilarity(proposed.authors, existing.authors);
     matchingFields.push({
       field: "authors",
       similarity: authorsSimilarity,
@@ -129,10 +113,7 @@ export class DuplicateDetector {
     totalWeight += fieldWeights.authors;
 
     // Compare ISBN (exact match)
-    const isbnSimilarity = calculateIsbnSimilarity(
-      proposed.isbn,
-      existing.isbn,
-    );
+    const isbnSimilarity = calculateIsbnSimilarity(proposed.isbn, existing.isbn);
     if (isbnSimilarity > 0) {
       matchingFields.push({
         field: "isbn",
@@ -180,10 +161,7 @@ export class DuplicateDetector {
     }
 
     // Compare series
-    const seriesSimilarity = calculateSeriesSimilarity(
-      proposed.series,
-      existing.series,
-    );
+    const seriesSimilarity = calculateSeriesSimilarity(proposed.series, existing.series);
     if (seriesSimilarity > 0) {
       matchingFields.push({
         field: "series",
@@ -196,8 +174,7 @@ export class DuplicateDetector {
       totalWeight += fieldWeights.series;
     }
 
-    const overallSimilarity =
-      totalWeight > 0 ? totalSimilarity / totalWeight : 0;
+    const overallSimilarity = totalWeight > 0 ? totalSimilarity / totalWeight : 0;
 
     // Determine match type and recommendation
     const { matchType, recommendation, explanation } = this.determineMatchType(
@@ -235,8 +212,7 @@ export class DuplicateDetector {
       return {
         matchType: "exact",
         recommendation: "skip",
-        explanation:
-          "This appears to be an exact duplicate of an existing entry.",
+        explanation: "This appears to be an exact duplicate of an existing entry.",
       };
     }
 
@@ -244,8 +220,7 @@ export class DuplicateDetector {
       return {
         matchType: "likely",
         recommendation: "review_manually",
-        explanation:
-          "This is likely a duplicate but may have some differences worth reviewing.",
+        explanation: "This is likely a duplicate but may have some differences worth reviewing.",
       };
     }
 
@@ -253,28 +228,22 @@ export class DuplicateDetector {
       return {
         matchType: "possible",
         recommendation: "review_manually",
-        explanation:
-          "This might be a duplicate or a different edition of the same work.",
+        explanation: "This might be a duplicate or a different edition of the same work.",
       };
     }
 
-    if (
-      isbnSimilarity > 0.8 ||
-      (titleSimilarity > 0.8 && authorsSimilarity > 0.8)
-    ) {
+    if (isbnSimilarity > 0.8 || (titleSimilarity > 0.8 && authorsSimilarity > 0.8)) {
       return {
         matchType: "different_edition",
         recommendation: "add_as_new",
-        explanation:
-          "This appears to be a different edition of an existing work.",
+        explanation: "This appears to be a different edition of an existing work.",
       };
     }
 
     return {
       matchType: "related_work",
       recommendation: "add_as_new",
-      explanation:
-        "This appears to be related but distinct from existing entries.",
+      explanation: "This appears to be related but distinct from existing entries.",
     };
   }
 }

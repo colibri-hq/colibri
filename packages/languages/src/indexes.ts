@@ -1,5 +1,5 @@
-import { ISO1_INDEX, ISO3_INDEX, LANGUAGES, NAME_INDEX } from "./generated/languages.js";
 import type { Language } from "./types.js";
+import { ISO1_INDEX, ISO3_INDEX, LANGUAGES, NAME_INDEX } from "./generated/languages.js";
 
 /**
  * Get a language by its ISO 639-3 code.

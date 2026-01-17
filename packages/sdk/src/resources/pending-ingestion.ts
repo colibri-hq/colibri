@@ -1,8 +1,5 @@
 import type { Database } from "../database.js";
-import type {
-  ExtractedMetadata,
-  DuplicateCheckResult,
-} from "../ingestion/types.js";
+import type { ExtractedMetadata, DuplicateCheckResult } from "../ingestion/types.js";
 
 const table = "pending_ingestion" as const;
 
@@ -25,10 +22,7 @@ export interface CreatePendingIngestionData {
  * @param data - Pending ingestion data
  * @returns The created pending ingestion record with ID
  */
-export async function createPendingIngestion(
-  database: Database,
-  data: CreatePendingIngestionData,
-) {
+export async function createPendingIngestion(database: Database, data: CreatePendingIngestionData) {
   // Convert checksum from Uint8Array to hex string
   const checksumHex = Array.from(data.checksum)
     .map((b) => b.toString(16).padStart(2, "0"))
@@ -53,8 +47,7 @@ export async function createPendingIngestion(
     uploadId: result.upload_id,
     s3Key: result.s3_key,
     checksum: hexToUint8Array(result.checksum),
-    extractedMetadata:
-      result.extracted_metadata as unknown as ExtractedMetadata,
+    extractedMetadata: result.extracted_metadata as unknown as ExtractedMetadata,
     duplicateInfo: result.duplicate_info as unknown as DuplicateCheckResult,
     createdAt: result.created_at,
     expiresAt: result.expires_at,
@@ -85,8 +78,7 @@ export async function getPendingIngestion(database: Database, id: string) {
     uploadId: result.upload_id,
     s3Key: result.s3_key,
     checksum: hexToUint8Array(result.checksum),
-    extractedMetadata:
-      result.extracted_metadata as unknown as ExtractedMetadata,
+    extractedMetadata: result.extracted_metadata as unknown as ExtractedMetadata,
     duplicateInfo: result.duplicate_info as unknown as DuplicateCheckResult,
     createdAt: result.created_at,
     expiresAt: result.expires_at,
@@ -100,14 +92,8 @@ export async function getPendingIngestion(database: Database, id: string) {
  * @param id - Pending ingestion ID (UUID)
  * @returns True if deleted, false if not found
  */
-export async function deletePendingIngestion(
-  database: Database,
-  id: string,
-): Promise<boolean> {
-  const result = await database
-    .deleteFrom(table)
-    .where("id", "=", id)
-    .executeTakeFirst();
+export async function deletePendingIngestion(database: Database, id: string): Promise<boolean> {
+  const result = await database.deleteFrom(table).where("id", "=", id).executeTakeFirst();
 
   return result.numDeletedRows > 0;
 }
@@ -118,9 +104,7 @@ export async function deletePendingIngestion(
  * @param database - Database connection
  * @returns Number of records deleted
  */
-export async function deleteExpiredIngestions(
-  database: Database,
-): Promise<number> {
+export async function deleteExpiredIngestions(database: Database): Promise<number> {
   const result = await database
     .deleteFrom(table)
     .where("expires_at", "<", new Date())
@@ -136,10 +120,7 @@ export async function deleteExpiredIngestions(
  * @param userId - User ID
  * @returns Array of pending ingestions
  */
-export async function getPendingIngestionsForUser(
-  database: Database,
-  userId: string,
-) {
+export async function getPendingIngestionsForUser(database: Database, userId: string) {
   const results = await database
     .selectFrom(table)
     .selectAll()
@@ -154,8 +135,7 @@ export async function getPendingIngestionsForUser(
     uploadId: result.upload_id,
     s3Key: result.s3_key,
     checksum: hexToUint8Array(result.checksum),
-    extractedMetadata:
-      result.extracted_metadata as unknown as ExtractedMetadata,
+    extractedMetadata: result.extracted_metadata as unknown as ExtractedMetadata,
     duplicateInfo: result.duplicate_info as unknown as DuplicateCheckResult,
     createdAt: result.created_at,
     expiresAt: result.expires_at,

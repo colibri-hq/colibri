@@ -1,6 +1,6 @@
-import type { PageLoad } from "./$types.js";
 import { getPage, getParentInfo, getSiblingPages } from "$lib/content/content";
 import { error } from "@sveltejs/kit";
+import type { PageLoad } from "./$types.js";
 
 export const load = function load({ data }) {
   const page = getPage(data.slug);
@@ -12,11 +12,5 @@ export const load = function load({ data }) {
   const parent = getParentInfo(page.slug);
   const siblings = getSiblingPages(page.slug);
 
-  return {
-    content: page.content,
-    metadata: page.metadata,
-    slug: page.slug,
-    parent,
-    siblings,
-  };
+  return { content: page.content, metadata: page.metadata, slug: page.slug, parent, siblings };
 } satisfies PageLoad;

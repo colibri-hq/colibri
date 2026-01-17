@@ -24,6 +24,7 @@
  * - Language (primarily English publications)
  */
 
+import { cleanIsbn } from "../utils/normalization.js";
 import {
   type CreatorQuery,
   type MetadataRecord,
@@ -34,7 +35,6 @@ import {
   type TitleQuery,
 } from "./provider.js";
 import { RetryableMetadataProvider } from "./retryable-provider.js";
-import { cleanIsbn } from "../utils/normalization.js";
 
 /**
  * SPARQL query result types
@@ -51,12 +51,8 @@ interface SparqlResult {
 }
 
 interface SparqlResponse {
-  head: {
-    vars: string[];
-  };
-  results: {
-    bindings: SparqlResult[];
-  };
+  head: { vars: string[] };
+  results: { bindings: SparqlResult[] };
 }
 
 /**
@@ -80,9 +76,7 @@ export class BNBMetadataProvider extends RetryableMetadataProvider {
 
   private readonly sparqlEndpoint = "https://bnb.data.bl.uk/sparql";
 
-  constructor(
-    private readonly fetch: typeof globalThis.fetch = globalThis.fetch,
-  ) {
+  constructor(private readonly fetch: typeof globalThis.fetch = globalThis.fetch) {
     super();
   }
 
@@ -112,10 +106,7 @@ export class BNBMetadataProvider extends RetryableMetadataProvider {
     const filter = `?book bibo:isbn "${cleanedIsbn}" .`;
 
     const sparqlQuery = this.buildBookQuery(filter, "isbn");
-    const response = await this.executeSparqlQuery(
-      sparqlQuery,
-      `ISBN search for "${isbn}"`,
-    );
+    const response = await this.executeSparqlQuery(sparqlQuery, `ISBN search for "${isbn}"`);
 
     return this.processSparqlResults(response, "isbn");
   }
@@ -141,9 +132,7 @@ export class BNBMetadataProvider extends RetryableMetadataProvider {
   /**
    * Search using multiple criteria
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     // Prioritize ISBN
     if (query.isbn) {
       return this.searchByISBN(query.isbn);
@@ -153,9 +142,7 @@ export class BNBMetadataProvider extends RetryableMetadataProvider {
 
     if (query.title) {
       const escapedTitle = this.escapeSparql(query.title);
-      filters.push(
-        `?book dct:title ?t . FILTER(CONTAINS(LCASE(?t), LCASE("${escapedTitle}")))`,
-      );
+      filters.push(`?book dct:title ?t . FILTER(CONTAINS(LCASE(?t), LCASE("${escapedTitle}")))`);
     }
 
     if (query.authors && query.authors.length > 0) {
@@ -178,10 +165,7 @@ export class BNBMetadataProvider extends RetryableMetadataProvider {
 
     const filter = filters.join("\n        ");
     const sparqlQuery = this.buildBookQuery(filter, "multi");
-    const response = await this.executeSparqlQuery(
-      sparqlQuery,
-      "multi-criteria search",
-    );
+    const response = await this.executeSparqlQuery(sparqlQuery, "multi-criteria search");
 
     return this.processSparqlResults(response, "multi");
   }
@@ -232,31 +216,20 @@ export class BNBMetadataProvider extends RetryableMetadataProvider {
   /**
    * Execute SPARQL query
    */
-  private async executeSparqlQuery(
-    query: string,
-    operationName: string,
-  ): Promise<SparqlResponse> {
+  private async executeSparqlQuery(query: string, operationName: string): Promise<SparqlResponse> {
     const result = await this.executeWithRetry(async () => {
       const params = new URLSearchParams({
         query: query,
         format: "application/sparql-results+json",
       });
 
-      const response = await this.fetch(
-        `${this.sparqlEndpoint}?${params.toString()}`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/sparql-results+json",
-            "User-Agent": this.userAgent,
-          },
-        },
-      );
+      const response = await this.fetch(`${this.sparqlEndpoint}?${params.toString()}`, {
+        method: "GET",
+        headers: { Accept: "application/sparql-results+json", "User-Agent": this.userAgent },
+      });
 
       if (!response.ok) {
-        throw new Error(
-          `BNB SPARQL query failed: ${response.status} ${response.statusText}`,
-        );
+        throw new Error(`BNB SPARQL query failed: ${response.status} ${response.statusText}`);
       }
 
       return (await response.json()) as SparqlResponse;
@@ -272,11 +245,7 @@ export class BNBMetadataProvider extends RetryableMetadataProvider {
   /**
    * Build SPARQL query for book search
    */
-  private buildBookQuery(
-    filter: string,
-    _searchType: string,
-    limit: number = 10,
-  ): string {
+  private buildBookQuery(filter: string, _searchType: string, limit: number = 10): string {
     // Use exact matching for performance (similar to WikiData optimization)
     return `
       PREFIX bibo: <http://purl.org/ontology/bibo/>
@@ -316,10 +285,7 @@ export class BNBMetadataProvider extends RetryableMetadataProvider {
   /**
    * Process SPARQL results into MetadataRecords
    */
-  private processSparqlResults(
-    response: SparqlResponse,
-    searchType: string,
-  ): MetadataRecord[] {
+  private processSparqlResults(response: SparqlResponse, searchType: string): MetadataRecord[] {
     const bindings = response.results.bindings;
     if (!bindings || bindings.length === 0) {
       return [];
@@ -382,11 +348,7 @@ export class BNBMetadataProvider extends RetryableMetadataProvider {
             publicationDate: this.parseDate(book.date),
             language: this.normalizeLanguage(book.language),
             pageCount: book.pages,
-            providerData: {
-              bookUri,
-              blId: book.blId,
-              ddcClassification: book.ddc,
-            },
+            providerData: { bookUri, blId: book.blId, ddcClassification: book.ddc },
           },
           this.calculateConfidence(searchType, book.title, authors, isbns),
         ),

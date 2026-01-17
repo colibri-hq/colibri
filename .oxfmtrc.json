@@ -4,16 +4,21 @@
   "tabWidth": 2,
   "useTabs": false,
   "semi": true,
-  "singleQuote": true,
+  "singleQuote": false,
   "trailingComma": "all",
   "endOfLine": "lf",
   "bracketSpacing": true,
   "arrowParens": "always",
   "embeddedLanguageFormatting": "auto",
-  "experimentalSortImports": { "order": "asc", "ignoreCase": true, "sortSideEffects": true },
+  "experimentalSortImports": {
+    "order": "asc",
+    "ignoreCase": true,
+    "newlinesBetween": false,
+    "sortSideEffects": true
+  },
   "experimentalSortPackageJson": true,
   "experimentalTailwindcss": {
-    "stylesheet": "./packages/shared/theme.css",
+    "stylesheet": "../../packages/shared/root.css",
     "preserveWhitespace": false,
     "preserveDuplicates": false,
     "functions": ["twMerge"]

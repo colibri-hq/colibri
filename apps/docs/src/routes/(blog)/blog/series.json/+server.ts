@@ -1,5 +1,5 @@
-import { json } from "@sveltejs/kit";
 import { getAllSeries, type SeriesInfo } from "$lib/content/blog.js";
+import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types.js";
 
 export const prerender = true;
@@ -15,10 +15,7 @@ export const GET = async function GET({ url }) {
     type: "series-listing",
     series: seriesList,
     total: seriesList.length,
-    links: {
-      html: `${baseUrl}/blog/series`,
-      json: `${baseUrl}/blog/series.json`,
-    },
+    links: { html: `${baseUrl}/blog/series`, json: `${baseUrl}/blog/series.json` },
   };
 
   return json(response, {
@@ -29,13 +26,7 @@ export const GET = async function GET({ url }) {
   });
 } satisfies RequestHandler;
 
-function summarizeSeries({
-  count,
-  description,
-  name,
-  posts,
-  slug,
-}: SeriesInfo): SeriesSummary {
+function summarizeSeries({ count, description, name, posts, slug }: SeriesInfo): SeriesSummary {
   return {
     name,
     slug,
@@ -55,20 +46,12 @@ type SeriesSummary = {
   slug: string;
   description?: string;
   postCount: number;
-  posts: Array<{
-    slug: string;
-    urlSlug: string;
-    title: string;
-    order?: number;
-  }>;
+  posts: Array<{ slug: string; urlSlug: string; title: string; order?: number }>;
 };
 
 type SeriesListingResponse = {
   type: "series-listing";
   series: SeriesSummary[];
   total: number;
-  links: {
-    html: string;
-    json: string;
-  };
+  links: { html: string; json: string };
 };

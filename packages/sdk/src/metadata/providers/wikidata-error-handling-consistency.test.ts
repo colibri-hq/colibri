@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { WikiDataMetadataProvider } from "./wikidata.js";
 import { OpenLibraryMetadataProvider } from "./open-library.js";
 import { RetryableMetadataProvider } from "./retryable-provider.js";
+import { WikiDataMetadataProvider } from "./wikidata.js";
 
 // Mock the OpenLibrary client
 vi.mock("@colibri-hq/open-library-client", () => ({
@@ -13,18 +13,14 @@ vi.mock("@colibri-hq/open-library-client", () => ({
 // Mock the rate limiter to avoid delays in tests
 vi.mock("./rate-limiter.js", () => ({
   globalRateLimiterRegistry: {
-    getLimiter: () => ({
-      waitForSlot: vi.fn().mockResolvedValue(undefined),
-    }),
+    getLimiter: () => ({ waitForSlot: vi.fn().mockResolvedValue(undefined) }),
   },
 }));
 
 // Mock the timeout manager to avoid timeouts in tests
 vi.mock("./timeout-manager.js", () => ({
   globalTimeoutManagerRegistry: {
-    getManager: () => ({
-      withRequestTimeout: <T>(promise: Promise<T>) => promise,
-    }),
+    getManager: () => ({ withRequestTimeout: <T>(promise: Promise<T>) => promise }),
   },
 }));
 
@@ -39,9 +35,7 @@ describe("WikiData Error Handling Pattern Consistency", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Mock delay at base class prototype level
-    RetryableMetadataProvider.prototype["delay"] = vi
-      .fn()
-      .mockResolvedValue(undefined);
+    RetryableMetadataProvider.prototype["delay"] = vi.fn().mockResolvedValue(undefined);
 
     mockFetch = vi.fn();
     wikidataProvider = new WikiDataMetadataProvider(mockFetch);
@@ -83,9 +77,7 @@ describe("WikiData Error Handling Pattern Consistency", () => {
       );
 
       expect(typeof openLibraryProvider.timeout.requestTimeout).toBe("number");
-      expect(typeof openLibraryProvider.timeout.operationTimeout).toBe(
-        "number",
-      );
+      expect(typeof openLibraryProvider.timeout.operationTimeout).toBe("number");
       expect(openLibraryProvider.timeout.requestTimeout).toBeGreaterThan(0);
       expect(openLibraryProvider.timeout.operationTimeout).toBeGreaterThan(
         openLibraryProvider.timeout.requestTimeout,
@@ -97,13 +89,9 @@ describe("WikiData Error Handling Pattern Consistency", () => {
       mockFetch.mockRejectedValue(new Error("network error"));
 
       // Delay is mocked to resolve immediately
-      const wikidataResult = await wikidataProvider.searchByTitle({
-        title: "Test Book",
-      });
+      const wikidataResult = await wikidataProvider.searchByTitle({ title: "Test Book" });
 
-      const openLibraryResult = await openLibraryProvider.searchByTitle({
-        title: "Test Book",
-      });
+      const openLibraryResult = await openLibraryProvider.searchByTitle({ title: "Test Book" });
 
       // Both should return empty arrays on network failure after retries
       expect(wikidataResult).toEqual([]);
@@ -123,14 +111,10 @@ describe("WikiData Error Handling Pattern Consistency", () => {
     ])("should handle retryable error '%s' consistently", async (errorMsg) => {
       mockFetch.mockRejectedValue(new Error(errorMsg));
 
-      const wikidataResult = await wikidataProvider.searchByTitle({
-        title: "Test",
-      });
+      const wikidataResult = await wikidataProvider.searchByTitle({ title: "Test" });
       expect(wikidataResult).toEqual([]);
 
-      const openLibraryResult = await openLibraryProvider.searchByTitle({
-        title: "Test",
-      });
+      const openLibraryResult = await openLibraryProvider.searchByTitle({ title: "Test" });
       expect(openLibraryResult).toEqual([]);
     });
 
@@ -140,22 +124,15 @@ describe("WikiData Error Handling Pattern Consistency", () => {
       "403 Forbidden",
       "404 Not Found",
       "422 Unprocessable Entity",
-    ])(
-      "should handle non-retryable error '%s' consistently",
-      async (errorMsg) => {
-        mockFetch.mockRejectedValueOnce(new Error(errorMsg));
-        const wikidataResult = await wikidataProvider.searchByTitle({
-          title: "Test",
-        });
-        expect(wikidataResult).toEqual([]);
+    ])("should handle non-retryable error '%s' consistently", async (errorMsg) => {
+      mockFetch.mockRejectedValueOnce(new Error(errorMsg));
+      const wikidataResult = await wikidataProvider.searchByTitle({ title: "Test" });
+      expect(wikidataResult).toEqual([]);
 
-        mockFetch.mockRejectedValueOnce(new Error(errorMsg));
-        const openLibraryResult = await openLibraryProvider.searchByTitle({
-          title: "Test",
-        });
-        expect(openLibraryResult).toEqual([]);
-      },
-    );
+      mockFetch.mockRejectedValueOnce(new Error(errorMsg));
+      const openLibraryResult = await openLibraryProvider.searchByTitle({ title: "Test" });
+      expect(openLibraryResult).toEqual([]);
+    });
 
     it("should log errors consistently", async () => {
       const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
@@ -168,12 +145,10 @@ describe("WikiData Error Handling Pattern Consistency", () => {
 
       // Both should log final failure messages
       const wikidataLogs = consoleSpy.mock.calls.filter(
-        (call) =>
-          call[0]?.includes("WikiData") && call[0]?.includes("failed after"),
+        (call) => call[0]?.includes("WikiData") && call[0]?.includes("failed after"),
       );
       const openLibraryLogs = consoleSpy.mock.calls.filter(
-        (call) =>
-          call[0]?.includes("OpenLibrary") && call[0]?.includes("failed after"),
+        (call) => call[0]?.includes("OpenLibrary") && call[0]?.includes("failed after"),
       );
 
       expect(wikidataLogs.length).toBeGreaterThan(0);

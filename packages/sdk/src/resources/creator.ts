@@ -1,25 +1,17 @@
-import type { Database, Schema } from "../database.js";
-import { lower, paginate } from "../utilities.js";
-import type { ContributionRole, Creator as $Creator } from "../schema.js";
 import type { Selectable } from "kysely";
 import { sql } from "kysely";
+import type { Database, Schema } from "../database.js";
+import type { ContributionRole, Creator as $Creator } from "../schema.js";
+import { lower, paginate } from "../utilities.js";
 
 const table = "creator" as const;
 
-export function loadCreators(
-  database: Database,
-  page?: number,
-  perPage?: number,
-) {
+export function loadCreators(database: Database, page?: number, perPage?: number) {
   return paginate(database, table, page, perPage).selectAll().execute();
 }
 
 export function loadCreator(database: Database, id: string) {
-  return database
-    .selectFrom(table)
-    .where("id", "=", id)
-    .selectAll()
-    .executeTakeFirstOrThrow();
+  return database.selectFrom(table).where("id", "=", id).selectAll().executeTakeFirstOrThrow();
 }
 
 export function loadContributionsForCreator(database: Database, id: string) {
@@ -104,16 +96,7 @@ export function updateCreator(
 ) {
   return database
     .updateTable(table)
-    .set({
-      amazon_id,
-      description,
-      goodreads_id,
-      image_id,
-      name,
-      sorting_key,
-      url,
-      wikipedia_url,
-    })
+    .set({ amazon_id, description, goodreads_id, image_id, name, sorting_key, url, wikipedia_url })
     .where("id", "=", id)
     .returningAll()
     .executeTakeFirstOrThrow();
@@ -150,23 +133,14 @@ export async function findSimilarCreators(
   const rows = await database
     .selectFrom(table)
     .selectAll()
-    .select(
-      sql<number>`COALESCE(similarity(lower(name), ${normalizedName}), 0)`.as(
-        "similarity",
-      ),
-    )
-    .where(
-      sql<boolean>`similarity(lower(name), ${normalizedName}) >= ${threshold}`,
-    )
+    .select(sql<number>`COALESCE(similarity(lower(name), ${normalizedName}), 0)`.as("similarity"))
+    .where(sql<boolean>`similarity(lower(name), ${normalizedName}) >= ${threshold}`)
     .orderBy(sql`similarity(lower(name), ${normalizedName})`, "desc")
     .execute();
 
   return rows.map((row) => {
     const { similarity, ...creator } = row;
-    return {
-      creator: creator as Creator,
-      similarity,
-    };
+    return { creator: creator as Creator, similarity };
   });
 }
 
@@ -179,12 +153,7 @@ export function createContribution(
 ) {
   return database
     .insertInto("contribution")
-    .values({
-      creator_id: creatorId,
-      edition_id: editionId,
-      role,
-      essential,
-    })
+    .values({ creator_id: creatorId, edition_id: editionId, role, essential })
     .returningAll()
     .executeTakeFirstOrThrow();
 }

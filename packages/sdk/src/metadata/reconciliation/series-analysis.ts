@@ -5,13 +5,8 @@
  * between a book and existing library entries.
  */
 
-import type {
-  LibraryEntry,
-  RelatedWork,
-  Series,
-  SeriesRelationship,
-} from "./types.js";
 import type { MetadataPreview } from "./preview.js";
+import type { LibraryEntry, RelatedWork, Series, SeriesRelationship } from "./types.js";
 import { calculateStringSimilarity } from "./similarity.js";
 
 /**
@@ -77,11 +72,7 @@ export class SeriesAnalyzer {
     }
 
     for (const series of preview.series.value) {
-      const relationship = this.analyzeSeriesRelationship(
-        series,
-        preview,
-        existingLibrary,
-      );
+      const relationship = this.analyzeSeriesRelationship(series, preview, existingLibrary);
       if (relationship) {
         relationships.push(relationship);
       }
@@ -107,8 +98,7 @@ export class SeriesAnalyzer {
     const seriesBooks = existingLibrary.filter((entry) =>
       entry.series?.some(
         (s) =>
-          calculateStringSimilarity(s.name, series.name) >=
-          this.config.minSeriesNameSimilarity,
+          calculateStringSimilarity(s.name, series.name) >= this.config.minSeriesNameSimilarity,
       ),
     );
 
@@ -120,29 +110,17 @@ export class SeriesAnalyzer {
     if (series.volume && typeof series.volume === "number") {
       // Look for previous and next volumes
       const prevVolume = seriesBooks.find((book) =>
-        book.series?.some(
-          ({ volume }) => series.volume && volume === Number(series.volume) - 1,
-        ),
+        book.series?.some(({ volume }) => series.volume && volume === Number(series.volume) - 1),
       );
       if (prevVolume) {
-        previousWork = {
-          title: prevVolume.title,
-          relationshipType: "prequel",
-          confidence: 0.9,
-        };
+        previousWork = { title: prevVolume.title, relationshipType: "prequel", confidence: 0.9 };
       }
 
       const nextVolume = seriesBooks.find((book) =>
-        book.series?.some(
-          ({ volume }) => series.volume && volume === Number(series.volume) + 1,
-        ),
+        book.series?.some(({ volume }) => series.volume && volume === Number(series.volume) + 1),
       );
       if (nextVolume) {
-        nextWork = {
-          title: nextVolume.title,
-          relationshipType: "sequel",
-          confidence: 0.9,
-        };
+        nextWork = { title: nextVolume.title, relationshipType: "sequel", confidence: 0.9 };
       }
     }
 
@@ -164,10 +142,7 @@ export class SeriesAnalyzer {
       : false;
 
     // Find missing works
-    const missingWorks: RelatedWork[] = this.findMissingWorks(
-      series,
-      seriesBooks,
-    );
+    const missingWorks: RelatedWork[] = this.findMissingWorks(series, seriesBooks);
 
     return {
       series,
@@ -184,10 +159,7 @@ export class SeriesAnalyzer {
   /**
    * Find missing works in a series
    */
-  private findMissingWorks(
-    series: Series,
-    seriesBooks: LibraryEntry[],
-  ): RelatedWork[] {
+  private findMissingWorks(series: Series, seriesBooks: LibraryEntry[]): RelatedWork[] {
     const missingWorks: RelatedWork[] = [];
 
     if (series.totalVolumes && typeof series.volume === "number") {

@@ -1,16 +1,8 @@
-import { ConfigurableMetadataProvider } from "./configurable-provider.js";
-import { globalMetadataCache, MetadataRecordCache } from "../cache.js";
-import {
-  globalPerformanceMonitor,
-  type PerformanceMonitor,
-} from "../performance.js";
 import type { MetadataConfigManager } from "../config.js";
-import type {
-  CreatorQuery,
-  MetadataRecord,
-  MultiCriteriaQuery,
-  TitleQuery,
-} from "./provider.js";
+import type { CreatorQuery, MetadataRecord, MultiCriteriaQuery, TitleQuery } from "./provider.js";
+import { globalMetadataCache, MetadataRecordCache } from "../cache.js";
+import { globalPerformanceMonitor, type PerformanceMonitor } from "../performance.js";
+import { ConfigurableMetadataProvider } from "./configurable-provider.js";
 
 /**
  * Base class for metadata providers with caching and performance monitoring
@@ -98,9 +90,7 @@ export abstract class CacheableMetadataProvider extends ConfigurableMetadataProv
   /**
    * Search by multiple criteria with caching
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     // Check cache first
     const cached = this.cache.getCachedQuery(this.name, query);
     if (cached) {
@@ -128,10 +118,7 @@ export abstract class CacheableMetadataProvider extends ConfigurableMetadataProv
    * Get performance statistics for this provider
    */
   getPerformanceStats() {
-    return this.performanceMonitor.getOperationStats(
-      "searchMultiCriteria",
-      this.name,
-    );
+    return this.performanceMonitor.getOperationStats("searchMultiCriteria", this.name);
   }
 
   /**
@@ -173,17 +160,11 @@ export abstract class CacheableMetadataProvider extends ConfigurableMetadataProv
   /**
    * Abstract methods that subclasses must implement for actual search logic
    */
-  protected abstract executeSearchByTitle(
-    query: TitleQuery,
-  ): Promise<MetadataRecord[]>;
+  protected abstract executeSearchByTitle(query: TitleQuery): Promise<MetadataRecord[]>;
 
-  protected abstract executeSearchByISBN(
-    isbn: string,
-  ): Promise<MetadataRecord[]>;
+  protected abstract executeSearchByISBN(isbn: string): Promise<MetadataRecord[]>;
 
-  protected abstract executeSearchByCreator(
-    query: CreatorQuery,
-  ): Promise<MetadataRecord[]>;
+  protected abstract executeSearchByCreator(query: CreatorQuery): Promise<MetadataRecord[]>;
 
   protected abstract executeSearchMultiCriteria(
     query: MultiCriteriaQuery,
@@ -197,9 +178,7 @@ export abstract class CacheableMetadataProvider extends ConfigurableMetadataProv
     const defaultTtl = 300000; // 5 minutes
 
     // Check for operation-specific TTL configuration
-    const operationTtl = config?.options?.[
-      `${operationType}CacheTtl`
-    ] as number;
+    const operationTtl = config?.options?.[`${operationType}CacheTtl`] as number;
     if (operationTtl) {
       return operationTtl;
     }

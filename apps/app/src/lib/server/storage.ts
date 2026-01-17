@@ -6,19 +6,11 @@ import {
   streamFile,
 } from "@colibri-hq/sdk/storage";
 
-export async function read(
-  storage: Storage,
-  filename: string,
-  bucket?: string,
-) {
+export async function read(storage: Storage, filename: string, bucket?: string) {
   return readFile(storage, filename, bucket);
 }
 
-export async function stream(
-  storage: Storage,
-  filename: string,
-  bucket?: string,
-) {
+export async function stream(storage: Storage, filename: string, bucket?: string) {
   return streamFile(storage, filename, bucket);
 }
 
@@ -39,12 +31,5 @@ export async function uploadUrl(
   metadata?: Record<string, string>,
   bucket?: string,
 ) {
-  return generatePresignedUploadUrl(
-    storage,
-    filename,
-    expiresIn,
-    checksum,
-    metadata,
-    bucket,
-  );
+  return generatePresignedUploadUrl(storage, filename, expiresIn, checksum, metadata, bucket);
 }

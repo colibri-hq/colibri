@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import type { createMockPersistence } from "../utilities";
 import {
   type AuthorizationServerOptions,
   type Entities,
   createAuthorizationServer,
 } from "../../src";
-import type { createMockPersistence } from "../utilities";
 
 describe("Pushed Authorization Requests Unit Tests", () => {
   let options: AuthorizationServerOptions;
@@ -13,11 +13,7 @@ describe("Pushed Authorization Requests Unit Tests", () => {
   beforeEach(() => {
     persistence = createMockPersistence();
 
-    options = {
-      issuer: "http://localhost:3000",
-      jwtSecret: "test-secret",
-      persistence,
-    };
+    options = { issuer: "http://localhost:3000", jwtSecret: "test-secret", persistence };
   });
 
   describe("Pushed Authorization Requests", () => {
@@ -51,10 +47,7 @@ describe("Pushed Authorization Requests Unit Tests", () => {
       };
 
       const result = await server.handlePushedAuthorizationRequest(request);
-      expect(result).toEqual({
-        request_uri: "test-request-uri",
-        expires_in: 600,
-      });
+      expect(result).toEqual({ request_uri: "test-request-uri", expires_in: 600 });
     });
 
     it("should validate stored request", async () => {
@@ -76,8 +69,7 @@ describe("Pushed Authorization Requests Unit Tests", () => {
 
       persistence.loadAuthorizationRequest.mockResolvedValue(mockRequest);
 
-      const result =
-        await server.validateAuthorizationRequest("test-request-uri");
+      const result = await server.validateAuthorizationRequest("test-request-uri");
       expect(result).toBe(true);
     });
 
@@ -100,8 +92,7 @@ describe("Pushed Authorization Requests Unit Tests", () => {
 
       persistence.loadAuthorizationRequest.mockResolvedValue(mockRequest);
 
-      const result =
-        await server.validateAuthorizationRequest("test-request-uri");
+      const result = await server.validateAuthorizationRequest("test-request-uri");
       expect(result).toBe(false);
     });
 
@@ -124,8 +115,7 @@ describe("Pushed Authorization Requests Unit Tests", () => {
 
       persistence.loadAuthorizationRequest.mockResolvedValue(mockRequest);
 
-      const result =
-        await server.validateAuthorizationRequest("test-request-uri");
+      const result = await server.validateAuthorizationRequest("test-request-uri");
       expect(result).toBe(false);
     });
 
@@ -134,8 +124,7 @@ describe("Pushed Authorization Requests Unit Tests", () => {
 
       persistence.loadAuthorizationRequest.mockResolvedValue(undefined);
 
-      const result =
-        await server.validateAuthorizationRequest("non-existent-uri");
+      const result = await server.validateAuthorizationRequest("non-existent-uri");
       expect(result).toBe(false);
     });
   });

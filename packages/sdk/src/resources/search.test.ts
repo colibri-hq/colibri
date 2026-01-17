@@ -30,9 +30,7 @@ describe("toTsQuery", () => {
     });
 
     it("handles tabs and newlines", () => {
-      expect(toTsQuery("epic\tfantasy\nnovel")).toBe(
-        "epic:* & fantasy:* & novel:*",
-      );
+      expect(toTsQuery("epic\tfantasy\nnovel")).toBe("epic:* & fantasy:* & novel:*");
     });
   });
 

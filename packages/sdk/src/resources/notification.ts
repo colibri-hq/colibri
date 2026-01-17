@@ -3,14 +3,9 @@ import type { Database, Schema } from "../database.js";
 
 // Type definitions
 export type Notification = Selectable<Schema["notification"]>;
-export type NotificationPreference = Selectable<
-  Schema["notification_preference"]
->;
+export type NotificationPreference = Selectable<Schema["notification_preference"]>;
 
-export type NotificationType =
-  | "comment_reply"
-  | "comment_reaction"
-  | "comment_mention";
+export type NotificationType = "comment_reply" | "comment_reaction" | "comment_mention";
 
 export interface CreateNotificationInput {
   userId: string;
@@ -52,11 +47,7 @@ export async function createNotification(
 export async function getNotifications(
   database: Database,
   userId: string,
-  options: {
-    unreadOnly?: boolean;
-    limit?: number;
-    offset?: number;
-  } = {},
+  options: { unreadOnly?: boolean; limit?: number; offset?: number } = {},
 ): Promise<Notification[]> {
   let query = database
     .selectFrom("notification")
@@ -81,10 +72,7 @@ export async function getNotifications(
 /**
  * Get count of unread notifications for a user
  */
-export async function getUnreadCount(
-  database: Database,
-  userId: string,
-): Promise<number> {
+export async function getUnreadCount(database: Database, userId: string): Promise<number> {
   const result = await database
     .selectFrom("notification")
     .where("user_id", "=", userId)
@@ -98,10 +86,7 @@ export async function getUnreadCount(
 /**
  * Mark a notification as read
  */
-export async function markAsRead(
-  database: Database,
-  notificationId: string,
-): Promise<void> {
+export async function markAsRead(database: Database, notificationId: string): Promise<void> {
   await database
     .updateTable("notification")
     .where("id", "=", notificationId)
@@ -112,10 +97,7 @@ export async function markAsRead(
 /**
  * Mark all notifications as read for a user
  */
-export async function markAllAsRead(
-  database: Database,
-  userId: string,
-): Promise<void> {
+export async function markAllAsRead(database: Database, userId: string): Promise<void> {
   await database
     .updateTable("notification")
     .where("user_id", "=", userId)
@@ -131,23 +113,14 @@ export async function deleteNotification(
   database: Database,
   notificationId: string,
 ): Promise<void> {
-  await database
-    .deleteFrom("notification")
-    .where("id", "=", notificationId)
-    .execute();
+  await database.deleteFrom("notification").where("id", "=", notificationId).execute();
 }
 
 /**
  * Delete all notifications for a user
  */
-export async function deleteAllNotifications(
-  database: Database,
-  userId: string,
-): Promise<void> {
-  await database
-    .deleteFrom("notification")
-    .where("user_id", "=", userId)
-    .execute();
+export async function deleteAllNotifications(database: Database, userId: string): Promise<void> {
+  await database.deleteFrom("notification").where("user_id", "=", userId).execute();
 }
 
 // Notification preferences
@@ -212,10 +185,7 @@ export async function updateNotificationPreferences(
   return database
     .updateTable("notification_preference")
     .where("user_id", "=", userId)
-    .set({
-      ...preferences,
-      updated_at: new Date(),
-    })
+    .set({ ...preferences, updated_at: new Date() })
     .returningAll()
     .executeTakeFirstOrThrow();
 }

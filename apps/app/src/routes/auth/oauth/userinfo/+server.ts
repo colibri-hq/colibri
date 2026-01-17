@@ -6,19 +6,11 @@ import { error, json } from "@sveltejs/kit";
 import jwt from "jsonwebtoken";
 import type { RequestHandler } from "./$types";
 
-export const GET = async function handler({
-  request,
-  url,
-  locals: { database },
-}) {
+export const GET = async function handler({ request, url, locals: { database } }) {
   return handleUserInfo(request, url, database);
 } satisfies RequestHandler;
 
-export const POST = async function handler({
-  request,
-  url,
-  locals: { database },
-}) {
+export const POST = async function handler({ request, url, locals: { database } }) {
   return handleUserInfo(request, url, database);
 } satisfies RequestHandler;
 
@@ -81,11 +73,7 @@ async function handleUserInfo(request: Request, url: URL, database: Database) {
           [new URL("role", url).toString()]: role,
         },
         env.JWT_SECRET,
-        {
-          subject: sub,
-          issuer: url.origin,
-          audience: authorizedClientId,
-        },
+        { subject: sub, issuer: url.origin, audience: authorizedClientId },
       );
 
       return new Response(jsonWebToken);

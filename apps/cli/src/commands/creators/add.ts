@@ -5,11 +5,7 @@ import { BaseCommand } from "../../command.js";
 
 export class Add extends BaseCommand<typeof Add> {
   static override args = {
-    name: Args.string({
-      description: "Name of the creator",
-      name: "name",
-      required: true,
-    }),
+    name: Args.string({ description: "Name of the creator", name: "name", required: true }),
   };
   static override description = "Add a new creator to the database";
   static override examples = ["<%= config.bin %> <%= command.id %>"];

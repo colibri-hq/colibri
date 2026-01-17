@@ -12,12 +12,7 @@ import { BaseCommand } from "../../command.ts";
 
 export default class Add extends BaseCommand<typeof Add> {
   static override args = {
-    file: Args.file({
-      description: "The file to add",
-      exists: true,
-      name: "file",
-      required: true,
-    }),
+    file: Args.file({ description: "The file to add", exists: true, name: "file", required: true }),
   };
 
   static override description = "Add a work to Colibri";
@@ -32,8 +27,7 @@ export default class Add extends BaseCommand<typeof Add> {
       description: "Create a work and enrich metadata from external sources",
     },
     {
-      command:
-        "<%= config.bin %> <%= command.id %> --skip-duplicates some-file.epub",
+      command: "<%= config.bin %> <%= command.id %> --skip-duplicates some-file.epub",
       description: "Skip the file if it already exists",
     },
   ];
@@ -75,11 +69,7 @@ export default class Add extends BaseCommand<typeof Add> {
     // Handle confirmation if needed
     if (result.status === "needs-confirmation" && result.pendingId) {
       const action = await this.promptDuplicateAction(result);
-      const confirmed = await confirmIngestion(
-        database,
-        result.pendingId,
-        action,
-      );
+      const confirmed = await confirmIngestion(database, result.pendingId, action);
       this.logResult(confirmed);
     } else {
       this.logResult(result);
@@ -136,24 +126,17 @@ export default class Add extends BaseCommand<typeof Add> {
     }
   }
 
-  private async promptDuplicateAction(
-    result: IngestWorkResult,
-  ): Promise<ConfirmAction> {
+  private async promptDuplicateAction(result: IngestWorkResult): Promise<ConfirmAction> {
     const duplicateInfo = result.duplicateInfo;
     const existingTitle = duplicateInfo?.existingEdition?.title ?? "Unknown";
 
     this.warn(duplicateInfo?.description ?? "Possible duplicate detected");
 
     if (duplicateInfo?.existingEdition) {
-      this.log(
-        `  Existing: "${existingTitle}" (Edition ID: ${duplicateInfo.existingEdition.id})`,
-      );
+      this.log(`  Existing: "${existingTitle}" (Edition ID: ${duplicateInfo.existingEdition.id})`);
     }
 
-    if (
-      duplicateInfo?.confidence !== undefined &&
-      duplicateInfo.confidence < 1
-    ) {
+    if (duplicateInfo?.confidence !== undefined && duplicateInfo.confidence < 1) {
       this.log(`  Confidence: ${Math.round(duplicateInfo.confidence * 100)}%`);
     }
 
@@ -173,11 +156,7 @@ export default class Add extends BaseCommand<typeof Add> {
               },
             ]
           : []),
-        {
-          description: "Skip importing this file",
-          name: "Skip",
-          value: "skip" as const,
-        },
+        { description: "Skip importing this file", name: "Skip", value: "skip" as const },
       ],
       message: "What would you like to do?",
     });

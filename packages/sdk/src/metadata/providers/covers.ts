@@ -130,9 +130,7 @@ function calculateEntropy(bytes: Uint8Array): number {
 /**
  * Get image dimensions from blob
  */
-async function getImageDimensions(
-  blob: Blob,
-): Promise<{ width: number; height: number } | null> {
+async function getImageDimensions(blob: Blob): Promise<{ width: number; height: number } | null> {
   try {
     // Use createImageBitmap for efficient dimension extraction
     const bitmap = await createImageBitmap(blob);
@@ -200,11 +198,7 @@ export async function assessCoverQuality(
     score -= 0.2;
   }
 
-  return {
-    acceptable: score >= 0.5 && issues.length < 3,
-    issues,
-    score: Math.max(0, score),
-  };
+  return { acceptable: score >= 0.5 && issues.length < 3, issues, score: Math.max(0, score) };
 }
 
 /**
@@ -241,18 +235,9 @@ class GoogleBooksSource implements CoverSource {
       const data = await response.blob();
       const dimensions = await getImageDimensions(data);
 
-      return {
-        url,
-        source: this.name,
-        data,
-        ...dimensions,
-      };
+      return { url, source: this.name, data, ...dimensions };
     } catch (error) {
-      throw new CoverFetchError(
-        `Failed to fetch from Google Books: ${error}`,
-        this.name,
-        error,
-      );
+      throw new CoverFetchError(`Failed to fetch from Google Books: ${error}`, this.name, error);
     }
   }
 }
@@ -292,18 +277,9 @@ class OpenLibrarySource implements CoverSource {
 
       const dimensions = await getImageDimensions(data);
 
-      return {
-        url,
-        source: this.name,
-        data,
-        ...dimensions,
-      };
+      return { url, source: this.name, data, ...dimensions };
     } catch (error) {
-      throw new CoverFetchError(
-        `Failed to fetch from OpenLibrary: ${error}`,
-        this.name,
-        error,
-      );
+      throw new CoverFetchError(`Failed to fetch from OpenLibrary: ${error}`, this.name, error);
     }
   }
 }
@@ -366,18 +342,9 @@ class LibraryThingSource implements CoverSource {
       const data = await response.blob();
       const dimensions = await getImageDimensions(data);
 
-      return {
-        url,
-        source: this.name,
-        data,
-        ...dimensions,
-      };
+      return { url, source: this.name, data, ...dimensions };
     } catch (error) {
-      throw new CoverFetchError(
-        `Failed to fetch from LibraryThing: ${error}`,
-        this.name,
-        error,
-      );
+      throw new CoverFetchError(`Failed to fetch from LibraryThing: ${error}`, this.name, error);
     }
   }
 }
@@ -438,10 +405,7 @@ export async function fetchCover(
   options?: CoverFetchOptions,
 ): Promise<CoverResult | null> {
   const sources = createSources(options);
-  const results: Array<{
-    cover: CoverResult;
-    assessment: QualityAssessment;
-  }> = [];
+  const results: Array<{ cover: CoverResult; assessment: QualityAssessment }> = [];
 
   // Try embedded cover first (always highest priority)
   if (embeddedCover) {

@@ -4,14 +4,8 @@ import { BaseCommand } from "../../command.ts";
 
 export class Set extends BaseCommand<typeof Set> {
   static args = {
-    key: Args.string({
-      description: "The settings key to set.",
-      required: true,
-    }),
-    value: Args.string({
-      description: "The value of the setting to set.",
-      required: true,
-    }),
+    key: Args.string({ description: "The settings key to set.", required: true }),
+    value: Args.string({ description: "The value of the setting to set.", required: true }),
   };
   static description = "Set the global instance settings.";
   static examples = ["<%= config.bin %> <%= command.id %> ui.colorMode dark"];
@@ -27,12 +21,7 @@ export class Set extends BaseCommand<typeof Set> {
     }
 
     try {
-      await updateSettings(this.instance.database, {
-        data: {
-          ...data,
-          [key]: value,
-        },
-      });
+      await updateSettings(this.instance.database, { data: { ...data, [key]: value } });
     } catch (error) {
       this.error(`Failed to update settings: ${error}`);
     }

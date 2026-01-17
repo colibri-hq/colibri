@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { PublisherReconciler } from "./publishers.js";
 import type { MetadataSource, PublicationInfoInput } from "./types.js";
+import { PublisherReconciler } from "./publishers.js";
 
 describe("PublisherReconciler", () => {
   const reconciler = new PublisherReconciler();
@@ -19,20 +19,13 @@ describe("PublisherReconciler", () => {
 
   describe("normalizePublisher", () => {
     it("should normalize basic publisher names", () => {
-      const result = reconciler.normalizePublisher(
-        "Penguin Random House Publishers Inc.",
-      );
+      const result = reconciler.normalizePublisher("Penguin Random House Publishers Inc.");
       expect(result.normalized).toBe("penguin random house");
       expect(result.name).toBe("Penguin Random House Publishers Inc.");
     });
 
     it("should handle known publisher variations", () => {
-      const variations = [
-        "Penguin",
-        "Random House",
-        "Bantam Books",
-        "Dell Publishing",
-      ];
+      const variations = ["Penguin", "Random House", "Bantam Books", "Dell Publishing"];
 
       for (const variation of variations) {
         const result = reconciler.normalizePublisher(variation);
@@ -41,12 +34,7 @@ describe("PublisherReconciler", () => {
     });
 
     it("should normalize HarperCollins variations", () => {
-      const variations = [
-        "Harper",
-        "Collins",
-        "Harper & Row",
-        "HarperCollins Publishers",
-      ];
+      const variations = ["Harper", "Collins", "Harper & Row", "HarperCollins Publishers"];
 
       for (const variation of variations) {
         const result = reconciler.normalizePublisher(variation);
@@ -60,9 +48,7 @@ describe("PublisherReconciler", () => {
     });
 
     it("should remove common suffixes", () => {
-      const result = reconciler.normalizePublisher(
-        "Example Publishing Company Inc.",
-      );
+      const result = reconciler.normalizePublisher("Example Publishing Company Inc.");
       expect(result.normalized).toBe("example");
     });
 
@@ -72,10 +58,7 @@ describe("PublisherReconciler", () => {
     });
 
     it("should handle Publisher objects", () => {
-      const input = {
-        name: "Penguin Random House",
-        location: "New York",
-      };
+      const input = { name: "Penguin Random House", location: "New York" };
 
       const result = reconciler.normalizePublisher(input);
       expect(result.name).toBe("Penguin Random House");
@@ -87,10 +70,7 @@ describe("PublisherReconciler", () => {
   describe("reconcilePublishers", () => {
     it("should handle single publisher input", () => {
       const inputs: PublicationInfoInput[] = [
-        {
-          publisher: "Penguin Random House",
-          source: mockSource1,
-        },
+        { publisher: "Penguin Random House", source: mockSource1 },
       ];
 
       const result = reconciler.reconcilePublishers(inputs);
@@ -103,14 +83,8 @@ describe("PublisherReconciler", () => {
 
     it("should deduplicate similar publisher names", () => {
       const inputs: PublicationInfoInput[] = [
-        {
-          publisher: "Penguin",
-          source: mockSource1,
-        },
-        {
-          publisher: "Random House",
-          source: mockSource2,
-        },
+        { publisher: "Penguin", source: mockSource1 },
+        { publisher: "Random House", source: mockSource2 },
       ];
 
       const result = reconciler.reconcilePublishers(inputs);
@@ -137,9 +111,7 @@ describe("PublisherReconciler", () => {
     });
 
     it("should throw error for no publishers", () => {
-      expect(() => reconciler.reconcilePublishers([])).toThrow(
-        "No publishers to reconcile",
-      );
+      expect(() => reconciler.reconcilePublishers([])).toThrow("No publishers to reconcile");
     });
 
     it("should throw error for no valid publishers", () => {
@@ -150,17 +122,12 @@ describe("PublisherReconciler", () => {
         },
       ];
 
-      expect(() => reconciler.reconcilePublishers(inputs)).toThrow(
-        "No valid publishers found",
-      );
+      expect(() => reconciler.reconcilePublishers(inputs)).toThrow("No valid publishers found");
     });
 
     it("should boost confidence for well-known publishers", () => {
       const inputs: PublicationInfoInput[] = [
-        {
-          publisher: "Oxford University Press",
-          source: mockSource1,
-        },
+        { publisher: "Oxford University Press", source: mockSource1 },
       ];
 
       const result = reconciler.reconcilePublishers(inputs);

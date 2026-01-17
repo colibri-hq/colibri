@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import type { MultiCriteriaQuery } from "../providers/provider.js";
 import type { RelaxationRule } from "./query-strategy.js";
 import { QueryStrategyBuilder } from "./query-strategy.js";
-import type { MultiCriteriaQuery } from "../providers/provider.js";
 
 describe("QueryStrategyBuilder", () => {
   let builder: QueryStrategyBuilder;
@@ -70,10 +70,7 @@ describe("QueryStrategyBuilder", () => {
     });
 
     it("should remove language constraint", () => {
-      const query: MultiCriteriaQuery = {
-        title: "The Great Gatsby",
-        language: "en",
-      };
+      const query: MultiCriteriaQuery = { title: "The Great Gatsby", language: "en" };
 
       const strategy = builder.buildStrategy(query);
 
@@ -94,8 +91,7 @@ describe("QueryStrategyBuilder", () => {
 
       // Should find a fallback with only the first author
       const broadenedQuery = strategy.fallbacks.find(
-        (q) =>
-          q.authors && q.authors.length === 1 && q.authors[0] === "Author One",
+        (q) => q.authors && q.authors.length === 1 && q.authors[0] === "Author One",
       );
       expect(broadenedQuery).toBeDefined();
     });
@@ -115,10 +111,7 @@ describe("QueryStrategyBuilder", () => {
     });
 
     it("should remove publisher constraint", () => {
-      const query: MultiCriteriaQuery = {
-        title: "Published Book",
-        publisher: "Some Publisher",
-      };
+      const query: MultiCriteriaQuery = { title: "Published Book", publisher: "Some Publisher" };
 
       const strategy = builder.buildStrategy(query);
 
@@ -129,10 +122,7 @@ describe("QueryStrategyBuilder", () => {
     });
 
     it("should broaden year range", () => {
-      const query: MultiCriteriaQuery = {
-        title: "Historical Book",
-        yearRange: [1990, 2000],
-      };
+      const query: MultiCriteriaQuery = { title: "Historical Book", yearRange: [1990, 2000] };
 
       const strategy = builder.buildStrategy(query);
 
@@ -146,9 +136,7 @@ describe("QueryStrategyBuilder", () => {
 
     it("should create title-only fallback as most relaxed", () => {
       // Use a builder with higher maxFallbacks to ensure title-only rule is reached
-      const builderWithMoreFallbacks = new QueryStrategyBuilder({
-        maxFallbacks: 10,
-      });
+      const builderWithMoreFallbacks = new QueryStrategyBuilder({ maxFallbacks: 10 });
 
       const query: MultiCriteriaQuery = {
         title: "Complex Query",
@@ -163,10 +151,7 @@ describe("QueryStrategyBuilder", () => {
 
       // The title-only query should be the last fallback (most relaxed)
       const titleOnlyQuery = strategy.fallbacks.find(
-        (q) =>
-          q.title === "Complex Query" &&
-          q.fuzzy === true &&
-          Object.keys(q).length === 2, // Only title and fuzzy
+        (q) => q.title === "Complex Query" && q.fuzzy === true && Object.keys(q).length === 2, // Only title and fuzzy
       );
       expect(titleOnlyQuery).toBeDefined();
     });
@@ -188,9 +173,7 @@ describe("QueryStrategyBuilder", () => {
     });
 
     it("should not create duplicate fallback queries", () => {
-      const query: MultiCriteriaQuery = {
-        title: "Simple Query",
-      };
+      const query: MultiCriteriaQuery = { title: "Simple Query" };
 
       const strategy = builder.buildStrategy(query);
 
@@ -213,11 +196,7 @@ describe("QueryStrategyBuilder", () => {
     });
 
     it("should assess high-confidence results as good quality", () => {
-      const results = [
-        { confidence: 0.9 },
-        { confidence: 0.8 },
-        { confidence: 0.85 },
-      ];
+      const results = [{ confidence: 0.9 }, { confidence: 0.8 }, { confidence: 0.85 }];
 
       const assessment = builder.assessResultQuality(results);
 
@@ -228,11 +207,7 @@ describe("QueryStrategyBuilder", () => {
     });
 
     it("should assess low-confidence results as poor quality", () => {
-      const results = [
-        { confidence: 0.3 },
-        { confidence: 0.4 },
-        { confidence: 0.2 },
-      ];
+      const results = [{ confidence: 0.3 }, { confidence: 0.4 }, { confidence: 0.2 }];
 
       const assessment = builder.assessResultQuality(results);
 
@@ -308,10 +283,7 @@ describe("QueryStrategyBuilder", () => {
 
   describe("configuration management", () => {
     it("should update configuration", () => {
-      builder.updateConfig({
-        maxFallbacks: 10,
-        enableFuzzyMatching: false,
-      });
+      builder.updateConfig({ maxFallbacks: 10, enableFuzzyMatching: false });
 
       const config = builder.getConfig();
       expect(config.maxFallbacks).toBe(10);
@@ -347,10 +319,7 @@ describe("QueryStrategyBuilder", () => {
       expect(strategy.primary).toEqual(query);
       // Should only have fuzzy matching as applicable rule
       expect(strategy.fallbacks.length).toBe(1);
-      expect(strategy.fallbacks[0]).toEqual({
-        title: "Only Title",
-        fuzzy: true,
-      });
+      expect(strategy.fallbacks[0]).toEqual({ title: "Only Title", fuzzy: true });
     });
 
     it("should handle disabled relaxation features", () => {
@@ -374,10 +343,7 @@ describe("QueryStrategyBuilder", () => {
 
       // Should only have title-only fallback
       expect(strategy.fallbacks.length).toBe(1);
-      expect(strategy.fallbacks[0]).toEqual({
-        title: "Complex Query",
-        fuzzy: true,
-      });
+      expect(strategy.fallbacks[0]).toEqual({ title: "Complex Query", fuzzy: true });
     });
   });
 });

@@ -1,11 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import type { MetadataSource, PublicationDate, Publisher, ReconciledField } from "./types.js";
 import { ConflictDetector } from "./conflicts.js";
-import type {
-  MetadataSource,
-  PublicationDate,
-  Publisher,
-  ReconciledField,
-} from "./types.js";
 
 describe("ConflictDetector", () => {
   let detector: ConflictDetector;
@@ -15,21 +10,9 @@ describe("ConflictDetector", () => {
     detector = new ConflictDetector();
 
     mockSources = [
-      {
-        name: "OpenLibrary",
-        reliability: 0.8,
-        timestamp: new Date("2024-01-01"),
-      },
-      {
-        name: "WikiData",
-        reliability: 0.9,
-        timestamp: new Date("2024-01-02"),
-      },
-      {
-        name: "LibraryOfCongress",
-        reliability: 0.95,
-        timestamp: new Date("2024-01-03"),
-      },
+      { name: "OpenLibrary", reliability: 0.8, timestamp: new Date("2024-01-01") },
+      { name: "WikiData", reliability: 0.9, timestamp: new Date("2024-01-02") },
+      { name: "LibraryOfCongress", reliability: 0.95, timestamp: new Date("2024-01-03") },
     ];
   });
 
@@ -43,11 +26,7 @@ describe("ConflictDetector", () => {
       };
 
       const rawValues = [{ value: "Test Title", source: mockSources[0] }];
-      const conflicts = detector.detectFieldConflicts(
-        field,
-        "title",
-        rawValues,
-      );
+      const conflicts = detector.detectFieldConflicts(field, "title", rawValues);
 
       expect(conflicts).toHaveLength(0);
     });
@@ -66,11 +45,7 @@ describe("ConflictDetector", () => {
         { value: "The Great Gatsby", source: mockSources[2] },
       ];
 
-      const conflicts = detector.detectFieldConflicts(
-        field,
-        "title",
-        rawValues,
-      );
+      const conflicts = detector.detectFieldConflicts(field, "title", rawValues);
 
       expect(conflicts.length).toBeGreaterThan(0);
       expect(conflicts[0].type).toBe("value_mismatch");
@@ -106,25 +81,13 @@ describe("ConflictDetector", () => {
 
       const rawValues = [
         { value: { year: 1925, precision: "year" }, source: mockSources[0] },
-        {
-          value: { year: 1925, month: 4, precision: "month" },
-          source: mockSources[1],
-        },
-        {
-          value: { year: 1925, month: 4, day: 10, precision: "day" },
-          source: mockSources[2],
-        },
+        { value: { year: 1925, month: 4, precision: "month" }, source: mockSources[1] },
+        { value: { year: 1925, month: 4, day: 10, precision: "day" }, source: mockSources[2] },
       ];
 
-      const conflicts = detector.detectFieldConflicts(
-        field,
-        "publicationDate",
-        rawValues,
-      );
+      const conflicts = detector.detectFieldConflicts(field, "publicationDate", rawValues);
 
-      expect(conflicts.some((c) => c.type === "precision_difference")).toBe(
-        true,
-      );
+      expect(conflicts.some((c) => c.type === "precision_difference")).toBe(true);
     });
 
     it("should detect completeness differences in arrays", () => {
@@ -137,25 +100,16 @@ describe("ConflictDetector", () => {
 
       const rawValues = [
         { value: ["Fiction"], source: mockSources[0] },
-        {
-          value: ["Fiction", "American Literature", "Jazz Age"],
-          source: mockSources[1],
-        },
+        { value: ["Fiction", "American Literature", "Jazz Age"], source: mockSources[1] },
         {
           value: ["Fiction", "American Literature", "Jazz Age", "Classic"],
           source: mockSources[2],
         },
       ];
 
-      const conflicts = detector.detectFieldConflicts(
-        field,
-        "subjects",
-        rawValues,
-      );
+      const conflicts = detector.detectFieldConflicts(field, "subjects", rawValues);
 
-      expect(conflicts.some((c) => c.type === "completeness_difference")).toBe(
-        true,
-      );
+      expect(conflicts.some((c) => c.type === "completeness_difference")).toBe(true);
     });
 
     it("should detect quality differences based on source reliability", () => {
@@ -177,11 +131,7 @@ describe("ConflictDetector", () => {
         { value: "Test Value", source: lowReliabilitySource },
       ];
 
-      const conflicts = detector.detectFieldConflicts(
-        field,
-        "title",
-        rawValues,
-      );
+      const conflicts = detector.detectFieldConflicts(field, "title", rawValues);
 
       expect(conflicts.some((c) => c.type === "quality_difference")).toBe(true);
     });
@@ -203,11 +153,7 @@ describe("ConflictDetector", () => {
         { value: "Value3", source: mockSources[2] },
       ];
 
-      const conflicts = limitedDetector.detectFieldConflicts(
-        field,
-        "title",
-        rawValues,
-      );
+      const conflicts = limitedDetector.detectFieldConflicts(field, "title", rawValues);
 
       expect(conflicts.length).toBeLessThanOrEqual(2);
     });
@@ -296,9 +242,9 @@ describe("ConflictDetector", () => {
 
       const summary = detector.analyzeAllConflicts(fields, rawMetadata);
 
-      expect(
-        summary.autoResolvableConflicts.length + summary.manualConflicts.length,
-      ).toBe(summary.totalConflicts);
+      expect(summary.autoResolvableConflicts.length + summary.manualConflicts.length).toBe(
+        summary.totalConflicts,
+      );
     });
 
     it("should generate appropriate recommendations", () => {
@@ -339,11 +285,7 @@ describe("ConflictDetector", () => {
         { value: "Great Gatsby", source: mockSources[1] }, // Very similar
       ];
 
-      const conflicts = detector.detectFieldConflicts(
-        field,
-        "title",
-        rawValues,
-      );
+      const conflicts = detector.detectFieldConflicts(field, "title", rawValues);
 
       // May detect conflicts due to different grouping logic, but should be minor
       if (conflicts.length > 0) {
@@ -364,11 +306,7 @@ describe("ConflictDetector", () => {
         { value: "To Kill a Mockingbird", source: mockSources[1] }, // Very different
       ];
 
-      const conflicts = detector.detectFieldConflicts(
-        field,
-        "title",
-        rawValues,
-      );
+      const conflicts = detector.detectFieldConflicts(field, "title", rawValues);
 
       expect(conflicts.length).toBeGreaterThan(0);
       expect(conflicts[0].type).toBe("value_mismatch");
@@ -377,11 +315,7 @@ describe("ConflictDetector", () => {
 
   describe("object comparison", () => {
     it("should compare publication dates correctly", () => {
-      const date1: PublicationDate = {
-        year: 1925,
-        month: 4,
-        precision: "month",
-      };
+      const date1: PublicationDate = { year: 1925, month: 4, precision: "month" };
       const date2: PublicationDate = { year: 1925, precision: "year" };
 
       const field: ReconciledField<PublicationDate> = {
@@ -396,27 +330,18 @@ describe("ConflictDetector", () => {
         { value: date2, source: mockSources[1] },
       ];
 
-      const conflicts = detector.detectFieldConflicts(
-        field,
-        "publicationDate",
-        rawValues,
-      );
+      const conflicts = detector.detectFieldConflicts(field, "publicationDate", rawValues);
 
       // May detect precision differences, but should not be critical
       if (conflicts.length > 0) {
-        expect(conflicts.some((c) => c.type === "precision_difference")).toBe(
-          true,
-        );
+        expect(conflicts.some((c) => c.type === "precision_difference")).toBe(true);
         expect(conflicts.every((c) => c.severity !== "critical")).toBe(true);
       }
     });
 
     it("should compare publishers correctly", () => {
       const pub1: Publisher = { name: "Scribner", normalized: "scribner" };
-      const pub2: Publisher = {
-        name: "Charles Scribner's Sons",
-        normalized: "scribner",
-      };
+      const pub2: Publisher = { name: "Charles Scribner's Sons", normalized: "scribner" };
 
       const field: ReconciledField<Publisher> = {
         value: pub1,
@@ -430,11 +355,7 @@ describe("ConflictDetector", () => {
         { value: pub2, source: mockSources[1] },
       ];
 
-      const conflicts = detector.detectFieldConflicts(
-        field,
-        "publisher",
-        rawValues,
-      );
+      const conflicts = detector.detectFieldConflicts(field, "publisher", rawValues);
 
       // Should be considered similar (same normalized name)
       expect(conflicts.length).toBe(0);
@@ -443,9 +364,7 @@ describe("ConflictDetector", () => {
 
   describe("configuration", () => {
     it("should respect string similarity threshold", () => {
-      const strictDetector = new ConflictDetector({
-        stringSimilarityThreshold: 0.95,
-      });
+      const strictDetector = new ConflictDetector({ stringSimilarityThreshold: 0.95 });
 
       const field: ReconciledField<string> = {
         value: "The Great Gatsby",
@@ -459,11 +378,7 @@ describe("ConflictDetector", () => {
         { value: "Great Gatsby", source: mockSources[1] },
       ];
 
-      const conflicts = strictDetector.detectFieldConflicts(
-        field,
-        "title",
-        rawValues,
-      );
+      const conflicts = strictDetector.detectFieldConflicts(field, "title", rawValues);
 
       // With strict threshold, should detect conflict
       expect(conflicts.length).toBeGreaterThan(0);
@@ -484,11 +399,7 @@ describe("ConflictDetector", () => {
         { value: 102, source: mockSources[1] }, // 2% difference
       ];
 
-      const conflicts = strictDetector.detectFieldConflicts(
-        field,
-        "pageCount",
-        rawValues,
-      );
+      const conflicts = strictDetector.detectFieldConflicts(field, "pageCount", rawValues);
 
       // With strict threshold, should detect conflict
       expect(conflicts.length).toBeGreaterThan(0);
@@ -504,9 +415,7 @@ describe("ConflictDetector", () => {
     });
 
     it("should control minor conflict detection", () => {
-      const noMinorDetector = new ConflictDetector({
-        detectMinorConflicts: false,
-      });
+      const noMinorDetector = new ConflictDetector({ detectMinorConflicts: false });
 
       const field: ReconciledField<string[]> = {
         value: ["9780743273565"],
@@ -520,11 +429,7 @@ describe("ConflictDetector", () => {
         { value: ["9780743273565"], source: mockSources[1] },
       ];
 
-      const conflicts = noMinorDetector.detectFieldConflicts(
-        field,
-        "isbn",
-        rawValues,
-      );
+      const conflicts = noMinorDetector.detectFieldConflicts(field, "isbn", rawValues);
 
       // Should not detect format differences when minor conflicts are disabled
       expect(conflicts.every((c) => c.type !== "format_difference")).toBe(true);
@@ -545,11 +450,7 @@ describe("ConflictDetector", () => {
         { value: "Different", source: mockSources[1] },
       ];
 
-      const conflicts = detector.detectFieldConflicts(
-        field,
-        "title",
-        rawValues,
-      );
+      const conflicts = detector.detectFieldConflicts(field, "title", rawValues);
 
       if (conflicts.length > 0) {
         const conflict = conflicts[0];
@@ -573,11 +474,7 @@ describe("ConflictDetector", () => {
         { value: "Different", source: mockSources[1] },
       ];
 
-      const conflicts = detector.detectFieldConflicts(
-        field,
-        "title",
-        rawValues,
-      );
+      const conflicts = detector.detectFieldConflicts(field, "title", rawValues);
 
       if (conflicts.length > 0) {
         const conflict = conflicts[0];
@@ -602,11 +499,7 @@ describe("ConflictDetector", () => {
         { value: "Different", source: mockSources[1] },
       ];
 
-      const conflicts = detector.detectFieldConflicts(
-        field,
-        "title",
-        rawValues,
-      );
+      const conflicts = detector.detectFieldConflicts(field, "title", rawValues);
 
       if (conflicts.length > 0) {
         const conflict = conflicts[0];

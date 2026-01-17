@@ -1,3 +1,4 @@
+import { cleanIsbn } from "../utils/normalization.js";
 import {
   type CreatorQuery,
   type MetadataRecord,
@@ -8,7 +9,6 @@ import {
   type TitleQuery,
 } from "./provider.js";
 import { RetryableMetadataProvider } from "./retryable-provider.js";
-import { cleanIsbn } from "../utils/normalization.js";
 
 type Fetch = typeof globalThis.fetch;
 
@@ -16,15 +16,8 @@ type Fetch = typeof globalThis.fetch;
  * ISNI API response interfaces
  */
 interface ISNISearchResponse {
-  responseHeader: {
-    status: number;
-    QTime: number;
-  };
-  response: {
-    numFound: number;
-    start: number;
-    docs: ISNIRecord[];
-  };
+  responseHeader: { status: number; QTime: number };
+  response: { numFound: number; start: number; docs: ISNIRecord[] };
 }
 
 interface ISNIRecord {
@@ -36,14 +29,8 @@ interface ISNIRecord {
   creationClass?: string;
   creationRole?: string;
   source?: string;
-  externalInformation?: Array<{
-    URI: string;
-    information: string;
-  }>;
-  otherIdentifierOfWork?: Array<{
-    type: string;
-    value: string;
-  }>;
+  externalInformation?: Array<{ URI: string; information: string }>;
+  otherIdentifierOfWork?: Array<{ type: string; value: string }>;
   titleOfWork?: string[];
   languageOfWork?: string[];
   formOfWork?: string[];
@@ -147,9 +134,7 @@ export class ISNIMetadataProvider extends RetryableMetadataProvider {
       const cleanedIsbn = cleanIsbn(isbn);
 
       // ISNI has very limited ISBN data, search by identifier
-      const results = await this.#searchISNI(
-        `local.otherIdentifierOfWork="${cleanedIsbn}"`,
-      );
+      const results = await this.#searchISNI(`local.otherIdentifierOfWork="${cleanedIsbn}"`);
 
       return results.map((result, index) =>
         this.createMetadataRecord(
@@ -212,9 +197,7 @@ export class ISNIMetadataProvider extends RetryableMetadataProvider {
   /**
    * Search using multiple criteria
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     return this.executeWithRetry(async () => {
       const searchParts: string[] = [];
 
@@ -226,9 +209,7 @@ export class ISNIMetadataProvider extends RetryableMetadataProvider {
 
       if (query.authors && query.authors.length > 0) {
         // Use first author for search
-        const authorQuery = query.fuzzy
-          ? query.authors[0]
-          : `"${query.authors[0]}"`;
+        const authorQuery = query.fuzzy ? query.authors[0] : `"${query.authors[0]}"`;
         searchParts.push(`local.personalName=${authorQuery}`);
       }
 
@@ -275,16 +256,11 @@ export class ISNIMetadataProvider extends RetryableMetadataProvider {
     const url = `${this.baseUrl}?${params.toString()}`;
 
     const response = await this.#fetch(url, {
-      headers: {
-        Accept: "application/json",
-        "User-Agent": "colibri-metadata-discovery/1.0",
-      },
+      headers: { Accept: "application/json", "User-Agent": "colibri-metadata-discovery/1.0" },
     });
 
     if (!response.ok) {
-      throw new Error(
-        `ISNI API error: ${response.status} ${response.statusText}`,
-      );
+      throw new Error(`ISNI API error: ${response.status} ${response.statusText}`);
     }
 
     const data = (await response.json()) as ISNISearchResponse;
@@ -297,12 +273,9 @@ export class ISNIMetadataProvider extends RetryableMetadataProvider {
    */
   #mapISNIRecordToMetadata(
     result: ISNIRecord,
-  ): Partial<
-    Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">
-  > {
-    const metadata: Partial<
-      Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">
-    > = {};
+  ): Partial<Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">> {
+    const metadata: Partial<Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">> =
+      {};
 
     // Author information (ISNI's strength)
     if (result.forename && result.surname) {
@@ -387,11 +360,7 @@ export class ISNIMetadataProvider extends RetryableMetadataProvider {
 
     const checkField = (field: any) => {
       fieldCount++;
-      if (
-        field &&
-        (typeof field !== "object" ||
-          (Array.isArray(field) && field.length > 0))
-      ) {
+      if (field && (typeof field !== "object" || (Array.isArray(field) && field.length > 0))) {
         filledFields++;
       }
     };

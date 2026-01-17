@@ -1,20 +1,12 @@
 import { getAuthSessionIdFromCookie, resolveUserId } from "$lib/server/auth";
-import {
-  createChallenge,
-  findUserByIdentifier,
-  listAuthenticatorsForUser,
-} from "@colibri-hq/sdk";
+import { createChallenge, findUserByIdentifier, listAuthenticatorsForUser } from "@colibri-hq/sdk";
 import {
   generateAuthenticationOptions,
   type GenerateAuthenticationOptionsOpts,
 } from "@simplewebauthn/server";
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 
-export const GET = async function handler({
-  url,
-  cookies,
-  locals: { database },
-}) {
+export const GET = async function handler({ url, cookies, locals: { database } }) {
   const userId = resolveUserId(cookies);
   const sessionId = getAuthSessionIdFromCookie(cookies);
 
@@ -35,12 +27,10 @@ export const GET = async function handler({
     const user = await findUserByIdentifier(database, userId);
     const authenticators = await listAuthenticatorsForUser(database, user);
 
-    options.allowCredentials = authenticators.map(
-      ({ identifier: id, transports }) => ({
-        transports,
-        id,
-      }),
-    );
+    options.allowCredentials = authenticators.map(({ identifier: id, transports }) => ({
+      transports,
+      id,
+    }));
   }
 
   const responseData = await generateAuthenticationOptions(options);

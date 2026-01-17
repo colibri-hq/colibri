@@ -1,4 +1,5 @@
-import { error, json } from "@sveltejs/kit";
+import { resolve } from "$app/paths";
+import { type AuthorWithGravatar, getAuthorWithGravatar } from "$lib/content/author.js";
 import {
   type BlogPostMetadata,
   getAdjacentPosts,
@@ -8,12 +9,8 @@ import {
   getSeriesPosts,
   getSeriesSlug,
 } from "$lib/content/blog.js";
-import {
-  type AuthorWithGravatar,
-  getAuthorWithGravatar,
-} from "$lib/content/author.js";
+import { error, json } from "@sveltejs/kit";
 import type { EntryGenerator, RequestHandler } from "./$types.js";
-import { resolve } from "$app/paths";
 
 export const prerender = true;
 
@@ -60,9 +57,7 @@ function buildAlternateLinks(baseUrl: string, slug: string) {
 
 export const entries = function entries() {
   const blogPosts = getBlogPosts();
-  return blogPosts.map((post) => ({
-    slug: post.urlSlug,
-  }));
+  return blogPosts.map((post) => ({ slug: post.urlSlug }));
 } satisfies EntryGenerator;
 
 export const GET = async function GET({ params, url }) {
@@ -94,10 +89,7 @@ export const GET = async function GET({ params, url }) {
       slug: getSeriesSlug(post.metadata.series),
       currentPosition: currentPosition + 1,
       totalPosts: seriesPosts.length,
-      posts: seriesPosts.map((p) => ({
-        slug: p.urlSlug,
-        title: p.metadata.title,
-      })),
+      posts: seriesPosts.map((p) => ({ slug: p.urlSlug, title: p.metadata.title })),
     };
   }
 
@@ -105,27 +97,17 @@ export const GET = async function GET({ params, url }) {
     type: "blog",
     slug: urlSlug,
     metadata: post.metadata,
-    author: {
-      name: author.name,
-      email: author.email,
-      gravatarUrl: author.gravatarUrl,
-    },
+    author: { name: author.name, email: author.email, gravatarUrl: author.gravatarUrl },
     content: stripFrontmatter(rawContent),
     navigation: {
       breadcrumbs: [
         { title: "Home", href: resolve("/") },
         { title: "Blog", href: resolve("/(blog)/blog") },
-        {
-          title: post.metadata.title,
-          href: resolve("/(blog)/blog/[slug]", { slug: urlSlug }),
-        },
+        { title: post.metadata.title, href: resolve("/(blog)/blog/[slug]", { slug: urlSlug }) },
       ],
       adjacent: {
         previous: adjacent.previous
-          ? {
-              slug: adjacent.previous.urlSlug,
-              title: adjacent.previous.metadata.title,
-            }
+          ? { slug: adjacent.previous.urlSlug, title: adjacent.previous.metadata.title }
           : undefined,
         next: adjacent.next
           ? { slug: adjacent.next.urlSlug, title: adjacent.next.metadata.title }

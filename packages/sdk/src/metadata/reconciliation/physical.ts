@@ -1,7 +1,4 @@
-import {
-  resolveLanguage,
-  getLanguageByIso3,
-} from "@colibri-hq/languages";
+import { resolveLanguage, getLanguageByIso3 } from "@colibri-hq/languages";
 import type {
   Conflict,
   FormatInfo,
@@ -17,7 +14,6 @@ import type {
  * Normalizes and reconciles physical and format descriptions from various sources
  */
 export class PhysicalReconciler {
-
   /**
    * Normalize page count from various input formats
    */
@@ -55,10 +51,7 @@ export class PhysicalReconciler {
   /**
    * Normalize format information from various input formats
    */
-  normalizeFormat(
-    input: string | FormatInfo,
-    bindingHint?: string,
-  ): FormatInfo {
+  normalizeFormat(input: string | FormatInfo, bindingHint?: string): FormatInfo {
     if (typeof input === "object" && input !== null) {
       return this.validateFormat(input);
     }
@@ -69,9 +62,7 @@ export class PhysicalReconciler {
   /**
    * Normalize language information from various input formats
    */
-  normalizeLanguages(
-    input: string | string[] | LanguageInfo[],
-  ): LanguageInfo[] {
+  normalizeLanguages(input: string | string[] | LanguageInfo[]): LanguageInfo[] {
     if (!input) return [];
 
     const inputs = Array.isArray(input) ? input : [input];
@@ -93,9 +84,7 @@ export class PhysicalReconciler {
   /**
    * Reconcile page counts from multiple sources
    */
-  reconcilePageCounts(
-    inputs: PhysicalDescriptionInput[],
-  ): ReconciledField<number> {
+  reconcilePageCounts(inputs: PhysicalDescriptionInput[]): ReconciledField<number> {
     const pageCounts = inputs
       .map((input) => ({
         count: this.normalizePageCount(input.pageCount || 0),
@@ -125,10 +114,7 @@ export class PhysicalReconciler {
     }
 
     // Group similar page counts (within 5% or 10 pages)
-    const groups = new Map<
-      number,
-      Array<{ count: number; source: MetadataSource }>
-    >();
+    const groups = new Map<number, Array<{ count: number; source: MetadataSource }>>();
 
     for (const item of pageCounts) {
       let foundGroup = false;
@@ -154,10 +140,7 @@ export class PhysicalReconciler {
     let bestReliability = 0;
 
     for (const group of groups.values()) {
-      const totalReliability = group.reduce(
-        (sum, item) => sum + item.source.reliability,
-        0,
-      );
+      const totalReliability = group.reduce((sum, item) => sum + item.source.reliability, 0);
       if (totalReliability > bestReliability) {
         bestReliability = totalReliability;
         bestGroup = group;
@@ -165,10 +148,7 @@ export class PhysicalReconciler {
     }
 
     // Calculate weighted average within the best group
-    const totalWeight = bestGroup.reduce(
-      (sum, item) => sum + item.source.reliability,
-      0,
-    );
+    const totalWeight = bestGroup.reduce((sum, item) => sum + item.source.reliability, 0);
     const weightedSum = bestGroup.reduce(
       (sum, item) => sum + item.count * item.source.reliability,
       0,
@@ -202,9 +182,7 @@ export class PhysicalReconciler {
   /**
    * Reconcile physical descriptions from multiple sources
    */
-  reconcilePhysicalDescriptions(
-    inputs: PhysicalDescriptionInput[],
-  ): ReconciledPhysicalDescription {
+  reconcilePhysicalDescriptions(inputs: PhysicalDescriptionInput[]): ReconciledPhysicalDescription {
     if (inputs.length === 0) {
       throw new Error("No physical descriptions to reconcile");
     }
@@ -224,13 +202,7 @@ export class PhysicalReconciler {
     // Reconcile weights
     const weight = this.reconcileWeights(inputs);
 
-    return {
-      pageCount,
-      dimensions,
-      format,
-      languages,
-      weight,
-    };
+    return { pageCount, dimensions, format, languages, weight };
   }
 
   /**
@@ -253,19 +225,14 @@ export class PhysicalReconciler {
       const match = dimensionStr.match(pattern);
       if (match) {
         const values = match.filter((m, i) => i > 0 && m && /\d/.test(m));
-        const units = match.filter(
-          (m, i) => i > 0 && m && /^(mm|cm|in|inches?)$/i.test(m),
-        );
+        const units = match.filter((m, i) => i > 0 && m && /^(mm|cm|in|inches?)$/i.test(m));
 
         if (values.length >= 2) {
           const unit = this.normalizeUnit(units[0] || "mm");
           const [dim1, dim2, dim3] = values.map((v) => parseFloat(v));
 
           // Convert to millimeters
-          const [width, height, depth] = this.convertToMillimeters(
-            [dim1, dim2, dim3],
-            unit,
-          );
+          const [width, height, depth] = this.convertToMillimeters([dim1, dim2, dim3], unit);
 
           // Assume first dimension is width, second is height, third is depth
           result.width = width;
@@ -300,40 +267,29 @@ export class PhysicalReconciler {
     const conversionFactors = { mm: 1, cm: 10, in: 25.4 };
     const factor = conversionFactors[unit];
 
-    return dimensions.map((dim) =>
-      dim ? Math.round(dim * factor * 100) / 100 : undefined,
-    );
+    return dimensions.map((dim) => (dim ? Math.round(dim * factor * 100) / 100 : undefined));
   }
 
   /**
    * Validate and normalize dimensions object
    */
-  private validateDimensions(
-    dimensions: PhysicalDimensions,
-  ): PhysicalDimensions {
+  private validateDimensions(dimensions: PhysicalDimensions): PhysicalDimensions {
     const result: PhysicalDimensions = { ...dimensions };
 
     // Convert all dimensions to millimeters if needed
     if (dimensions.unit && dimensions.unit !== "mm") {
-      const factor =
-        dimensions.unit === "cm" ? 10 : dimensions.unit === "in" ? 25.4 : 1;
+      const factor = dimensions.unit === "cm" ? 10 : dimensions.unit === "in" ? 25.4 : 1;
 
-      if (dimensions.width)
-        result.width = Math.round(dimensions.width * factor * 100) / 100;
-      if (dimensions.height)
-        result.height = Math.round(dimensions.height * factor * 100) / 100;
-      if (dimensions.depth)
-        result.depth = Math.round(dimensions.depth * factor * 100) / 100;
+      if (dimensions.width) result.width = Math.round(dimensions.width * factor * 100) / 100;
+      if (dimensions.height) result.height = Math.round(dimensions.height * factor * 100) / 100;
+      if (dimensions.depth) result.depth = Math.round(dimensions.depth * factor * 100) / 100;
       result.unit = "mm";
     }
 
     // Validate reasonable ranges (in mm)
-    if (result.width && (result.width < 10 || result.width > 1000))
-      result.width = undefined;
-    if (result.height && (result.height < 10 || result.height > 1000))
-      result.height = undefined;
-    if (result.depth && (result.depth < 1 || result.depth > 200))
-      result.depth = undefined;
+    if (result.width && (result.width < 10 || result.width > 1000)) result.width = undefined;
+    if (result.height && (result.height < 10 || result.height > 1000)) result.height = undefined;
+    if (result.depth && (result.depth < 1 || result.depth > 200)) result.depth = undefined;
 
     return result;
   }
@@ -341,10 +297,7 @@ export class PhysicalReconciler {
   /**
    * Parse format strings and normalize binding/format types
    */
-  private parseFormatString(
-    formatStr: string,
-    bindingHint?: string,
-  ): FormatInfo {
+  private parseFormatString(formatStr: string, bindingHint?: string): FormatInfo {
     const result: FormatInfo = { raw: formatStr };
     const normalized = formatStr.toLowerCase();
 
@@ -355,10 +308,7 @@ export class PhysicalReconciler {
       normalized.includes("hard cover")
     ) {
       result.binding = "hardcover";
-    } else if (
-      normalized.includes("mass market") ||
-      normalized.includes("pocket")
-    ) {
+    } else if (normalized.includes("mass market") || normalized.includes("pocket")) {
       result.binding = "mass_market";
     } else if (
       normalized.includes("paperback") ||
@@ -366,10 +316,7 @@ export class PhysicalReconciler {
       normalized.includes("soft cover")
     ) {
       result.binding = "paperback";
-    } else if (
-      normalized.includes("board book") ||
-      normalized.includes("boardbook")
-    ) {
+    } else if (normalized.includes("board book") || normalized.includes("boardbook")) {
       result.binding = "board_book";
     } else if (
       normalized.includes("spiral") ||
@@ -402,10 +349,7 @@ export class PhysicalReconciler {
     ) {
       result.format = "ebook";
       result.medium = "digital";
-    } else if (
-      normalized.includes("audiobook") ||
-      normalized.includes("audio book")
-    ) {
+    } else if (normalized.includes("audiobook") || normalized.includes("audio book")) {
       result.format = "audiobook";
       result.medium = "audio";
     } else if (normalized.includes("magazine")) {
@@ -426,11 +370,7 @@ export class PhysicalReconciler {
     } else {
       result.format = "book";
       result.medium =
-        result.binding === "digital"
-          ? "digital"
-          : result.binding === "audio"
-            ? "audio"
-            : "print";
+        result.binding === "digital" ? "digital" : result.binding === "audio" ? "audio" : "print";
     }
 
     return result;
@@ -443,16 +383,13 @@ export class PhysicalReconciler {
     const normalized = binding.toLowerCase();
 
     if (normalized.includes("hard")) return "hardcover";
-    if (normalized.includes("paper") || normalized.includes("soft"))
-      return "paperback";
+    if (normalized.includes("paper") || normalized.includes("soft")) return "paperback";
     if (normalized.includes("mass")) return "mass_market";
     if (normalized.includes("board")) return "board_book";
-    if (normalized.includes("spiral") || normalized.includes("coil"))
-      return "spiral";
+    if (normalized.includes("spiral") || normalized.includes("coil")) return "spiral";
     if (normalized.includes("leather")) return "leather";
     if (normalized.includes("cloth")) return "cloth";
-    if (normalized.includes("digital") || normalized.includes("ebook"))
-      return "digital";
+    if (normalized.includes("digital") || normalized.includes("ebook")) return "digital";
     if (normalized.includes("audio")) return "audio";
 
     return "other";
@@ -506,22 +443,11 @@ export class PhysicalReconciler {
               ? 0.8
               : 0.7;
 
-      return {
-        code: resolved.iso3,
-        name: resolved.name,
-        region,
-        confidence,
-        raw: langStr,
-      };
+      return { code: resolved.iso3, name: resolved.name, region, confidence, raw: langStr };
     }
 
     // Fallback - return as-is with low confidence
-    return {
-      code: trimmed.toLowerCase(),
-      name: langStr,
-      confidence: 0.3,
-      raw: langStr,
-    };
+    return { code: trimmed.toLowerCase(), name: langStr, confidence: 0.3, raw: langStr };
   }
 
   /**
@@ -556,18 +482,12 @@ export class PhysicalReconciler {
   ): ReconciledField<PhysicalDimensions> {
     const dimensionsList = inputs
       .map((input) => ({
-        dimensions: input.dimensions
-          ? this.normalizeDimensions(input.dimensions)
-          : undefined,
+        dimensions: input.dimensions ? this.normalizeDimensions(input.dimensions) : undefined,
         source: input.source,
       }))
       .filter(
-        (item) =>
-          item.dimensions && (item.dimensions.width || item.dimensions.height),
-      ) as Array<{
-      dimensions: PhysicalDimensions;
-      source: MetadataSource;
-    }>;
+        (item) => item.dimensions && (item.dimensions.width || item.dimensions.height),
+      ) as Array<{ dimensions: PhysicalDimensions; source: MetadataSource }>;
 
     if (dimensionsList.length === 0) {
       return {
@@ -591,11 +511,9 @@ export class PhysicalReconciler {
     const scored = dimensionsList
       .map((item) => {
         const completeness =
-          [
-            item.dimensions.width,
-            item.dimensions.height,
-            item.dimensions.depth,
-          ].filter((d) => d !== undefined).length / 3;
+          [item.dimensions.width, item.dimensions.height, item.dimensions.depth].filter(
+            (d) => d !== undefined,
+          ).length / 3;
         const score = item.source.reliability * completeness;
 
         return { ...item, score };
@@ -613,9 +531,7 @@ export class PhysicalReconciler {
   /**
    * Reconcile formats from multiple sources
    */
-  private reconcileFormats(
-    inputs: PhysicalDescriptionInput[],
-  ): ReconciledField<FormatInfo> {
+  private reconcileFormats(inputs: PhysicalDescriptionInput[]): ReconciledField<FormatInfo> {
     const formatsList = inputs
       .map((input) => ({
         format: input.format
@@ -625,10 +541,7 @@ export class PhysicalReconciler {
             : undefined,
         source: input.source,
       }))
-      .filter((item) => item.format) as Array<{
-      format: FormatInfo;
-      source: MetadataSource;
-    }>;
+      .filter((item) => item.format) as Array<{ format: FormatInfo; source: MetadataSource }>;
 
     if (formatsList.length === 0) {
       return {
@@ -649,9 +562,7 @@ export class PhysicalReconciler {
     }
 
     // Group by format consistency and select most reliable
-    const bestFormat = formatsList.sort(
-      (a, b) => b.source.reliability - a.source.reliability,
-    )[0];
+    const bestFormat = formatsList.sort((a, b) => b.source.reliability - a.source.reliability)[0];
 
     return {
       value: bestFormat.format,
@@ -664,13 +575,8 @@ export class PhysicalReconciler {
   /**
    * Reconcile languages from multiple sources
    */
-  private reconcileLanguages(
-    inputs: PhysicalDescriptionInput[],
-  ): ReconciledField<LanguageInfo[]> {
-    const allLanguages: Array<{
-      languages: LanguageInfo[];
-      source: MetadataSource;
-    }> = [];
+  private reconcileLanguages(inputs: PhysicalDescriptionInput[]): ReconciledField<LanguageInfo[]> {
+    const allLanguages: Array<{ languages: LanguageInfo[]; source: MetadataSource }> = [];
 
     for (const input of inputs) {
       if (input.languages) {
@@ -703,10 +609,7 @@ export class PhysicalReconciler {
         if (!existing || (lang.confidence || 0) > (existing.confidence || 0)) {
           languageMap.set(lang.code, {
             ...lang,
-            confidence: Math.max(
-              lang.confidence || 0,
-              existing?.confidence || 0,
-            ),
+            confidence: Math.max(lang.confidence || 0, existing?.confidence || 0),
           });
         }
       }
@@ -717,10 +620,8 @@ export class PhysicalReconciler {
     );
 
     const avgConfidence =
-      reconciledLanguages.reduce(
-        (sum, lang) => sum + (lang.confidence || 0),
-        0,
-      ) / reconciledLanguages.length;
+      reconciledLanguages.reduce((sum, lang) => sum + (lang.confidence || 0), 0) /
+      reconciledLanguages.length;
 
     return {
       value: reconciledLanguages,
@@ -733,14 +634,9 @@ export class PhysicalReconciler {
   /**
    * Reconcile weights from multiple sources
    */
-  private reconcileWeights(
-    inputs: PhysicalDescriptionInput[],
-  ): ReconciledField<number> {
+  private reconcileWeights(inputs: PhysicalDescriptionInput[]): ReconciledField<number> {
     const weights = inputs
-      .map((input) => ({
-        weight: this.normalizeWeight(input.weight),
-        source: input.source,
-      }))
+      .map((input) => ({ weight: this.normalizeWeight(input.weight), source: input.source }))
       .filter((item) => item.weight !== undefined) as Array<{
       weight: number;
       source: MetadataSource;
@@ -765,10 +661,7 @@ export class PhysicalReconciler {
     }
 
     // Calculate weighted average
-    const totalReliability = weights.reduce(
-      (sum, item) => sum + item.source.reliability,
-      0,
-    );
+    const totalReliability = weights.reduce((sum, item) => sum + item.source.reliability, 0);
     const weightedSum = weights.reduce(
       (sum, item) => sum + item.weight * item.source.reliability,
       0,
@@ -786,9 +679,7 @@ export class PhysicalReconciler {
   /**
    * Normalize weight from various input formats
    */
-  private normalizeWeight(
-    input: number | string | undefined,
-  ): number | undefined {
+  private normalizeWeight(input: number | string | undefined): number | undefined {
     if (input === undefined) return undefined;
 
     if (typeof input === "number") {

@@ -1,10 +1,10 @@
+import type { User } from "@colibri-hq/sdk";
+import type { Cookies } from "@sveltejs/kit";
+import type { JwtPayload } from "jsonwebtoken";
 import { dev } from "$app/environment";
 import { env } from "$env/dynamic/private";
 import { sendMail } from "$lib/server/mail";
-import type { User } from "@colibri-hq/sdk";
 import { generateRandomString } from "@colibri-hq/shared";
-import type { Cookies } from "@sveltejs/kit";
-import type { JwtPayload } from "jsonwebtoken";
 import jwt from "jsonwebtoken";
 
 const defaultSessionIdCookieName = "ksid";
@@ -25,17 +25,10 @@ interface AccessTokenPayload extends JwtPayload {
  *
  * @param user
  */
-export function issueUserToken(
-  user: Pick<User, "id" | "name" | "email" | "role">,
-) {
-  const payload: Partial<AccessTokenPayload> = {
-    name: user.name || user.email,
-    email: user.email,
-  };
+export function issueUserToken(user: Pick<User, "id" | "name" | "email" | "role">) {
+  const payload: Partial<AccessTokenPayload> = { name: user.name || user.email, email: user.email };
 
-  return jwt.sign(payload, env.JWT_SECRET, {
-    subject: user.id.toString(),
-  });
+  return jwt.sign(payload, env.JWT_SECRET, { subject: user.id.toString() });
 }
 
 export function verifyToken(token: string) {
@@ -43,9 +36,7 @@ export function verifyToken(token: string) {
     throw new Error("Missing or invalid access token");
   }
 
-  const { payload } = jwt.verify(token, env.JWT_SECRET, {
-    complete: true,
-  });
+  const { payload } = jwt.verify(token, env.JWT_SECRET, { complete: true });
 
   if (typeof payload === "string") {
     throw new Error("Unexpected token payload");
@@ -86,11 +77,7 @@ export function getAuthSessionIdFromCookie(cookies: Cookies) {
 export function setJwtCookie(cookies: Cookies, token: string) {
   const name = env.JWT_COOKIE_NAME || defaultJwtCookieName;
 
-  cookies.set(name, token, {
-    path: "/",
-    secure: !dev,
-    httpOnly: true,
-  });
+  cookies.set(name, token, { path: "/", secure: !dev, httpOnly: true });
 }
 
 export function getJwtCookie(cookies: Cookies) {

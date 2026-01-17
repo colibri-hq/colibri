@@ -1,7 +1,7 @@
-import type { Metadata } from "./metadata.js";
 import { parse } from "@colibri-hq/mobi";
-import { fileTypeFromBuffer } from "file-type";
 import { wrapArray } from "@colibri-hq/shared";
+import { fileTypeFromBuffer } from "file-type";
+import type { Metadata } from "./metadata.js";
 
 export async function isMobiFile(file: File): Promise<boolean> {
   const buffer = await file.slice(60, 68).arrayBuffer();
@@ -10,10 +10,7 @@ export async function isMobiFile(file: File): Promise<boolean> {
   return fingerprint === "BOOKMOBI";
 }
 
-export async function loadMobiMetadata(
-  file: File,
-  _signal?: AbortSignal,
-): Promise<Metadata> {
+export async function loadMobiMetadata(file: File, _signal?: AbortSignal): Promise<Metadata> {
   const metadata = await parse(file);
   const {
     title,
@@ -40,10 +37,7 @@ export async function loadMobiMetadata(
     language: locale?.tag ?? language,
     legalInformation,
     pageProgression,
-    properties: {
-      pdbHeader: metadata.pdbHeader,
-      ...properties,
-    },
+    properties: { pdbHeader: metadata.pdbHeader, ...properties },
     series: loadSeries(metadata),
     sortingKey: titleFileAs ?? title,
     synopsis,
@@ -52,9 +46,7 @@ export async function loadMobiMetadata(
   };
 }
 
-async function loadCover({
-  coverImage,
-}: Pick<Awaited<ReturnType<typeof parse>>, "coverImage">) {
+async function loadCover({ coverImage }: Pick<Awaited<ReturnType<typeof parse>>, "coverImage">) {
   if (!coverImage) {
     return undefined;
   }
@@ -78,11 +70,7 @@ function loadContributors({
 
   if (creator) {
     for (const name of wrapArray(creator)) {
-      contributors.push({
-        name,
-        sortingKey: creatorFileAs ?? name,
-        roles: ["aut"],
-      });
+      contributors.push({ name, sortingKey: creatorFileAs ?? name, roles: ["aut"] });
     }
   }
 
@@ -96,11 +84,7 @@ function loadContributors({
 
   if (contributor && !contributor.includes("[https://calibre-ebook.com]")) {
     for (const name of wrapArray(contributor)) {
-      contributors.push({
-        name,
-        sortingKey: name,
-        roles: ["ctb"],
-      });
+      contributors.push({ name, sortingKey: name, roles: ["ctb"] });
     }
   }
 
@@ -118,16 +102,11 @@ function loadSeries({
     return undefined;
   }
 
-  return {
-    name: calibreSeries,
-    position: calibreSeriesIndex,
-  };
+  return { name: calibreSeries, position: calibreSeriesIndex };
 }
 
 function loadTags(
-  {
-    subject,
-  }: Pick<Awaited<ReturnType<typeof parse>>, "subject" | "subjectCode">,
+  { subject }: Pick<Awaited<ReturnType<typeof parse>>, "subject" | "subjectCode">,
   separator = ";",
 ): string[] {
   if (!subject) {

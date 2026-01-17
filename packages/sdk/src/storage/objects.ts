@@ -10,12 +10,12 @@ import {
   type ObjectCannedACL,
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
-import type { Storage, StoredObject } from "./index.js";
-import { fileURLToPath } from "node:url";
+import { readFile, writeFile } from "node:fs/promises";
 import { Readable } from "node:stream";
 import { buffer as streamToBuffer } from "node:stream/consumers";
-import { readFile, writeFile } from "node:fs/promises";
 import { ReadableStream } from "node:stream/web";
+import { fileURLToPath } from "node:url";
+import type { Storage, StoredObject } from "./index.js";
 
 export async function listObjects(
   { client, defaultBucket }: Storage,
@@ -28,11 +28,7 @@ export async function listObjects(
 
   do {
     response = await client.send(
-      new ListObjectsV2Command({
-        Bucket: bucketName,
-        Prefix: prefix,
-        Delimiter: delimiter,
-      }),
+      new ListObjectsV2Command({ Bucket: bucketName, Prefix: prefix, Delimiter: delimiter }),
     );
 
     objects.push(...(response.Contents ?? []));
@@ -58,10 +54,7 @@ export async function removeObjects(
 
     try {
       await client.send(
-        new DeleteObjectCommand({
-          Bucket: bucket,
-          Key: key,
-        }),
+        new DeleteObjectCommand({ Bucket: bucket, Key: key }),
         abortSignal ? { abortSignal } : undefined,
       );
     } catch (cause) {
@@ -80,9 +73,7 @@ export async function removeObjects(
       abortSignal ? { abortSignal } : undefined,
     );
   } catch (cause) {
-    throw new Error(`Failed to remove ${keys.length} objects: ${cause}`, {
-      cause,
-    });
+    throw new Error(`Failed to remove ${keys.length} objects: ${cause}`, { cause });
   }
 }
 
@@ -95,15 +86,16 @@ export async function moveObject(
     source,
     storage.defaultBucket,
   );
-  const { bucketName: destinationBucket, key: destinationKey } =
-    new ObjectReference(destination, storage.defaultBucket);
+  const { bucketName: destinationBucket, key: destinationKey } = new ObjectReference(
+    destination,
+    storage.defaultBucket,
+  );
 
   let destinationExists = false;
 
   const { ETag: DestinationETag } =
     (await statObject(storage, destinationKey, destinationBucket)) ?? {};
-  const { ETag: SourceETag } =
-    (await statObject(storage, sourceKey, sourceBucket)) ?? {};
+  const { ETag: SourceETag } = (await statObject(storage, sourceKey, sourceBucket)) ?? {};
 
   if (!SourceETag) {
     throw new Error(`Source object "${source}" does not exist`);
@@ -128,12 +120,7 @@ export async function statObject(
   bucketName: string = defaultBucket,
 ): Promise<HeadObjectCommandOutput | undefined> {
   try {
-    return await client.send(
-      new HeadObjectCommand({
-        Bucket: bucketName,
-        Key: key,
-      }),
-    );
+    return await client.send(new HeadObjectCommand({ Bucket: bucketName, Key: key }));
   } catch (error) {
     if (!(error instanceof Error)) {
       throw error;
@@ -143,10 +130,9 @@ export async function statObject(
       return undefined;
     }
 
-    throw new Error(
-      `Failed to stat object "${key}" in bucket "${bucketName}": ${error.message}`,
-      { cause: error },
-    );
+    throw new Error(`Failed to stat object "${key}" in bucket "${bucketName}": ${error.message}`, {
+      cause: error,
+    });
   }
 }
 
@@ -177,24 +163,14 @@ export async function copyObject(
     });
 
     if (status !== 200) {
-      throw new Error(
-        `Failed to fetch object from "${sourceRef.url}": ${status}`,
-      );
+      throw new Error(`Failed to fetch object from "${sourceRef.url}": ${status}`);
     }
 
     if (!body) {
-      throw new Error(
-        `Failed to fetch object from "${sourceRef.url}": No body in response`,
-      );
+      throw new Error(`Failed to fetch object from "${sourceRef.url}": No body in response`);
     }
 
-    return await uploadObject(
-      storage,
-      body as ReadableStream,
-      key,
-      {},
-      bucketName,
-    );
+    return await uploadObject(storage, body as ReadableStream, key, {}, bucketName);
   }
   // endregion
 
@@ -235,12 +211,7 @@ export async function downloadObject(
   key: string,
   bucketName: string = defaultBucket,
 ) {
-  const response = await client.send(
-    new GetObjectCommand({
-      Bucket: bucketName,
-      Key: key,
-    }),
-  );
+  const response = await client.send(new GetObjectCommand({ Bucket: bucketName, Key: key }));
 
   if (!response.Body) {
     throw new Error(
@@ -350,8 +321,7 @@ class ObjectReference {
   public get bucketName() {
     if (!this.isS3) {
       throw new Error(
-        `Cannot resolve bucket from object reference "${this.sourcePath}": ` +
-          `Not an s3:// URL`,
+        `Cannot resolve bucket from object reference "${this.sourcePath}": ` + `Not an s3:// URL`,
       );
     }
 
@@ -361,8 +331,7 @@ class ObjectReference {
   public get key() {
     if (!this.isS3) {
       throw new Error(
-        `Cannot resolve key from object reference "${this.sourcePath}": ` +
-          `Not an s3:// URL`,
+        `Cannot resolve key from object reference "${this.sourcePath}": ` + `Not an s3:// URL`,
       );
     }
 
@@ -379,9 +348,7 @@ class ObjectReference {
 
   static #assertProtocolSupported(url: URL) {
     if (!ObjectReference.isProtocolSupported(url.protocol)) {
-      throw new Error(
-        `Invalid object reference "${url}": Unsupported protocol "${url.protocol}"`,
-      );
+      throw new Error(`Invalid object reference "${url}": Unsupported protocol "${url.protocol}"`);
     }
   }
 }

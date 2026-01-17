@@ -1,31 +1,14 @@
 import type { RequestEvent } from "@sveltejs/kit";
-import {
-  createUser,
-  initialize,
-  setSetting,
-  storeSecret,
-} from "@colibri-hq/sdk";
+import { createUser, initialize, setSetting, storeSecret } from "@colibri-hq/sdk";
 import { updateStorageDsn } from "@colibri-hq/sdk/storage";
 import { json } from "@sveltejs/kit";
 import { buildStorageDsn, type SetupConfig } from "../../../core/state.js";
 
 interface ConfigRequest {
-  admin: {
-    email: string;
-    name: string;
-  };
+  admin: { email: string; name: string };
   databaseDsn: string;
-  instance: {
-    description?: string;
-    name: string;
-  };
-  smtp?: {
-    from: string;
-    host: string;
-    password: string;
-    port: number;
-    username: string;
-  };
+  instance: { description?: string; name: string };
+  smtp?: { from: string; host: string; password: string; port: number; username: string };
   storage: {
     accessKeyId: string;
     endpoint: string;
@@ -53,11 +36,7 @@ export async function POST({ request }: RequestEvent) {
     });
 
     // Set instance settings
-    await setSetting(
-      db,
-      "urn:colibri:settings:general:instance-name",
-      config.instance.name,
-    );
+    await setSetting(db, "urn:colibri:settings:general:instance-name", config.instance.name);
 
     if (config.instance.description) {
       await setSetting(
@@ -84,30 +63,10 @@ export async function POST({ request }: RequestEvent) {
 
     // Configure SMTP if provided
     if (config.smtp) {
-      await storeSecret(
-        db,
-        "smtp.host",
-        config.smtp.host,
-        "SMTP server hostname",
-      );
-      await storeSecret(
-        db,
-        "smtp.port",
-        String(config.smtp.port),
-        "SMTP server port",
-      );
-      await storeSecret(
-        db,
-        "smtp.username",
-        config.smtp.username,
-        "SMTP username",
-      );
-      await storeSecret(
-        db,
-        "smtp.password",
-        config.smtp.password,
-        "SMTP password",
-      );
+      await storeSecret(db, "smtp.host", config.smtp.host, "SMTP server hostname");
+      await storeSecret(db, "smtp.port", String(config.smtp.port), "SMTP server port");
+      await storeSecret(db, "smtp.username", config.smtp.username, "SMTP username");
+      await storeSecret(db, "smtp.password", config.smtp.password, "SMTP password");
       await storeSecret(db, "smtp.from", config.smtp.from, "SMTP from address");
     }
 
@@ -120,10 +79,7 @@ export async function POST({ request }: RequestEvent) {
     }
 
     return json(
-      {
-        error: error instanceof Error ? error.message : "Configuration failed",
-        success: false,
-      },
+      { error: error instanceof Error ? error.message : "Configuration failed", success: false },
       { status: 500 },
     );
   }

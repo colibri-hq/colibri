@@ -12,7 +12,6 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import { MetadataAggregator } from "./aggregator.js";
 import type {
   MetadataProvider,
   MetadataRecord,
@@ -21,6 +20,7 @@ import type {
   TimeoutConfig,
   TitleQuery,
 } from "./providers/provider.js";
+import { MetadataAggregator } from "./aggregator.js";
 import { MetadataType } from "./providers/provider.js";
 
 /**
@@ -29,21 +29,12 @@ import { MetadataType } from "./providers/provider.js";
 class MockProvider implements MetadataProvider {
   readonly name: string;
   readonly priority: number;
-  readonly rateLimit: RateLimitConfig = {
-    maxRequests: 100,
-    windowMs: 60000,
-    requestDelay: 0,
-  };
-  readonly timeout: TimeoutConfig = {
-    requestTimeout: 10000,
-    operationTimeout: 30000,
-  };
+  readonly rateLimit: RateLimitConfig = { maxRequests: 100, windowMs: 60000, requestDelay: 0 };
+  readonly timeout: TimeoutConfig = { requestTimeout: 10000, operationTimeout: 30000 };
 
   private searchByISBNFn: (isbn: string) => Promise<MetadataRecord[]>;
   private searchByTitleFn: (query: TitleQuery) => Promise<MetadataRecord[]>;
-  private searchMultiCriteriaFn: (
-    query: MultiCriteriaQuery,
-  ) => Promise<MetadataRecord[]>;
+  private searchMultiCriteriaFn: (query: MultiCriteriaQuery) => Promise<MetadataRecord[]>;
 
   constructor(
     name: string,
@@ -51,17 +42,14 @@ class MockProvider implements MetadataProvider {
     options: {
       searchByISBN?: (isbn: string) => Promise<MetadataRecord[]>;
       searchByTitle?: (query: TitleQuery) => Promise<MetadataRecord[]>;
-      searchMultiCriteria?: (
-        query: MultiCriteriaQuery,
-      ) => Promise<MetadataRecord[]>;
+      searchMultiCriteria?: (query: MultiCriteriaQuery) => Promise<MetadataRecord[]>;
     } = {},
   ) {
     this.name = name;
     this.priority = priority;
     this.searchByISBNFn = options.searchByISBN ?? this.defaultSearch;
     this.searchByTitleFn = options.searchByTitle ?? this.defaultSearch;
-    this.searchMultiCriteriaFn =
-      options.searchMultiCriteria ?? this.defaultSearch;
+    this.searchMultiCriteriaFn = options.searchMultiCriteria ?? this.defaultSearch;
   }
 
   async searchByISBN(isbn: string): Promise<MetadataRecord[]> {
@@ -76,9 +64,7 @@ class MockProvider implements MetadataProvider {
     return [];
   }
 
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     return this.searchMultiCriteriaFn(query);
   }
 
@@ -96,9 +82,7 @@ class MockProvider implements MetadataProvider {
 /**
  * Helper to create test metadata records
  */
-function createTestRecord(
-  overrides: Partial<MetadataRecord> = {},
-): MetadataRecord {
+function createTestRecord(overrides: Partial<MetadataRecord> = {}): MetadataRecord {
   return {
     id: "test-id-" + Math.random(),
     source: "test",
@@ -166,21 +150,11 @@ describe("MetadataAggregator", () => {
 
   describe("searchByISBN", () => {
     it("should query all providers in parallel", async () => {
-      const record1 = createTestRecord({
-        source: "Provider1",
-        isbn: ["9780306406157"],
-      });
-      const record2 = createTestRecord({
-        source: "Provider2",
-        isbn: ["9780306406157"],
-      });
+      const record1 = createTestRecord({ source: "Provider1", isbn: ["9780306406157"] });
+      const record2 = createTestRecord({ source: "Provider2", isbn: ["9780306406157"] });
 
-      const provider1 = new MockProvider("Provider1", 80, {
-        searchByISBN: async () => [record1],
-      });
-      const provider2 = new MockProvider("Provider2", 70, {
-        searchByISBN: async () => [record2],
-      });
+      const provider1 = new MockProvider("Provider1", 80, { searchByISBN: async () => [record1] });
+      const provider2 = new MockProvider("Provider2", 70, { searchByISBN: async () => [record2] });
 
       const aggregator = new MetadataAggregator([provider1, provider2]);
       const result = await aggregator.searchByISBN("9780306406157");
@@ -242,9 +216,7 @@ describe("MetadataAggregator", () => {
         },
       });
 
-      const aggregator = new MetadataAggregator([provider1, provider2], {
-        minProviders: 1,
-      });
+      const aggregator = new MetadataAggregator([provider1, provider2], { minProviders: 1 });
 
       await expect(aggregator.searchByISBN("9780306406157")).rejects.toThrow(
         /Only 0 provider\(s\) responded successfully/,
@@ -267,12 +239,8 @@ describe("MetadataAggregator", () => {
         confidence: 0.8,
       });
 
-      const provider1 = new MockProvider("Provider1", 80, {
-        searchByISBN: async () => [record1],
-      });
-      const provider2 = new MockProvider("Provider2", 70, {
-        searchByISBN: async () => [record2],
-      });
+      const provider1 = new MockProvider("Provider1", 80, { searchByISBN: async () => [record1] });
+      const provider2 = new MockProvider("Provider2", 70, { searchByISBN: async () => [record2] });
 
       const aggregator = new MetadataAggregator([provider1, provider2]);
       const result = await aggregator.searchByISBN("9780306406157");
@@ -285,21 +253,11 @@ describe("MetadataAggregator", () => {
     });
 
     it("should not deduplicate when option is disabled", async () => {
-      const record1 = createTestRecord({
-        source: "Provider1",
-        isbn: ["9780306406157"],
-      });
-      const record2 = createTestRecord({
-        source: "Provider2",
-        isbn: ["9780306406157"],
-      });
+      const record1 = createTestRecord({ source: "Provider1", isbn: ["9780306406157"] });
+      const record2 = createTestRecord({ source: "Provider2", isbn: ["9780306406157"] });
 
-      const provider1 = new MockProvider("Provider1", 80, {
-        searchByISBN: async () => [record1],
-      });
-      const provider2 = new MockProvider("Provider2", 70, {
-        searchByISBN: async () => [record2],
-      });
+      const provider1 = new MockProvider("Provider1", 80, { searchByISBN: async () => [record1] });
+      const provider2 = new MockProvider("Provider2", 70, { searchByISBN: async () => [record2] });
 
       const aggregator = new MetadataAggregator([provider1, provider2], {
         deduplicateByIsbn: false,
@@ -326,12 +284,8 @@ describe("MetadataAggregator", () => {
         confidence: 0.9,
       });
 
-      const provider1 = new MockProvider("Provider1", 80, {
-        searchByISBN: async () => [record1],
-      });
-      const provider2 = new MockProvider("Provider2", 70, {
-        searchByISBN: async () => [record2],
-      });
+      const provider1 = new MockProvider("Provider1", 80, { searchByISBN: async () => [record1] });
+      const provider2 = new MockProvider("Provider2", 70, { searchByISBN: async () => [record2] });
 
       const aggregator = new MetadataAggregator([provider1, provider2], {
         deduplicateByIsbn: false,
@@ -350,9 +304,7 @@ describe("MetadataAggregator", () => {
         searchByISBN: async () => [createTestRecord()],
       });
 
-      const aggregator = new MetadataAggregator([provider], {
-        calculateConsensus: false,
-      });
+      const aggregator = new MetadataAggregator([provider], { calculateConsensus: false });
       const result = await aggregator.searchByISBN("9780306406157");
 
       expect(result.consensus).toBeUndefined();
@@ -367,12 +319,8 @@ describe("MetadataAggregator", () => {
       const spy1 = vi.fn(async () => [record1]);
       const spy2 = vi.fn(async () => [record2]);
 
-      const provider1 = new MockProvider("Provider1", 80, {
-        searchByTitle: spy1,
-      });
-      const provider2 = new MockProvider("Provider2", 70, {
-        searchByTitle: spy2,
-      });
+      const provider1 = new MockProvider("Provider1", 80, { searchByTitle: spy1 });
+      const provider2 = new MockProvider("Provider2", 70, { searchByTitle: spy2 });
 
       const aggregator = new MetadataAggregator([provider1, provider2]);
       const query: TitleQuery = { title: "Test Book", fuzzy: true };
@@ -396,40 +344,22 @@ describe("MetadataAggregator", () => {
         confidence: 0.8,
       });
 
-      const provider1 = new MockProvider("Provider1", 80, {
-        searchByTitle: async () => [record1],
-      });
-      const provider2 = new MockProvider("Provider2", 70, {
-        searchByTitle: async () => [record2],
-      });
+      const provider1 = new MockProvider("Provider1", 80, { searchByTitle: async () => [record1] });
+      const provider2 = new MockProvider("Provider2", 70, { searchByTitle: async () => [record2] });
 
       const aggregator = new MetadataAggregator([provider1, provider2]);
-      const result = await aggregator.searchByTitle({
-        title: "The Great Gatsby",
-      });
+      const result = await aggregator.searchByTitle({ title: "The Great Gatsby" });
 
       // Should deduplicate by title
       expect(result.results.length).toBe(1);
     });
 
     it("should keep results with different titles", async () => {
-      const record1 = createTestRecord({
-        source: "Provider1",
-        title: "Book A",
-        isbn: undefined,
-      });
-      const record2 = createTestRecord({
-        source: "Provider2",
-        title: "Book B",
-        isbn: undefined,
-      });
+      const record1 = createTestRecord({ source: "Provider1", title: "Book A", isbn: undefined });
+      const record2 = createTestRecord({ source: "Provider2", title: "Book B", isbn: undefined });
 
-      const provider1 = new MockProvider("Provider1", 80, {
-        searchByTitle: async () => [record1],
-      });
-      const provider2 = new MockProvider("Provider2", 70, {
-        searchByTitle: async () => [record2],
-      });
+      const provider1 = new MockProvider("Provider1", 80, { searchByTitle: async () => [record1] });
+      const provider2 = new MockProvider("Provider2", 70, { searchByTitle: async () => [record2] });
 
       const aggregator = new MetadataAggregator([provider1, provider2]);
       const result = await aggregator.searchByTitle({ title: "Book" });
@@ -443,12 +373,8 @@ describe("MetadataAggregator", () => {
       const spy1 = vi.fn(async () => [createTestRecord()]);
       const spy2 = vi.fn(async () => [createTestRecord()]);
 
-      const provider1 = new MockProvider("Provider1", 80, {
-        searchMultiCriteria: spy1,
-      });
-      const provider2 = new MockProvider("Provider2", 70, {
-        searchMultiCriteria: spy2,
-      });
+      const provider1 = new MockProvider("Provider1", 80, { searchMultiCriteria: spy1 });
+      const provider2 = new MockProvider("Provider2", 70, { searchMultiCriteria: spy2 });
 
       const aggregator = new MetadataAggregator([provider1, provider2]);
       const query: MultiCriteriaQuery = {
@@ -503,22 +429,14 @@ describe("MetadataAggregator", () => {
         searchMultiCriteria: async () => [record3],
       });
 
-      const aggregator = new MetadataAggregator([
-        provider1,
-        provider2,
-        provider3,
-      ]);
-      const result = await aggregator.searchMultiCriteria({
-        title: "Book",
-      });
+      const aggregator = new MetadataAggregator([provider1, provider2, provider3]);
+      const result = await aggregator.searchMultiCriteria({ title: "Book" });
 
       // Should have 2 results after deduplication
       expect(result.results.length).toBe(2);
 
       // Find the merged record
-      const mergedRecord = result.results.find((r) =>
-        r.isbn?.includes("9780306406157"),
-      );
+      const mergedRecord = result.results.find((r) => r.isbn?.includes("9780306406157"));
       expect(mergedRecord).toBeDefined();
       expect(mergedRecord?.authors).toContain("Author One");
       expect(mergedRecord?.authors).toContain("Author Two");
@@ -544,12 +462,8 @@ describe("MetadataAggregator", () => {
         confidence: 0.85,
       });
 
-      const provider1 = new MockProvider("Provider1", 80, {
-        searchByISBN: async () => [record1],
-      });
-      const provider2 = new MockProvider("Provider2", 70, {
-        searchByISBN: async () => [record2],
-      });
+      const provider1 = new MockProvider("Provider1", 80, { searchByISBN: async () => [record1] });
+      const provider2 = new MockProvider("Provider2", 70, { searchByISBN: async () => [record2] });
 
       const aggregator = new MetadataAggregator([provider1, provider2]);
       const result = await aggregator.searchByISBN("9780306406157");
@@ -584,12 +498,8 @@ describe("MetadataAggregator", () => {
         confidence: 0.7,
       });
 
-      const provider1 = new MockProvider("Provider1", 80, {
-        searchByISBN: async () => [record1],
-      });
-      const provider2 = new MockProvider("Provider2", 70, {
-        searchByISBN: async () => [record2],
-      });
+      const provider1 = new MockProvider("Provider1", 80, { searchByISBN: async () => [record1] });
+      const provider2 = new MockProvider("Provider2", 70, { searchByISBN: async () => [record2] });
 
       const aggregator = new MetadataAggregator([provider1, provider2]);
       const result = await aggregator.searchByISBN("9780306406157");
@@ -620,12 +530,8 @@ describe("MetadataAggregator", () => {
         confidence: 0.7,
       });
 
-      const provider1 = new MockProvider("Provider1", 80, {
-        searchByISBN: async () => [record1],
-      });
-      const provider2 = new MockProvider("Provider2", 70, {
-        searchByISBN: async () => [record2],
-      });
+      const provider1 = new MockProvider("Provider1", 80, { searchByISBN: async () => [record1] });
+      const provider2 = new MockProvider("Provider2", 70, { searchByISBN: async () => [record2] });
 
       const aggregator = new MetadataAggregator([provider1, provider2]);
       const result = await aggregator.searchByISBN("9780306406157");
@@ -647,28 +553,16 @@ describe("MetadataAggregator", () => {
       });
       const provider2 = new MockProvider("Provider2", 70, {
         searchByISBN: async () => [
-          createTestRecord({
-            source: "Provider2",
-            isbn: ["9780306406157"],
-            title: "Book A",
-          }),
+          createTestRecord({ source: "Provider2", isbn: ["9780306406157"], title: "Book A" }),
         ],
       });
       const provider3 = new MockProvider("Provider3", 60, {
         searchByISBN: async () => [
-          createTestRecord({
-            source: "Provider3",
-            isbn: ["9781405076401"],
-            title: "Book B",
-          }),
+          createTestRecord({ source: "Provider3", isbn: ["9781405076401"], title: "Book B" }),
         ],
       });
 
-      const aggregator = new MetadataAggregator([
-        provider1,
-        provider2,
-        provider3,
-      ]);
+      const aggregator = new MetadataAggregator([provider1, provider2, provider3]);
       const result = await aggregator.searchByISBN("9780306406157");
 
       expect(result.errors.size).toBe(1);
@@ -690,20 +584,14 @@ describe("MetadataAggregator", () => {
       const result = await aggregator.searchByISBN("9780306406157");
 
       expect(result.errors.get("Provider1")).toBe(testError);
-      expect(result.errors.get("Provider1")?.message).toBe(
-        "Detailed error message",
-      );
+      expect(result.errors.get("Provider1")?.message).toBe("Detailed error message");
     });
   });
 
   describe("Empty Results", () => {
     it("should handle providers returning empty results", async () => {
-      const provider1 = new MockProvider("Provider1", 80, {
-        searchByISBN: async () => [],
-      });
-      const provider2 = new MockProvider("Provider2", 70, {
-        searchByISBN: async () => [],
-      });
+      const provider1 = new MockProvider("Provider1", 80, { searchByISBN: async () => [] });
+      const provider2 = new MockProvider("Provider2", 70, { searchByISBN: async () => [] });
 
       const aggregator = new MetadataAggregator([provider1, provider2]);
       const result = await aggregator.searchByISBN("9780306406157");
@@ -714,13 +602,9 @@ describe("MetadataAggregator", () => {
     });
 
     it("should not calculate consensus for empty results", async () => {
-      const provider = new MockProvider("Provider1", 80, {
-        searchByISBN: async () => [],
-      });
+      const provider = new MockProvider("Provider1", 80, { searchByISBN: async () => [] });
 
-      const aggregator = new MetadataAggregator([provider], {
-        calculateConsensus: true,
-      });
+      const aggregator = new MetadataAggregator([provider], { calculateConsensus: true });
       const result = await aggregator.searchByISBN("9780306406157");
 
       expect(result.consensus).toBeUndefined();

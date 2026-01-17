@@ -33,9 +33,7 @@ const MDI_PATTERN = /^[a-z0-9_]+$/;
  * @param urn - The icon URN string to parse
  * @returns Parsed icon object or null if invalid/empty
  */
-export function parseIconUrn(
-  urn: string | null | undefined,
-): ParsedIcon | null {
+export function parseIconUrn(urn: string | null | undefined): ParsedIcon | null {
   if (!urn) {
     return null;
   }
@@ -101,27 +99,21 @@ export function createCustomIconUrn(url: string): string {
 /**
  * Type guard to check if parsed icon is an MDI icon.
  */
-export function isMdiIcon(
-  parsed: ParsedIcon | null,
-): parsed is ParsedIcon & { type: "mdi" } {
+export function isMdiIcon(parsed: ParsedIcon | null): parsed is ParsedIcon & { type: "mdi" } {
   return parsed?.type === "mdi";
 }
 
 /**
  * Type guard to check if parsed icon is an emoji.
  */
-export function isEmoji(
-  parsed: ParsedIcon | null,
-): parsed is ParsedIcon & { type: "emoji" } {
+export function isEmoji(parsed: ParsedIcon | null): parsed is ParsedIcon & { type: "emoji" } {
   return parsed?.type === "emoji";
 }
 
 /**
  * Type guard to check if parsed icon is a custom icon.
  */
-export function isCustomIcon(
-  parsed: ParsedIcon | null,
-): parsed is ParsedIcon & { type: "custom" } {
+export function isCustomIcon(parsed: ParsedIcon | null): parsed is ParsedIcon & { type: "custom" } {
   return parsed?.type === "custom";
 }
 

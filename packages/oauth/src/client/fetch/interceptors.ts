@@ -74,10 +74,7 @@ export class InterceptorManager {
   /**
    * Run all response interceptors on a response
    */
-  async runResponseInterceptors(
-    response: Response,
-    request: Request,
-  ): Promise<Response> {
+  async runResponseInterceptors(response: Response, request: Request): Promise<Response> {
     let current = response;
 
     for (const interceptor of this.#responseInterceptors) {
@@ -175,15 +172,11 @@ export function createRetryInterceptor(options: {
     }
 
     // Calculate delay
-    const delay = exponentialBackoff
-      ? retryDelay * Math.pow(2, count)
-      : retryDelay;
+    const delay = exponentialBackoff ? retryDelay * Math.pow(2, count) : retryDelay;
 
     // Check for Retry-After header
     const retryAfter = response.headers.get("Retry-After");
-    const actualDelay = retryAfter
-      ? parseInt(retryAfter, 10) * 1000 || delay
-      : delay;
+    const actualDelay = retryAfter ? parseInt(retryAfter, 10) * 1000 || delay : delay;
 
     // Wait before retry
     await new Promise((resolve) => setTimeout(resolve, actualDelay));

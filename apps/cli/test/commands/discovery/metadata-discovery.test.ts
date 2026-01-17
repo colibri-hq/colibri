@@ -8,16 +8,9 @@ import { describe, expect, it } from "vitest";
 
 // Mock provider for testing
 class MockMetadataProvider {
-  rateLimit = {
-    maxRequests: 100,
-    requestDelay: 100,
-    windowMs: 60_000,
-  };
+  rateLimit = { maxRequests: 100, requestDelay: 100, windowMs: 60_000 };
 
-  timeout = {
-    operationTimeout: 30_000,
-    requestTimeout: 10_000,
-  };
+  timeout = { operationTimeout: 30_000, requestTimeout: 10_000 };
 
   constructor(
     public name: string,
@@ -169,48 +162,31 @@ describe("Metadata Discovery Integration Tests", () => {
         title: "The Great Gatsby",
       };
 
-      const provider = new MockMetadataProvider("TestProvider", 80, [
-        mockRecord,
-      ]);
+      const provider = new MockMetadataProvider("TestProvider", 80, [mockRecord]);
       const coordinator = new TestCoordinator([provider]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "The Great Gatsby",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "The Great Gatsby" };
 
       const result = await coordinator.query(query);
 
       expect(result.totalRecords).toBe(1);
       expect(result.aggregatedRecords[0].title).toBe("The Great Gatsby");
-      expect(result.aggregatedRecords[0].authors).toContain(
-        "F. Scott Fitzgerald",
-      );
+      expect(result.aggregatedRecords[0].authors).toContain("F. Scott Fitzgerald");
       expect(result.providers[0].success).toBe(true);
       expect(result.totalDuration).toBeGreaterThanOrEqual(0);
     });
 
     it("should handle provider failures gracefully", async () => {
-      const failingProvider = new MockMetadataProvider(
-        "FailingProvider",
-        80,
-        [],
-        true,
-      );
+      const failingProvider = new MockMetadataProvider("FailingProvider", 80, [], true);
       const coordinator = new TestCoordinator([failingProvider]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Test Book",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Test Book" };
 
       const result = await coordinator.query(query);
 
       expect(result.totalRecords).toBe(0);
       expect(result.providers[0].success).toBe(false);
-      expect(result.providers[0].error?.message).toContain(
-        "FailingProvider provider failed",
-      );
+      expect(result.providers[0].error?.message).toContain("FailingProvider provider failed");
     });
 
     it("should handle multi-criteria searches", async () => {
@@ -226,9 +202,7 @@ describe("Metadata Discovery Integration Tests", () => {
         title: "The Hobbit",
       };
 
-      const provider = new MockMetadataProvider("TestProvider", 80, [
-        mockRecord,
-      ]);
+      const provider = new MockMetadataProvider("TestProvider", 80, [mockRecord]);
       const coordinator = new TestCoordinator([provider]);
 
       const query: MultiCriteriaQuery = {
@@ -260,15 +234,10 @@ describe("Metadata Discovery Integration Tests", () => {
         title: "1984",
       };
 
-      const provider = new MockMetadataProvider("TestProvider", 80, [
-        mockRecord,
-      ]);
+      const provider = new MockMetadataProvider("TestProvider", 80, [mockRecord]);
       const coordinator = new TestCoordinator([provider]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        isbn: "978-0-451-52493-5",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, isbn: "978-0-451-52493-5" };
 
       const result = await coordinator.query(query);
 
@@ -291,25 +260,12 @@ describe("Metadata Discovery Integration Tests", () => {
         title: "Working Book",
       };
 
-      const failingProvider = new MockMetadataProvider(
-        "FailingProvider",
-        90,
-        [],
-        true,
-      );
-      const workingProvider = new MockMetadataProvider("WorkingProvider", 85, [
-        workingRecord,
-      ]);
+      const failingProvider = new MockMetadataProvider("FailingProvider", 90, [], true);
+      const workingProvider = new MockMetadataProvider("WorkingProvider", 85, [workingRecord]);
 
-      const coordinator = new TestCoordinator([
-        failingProvider,
-        workingProvider,
-      ]);
+      const coordinator = new TestCoordinator([failingProvider, workingProvider]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Test Book",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Test Book" };
 
       const result = await coordinator.query(query);
 
@@ -343,20 +299,8 @@ describe("Metadata Discovery Integration Tests", () => {
         false,
         800,
       );
-      const fastFailureProvider = new MockMetadataProvider(
-        "FastFailure",
-        90,
-        [],
-        true,
-        50,
-      );
-      const slowFailureProvider = new MockMetadataProvider(
-        "SlowFailure",
-        80,
-        [],
-        true,
-        1200,
-      );
+      const fastFailureProvider = new MockMetadataProvider("FastFailure", 90, [], true, 50);
+      const slowFailureProvider = new MockMetadataProvider("SlowFailure", 80, [], true, 1200);
 
       const coordinator = new TestCoordinator([
         fastSuccessProvider,
@@ -365,10 +309,7 @@ describe("Metadata Discovery Integration Tests", () => {
         slowFailureProvider,
       ]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Mixed Test",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Mixed Test" };
 
       const startTime = Date.now();
       const result = await coordinator.query(query);
@@ -392,10 +333,7 @@ describe("Metadata Discovery Integration Tests", () => {
 
       const coordinator = new TestCoordinator([timeoutProvider]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Timeout Test",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Timeout Test" };
 
       const result = await coordinator.query(query);
 
@@ -405,10 +343,7 @@ describe("Metadata Discovery Integration Tests", () => {
     });
 
     it("should handle rate limit errors", async () => {
-      const rateLimitProvider = new MockMetadataProvider(
-        "RateLimitProvider",
-        80,
-      );
+      const rateLimitProvider = new MockMetadataProvider("RateLimitProvider", 80);
       rateLimitProvider.searchMultiCriteria = async () => {
         const error = new Error("Too many requests");
         // @ts-expect-error Simulate HTTP status
@@ -418,10 +353,7 @@ describe("Metadata Discovery Integration Tests", () => {
 
       const coordinator = new TestCoordinator([rateLimitProvider]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Rate Limit Test",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Rate Limit Test" };
 
       const result = await coordinator.query(query);
 
@@ -451,27 +383,12 @@ describe("Metadata Discovery Integration Tests", () => {
         title: "Slow Book",
       };
 
-      const fastProvider = new MockMetadataProvider(
-        "FastProvider",
-        90,
-        [fastRecord],
-        false,
-        100,
-      );
-      const slowProvider = new MockMetadataProvider(
-        "SlowProvider",
-        80,
-        [slowRecord],
-        false,
-        1000,
-      );
+      const fastProvider = new MockMetadataProvider("FastProvider", 90, [fastRecord], false, 100);
+      const slowProvider = new MockMetadataProvider("SlowProvider", 80, [slowRecord], false, 1000);
 
       const coordinator = new TestCoordinator([fastProvider, slowProvider]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Performance Test",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Performance Test" };
 
       const startTime = Date.now();
       const result = await coordinator.query(query);
@@ -494,30 +411,12 @@ describe("Metadata Discovery Integration Tests", () => {
         title: "Quick Book",
       };
 
-      const quickProvider = new MockMetadataProvider(
-        "QuickProvider",
-        85,
-        [quickRecord],
-        false,
-        50,
-      );
-      const verySlowProvider = new MockMetadataProvider(
-        "VerySlowProvider",
-        95,
-        [],
-        false,
-        2000,
-      );
+      const quickProvider = new MockMetadataProvider("QuickProvider", 85, [quickRecord], false, 50);
+      const verySlowProvider = new MockMetadataProvider("VerySlowProvider", 95, [], false, 2000);
 
-      const coordinator = new TestCoordinator([
-        quickProvider,
-        verySlowProvider,
-      ]);
+      const coordinator = new TestCoordinator([quickProvider, verySlowProvider]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Speed Test",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Speed Test" };
 
       const startTime = Date.now();
       const result = await coordinator.query(query);
@@ -527,9 +426,7 @@ describe("Metadata Discovery Integration Tests", () => {
       // Should complete in time close to slow provider (concurrent execution)
       expect(totalTime).toBeLessThan(2500); // Should be close to 2000ms, not 2050ms
       expect(totalTime).toBeGreaterThanOrEqual(2000); // But at least as long as slow provider
-      expect(
-        result.aggregatedRecords.some((r) => r.title === "Quick Book"),
-      ).toBe(true);
+      expect(result.aggregatedRecords.some((r) => r.title === "Quick Book")).toBe(true);
     }, 10_000);
 
     it("should handle high concurrency without degradation", async () => {
@@ -553,10 +450,7 @@ describe("Metadata Discovery Integration Tests", () => {
       );
       const coordinator = new TestCoordinator([highVolumeProvider]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "High Volume Test",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "High Volume Test" };
 
       const startTime = Date.now();
       const result = await coordinator.query(query);
@@ -587,10 +481,7 @@ describe("Metadata Discovery Integration Tests", () => {
       );
       const coordinator = new TestCoordinator([performanceProvider]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Performance Test",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Performance Test" };
 
       const result = await coordinator.query(query);
 
@@ -621,19 +512,12 @@ describe("Metadata Discovery Integration Tests", () => {
         title: "Duplicate Book",
       };
 
-      const provider1 = new MockMetadataProvider("Provider1", 85, [
-        identicalRecord1,
-      ]);
-      const provider2 = new MockMetadataProvider("Provider2", 90, [
-        identicalRecord2,
-      ]);
+      const provider1 = new MockMetadataProvider("Provider1", 85, [identicalRecord1]);
+      const provider2 = new MockMetadataProvider("Provider2", 90, [identicalRecord2]);
 
       const coordinator = new TestCoordinator([provider1, provider2]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Duplicate Book",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Duplicate Book" };
 
       const result = await coordinator.query(query);
 
@@ -669,39 +553,20 @@ describe("Metadata Discovery Integration Tests", () => {
         title: "Completely Different",
       };
 
-      const provider1 = new MockMetadataProvider("Provider1", 85, [
-        partialMatch1,
-      ]);
-      const provider2 = new MockMetadataProvider("Provider2", 80, [
-        partialMatch2,
-      ]);
-      const provider3 = new MockMetadataProvider("Provider3", 75, [
-        differentBook,
-      ]);
+      const provider1 = new MockMetadataProvider("Provider1", 85, [partialMatch1]);
+      const provider2 = new MockMetadataProvider("Provider2", 80, [partialMatch2]);
+      const provider3 = new MockMetadataProvider("Provider3", 75, [differentBook]);
 
-      const coordinator = new TestCoordinator([
-        provider1,
-        provider2,
-        provider3,
-      ]);
+      const coordinator = new TestCoordinator([provider1, provider2, provider3]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Great Book",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Great Book" };
 
       const result = await coordinator.query(query);
 
       expect(result.totalRecords).toBe(3); // Should not deduplicate partial matches
-      expect(result.aggregatedRecords.map((r) => r.title)).toContain(
-        "The Great Book",
-      );
-      expect(result.aggregatedRecords.map((r) => r.title)).toContain(
-        "Great Book",
-      );
-      expect(result.aggregatedRecords.map((r) => r.title)).toContain(
-        "Completely Different",
-      );
+      expect(result.aggregatedRecords.map((r) => r.title)).toContain("The Great Book");
+      expect(result.aggregatedRecords.map((r) => r.title)).toContain("Great Book");
+      expect(result.aggregatedRecords.map((r) => r.title)).toContain("Completely Different");
     });
 
     it("should prioritize results by confidence across providers", async () => {
@@ -732,40 +597,25 @@ describe("Metadata Discovery Integration Tests", () => {
         title: "Another Test Book",
       };
 
-      const lowProvider = new MockMetadataProvider(
-        "LowConfidenceProvider",
-        95,
-        [lowConfidenceRecord],
-      );
-      const highProvider = new MockMetadataProvider(
-        "HighConfidenceProvider",
-        70,
-        [highConfidenceRecord],
-      );
-      const mediumProvider = new MockMetadataProvider(
-        "MediumConfidenceProvider",
-        85,
-        [mediumConfidenceRecord],
-      );
-
-      const coordinator = new TestCoordinator([
-        lowProvider,
-        highProvider,
-        mediumProvider,
+      const lowProvider = new MockMetadataProvider("LowConfidenceProvider", 95, [
+        lowConfidenceRecord,
+      ]);
+      const highProvider = new MockMetadataProvider("HighConfidenceProvider", 70, [
+        highConfidenceRecord,
+      ]);
+      const mediumProvider = new MockMetadataProvider("MediumConfidenceProvider", 85, [
+        mediumConfidenceRecord,
       ]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Test Book",
-      };
+      const coordinator = new TestCoordinator([lowProvider, highProvider, mediumProvider]);
+
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Test Book" };
 
       const result = await coordinator.query(query);
 
       // Should sort by confidence (highest first)
       expect(result.aggregatedRecords[0].confidence).toBe(0.95);
-      expect(result.aggregatedRecords[0].authors).toContain(
-        "High Confidence Author",
-      );
+      expect(result.aggregatedRecords[0].authors).toContain("High Confidence Author");
       expect(result.aggregatedRecords[1].confidence).toBe(0.75);
       expect(result.aggregatedRecords[2].confidence).toBe(0.6);
     });
@@ -776,10 +626,7 @@ describe("Metadata Discovery Integration Tests", () => {
       const emptyProvider = new MockMetadataProvider("EmptyProvider", 80, []);
       const coordinator = new TestCoordinator([emptyProvider]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Nonexistent Book",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Nonexistent Book" };
 
       const result = await coordinator.query(query);
 
@@ -800,17 +647,12 @@ describe("Metadata Discovery Integration Tests", () => {
         title: undefined,
       };
 
-      const malformedProvider = new MockMetadataProvider(
-        "MalformedProvider",
-        80,
-        [malformedRecord],
-      );
+      const malformedProvider = new MockMetadataProvider("MalformedProvider", 80, [
+        malformedRecord,
+      ]);
       const coordinator = new TestCoordinator([malformedProvider]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Malformed Test",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Malformed Test" };
 
       const result = await coordinator.query(query);
 
@@ -821,10 +663,7 @@ describe("Metadata Discovery Integration Tests", () => {
 
     it("should handle concurrent requests with rate limiting simulation", async () => {
       let requestCount = 0;
-      const rateLimitedProvider = new MockMetadataProvider(
-        "RateLimitedProvider",
-        80,
-      );
+      const rateLimitedProvider = new MockMetadataProvider("RateLimitedProvider", 80);
 
       rateLimitedProvider.searchMultiCriteria = async () => {
         requestCount++;
@@ -848,15 +687,10 @@ describe("Metadata Discovery Integration Tests", () => {
 
       const coordinator = new TestCoordinator([rateLimitedProvider]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Rate Test",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Rate Test" };
 
       // Make multiple requests
-      const promises = Array.from({ length: 5 }, () =>
-        coordinator.query(query),
-      );
+      const promises = Array.from({ length: 5 }, () => coordinator.query(query));
       const results = await Promise.allSettled(promises);
 
       // Some should succeed, some should fail with rate limit
@@ -880,9 +714,7 @@ describe("Metadata Discovery Integration Tests", () => {
       expect(provider.getReliabilityScore(MetadataType.TITLE)).toBe(0.8);
       expect(provider.getReliabilityScore(MetadataType.AUTHORS)).toBe(0.7);
       expect(provider.getReliabilityScore(MetadataType.ISBN)).toBe(0.9);
-      expect(provider.getReliabilityScore(MetadataType.PUBLICATION_DATE)).toBe(
-        0.6,
-      );
+      expect(provider.getReliabilityScore(MetadataType.PUBLICATION_DATE)).toBe(0.6);
     });
 
     it("should track data type support", async () => {
@@ -891,9 +723,7 @@ describe("Metadata Discovery Integration Tests", () => {
       expect(provider.supportsDataType(MetadataType.TITLE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.AUTHORS)).toBe(true);
       expect(provider.supportsDataType(MetadataType.ISBN)).toBe(true);
-      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(
-        false,
-      );
+      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(false);
     });
 
     it("should measure provider performance metrics", async () => {
@@ -915,10 +745,7 @@ describe("Metadata Discovery Integration Tests", () => {
       );
       const coordinator = new TestCoordinator([metricsProvider]);
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Metrics Test",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Metrics Test" };
 
       const result = await coordinator.query(query);
 

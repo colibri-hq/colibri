@@ -1,7 +1,4 @@
-import type {
-  AuthenticationColorScheme,
-  AuthenticationUserRole,
-} from "@colibri-hq/sdk/schema";
+import type { AuthenticationColorScheme, AuthenticationUserRole } from "@colibri-hq/sdk/schema";
 import { createUser } from "@colibri-hq/sdk";
 import { inferNameFromEmailAddress } from "@colibri-hq/shared";
 import { Args, Flags } from "@oclif/core";
@@ -11,12 +8,7 @@ import { date } from "../../flags/date.ts";
 
 const roleFlag = Flags.option({
   default: "adult" as const,
-  options: [
-    "admin",
-    "adult",
-    "child",
-    "guest",
-  ] satisfies AuthenticationUserRole[],
+  options: ["admin", "adult", "child", "guest"] satisfies AuthenticationUserRole[],
 });
 const colorSchemeFlag = Flags.option({
   default: "system" as const,
@@ -25,15 +17,10 @@ const colorSchemeFlag = Flags.option({
 
 export default class Add extends BaseCommand<typeof Add> {
   static args = {
-    email: Args.string({
-      description: "Email address of the new user",
-      required: true,
-    }),
+    email: Args.string({ description: "Email address of the new user", required: true }),
   };
   static description = "Add a new user.";
-  static examples = [
-    "<%= config.bin %> <%= command.id %> jane.doe@gmail.com --name Jane",
-  ];
+  static examples = ["<%= config.bin %> <%= command.id %> jane.doe@gmail.com --name Jane"];
   static flags = {
     birthdate: date({
       description: "Birthdate of the new user.",
@@ -45,10 +32,7 @@ export default class Add extends BaseCommand<typeof Add> {
       multiple: false,
       required: false,
     }),
-    name: Flags.string({
-      description: "Name of the new user.",
-      required: false,
-    }),
+    name: Flags.string({ description: "Name of the new user.", required: false }),
     role: roleFlag({
       char: "r",
       description: "Role of the new user.",
@@ -64,10 +48,7 @@ export default class Add extends BaseCommand<typeof Add> {
   };
 
   async run() {
-    const spinner = ora({
-      stream: process.stderr,
-      text: "Creating user…",
-    }).start();
+    const spinner = ora({ stream: process.stderr, text: "Creating user…" }).start();
     const { email } = this.args;
     const { birthdate = null, colorScheme, role, verified } = this.flags;
     let { name } = this.flags;

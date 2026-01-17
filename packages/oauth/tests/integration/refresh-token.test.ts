@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { createTestServer, createMockPersistence } from "../utilities";
-import { type Entities } from "../../src/index.js";
 import type { FastifyInstance } from "fastify";
+import { describe, it, expect, beforeEach } from "vitest";
+import { type Entities } from "../../src/index.js";
+import { createTestServer, createMockPersistence } from "../utilities";
 
 describe("Refresh Token Grant Integration Tests", () => {
   let server: FastifyInstance;
@@ -165,9 +165,7 @@ describe("Refresh Token Grant Integration Tests", () => {
       });
 
       expect(response.statusCode).toBe(200);
-      expect(persistence.revokeRefreshToken).toHaveBeenCalledWith(
-        "test-refresh-token",
-      );
+      expect(persistence.revokeRefreshToken).toHaveBeenCalledWith("test-refresh-token");
     });
   });
 });

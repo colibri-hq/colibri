@@ -1,12 +1,7 @@
 /**
  * Language type classification per ISO 639-3.
  */
-export type LanguageType =
-  | 'living'
-  | 'historical'
-  | 'extinct'
-  | 'constructed'
-  | 'special';
+export type LanguageType = "living" | "historical" | "extinct" | "constructed" | "special";
 
 /**
  * A language record from the ISO 639-3 standard.
@@ -27,7 +22,7 @@ export interface Language {
 /**
  * The method used to resolve a language input.
  */
-export type MatchType = 'iso3' | 'iso1' | 'name' | 'regional';
+export type MatchType = "iso3" | "iso1" | "name" | "regional";
 
 /**
  * A resolved language with information about how it was matched.

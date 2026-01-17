@@ -33,18 +33,14 @@ describe("Cover Image Fetching", () => {
 
   describe("isPlaceholderImage", () => {
     it("should detect very small images as placeholders", async () => {
-      const tinyImage = new Blob([new Uint8Array(500)], {
-        type: "image/jpeg",
-      });
+      const tinyImage = new Blob([new Uint8Array(500)], { type: "image/jpeg" });
       const result = await isPlaceholderImage(tinyImage);
       expect(result).toBe(true);
     });
 
     it("should detect low entropy images as placeholders", async () => {
       // Create a solid color image (all same bytes = zero entropy)
-      const solidColor = new Blob([new Uint8Array(2000).fill(255)], {
-        type: "image/png",
-      });
+      const solidColor = new Blob([new Uint8Array(2000).fill(255)], { type: "image/png" });
       const result = await isPlaceholderImage(solidColor);
       expect(result).toBe(true);
     });
@@ -87,10 +83,7 @@ describe("Cover Image Fetching", () => {
         data: new Blob([new Uint8Array(10000)], { type: "image/jpeg" }),
       };
 
-      const assessment = await assessCoverQuality(smallCover, {
-        minWidth: 400,
-        minHeight: 600,
-      });
+      const assessment = await assessCoverQuality(smallCover, { minWidth: 400, minHeight: 600 });
 
       expect(assessment.acceptable).toBe(false);
       expect(assessment.issues.length).toBeGreaterThan(0);
@@ -108,9 +101,7 @@ describe("Cover Image Fetching", () => {
       };
 
       const assessment = await assessCoverQuality(weirdCover);
-      expect(assessment.issues.some((i) => i.includes("aspect ratio"))).toBe(
-        true,
-      );
+      expect(assessment.issues.some((i) => i.includes("aspect ratio"))).toBe(true);
     });
 
     it("should penalize covers without data", async () => {
@@ -123,9 +114,7 @@ describe("Cover Image Fetching", () => {
 
       const assessment = await assessCoverQuality(noCover);
       expect(assessment.score).toBeLessThan(0.8);
-      expect(assessment.issues.some((i) => i.includes("No image data"))).toBe(
-        true,
-      );
+      expect(assessment.issues.some((i) => i.includes("No image data"))).toBe(true);
     });
   });
 
@@ -141,13 +130,9 @@ describe("Cover Image Fetching", () => {
 
     it("should fall back to external sources if embedded is low quality", async () => {
       // Create a really small embedded cover that won't pass quality check
-      const lowQualityBlob = new Blob([new Uint8Array(500)], {
-        type: "image/jpeg",
-      });
+      const lowQualityBlob = new Blob([new Uint8Array(500)], { type: "image/jpeg" });
 
-      mockFetch.mockResolvedValueOnce(
-        createMockResponse(createMockImageBlob(600, 900)),
-      );
+      mockFetch.mockResolvedValueOnce(createMockResponse(createMockImageBlob(600, 900)));
 
       const result = await fetchCover("9780123456789", lowQualityBlob);
 
@@ -157,9 +142,7 @@ describe("Cover Image Fetching", () => {
     });
 
     it("should try Google Books first", async () => {
-      mockFetch.mockResolvedValueOnce(
-        createMockResponse(createMockImageBlob(600, 900)),
-      );
+      mockFetch.mockResolvedValueOnce(createMockResponse(createMockImageBlob(600, 900)));
 
       const result = await fetchCover("9780123456789", null);
 
@@ -175,9 +158,7 @@ describe("Cover Image Fetching", () => {
       mockFetch.mockResolvedValueOnce(createMockResponse(null, 404));
 
       // OpenLibrary succeeds
-      mockFetch.mockResolvedValueOnce(
-        createMockResponse(createMockImageBlob(600, 900)),
-      );
+      mockFetch.mockResolvedValueOnce(createMockResponse(createMockImageBlob(600, 900)));
 
       const result = await fetchCover("9780123456789", null);
 
@@ -190,9 +171,7 @@ describe("Cover Image Fetching", () => {
       mockFetch.mockResolvedValueOnce(createMockResponse(null, 404));
 
       // OpenLibrary returns placeholder
-      mockFetch.mockResolvedValueOnce(
-        createMockResponse(new Blob([new Uint8Array(500)])),
-      );
+      mockFetch.mockResolvedValueOnce(createMockResponse(new Blob([new Uint8Array(500)])));
 
       const result = await fetchCover("9780123456789", null);
 
@@ -203,9 +182,7 @@ describe("Cover Image Fetching", () => {
       const mediumQualityEmbedded = createMockImageBlob(300, 450);
 
       // External source returns slightly better cover
-      mockFetch.mockResolvedValueOnce(
-        createMockResponse(createMockImageBlob(350, 500)),
-      );
+      mockFetch.mockResolvedValueOnce(createMockResponse(createMockImageBlob(350, 500)));
 
       const result = await fetchCover("9780123456789", mediumQualityEmbedded, {
         minWidth: 400,
@@ -223,13 +200,9 @@ describe("Cover Image Fetching", () => {
     });
 
     it("should use preferred sources", async () => {
-      mockFetch.mockResolvedValue(
-        createMockResponse(createMockImageBlob(600, 900)),
-      );
+      mockFetch.mockResolvedValue(createMockResponse(createMockImageBlob(600, 900)));
 
-      const options: CoverFetchOptions = {
-        preferredSources: ["OpenLibrary", "Google Books"],
-      };
+      const options: CoverFetchOptions = { preferredSources: ["OpenLibrary", "Google Books"] };
 
       await fetchCover("9780123456789", null, options);
 
@@ -256,9 +229,7 @@ describe("Cover Image Fetching", () => {
 
   describe("LibraryThing integration", () => {
     it("should use LibraryThing when API key is provided", async () => {
-      mockFetch.mockResolvedValue(
-        createMockResponse(createMockImageBlob(600, 900)),
-      );
+      mockFetch.mockResolvedValue(createMockResponse(createMockImageBlob(600, 900)));
 
       const options: CoverFetchOptions = {
         libraryThingApiKey: "test-api-key",
@@ -305,14 +276,9 @@ describe("Cover Image Fetching", () => {
       // Create a very small blob that will be detected as placeholder
       // This should be returned by ALL sources
       mockFetch.mockImplementation(() => {
-        const corruptedBlob = new Blob([new Uint8Array([1, 2, 3, 4])], {
-          type: "image/jpeg",
-        });
+        const corruptedBlob = new Blob([new Uint8Array([1, 2, 3, 4])], { type: "image/jpeg" });
         return Promise.resolve(
-          new Response(corruptedBlob, {
-            status: 200,
-            headers: { "content-type": "image/jpeg" },
-          }),
+          new Response(corruptedBlob, { status: 200, headers: { "content-type": "image/jpeg" } }),
         );
       });
 
@@ -346,10 +312,7 @@ function createMockResponse(blob: Blob | null, status: number = 200): Response {
     return new Response(null, { status });
   }
 
-  return new Response(blob, {
-    status,
-    headers: { "content-type": "image/jpeg" },
-  });
+  return new Response(blob, { status, headers: { "content-type": "image/jpeg" } });
 }
 
 // Mock createImageBitmap since it's not available in Node
@@ -360,11 +323,7 @@ global.createImageBitmap = vi.fn(async (blob: Blob) => {
 
   // For very small blobs, return small dimensions
   if (size < 1000) {
-    return {
-      width: 5,
-      height: 7,
-      close: () => {},
-    } as ImageBitmap;
+    return { width: 5, height: 7, close: () => {} } as ImageBitmap;
   }
 
   // Estimate dimensions based on size
@@ -372,9 +331,5 @@ global.createImageBitmap = vi.fn(async (blob: Blob) => {
   const width = Math.sqrt(pixels * 0.67); // Assume ~2:3 ratio
   const height = width * 1.5;
 
-  return {
-    width: Math.floor(width),
-    height: Math.floor(height),
-    close: () => {},
-  } as ImageBitmap;
+  return { width: Math.floor(width), height: Math.floor(height), close: () => {} } as ImageBitmap;
 });

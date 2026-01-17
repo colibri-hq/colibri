@@ -1,37 +1,18 @@
-import { EventEmitter } from "events";
 import type { DuplicateCheckResult } from "@colibri-hq/sdk/ingestion";
+import { EventEmitter } from "events";
 
 /**
  * Import event types for SSE notifications
  */
 export type ImportEvent =
   | { type: "started"; uploadId: string; filename: string }
-  | {
-      type: "progress";
-      uploadId: string;
-      stage: "uploading" | "processing" | "ingesting";
-    }
-  | {
-      type: "completed";
-      uploadId: string;
-      workId: string;
-      editionId: string;
-      title: string;
-    }
-  | {
-      type: "duplicate";
-      uploadId: string;
-      pendingId: string;
-      duplicateInfo: DuplicateCheckResult;
-    }
+  | { type: "progress"; uploadId: string; stage: "uploading" | "processing" | "ingesting" }
+  | { type: "completed"; uploadId: string; workId: string; editionId: string; title: string }
+  | { type: "duplicate"; uploadId: string; pendingId: string; duplicateInfo: DuplicateCheckResult }
   | { type: "skipped"; uploadId: string; reason: string }
   | { type: "failed"; uploadId: string; error: string }
   // Enrichment events
-  | {
-      type: "enrichment-started";
-      workId: string;
-      title: string;
-    }
+  | { type: "enrichment-started"; workId: string; title: string }
   | {
       type: "enrichment-completed";
       workId: string;
@@ -40,11 +21,7 @@ export type ImportEvent =
       hasConflicts: boolean;
       sources: string[];
     }
-  | {
-      type: "enrichment-failed";
-      workId: string;
-      error: string;
-    };
+  | { type: "enrichment-failed"; workId: string; error: string };
 
 /**
  * Per-user event emitters for SSE import notifications.

@@ -14,9 +14,6 @@ export const POST = async function handle({ request }) {
 
   return json({
     status: 200,
-    body: {
-      integrity: request.integrity,
-      message: "Hello from the server!",
-    },
+    body: { integrity: request.integrity, message: "Hello from the server!" },
   });
 } satisfies RequestHandler;

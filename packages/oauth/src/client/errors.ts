@@ -81,10 +81,7 @@ export class OAuthClientError extends Error {
   /**
    * Check if an error is an OAuthClientError with a specific code
    */
-  static isCode(
-    error: unknown,
-    code: OAuthErrorCode | string,
-  ): error is OAuthClientError {
+  static isCode(error: unknown, code: OAuthErrorCode | string): error is OAuthClientError {
     return error instanceof OAuthClientError && error.code === code;
   }
 
@@ -92,11 +89,7 @@ export class OAuthClientError extends Error {
    * Convert to a plain object for serialization
    */
   toJSON(): OAuthErrorResponse {
-    return {
-      error: this.code,
-      error_description: this.description,
-      error_uri: this.uri,
-    };
+    return { error: this.code, error_description: this.description, error_uri: this.uri };
   }
 }
 
@@ -105,12 +98,7 @@ export class OAuthClientError extends Error {
  */
 export class TokenExpiredError extends OAuthClientError {
   constructor(message?: string, options?: { cause?: unknown }) {
-    super(
-      "expired_token",
-      message ?? "The token has expired",
-      undefined,
-      options,
-    );
+    super("expired_token", message ?? "The token has expired", undefined, options);
     this.name = "TokenExpiredError";
   }
 }
@@ -125,12 +113,7 @@ export class TokenExpiredError extends OAuthClientError {
  */
 export class InvalidGrantError extends OAuthClientError {
   constructor(message?: string, options?: { cause?: unknown }) {
-    super(
-      "invalid_grant",
-      message ?? "The grant is invalid",
-      undefined,
-      options,
-    );
+    super("invalid_grant", message ?? "The grant is invalid", undefined, options);
     this.name = "InvalidGrantError";
   }
 }
@@ -185,8 +168,7 @@ export class AccessDeniedError extends OAuthClientError {
   constructor(message?: string, options?: { cause?: unknown }) {
     super(
       "access_denied",
-      message ??
-        "The resource owner or authorization server denied the request",
+      message ?? "The resource owner or authorization server denied the request",
       undefined,
       options,
     );
@@ -221,12 +203,7 @@ export class DiscoveryError extends OAuthClientError {
  */
 export class StateMismatchError extends OAuthClientError {
   constructor(options?: { cause?: unknown }) {
-    super(
-      "invalid_request",
-      "State parameter mismatch - possible CSRF attack",
-      undefined,
-      options,
-    );
+    super("invalid_request", "State parameter mismatch - possible CSRF attack", undefined, options);
     this.name = "StateMismatchError";
   }
 }
@@ -239,11 +216,7 @@ export class StateMismatchError extends OAuthClientError {
  * @see RFC 9207
  */
 export class IssuerMismatchError extends OAuthClientError {
-  constructor(
-    expected: string,
-    received: string,
-    options?: { cause?: unknown },
-  ) {
+  constructor(expected: string, received: string, options?: { cause?: unknown }) {
     super(
       "invalid_request",
       `Issuer mismatch - expected "${expected}", received "${received}"`,
@@ -284,12 +257,7 @@ export class AbortError extends OAuthClientError {
  */
 export class ConfigurationError extends OAuthClientError {
   constructor(message: string, options?: { cause?: unknown }) {
-    super(
-      "invalid_request",
-      `Configuration error: ${message}`,
-      undefined,
-      options,
-    );
+    super("invalid_request", `Configuration error: ${message}`, undefined, options);
     this.name = "ConfigurationError";
   }
 }

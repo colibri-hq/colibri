@@ -16,13 +16,7 @@ export async function startGuiServer(options: GuiServerOptions): Promise<void> {
   // Resolve the package root (where svelte.config.js and vite.config.ts are)
   const packageRoot = resolve(__dirname, "../..");
 
-  const server = await createServer({
-    root: packageRoot,
-    server: {
-      port,
-      strictPort: false,
-    },
-  });
+  const server = await createServer({ root: packageRoot, server: { port, strictPort: false } });
 
   await server.listen();
 

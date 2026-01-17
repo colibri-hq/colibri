@@ -2,14 +2,8 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "include": [],
   "references": [
-    {
-      "path": "./tsconfig.lib.json"
-    },
-    {
-      "path": "./tsconfig.node.json"
-    },
-    {
-      "path": "./tsconfig.test.json"
-    }
+    { "path": "./tsconfig.lib.json" },
+    { "path": "./tsconfig.node.json" },
+    { "path": "./tsconfig.test.json" }
   ]
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from "vitest";
-import { MemoryTokenStore } from "../../../src/client/storage/memory.js";
 import type { StoredTokens } from "../../../src/client/types.js";
+import { MemoryTokenStore } from "../../../src/client/storage/memory.js";
 
 describe("MemoryTokenStore", () => {
   let store: MemoryTokenStore;

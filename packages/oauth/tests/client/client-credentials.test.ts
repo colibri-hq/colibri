@@ -90,20 +90,22 @@ describe("ClientCredentialsClient", () => {
   describe("getToken", () => {
     it("should request token with correct grant_type", async () => {
       const mockFetchWithValidation = createMockFetch();
-      mockFetchWithValidation.mockImplementation(async (url: RequestInfo | URL, init?: RequestInit) => {
-        const urlString = url.toString();
-        if (urlString.includes("/.well-known/")) {
-          return createJsonResponse(mockMetadata);
-        }
-        if (urlString.includes("/token")) {
-          const body = init?.body as string;
-          expect(body).toContain("grant_type=client_credentials");
-          expect(body).toContain("client_id=service-account");
-          expect(body).toContain("client_secret=test-secret");
-          return createJsonResponse(mockTokenResponse());
-        }
-        return new Response("Not Found", { status: 404 });
-      });
+      mockFetchWithValidation.mockImplementation(
+        async (url: RequestInfo | URL, init?: RequestInit) => {
+          const urlString = url.toString();
+          if (urlString.includes("/.well-known/")) {
+            return createJsonResponse(mockMetadata);
+          }
+          if (urlString.includes("/token")) {
+            const body = init?.body as string;
+            expect(body).toContain("grant_type=client_credentials");
+            expect(body).toContain("client_id=service-account");
+            expect(body).toContain("client_secret=test-secret");
+            return createJsonResponse(mockTokenResponse());
+          }
+          return new Response("Not Found", { status: 404 });
+        },
+      );
 
       const client = new ClientCredentialsClient({
         issuer: "https://auth.example.com",
@@ -346,20 +348,22 @@ describe("ClientCredentialsClient", () => {
 
       const mockFetchWithRefresh = createMockFetch();
       let refreshCalled = false;
-      mockFetchWithRefresh.mockImplementation(async (url: RequestInfo | URL, init?: RequestInit) => {
-        const urlString = url.toString();
-        if (urlString.includes("/.well-known/")) {
-          return createJsonResponse(mockMetadata);
-        }
-        if (urlString.includes("/token")) {
-          const body = init?.body as string;
-          if (body.includes("grant_type=refresh_token")) {
-            refreshCalled = true;
+      mockFetchWithRefresh.mockImplementation(
+        async (url: RequestInfo | URL, init?: RequestInit) => {
+          const urlString = url.toString();
+          if (urlString.includes("/.well-known/")) {
+            return createJsonResponse(mockMetadata);
           }
-          return createJsonResponse(mockTokenResponse());
-        }
-        return new Response("Not Found", { status: 404 });
-      });
+          if (urlString.includes("/token")) {
+            const body = init?.body as string;
+            if (body.includes("grant_type=refresh_token")) {
+              refreshCalled = true;
+            }
+            return createJsonResponse(mockTokenResponse());
+          }
+          return new Response("Not Found", { status: 404 });
+        },
+      );
 
       const client = new ClientCredentialsClient({
         issuer: "https://auth.example.com",
@@ -430,19 +434,21 @@ describe("ClientCredentialsClient", () => {
       mockTokenStore._store.set("service-account", expiringTokens);
 
       const mockFetchWithNoRefresh = createMockFetch();
-      mockFetchWithNoRefresh.mockImplementation(async (url: RequestInfo | URL, init?: RequestInit) => {
-        const urlString = url.toString();
-        if (urlString.includes("/.well-known/")) {
-          return createJsonResponse(mockMetadata);
-        }
-        if (urlString.includes("/token")) {
-          const body = init?.body as string;
-          expect(body).toContain("grant_type=client_credentials");
-          expect(body).not.toContain("grant_type=refresh_token");
-          return createJsonResponse(mockTokenResponse());
-        }
-        return new Response("Not Found", { status: 404 });
-      });
+      mockFetchWithNoRefresh.mockImplementation(
+        async (url: RequestInfo | URL, init?: RequestInit) => {
+          const urlString = url.toString();
+          if (urlString.includes("/.well-known/")) {
+            return createJsonResponse(mockMetadata);
+          }
+          if (urlString.includes("/token")) {
+            const body = init?.body as string;
+            expect(body).toContain("grant_type=client_credentials");
+            expect(body).not.toContain("grant_type=refresh_token");
+            return createJsonResponse(mockTokenResponse());
+          }
+          return new Response("Not Found", { status: 404 });
+        },
+      );
 
       const client = new ClientCredentialsClient({
         issuer: "https://auth.example.com",

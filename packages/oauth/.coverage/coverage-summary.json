@@ -1,16 +1,93 @@
-{"total": {"lines":{"total":714,"covered":663,"skipped":0,"pct":92.85},"statements":{"total":728,"covered":676,"skipped":0,"pct":92.85},"functions":{"total":155,"covered":140,"skipped":0,"pct":90.32},"branches":{"total":370,"covered":327,"skipped":0,"pct":88.37},"branchesTrue":{"total":0,"covered":0,"skipped":0,"pct":100}}
-,"/Users/moritz/Projects/colibri/packages/oauth/src/client/authorization-code.ts": {"lines":{"total":81,"covered":79,"skipped":0,"pct":97.53},"functions":{"total":7,"covered":7,"skipped":0,"pct":100},"statements":{"total":81,"covered":79,"skipped":0,"pct":97.53},"branches":{"total":70,"covered":67,"skipped":0,"pct":95.71}}
-,"/Users/moritz/Projects/colibri/packages/oauth/src/client/base.ts": {"lines":{"total":99,"covered":95,"skipped":0,"pct":95.95},"functions":{"total":19,"covered":17,"skipped":0,"pct":89.47},"statements":{"total":99,"covered":95,"skipped":0,"pct":95.95},"branches":{"total":56,"covered":50,"skipped":0,"pct":89.28}}
-,"/Users/moritz/Projects/colibri/packages/oauth/src/client/client-credentials.ts": {"lines":{"total":43,"covered":43,"skipped":0,"pct":100},"functions":{"total":5,"covered":5,"skipped":0,"pct":100},"statements":{"total":43,"covered":43,"skipped":0,"pct":100},"branches":{"total":22,"covered":22,"skipped":0,"pct":100}}
-,"/Users/moritz/Projects/colibri/packages/oauth/src/client/device-authorization.ts": {"lines":{"total":68,"covered":62,"skipped":0,"pct":91.17},"functions":{"total":9,"covered":9,"skipped":0,"pct":100},"statements":{"total":68,"covered":62,"skipped":0,"pct":91.17},"branches":{"total":30,"covered":26,"skipped":0,"pct":86.66}}
-,"/Users/moritz/Projects/colibri/packages/oauth/src/client/discovery.ts": {"lines":{"total":71,"covered":71,"skipped":0,"pct":100},"functions":{"total":15,"covered":15,"skipped":0,"pct":100},"statements":{"total":72,"covered":72,"skipped":0,"pct":100},"branches":{"total":44,"covered":43,"skipped":0,"pct":97.72}}
-,"/Users/moritz/Projects/colibri/packages/oauth/src/client/errors.ts": {"lines":{"total":39,"covered":39,"skipped":0,"pct":100},"functions":{"total":16,"covered":16,"skipped":0,"pct":100},"statements":{"total":39,"covered":39,"skipped":0,"pct":100},"branches":{"total":14,"covered":12,"skipped":0,"pct":85.71}}
-,"/Users/moritz/Projects/colibri/packages/oauth/src/client/pkce.ts": {"lines":{"total":46,"covered":45,"skipped":0,"pct":97.82},"functions":{"total":8,"covered":8,"skipped":0,"pct":100},"statements":{"total":49,"covered":48,"skipped":0,"pct":97.95},"branches":{"total":23,"covered":22,"skipped":0,"pct":95.65}}
-,"/Users/moritz/Projects/colibri/packages/oauth/src/client/fetch/index.ts": {"lines":{"total":27,"covered":27,"skipped":0,"pct":100},"functions":{"total":7,"covered":7,"skipped":0,"pct":100},"statements":{"total":28,"covered":28,"skipped":0,"pct":100},"branches":{"total":13,"covered":12,"skipped":0,"pct":92.3}}
-,"/Users/moritz/Projects/colibri/packages/oauth/src/client/fetch/interceptors.ts": {"lines":{"total":40,"covered":39,"skipped":0,"pct":97.5},"functions":{"total":12,"covered":12,"skipped":0,"pct":100},"statements":{"total":41,"covered":40,"skipped":0,"pct":97.56},"branches":{"total":22,"covered":18,"skipped":0,"pct":81.81}}
-,"/Users/moritz/Projects/colibri/packages/oauth/src/client/storage/local-storage.ts": {"lines":{"total":29,"covered":28,"skipped":0,"pct":96.55},"functions":{"total":6,"covered":6,"skipped":0,"pct":100},"statements":{"total":30,"covered":29,"skipped":0,"pct":96.66},"branches":{"total":11,"covered":10,"skipped":0,"pct":90.9}}
-,"/Users/moritz/Projects/colibri/packages/oauth/src/client/storage/memory.ts": {"lines":{"total":6,"covered":6,"skipped":0,"pct":100},"functions":{"total":5,"covered":5,"skipped":0,"pct":100},"statements":{"total":6,"covered":6,"skipped":0,"pct":100},"branches":{"total":2,"covered":2,"skipped":0,"pct":100}}
-,"/Users/moritz/Projects/colibri/packages/oauth/src/client/storage/secure.ts": {"lines":{"total":78,"covered":77,"skipped":0,"pct":98.71},"functions":{"total":13,"covered":13,"skipped":0,"pct":100},"statements":{"total":81,"covered":80,"skipped":0,"pct":98.76},"branches":{"total":16,"covered":15,"skipped":0,"pct":93.75}}
-,"/Users/moritz/Projects/colibri/packages/oauth/tests/client/__helpers__/crypto.ts": {"lines":{"total":44,"covered":22,"skipped":0,"pct":50},"functions":{"total":10,"covered":6,"skipped":0,"pct":60},"statements":{"total":48,"covered":25,"skipped":0,"pct":52.08},"branches":{"total":11,"covered":2,"skipped":0,"pct":18.18}}
-,"/Users/moritz/Projects/colibri/packages/oauth/tests/client/__helpers__/mock-server.ts": {"lines":{"total":43,"covered":30,"skipped":0,"pct":69.76},"functions":{"total":23,"covered":14,"skipped":0,"pct":60.86},"statements":{"total":43,"covered":30,"skipped":0,"pct":69.76},"branches":{"total":36,"covered":26,"skipped":0,"pct":72.22}}
+{
+  "total": {
+    "lines": { "total": 714, "covered": 663, "skipped": 0, "pct": 92.85 },
+    "statements": { "total": 728, "covered": 676, "skipped": 0, "pct": 92.85 },
+    "functions": { "total": 155, "covered": 140, "skipped": 0, "pct": 90.32 },
+    "branches": { "total": 370, "covered": 327, "skipped": 0, "pct": 88.37 },
+    "branchesTrue": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "/Users/moritz/Projects/colibri/packages/oauth/src/client/authorization-code.ts": {
+    "lines": { "total": 81, "covered": 79, "skipped": 0, "pct": 97.53 },
+    "functions": { "total": 7, "covered": 7, "skipped": 0, "pct": 100 },
+    "statements": { "total": 81, "covered": 79, "skipped": 0, "pct": 97.53 },
+    "branches": { "total": 70, "covered": 67, "skipped": 0, "pct": 95.71 }
+  },
+  "/Users/moritz/Projects/colibri/packages/oauth/src/client/base.ts": {
+    "lines": { "total": 99, "covered": 95, "skipped": 0, "pct": 95.95 },
+    "functions": { "total": 19, "covered": 17, "skipped": 0, "pct": 89.47 },
+    "statements": { "total": 99, "covered": 95, "skipped": 0, "pct": 95.95 },
+    "branches": { "total": 56, "covered": 50, "skipped": 0, "pct": 89.28 }
+  },
+  "/Users/moritz/Projects/colibri/packages/oauth/src/client/client-credentials.ts": {
+    "lines": { "total": 43, "covered": 43, "skipped": 0, "pct": 100 },
+    "functions": { "total": 5, "covered": 5, "skipped": 0, "pct": 100 },
+    "statements": { "total": 43, "covered": 43, "skipped": 0, "pct": 100 },
+    "branches": { "total": 22, "covered": 22, "skipped": 0, "pct": 100 }
+  },
+  "/Users/moritz/Projects/colibri/packages/oauth/src/client/device-authorization.ts": {
+    "lines": { "total": 68, "covered": 62, "skipped": 0, "pct": 91.17 },
+    "functions": { "total": 9, "covered": 9, "skipped": 0, "pct": 100 },
+    "statements": { "total": 68, "covered": 62, "skipped": 0, "pct": 91.17 },
+    "branches": { "total": 30, "covered": 26, "skipped": 0, "pct": 86.66 }
+  },
+  "/Users/moritz/Projects/colibri/packages/oauth/src/client/discovery.ts": {
+    "lines": { "total": 71, "covered": 71, "skipped": 0, "pct": 100 },
+    "functions": { "total": 15, "covered": 15, "skipped": 0, "pct": 100 },
+    "statements": { "total": 72, "covered": 72, "skipped": 0, "pct": 100 },
+    "branches": { "total": 44, "covered": 43, "skipped": 0, "pct": 97.72 }
+  },
+  "/Users/moritz/Projects/colibri/packages/oauth/src/client/errors.ts": {
+    "lines": { "total": 39, "covered": 39, "skipped": 0, "pct": 100 },
+    "functions": { "total": 16, "covered": 16, "skipped": 0, "pct": 100 },
+    "statements": { "total": 39, "covered": 39, "skipped": 0, "pct": 100 },
+    "branches": { "total": 14, "covered": 12, "skipped": 0, "pct": 85.71 }
+  },
+  "/Users/moritz/Projects/colibri/packages/oauth/src/client/pkce.ts": {
+    "lines": { "total": 46, "covered": 45, "skipped": 0, "pct": 97.82 },
+    "functions": { "total": 8, "covered": 8, "skipped": 0, "pct": 100 },
+    "statements": { "total": 49, "covered": 48, "skipped": 0, "pct": 97.95 },
+    "branches": { "total": 23, "covered": 22, "skipped": 0, "pct": 95.65 }
+  },
+  "/Users/moritz/Projects/colibri/packages/oauth/src/client/fetch/index.ts": {
+    "lines": { "total": 27, "covered": 27, "skipped": 0, "pct": 100 },
+    "functions": { "total": 7, "covered": 7, "skipped": 0, "pct": 100 },
+    "statements": { "total": 28, "covered": 28, "skipped": 0, "pct": 100 },
+    "branches": { "total": 13, "covered": 12, "skipped": 0, "pct": 92.3 }
+  },
+  "/Users/moritz/Projects/colibri/packages/oauth/src/client/fetch/interceptors.ts": {
+    "lines": { "total": 40, "covered": 39, "skipped": 0, "pct": 97.5 },
+    "functions": { "total": 12, "covered": 12, "skipped": 0, "pct": 100 },
+    "statements": { "total": 41, "covered": 40, "skipped": 0, "pct": 97.56 },
+    "branches": { "total": 22, "covered": 18, "skipped": 0, "pct": 81.81 }
+  },
+  "/Users/moritz/Projects/colibri/packages/oauth/src/client/storage/local-storage.ts": {
+    "lines": { "total": 29, "covered": 28, "skipped": 0, "pct": 96.55 },
+    "functions": { "total": 6, "covered": 6, "skipped": 0, "pct": 100 },
+    "statements": { "total": 30, "covered": 29, "skipped": 0, "pct": 96.66 },
+    "branches": { "total": 11, "covered": 10, "skipped": 0, "pct": 90.9 }
+  },
+  "/Users/moritz/Projects/colibri/packages/oauth/src/client/storage/memory.ts": {
+    "lines": { "total": 6, "covered": 6, "skipped": 0, "pct": 100 },
+    "functions": { "total": 5, "covered": 5, "skipped": 0, "pct": 100 },
+    "statements": { "total": 6, "covered": 6, "skipped": 0, "pct": 100 },
+    "branches": { "total": 2, "covered": 2, "skipped": 0, "pct": 100 }
+  },
+  "/Users/moritz/Projects/colibri/packages/oauth/src/client/storage/secure.ts": {
+    "lines": { "total": 78, "covered": 77, "skipped": 0, "pct": 98.71 },
+    "functions": { "total": 13, "covered": 13, "skipped": 0, "pct": 100 },
+    "statements": { "total": 81, "covered": 80, "skipped": 0, "pct": 98.76 },
+    "branches": { "total": 16, "covered": 15, "skipped": 0, "pct": 93.75 }
+  },
+  "/Users/moritz/Projects/colibri/packages/oauth/tests/client/__helpers__/crypto.ts": {
+    "lines": { "total": 44, "covered": 22, "skipped": 0, "pct": 50 },
+    "functions": { "total": 10, "covered": 6, "skipped": 0, "pct": 60 },
+    "statements": { "total": 48, "covered": 25, "skipped": 0, "pct": 52.08 },
+    "branches": { "total": 11, "covered": 2, "skipped": 0, "pct": 18.18 }
+  },
+  "/Users/moritz/Projects/colibri/packages/oauth/tests/client/__helpers__/mock-server.ts": {
+    "lines": { "total": 43, "covered": 30, "skipped": 0, "pct": 69.76 },
+    "functions": { "total": 23, "covered": 14, "skipped": 0, "pct": 60.86 },
+    "statements": { "total": 43, "covered": 30, "skipped": 0, "pct": 69.76 },
+    "branches": { "total": 36, "covered": 26, "skipped": 0, "pct": 72.22 }
+  }
 }

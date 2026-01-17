@@ -1,12 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ConfigurableMetadataProvider } from "./configurable-provider.js";
+import type { CreatorQuery, MetadataRecord, MultiCriteriaQuery, TitleQuery } from "./provider.js";
 import { MetadataConfigManager } from "../config.js";
-import type {
-  CreatorQuery,
-  MetadataRecord,
-  MultiCriteriaQuery,
-  TitleQuery,
-} from "./provider.js";
+import { ConfigurableMetadataProvider } from "./configurable-provider.js";
 
 // Mock provider for testing
 class TestConfigurableProvider extends ConfigurableMetadataProvider {
@@ -32,9 +27,7 @@ class TestConfigurableProvider extends ConfigurableMetadataProvider {
     return [];
   }
 
-  async searchMultiCriteria(
-    _query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(_query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     return [];
   }
 
@@ -86,14 +79,8 @@ describe("ConfigurableMetadataProvider", () => {
       configManager.updateProviderConfig("test-provider", {
         enabled: true,
         priority: 75,
-        rateLimit: {
-          maxRequests: 200,
-          windowMs: 30000,
-        },
-        timeout: {
-          requestTimeout: 5000,
-          operationTimeout: 15000,
-        },
+        rateLimit: { maxRequests: 200, windowMs: 30000 },
+        timeout: { requestTimeout: 5000, operationTimeout: 15000 },
       });
     });
 
@@ -107,12 +94,7 @@ describe("ConfigurableMetadataProvider", () => {
     });
 
     it("should update configuration through provider methods", () => {
-      provider.updateConfig({
-        priority: 90,
-        options: {
-          customOption: "test-value",
-        },
-      });
+      provider.updateConfig({ priority: 90, options: { customOption: "test-value" } });
 
       expect(provider.priority).toBe(90);
       expect(provider.testGetOption("customOption")).toBe("test-value");
@@ -131,23 +113,13 @@ describe("ConfigurableMetadataProvider", () => {
     beforeEach(() => {
       configManager.updateProviderConfig("test-provider", {
         enabled: true,
-        options: {
-          stringOption: "test-string",
-          numberOption: 42,
-          booleanOption: true,
-        },
-        auth: {
-          apiKey: "secret-key",
-          username: "test-user",
-        },
+        options: { stringOption: "test-string", numberOption: 42, booleanOption: true },
+        auth: { apiKey: "secret-key", username: "test-user" },
         endpoints: {
           baseUrl: "https://custom.api.com",
           searchUrl: "https://custom.api.com/search",
         },
-        features: {
-          fuzzySearch: true,
-          coverImages: false,
-        },
+        features: { fuzzySearch: true, coverImages: false },
       });
     });
 
@@ -166,16 +138,10 @@ describe("ConfigurableMetadataProvider", () => {
     });
 
     it("should get endpoint configuration", () => {
-      expect(provider.testGetEndpoint("baseUrl")).toBe(
-        "https://custom.api.com",
-      );
-      expect(provider.testGetEndpoint("searchUrl")).toBe(
-        "https://custom.api.com/search",
-      );
+      expect(provider.testGetEndpoint("baseUrl")).toBe("https://custom.api.com");
+      expect(provider.testGetEndpoint("searchUrl")).toBe("https://custom.api.com/search");
       expect(provider.testGetEndpoint("nonExistent")).toBeUndefined();
-      expect(provider.testGetEndpoint("nonExistent", "default")).toBe(
-        "default",
-      );
+      expect(provider.testGetEndpoint("nonExistent", "default")).toBe("default");
     });
 
     it("should check feature flags", () => {
@@ -189,9 +155,7 @@ describe("ConfigurableMetadataProvider", () => {
       expect(provider.testGetBaseUrl()).toBe("https://custom.api.com");
 
       // Test fallback to default
-      configManager.updateProviderConfig("test-provider", {
-        endpoints: {},
-      });
+      configManager.updateProviderConfig("test-provider", { endpoints: {} });
       expect(provider.testGetBaseUrl()).toBe("https://api.test.com");
     });
   });
@@ -201,25 +165,17 @@ describe("ConfigurableMetadataProvider", () => {
       const onConfigChangedSpy = vi.fn();
       (provider as any).onConfigChanged = onConfigChangedSpy;
 
-      configManager.updateProviderConfig("test-provider", {
-        enabled: true,
-        priority: 80,
-      });
+      configManager.updateProviderConfig("test-provider", { enabled: true, priority: 80 });
 
       expect(onConfigChangedSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          enabled: true,
-          priority: 80,
-        }),
+        expect.objectContaining({ enabled: true, priority: 80 }),
       );
     });
 
     it("should not call onConfigChanged if method is not implemented", () => {
       // Should not throw error when onConfigChanged is not implemented
       expect(() => {
-        configManager.updateProviderConfig("test-provider", {
-          enabled: true,
-        });
+        configManager.updateProviderConfig("test-provider", { enabled: true });
       }).not.toThrow();
     });
   });

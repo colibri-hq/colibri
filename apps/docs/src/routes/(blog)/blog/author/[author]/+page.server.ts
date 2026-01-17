@@ -1,5 +1,5 @@
-import { error } from "@sveltejs/kit";
 import { getBlogAuthors, getPostsByAuthor } from "$lib/content/blog";
+import { error } from "@sveltejs/kit";
 import type { EntryGenerator, PageServerLoad } from "./$types.js";
 
 export const prerender = true;
@@ -21,9 +21,5 @@ export const load = async function load({ params }) {
     error(404, { message: `No posts found by author "${authorName}"` });
   }
 
-  return {
-    authorName,
-    author: authorInfo.author,
-    posts,
-  };
+  return { authorName, author: authorInfo.author, posts };
 } satisfies PageServerLoad;

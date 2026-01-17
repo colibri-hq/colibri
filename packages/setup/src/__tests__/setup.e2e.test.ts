@@ -1,16 +1,8 @@
 import type { Database } from "@colibri-hq/sdk";
 import { initialize } from "@colibri-hq/sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import {
-  applySetup,
-  buildStorageDsn,
-  type SetupConfig,
-} from "../core/state.js";
-import {
-  setupTestDatabase,
-  teardownTestDatabase,
-  type TestContext,
-} from "./test-utils.js";
+import { applySetup, buildStorageDsn, type SetupConfig } from "../core/state.js";
+import { setupTestDatabase, teardownTestDatabase, type TestContext } from "./test-utils.js";
 
 describe("Setup E2E Tests", () => {
   let testContext: TestContext;
@@ -105,16 +97,10 @@ describe("Setup E2E Tests", () => {
   describe("applySetup", () => {
     it("should create admin user and configure instance", async () => {
       const config: SetupConfig = {
-        admin: {
-          email: "admin@example.com",
-          name: "Test Admin",
-        },
+        admin: { email: "admin@example.com", name: "Test Admin" },
         database,
         databaseDsn: testContext.connectionString,
-        instance: {
-          description: "A test instance",
-          name: "Test Library",
-        },
+        instance: { description: "A test instance", name: "Test Library" },
         storage: {
           accessKeyId: "test-access-key",
           endpoint: "http://localhost:9000",
@@ -170,15 +156,10 @@ describe("Setup E2E Tests", () => {
       await database.deleteFrom("vault.secrets").execute();
 
       const config: SetupConfig = {
-        admin: {
-          email: "admin2@example.com",
-          name: "Admin Two",
-        },
+        admin: { email: "admin2@example.com", name: "Admin Two" },
         database,
         databaseDsn: testContext.connectionString,
-        instance: {
-          name: "SMTP Test Library",
-        },
+        instance: { name: "SMTP Test Library" },
         smtp: {
           from: "noreply@example.com",
           host: "smtp.example.com",
@@ -230,16 +211,10 @@ describe("Setup E2E Tests", () => {
       await database.deleteFrom("vault.secrets").execute();
 
       const config: SetupConfig = {
-        admin: {
-          email: "librarian@mybooks.com",
-          name: "My Librarian",
-        },
+        admin: { email: "librarian@mybooks.com", name: "My Librarian" },
         database,
         databaseDsn: testContext.connectionString,
-        instance: {
-          description: "My personal ebook collection",
-          name: "My Book Library",
-        },
+        instance: { description: "My personal ebook collection", name: "My Book Library" },
         storage: {
           accessKeyId: "AKIAIOSFODNN7EXAMPLE",
           endpoint: "https://s3.us-west-2.amazonaws.com",
@@ -264,10 +239,7 @@ describe("Setup E2E Tests", () => {
       // Test 2: Instance settings are queryable via getSetting
       const { getSetting } = await import("@colibri-hq/sdk");
 
-      const instanceName = await getSetting(
-        database,
-        "urn:colibri:settings:general:instance-name",
-      );
+      const instanceName = await getSetting(database, "urn:colibri:settings:general:instance-name");
       expect(instanceName.value).toBe("My Book Library");
 
       const instanceDesc = await getSetting(
@@ -297,9 +269,7 @@ describe("Setup E2E Tests", () => {
       // Test 4: Can create creators
       const creator = await database
         .insertInto("creator")
-        .values({
-          name: "Test Author",
-        })
+        .values({ name: "Test Author" })
         .returning("id")
         .executeTakeFirstOrThrow();
 
@@ -308,10 +278,7 @@ describe("Setup E2E Tests", () => {
       // Test 5: Can create editions and link to work/creator
       const edition = await database
         .insertInto("edition")
-        .values({
-          title: "Test Book Title",
-          work_id: work.id,
-        })
+        .values({ title: "Test Book Title", work_id: work.id })
         .returning("id")
         .executeTakeFirstOrThrow();
 
@@ -320,11 +287,7 @@ describe("Setup E2E Tests", () => {
       // Test 6: Can link edition to creator via contribution
       await database
         .insertInto("contribution")
-        .values({
-          creator_id: creator.id,
-          edition_id: edition.id,
-          role: "aut",
-        })
+        .values({ creator_id: creator.id, edition_id: edition.id, role: "aut" })
         .execute();
 
       const contribution = await database

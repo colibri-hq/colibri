@@ -1,6 +1,6 @@
-import { playwright } from "@vitest/browser-playwright";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import tailwindcss from "@tailwindcss/vite";
+import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -22,11 +22,7 @@ export default defineConfig({
         test: {
           name: "browser",
           include: ["src/**/*.browser.{test,spec}.ts"],
-          browser: {
-            enabled: true,
-            provider: playwright(),
-            instances: [{ browser: "chromium" }],
-          },
+          browser: { enabled: true, provider: playwright(), instances: [{ browser: "chromium" }] },
         },
       },
     ],

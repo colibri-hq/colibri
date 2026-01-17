@@ -36,15 +36,7 @@ declare module "svelte-gravatar" {
     protocol?: string;
     domain?: string;
     size?: number;
-    default?:
-      | "404"
-      | "mp"
-      | "identicon"
-      | "monsterid"
-      | "wavatar"
-      | "retro"
-      | "robohash"
-      | "blank";
+    default?: "404" | "mp" | "identicon" | "monsterid" | "wavatar" | "retro" | "robohash" | "blank";
     rating?: "g" | "pg" | "r" | "x";
     class?: string;
     style?: string;

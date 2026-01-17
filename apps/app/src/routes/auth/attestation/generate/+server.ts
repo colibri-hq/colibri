@@ -1,21 +1,13 @@
+import type { GenerateRegistrationOptionsOpts } from "@simplewebauthn/server";
 import { env } from "$env/dynamic/private";
 import { getAuthSessionIdFromCookie, resolveUserId } from "$lib/server/auth";
-import {
-  createChallenge,
-  findUserByIdentifier,
-  listAuthenticatorsForUser,
-} from "@colibri-hq/sdk";
-import type { GenerateRegistrationOptionsOpts } from "@simplewebauthn/server";
+import { createChallenge, findUserByIdentifier, listAuthenticatorsForUser } from "@colibri-hq/sdk";
 import { generateRegistrationOptions } from "@simplewebauthn/server";
 import { isoUint8Array } from "@simplewebauthn/server/helpers";
 import { error, json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 
-export const GET: RequestHandler = async function handler({
-  url,
-  cookies,
-  locals: { database },
-}) {
+export const GET: RequestHandler = async function handler({ url, cookies, locals: { database } }) {
   const sessionId = getAuthSessionIdFromCookie(cookies);
 
   if (!sessionId) {
@@ -47,22 +39,17 @@ export const GET: RequestHandler = async function handler({
      * the browser if it's asked to perform registration when one of these ID's already resides
      * on it.
      */
-    excludeCredentials: authenticators.map(
-      ({ identifier: id, transports }) => ({
-        type: "public-key",
-        transports,
-        id,
-      }),
-    ),
+    excludeCredentials: authenticators.map(({ identifier: id, transports }) => ({
+      type: "public-key",
+      transports,
+      id,
+    })),
 
     /**
      * The optional authenticatorSelection property allows for specifying more the types of
      * authenticators that users to can use for registration
      */
-    authenticatorSelection: {
-      residentKey: "required",
-      userVerification: "preferred",
-    },
+    authenticatorSelection: { residentKey: "required", userVerification: "preferred" },
 
     /**
      * Support the two most common algorithms: ES256, and RS256

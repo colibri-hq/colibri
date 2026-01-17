@@ -1,6 +1,4 @@
-function formatValue(
-  value: Exclude<SearchParameterValue, Array<unknown> | object>,
-): string {
+function formatValue(value: Exclude<SearchParameterValue, Array<unknown> | object>): string {
   value = String(value).trim();
 
   return /\s/.test(value) ? `"${value.replace(/"/g, '\\"').trim()}"` : value;

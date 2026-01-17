@@ -1,6 +1,6 @@
-import type { Metadata } from "./metadata.js";
 import type { PDFDocumentProxy } from "@colibri-hq/pdf";
 import * as pdfjs from "@colibri-hq/pdf";
+import type { Metadata } from "./metadata.js";
 
 export async function isPdfFile(file: File): Promise<boolean> {
   const slices = new Uint8Array(await file.slice(0, 5).arrayBuffer());
@@ -14,35 +14,16 @@ export async function isPdfFile(file: File): Promise<boolean> {
   );
 }
 
-export async function loadPdfMetadata(
-  file: File,
-  _signal?: AbortSignal,
-): Promise<Metadata> {
+export async function loadPdfMetadata(file: File, _signal?: AbortSignal): Promise<Metadata> {
   const document = await loadPdf(file);
   const { info, metadata } = await document.getMetadata();
-  const {
-    Author,
-    CreationDate,
-    Keywords,
-    Language,
-    ModDate,
-    Title,
-    Subject,
-    ...properties
-  } = Object.fromEntries(Object.entries(info));
+  const { Author, CreationDate, Keywords, Language, ModDate, Title, Subject, ...properties } =
+    Object.fromEntries(Object.entries(info));
   const dateCreated = parseDate(CreationDate);
   const dateModified = parseDate(ModDate);
 
   return {
-    contributors: Author
-      ? [
-          {
-            name: Author,
-            roles: ["aut"],
-            sortingKey: Author,
-          },
-        ]
-      : [],
+    contributors: Author ? [{ name: Author, roles: ["aut"], sortingKey: Author }] : [],
     dateCreated,
     dateModified,
     legalInformation: undefined,

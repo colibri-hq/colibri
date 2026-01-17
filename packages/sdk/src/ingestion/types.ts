@@ -141,11 +141,7 @@ export interface ExtractedMetadata {
   legalInformation?: string | undefined;
   identifiers?: Array<{ type: string; value: string }> | undefined;
   contributors?:
-    | Array<{
-        name: string;
-        roles: string[];
-        sortingKey?: string | undefined;
-      }>
+    | Array<{ name: string; roles: string[]; sortingKey?: string | undefined }>
     | undefined;
   cover?: Blob | File | undefined;
   properties?: Record<string, unknown> | undefined;
@@ -179,9 +175,7 @@ export interface BatchImportOptions extends IngestWorkOptions {
   /** Dry run - don't actually import */
   dryRun?: boolean | undefined;
   /** Progress callback */
-  onProgress?:
-    | ((current: number, total: number, file: string) => void)
-    | undefined;
+  onProgress?: ((current: number, total: number, file: string) => void) | undefined;
   /** Result callback - called after each file is processed */
   onResult?: ((result: IngestWorkResult, file: string) => void) | undefined;
 }

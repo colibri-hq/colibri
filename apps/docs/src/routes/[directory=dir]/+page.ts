@@ -1,5 +1,5 @@
-import type { PageLoad } from "./$types.js";
 import { getSiblingPages } from "$lib/content/content";
+import type { PageLoad } from "./$types.js";
 
 export const load = function load({ data }) {
   const { indexPage, ...rest } = data;

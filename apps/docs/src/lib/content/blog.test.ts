@@ -1,11 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  generateExcerpt,
-  getMonthName,
-  formatBlogDate,
-  getSeriesSlug,
-  MONTH_NAMES,
-} from "./blog";
+import { generateExcerpt, getMonthName, formatBlogDate, getSeriesSlug, MONTH_NAMES } from "./blog";
 
 describe("generateExcerpt", () => {
   describe("basic text handling", () => {
@@ -52,27 +46,19 @@ This is the actual content.`;
     });
 
     it("removes bold formatting", () => {
-      expect(generateExcerpt("This is **bold** text")).toBe(
-        "This is bold text",
-      );
-      expect(generateExcerpt("This is __also bold__ text")).toBe(
-        "This is also bold text",
-      );
+      expect(generateExcerpt("This is **bold** text")).toBe("This is bold text");
+      expect(generateExcerpt("This is __also bold__ text")).toBe("This is also bold text");
     });
 
     it("removes italic formatting", () => {
-      expect(generateExcerpt("This is *italic* text")).toBe(
-        "This is italic text",
-      );
-      expect(generateExcerpt("This is _also italic_ text")).toBe(
-        "This is also italic text",
-      );
+      expect(generateExcerpt("This is *italic* text")).toBe("This is italic text");
+      expect(generateExcerpt("This is _also italic_ text")).toBe("This is also italic text");
     });
 
     it("keeps link text but removes URL", () => {
-      expect(
-        generateExcerpt("Check out [this link](https://example.com) for more"),
-      ).toBe("Check out this link for more");
+      expect(generateExcerpt("Check out [this link](https://example.com) for more")).toBe(
+        "Check out this link for more",
+      );
     });
 
     it("removes images completely", () => {
@@ -82,9 +68,7 @@ This is the actual content.`;
     });
 
     it("removes inline code", () => {
-      expect(generateExcerpt("Use `const x = 1` for variables")).toBe(
-        "Use for variables",
-      );
+      expect(generateExcerpt("Use `const x = 1` for variables")).toBe("Use for variables");
     });
 
     it("removes code blocks", () => {
@@ -103,9 +87,7 @@ Text after`;
     });
 
     it("removes HTML tags", () => {
-      expect(generateExcerpt("<div>Hello</div> <span>World</span>")).toBe(
-        "Hello World",
-      );
+      expect(generateExcerpt("<div>Hello</div> <span>World</span>")).toBe("Hello World");
     });
   });
 
@@ -119,8 +101,7 @@ Text after`;
     });
 
     it("handles custom max length", () => {
-      const text =
-        "This is a test sentence that is longer than fifty characters.";
+      const text = "This is a test sentence that is longer than fifty characters.";
       const excerpt = generateExcerpt(text, 50);
       expect(excerpt.length).toBeLessThanOrEqual(53); // 50 + "..."
     });

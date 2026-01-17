@@ -56,22 +56,18 @@ export async function loadConfig(configFile?: string) {
     }
 
     if (strict) {
-      throw new Error(
-        `Failed to load configuration file at "${configFile}": ${error}`,
-        { cause: error },
-      );
+      throw new Error(`Failed to load configuration file at "${configFile}": ${error}`, {
+        cause: error,
+      });
     }
 
     if ("code" in error && error.code === "ENOENT") {
       return createDefaultConfig();
     }
 
-    throw new Error(
-      `Failed to load configuration file at "${configFile}": ${error}`,
-      {
-        cause: error,
-      },
-    );
+    throw new Error(`Failed to load configuration file at "${configFile}": ${error}`, {
+      cause: error,
+    });
   }
 }
 
@@ -82,11 +78,7 @@ async function findConfigFile() {
 
       return file;
     } catch (error) {
-      if (
-        !(error instanceof Error) ||
-        !("code" in error) ||
-        error.code !== "ENOENT"
-      ) {
+      if (!(error instanceof Error) || !("code" in error) || error.code !== "ENOENT") {
         throw error;
       }
     }
@@ -110,7 +102,5 @@ function serializeConfig(config: Config) {
 }
 
 function createDefaultConfig(): Config {
-  return {
-    instances: {},
-  };
+  return { instances: {} };
 }

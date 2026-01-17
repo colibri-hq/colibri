@@ -11,9 +11,9 @@
  * Run with: tsx packages/sdk/src/examples/series-tags-demo.ts
  */
 
-import { loadEpubMetadata } from "../ebooks/epub.js";
-import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
+import { loadEpubMetadata } from "../ebooks/epub.js";
 
 async function demonstrateMetadataExtraction() {
   console.log("=== EPUB Metadata Extraction Demo ===\n");
@@ -32,9 +32,7 @@ async function demonstrateMetadataExtraction() {
     // Load EPUB file
     console.log("📚 Loading EPUB file...");
     const buffer = await readFile(epubPath);
-    const file = new File([buffer], "Ikigai.epub", {
-      type: "application/epub+zip",
-    });
+    const file = new File([buffer], "Ikigai.epub", { type: "application/epub+zip" });
 
     // Extract metadata
     console.log("🔍 Extracting metadata...\n");
@@ -44,10 +42,7 @@ async function demonstrateMetadataExtraction() {
     console.log("Basic Information:");
     console.log("  Title:", metadata.title);
     console.log("  Language:", metadata.language);
-    console.log(
-      "  Contributors:",
-      metadata.contributors.map((c) => c.name).join(", "),
-    );
+    console.log("  Contributors:", metadata.contributors.map((c) => c.name).join(", "));
     console.log("  Published:", metadata.datePublished?.toDateString());
     console.log();
 
@@ -59,9 +54,7 @@ async function demonstrateMetadataExtraction() {
       console.log("    Position:", metadata.series.position ?? "Not specified");
     } else {
       console.log("  ℹ️  No series metadata found");
-      console.log(
-        "    (This book is not part of a series or metadata is missing)",
-      );
+      console.log("    (This book is not part of a series or metadata is missing)");
     }
     console.log();
 
@@ -74,9 +67,7 @@ async function demonstrateMetadataExtraction() {
       });
     } else {
       console.log("  ℹ️  No subject tags found");
-      console.log(
-        "    (This EPUB doesn't have <dc:subject> elements or they're empty)",
-      );
+      console.log("    (This EPUB doesn't have <dc:subject> elements or they're empty)");
     }
     console.log();
 
@@ -97,13 +88,7 @@ async function demonstrateMetadataExtraction() {
 
     // Demonstrate tag normalization
     console.log("Tag Normalization Examples:");
-    const rawTags = [
-      "  Fiction  ",
-      "FANTASY",
-      "Science Fiction",
-      "Sci-Fi",
-      "science fiction",
-    ];
+    const rawTags = ["  Fiction  ", "FANTASY", "Science Fiction", "Sci-Fi", "science fiction"];
 
     console.log("  Raw tags:");
     rawTags.forEach((tag) => console.log(`    "${tag}"`));
@@ -112,9 +97,7 @@ async function demonstrateMetadataExtraction() {
     const normalized = [...new Set(rawTags.map((t) => t.toLowerCase().trim()))];
     normalized.forEach((tag) => console.log(`    "${tag}"`));
 
-    console.log(
-      `\n  Result: ${rawTags.length} raw → ${normalized.length} unique`,
-    );
+    console.log(`\n  Result: ${rawTags.length} raw → ${normalized.length} unique`);
     console.log();
   } catch (error) {
     console.error("❌ Error:", error);
@@ -181,9 +164,7 @@ async function demonstrateIngestionFlow() {
   console.log();
 
   console.log("Step 2: Process series metadata");
-  console.log(
-    '  → findOrCreateSeries("The Lord of the Rings", { language: "en" })',
-  );
+  console.log('  → findOrCreateSeries("The Lord of the Rings", { language: "en" })');
   console.log("    1. Try exact match (case-insensitive)");
   console.log("    2. Try fuzzy match (>70% similarity)");
   console.log("    3. Create new series if no match");
@@ -216,9 +197,7 @@ async function demonstrateQueryExamples() {
   console.log("Query all works in a series:");
   console.log("  const works = await loadSeriesWorks(database, seriesId);");
   console.log("  works.forEach(work => {");
-  console.log(
-    "    console.log(`${work.series_position}. ${work.edition_title}`);",
-  );
+  console.log("    console.log(`${work.series_position}. ${work.edition_title}`);");
   console.log("  });");
   console.log();
 
@@ -229,18 +208,14 @@ async function demonstrateQueryExamples() {
   console.log();
 
   console.log("Find or create a series:");
-  console.log(
-    '  const series = await findOrCreateSeries(database, "Harry Potter", {',
-  );
+  console.log('  const series = await findOrCreateSeries(database, "Harry Potter", {');
   console.log('    language: "en",');
   console.log('    userId: "user123",');
   console.log("  });");
   console.log();
 
   console.log("Find or create a tag:");
-  console.log(
-    '  const tag = await findOrCreateTag(database, "Science Fiction", {',
-  );
+  console.log('  const tag = await findOrCreateTag(database, "Science Fiction", {');
   console.log('    color: "#3b82f6",');
   console.log('    emoji: "🚀",');
   console.log('    userId: "user123",');

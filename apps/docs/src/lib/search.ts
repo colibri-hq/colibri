@@ -6,10 +6,7 @@
 // Pagefind types (generated at build time, loaded dynamically)
 interface PagefindAPI {
   init: () => Promise<void>;
-  search: (
-    query: string,
-    options?: PagefindSearchOptions,
-  ) => Promise<PagefindSearchResponse>;
+  search: (query: string, options?: PagefindSearchOptions) => Promise<PagefindSearchResponse>;
   debouncedSearch: (
     query: string,
     options?: PagefindSearchOptions,
@@ -29,11 +26,7 @@ interface PagefindSearchResponse {
   unfilteredResultCount: number;
   filters: Record<string, Record<string, number>>;
   totalFilters: Record<string, Record<string, number>>;
-  timings: {
-    preload: number;
-    search: number;
-    total: number;
-  };
+  timings: { preload: number; search: number; total: number };
 }
 
 interface PagefindResult {
@@ -48,26 +41,13 @@ interface PagefindResultData {
   content: string;
   word_count: number;
   excerpt: string; // HTML with <mark> tags for highlighting
-  meta: {
-    title: string;
-    image?: string;
-    image_alt?: string;
-  };
-  anchors?: Array<{
-    element: string;
-    id: string;
-    text: string;
-    location: number;
-  }>;
+  meta: { title: string; image?: string; image_alt?: string };
+  anchors?: Array<{ element: string; id: string; text: string; location: number }>;
   sub_results?: Array<{
     url: string;
     title: string;
     excerpt: string;
-    anchor?: {
-      element: string;
-      id: string;
-      text: string;
-    };
+    anchor?: { element: string; id: string; text: string };
   }>;
 }
 
@@ -158,19 +138,17 @@ export async function search(query: string, maxResults = 10): Promise<SearchResu
   }
 
   // Load result data in parallel for the first N results
-  const resultPromises = response.results
-    .slice(0, maxResults)
-    .map(async (result) => {
-      const data = await result.data();
-      return {
-        id: result.id,
-        url: data.url,
-        title: data.meta.title || urlToBreadcrumb(data.url).pop() || "Untitled",
-        excerpt: data.excerpt,
-        breadcrumb: urlToBreadcrumb(data.url),
-        score: result.score,
-      };
-    });
+  const resultPromises = response.results.slice(0, maxResults).map(async (result) => {
+    const data = await result.data();
+    return {
+      id: result.id,
+      url: data.url,
+      title: data.meta.title || urlToBreadcrumb(data.url).pop() || "Untitled",
+      excerpt: data.excerpt,
+      breadcrumb: urlToBreadcrumb(data.url),
+      score: result.score,
+    };
+  });
 
   return Promise.all(resultPromises);
 }
@@ -201,10 +179,7 @@ export function addRecentSearch(query: string): void {
   try {
     const recent = getRecentSearches().filter((q) => q !== query);
     recent.unshift(query.trim());
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(recent.slice(0, MAX_RECENT)),
-    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(recent.slice(0, MAX_RECENT)));
   } catch {
     // Ignore localStorage errors
   }

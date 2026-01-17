@@ -311,10 +311,7 @@ export function isbn10To13(isbn10: string): string {
  * @param convertTo13 - Whether to convert ISBN-10 to ISBN-13 (default: true)
  * @returns Normalized ISBN-13 or null if invalid
  */
-export function normalizeIsbn(
-  isbn: string,
-  convertTo13: boolean = true,
-): string | null {
+export function normalizeIsbn(isbn: string, convertTo13: boolean = true): string | null {
   if (!isbn) return null;
 
   const cleaned = cleanIsbn(isbn);
@@ -357,8 +354,7 @@ const TITLE_PREFIXES =
 /**
  * Common suffixes to extract from author names
  */
-const NAME_SUFFIXES =
-  /,?\s*\b(jr|sr|ii|iii|iv|v|phd|md|esq|d\.?d\.?s?)\b\.?\s*$/i;
+const NAME_SUFFIXES = /,?\s*\b(jr|sr|ii|iii|iv|v|phd|md|esq|d\.?d\.?s?)\b\.?\s*$/i;
 
 /**
  * Life dates pattern to remove
@@ -441,11 +437,7 @@ export function parseAuthorName(name: string): ParsedAuthorName {
   if (working.includes(",")) {
     const parts = working.split(",").map((p) => p.trim());
     if (parts.length >= 2 && parts[0] && parts[1]) {
-      return {
-        firstName: parts[1],
-        lastName: parts[0],
-        suffix,
-      };
+      return { firstName: parts[1], lastName: parts[0], suffix };
     }
   }
 
@@ -511,10 +503,7 @@ const LEADING_ARTICLES =
  * @param removeArticles - Whether to remove leading articles (default: true)
  * @returns Normalized title
  */
-export function normalizeTitle(
-  title: string,
-  removeArticles: boolean = true,
-): string {
+export function normalizeTitle(title: string, removeArticles: boolean = true): string {
   if (!title) return "";
 
   let normalized = title

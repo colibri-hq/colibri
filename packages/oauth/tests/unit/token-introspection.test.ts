@@ -1,20 +1,17 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import type { createMockPersistence } from "../utilities";
 import {
   type AuthorizationServerOptions,
   type Entities,
   createAuthorizationServer,
 } from "../../src";
-import type { createMockPersistence } from "../utilities";
 
 describe("Token Introspection Unit Tests", () => {
   let options: AuthorizationServerOptions;
   let persistence: ReturnType<typeof createMockPersistence>;
 
   beforeEach(() => {
-    options = {
-      issuer: "http://localhost:3000",
-      jwtSecret: "test-secret",
-    };
+    options = { issuer: "http://localhost:3000", jwtSecret: "test-secret" };
   });
 
   describe("Token Introspection", () => {
@@ -32,10 +29,7 @@ describe("Token Introspection Unit Tests", () => {
 
       persistence.loadTokenInfo.mockResolvedValue(mockToken);
 
-      const request = {
-        token: "test-token",
-        token_type_hint: "access_token",
-      };
+      const request = { token: "test-token", token_type_hint: "access_token" };
 
       const result = await server.handleTokenIntrospectionRequest(request);
       expect(result).toEqual({
@@ -62,15 +56,10 @@ describe("Token Introspection Unit Tests", () => {
 
       persistence.loadTokenInfo.mockResolvedValue(mockToken);
 
-      const request = {
-        token: "test-token",
-        token_type_hint: "access_token",
-      };
+      const request = { token: "test-token", token_type_hint: "access_token" };
 
       const result = await server.handleTokenIntrospectionRequest(request);
-      expect(result).toEqual({
-        active: false,
-      });
+      expect(result).toEqual({ active: false });
     });
 
     it("should return inactive for revoked token", async () => {
@@ -87,15 +76,10 @@ describe("Token Introspection Unit Tests", () => {
 
       persistence.loadTokenInfo.mockResolvedValue(mockToken);
 
-      const request = {
-        token: "test-token",
-        token_type_hint: "access_token",
-      };
+      const request = { token: "test-token", token_type_hint: "access_token" };
 
       const result = await server.handleTokenIntrospectionRequest(request);
-      expect(result).toEqual({
-        active: false,
-      });
+      expect(result).toEqual({ active: false });
     });
 
     it("should return inactive for non-existent token", async () => {
@@ -103,15 +87,10 @@ describe("Token Introspection Unit Tests", () => {
 
       persistence.loadTokenInfo.mockResolvedValue(undefined);
 
-      const request = {
-        token: "non-existent-token",
-        token_type_hint: "access_token",
-      };
+      const request = { token: "non-existent-token", token_type_hint: "access_token" };
 
       const result = await server.handleTokenIntrospectionRequest(request);
-      expect(result).toEqual({
-        active: false,
-      });
+      expect(result).toEqual({ active: false });
     });
   });
 });

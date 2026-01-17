@@ -30,41 +30,20 @@ export interface DuplicateCheckResult {
 }
 
 // Upload request types
-export type UploadPayload = {
-  files: { id: string; name: string; buffer: ArrayBuffer }[];
-};
+export type UploadPayload = { files: { id: string; name: string; buffer: ArrayBuffer }[] };
 export type UploadRequest = WorkerMessage<"upload", UploadPayload>;
 
-export type ResumePayload = {
-  ids: string[];
-};
+export type ResumePayload = { ids: string[] };
 export type ResumeRequest = WorkerMessage<"resume", ResumePayload>;
 
-export type CancelPayload = {
-  id?: string;
-};
+export type CancelPayload = { id?: string };
 export type CancelUploadRequest = WorkerMessage<"cancel", CancelPayload>;
 
 // Upload response types
 export type UploadStatus = "uploading" | "processing" | "ingesting";
 
 type UploadResponsePayload =
-  | {
-      id: string;
-      name: string;
-      failed: true;
-      error: string;
-    }
-  | {
-      id: string;
-      name: string;
-      failed: false;
-      duplicate: true;
-    }
-  | {
-      id: string;
-      name: string;
-      failed: false;
-      status: UploadStatus;
-    };
+  | { id: string; name: string; failed: true; error: string }
+  | { id: string; name: string; failed: false; duplicate: true }
+  | { id: string; name: string; failed: false; status: UploadStatus };
 export type UploadResponse = WorkerMessage<"upload", UploadResponsePayload>;

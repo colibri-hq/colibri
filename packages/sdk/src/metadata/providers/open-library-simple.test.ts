@@ -16,27 +16,17 @@ describe("OpenLibraryMetadataProvider - Basic Tests", () => {
     });
 
     it("should provide reliability scores for different data types", () => {
-      expect(provider.getReliabilityScore(MetadataType.TITLE)).toBeGreaterThan(
-        0.9,
-      );
-      expect(
-        provider.getReliabilityScore(MetadataType.AUTHORS),
-      ).toBeGreaterThan(0.8);
-      expect(provider.getReliabilityScore(MetadataType.ISBN)).toBeGreaterThan(
-        0.9,
-      );
-      expect(
-        provider.getReliabilityScore(MetadataType.DESCRIPTION),
-      ).toBeGreaterThan(0.6);
+      expect(provider.getReliabilityScore(MetadataType.TITLE)).toBeGreaterThan(0.9);
+      expect(provider.getReliabilityScore(MetadataType.AUTHORS)).toBeGreaterThan(0.8);
+      expect(provider.getReliabilityScore(MetadataType.ISBN)).toBeGreaterThan(0.9);
+      expect(provider.getReliabilityScore(MetadataType.DESCRIPTION)).toBeGreaterThan(0.6);
     });
 
     it("should support expected metadata types", () => {
       expect(provider.supportsDataType(MetadataType.TITLE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.AUTHORS)).toBe(true);
       expect(provider.supportsDataType(MetadataType.ISBN)).toBe(true);
-      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(
-        false,
-      );
+      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(false);
     });
   });
 });

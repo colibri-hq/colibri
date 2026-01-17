@@ -4,7 +4,5 @@ import type { LayoutServerLoad } from "./$types.js";
 export const load = function load() {
   const contentTree = getContentTree();
 
-  return {
-    contentTree,
-  };
+  return { contentTree };
 } satisfies LayoutServerLoad;

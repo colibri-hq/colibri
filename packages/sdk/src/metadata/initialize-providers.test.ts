@@ -18,19 +18,11 @@ import {
 import { globalProviderRegistry } from "./registry.js";
 
 // Mock the database and settings
-const mockDatabase = {
-  selectFrom: vi.fn(),
-  insertInto: vi.fn(),
-  updateTable: vi.fn(),
-} as any;
+const mockDatabase = { selectFrom: vi.fn(), insertInto: vi.fn(), updateTable: vi.fn() } as any;
 
 // Mock settings responses
 const mockSettings: Record<string, any> = {
-  "urn:colibri:settings:metadata:enabled-providers": [
-    "OpenLibrary",
-    "WikiData",
-    "GoogleBooks",
-  ],
+  "urn:colibri:settings:metadata:enabled-providers": ["OpenLibrary", "WikiData", "GoogleBooks"],
   "urn:colibri:settings:metadata:google-books-enabled": true,
   "urn:colibri:settings:metadata:google-books-api-key": "",
   "urn:colibri:settings:metadata:amazon-enabled": false,
@@ -48,10 +40,7 @@ vi.mock("../settings/index.js", () => ({
     return Promise.resolve(mockSettings[key] ?? "");
   }),
   getSetting: vi.fn((_db, key) => {
-    return Promise.resolve({
-      value: mockSettings[key] ?? "",
-      source: "default",
-    });
+    return Promise.resolve({ value: mockSettings[key] ?? "", source: "default" });
   }),
 }));
 
@@ -141,9 +130,7 @@ describe("Provider Initialization Infrastructure", () => {
 
     it("skips providers with missing required credentials", async () => {
       // Add ISBNdb to enabled list but without API key
-      mockSettings["urn:colibri:settings:metadata:enabled-providers"] = [
-        "ISBNdb",
-      ];
+      mockSettings["urn:colibri:settings:metadata:enabled-providers"] = ["ISBNdb"];
       mockSettings["urn:colibri:settings:metadata:isbndb-enabled"] = true;
       mockSettings["urn:colibri:settings:metadata:isbndb-api-key"] = "";
 
@@ -157,34 +144,20 @@ describe("Provider Initialization Infrastructure", () => {
   describe("reinitializeProvider", () => {
     it("re-registers a provider after settings change", async () => {
       // First initialize
-      mockSettings["urn:colibri:settings:metadata:enabled-providers"] = [
-        "OpenLibrary",
-      ];
+      mockSettings["urn:colibri:settings:metadata:enabled-providers"] = ["OpenLibrary"];
       await initializeMetadataProviders(mockDatabase, mockFetch);
 
-      expect(globalProviderRegistry.listEnabledProviders()).toContain(
-        "OpenLibrary",
-      );
+      expect(globalProviderRegistry.listEnabledProviders()).toContain("OpenLibrary");
 
       // Reinitialize
-      const result = await reinitializeProvider(
-        mockDatabase,
-        "OpenLibrary",
-        mockFetch,
-      );
+      const result = await reinitializeProvider(mockDatabase, "OpenLibrary", mockFetch);
 
       expect(result).toBe(true);
-      expect(globalProviderRegistry.listEnabledProviders()).toContain(
-        "OpenLibrary",
-      );
+      expect(globalProviderRegistry.listEnabledProviders()).toContain("OpenLibrary");
     });
 
     it("returns false for unknown providers", async () => {
-      const result = await reinitializeProvider(
-        mockDatabase,
-        "UnknownProvider",
-        mockFetch,
-      );
+      const result = await reinitializeProvider(mockDatabase, "UnknownProvider", mockFetch);
 
       expect(result).toBe(false);
     });
@@ -192,11 +165,7 @@ describe("Provider Initialization Infrastructure", () => {
     it("returns false for disabled providers", async () => {
       mockSettings["urn:colibri:settings:metadata:enabled-providers"] = [];
 
-      const result = await reinitializeProvider(
-        mockDatabase,
-        "OpenLibrary",
-        mockFetch,
-      );
+      const result = await reinitializeProvider(mockDatabase, "OpenLibrary", mockFetch);
 
       expect(result).toBe(false);
     });
@@ -250,9 +219,7 @@ describe("Provider Initialization Infrastructure", () => {
 
   describe("cleanupMetadataProviders", () => {
     it("clears all registered providers", async () => {
-      mockSettings["urn:colibri:settings:metadata:enabled-providers"] = [
-        "OpenLibrary",
-      ];
+      mockSettings["urn:colibri:settings:metadata:enabled-providers"] = ["OpenLibrary"];
       await initializeMetadataProviders(mockDatabase, mockFetch);
 
       expect(globalProviderRegistry.listProviders().length).toBeGreaterThan(0);

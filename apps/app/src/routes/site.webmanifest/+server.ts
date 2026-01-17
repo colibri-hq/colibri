@@ -28,9 +28,7 @@ export const GET = async function handle({ url }) {
   } satisfies WebAppManifest;
 
   return new Response(JSON.stringify(manifest), {
-    headers: {
-      "content-type": "application/manifest+json",
-    },
+    headers: { "content-type": "application/manifest+json" },
   });
 } satisfies RequestHandler;
 

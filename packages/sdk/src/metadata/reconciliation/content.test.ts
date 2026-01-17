@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { ContentReconciler } from "./content.js";
 import type {
   ContentDescriptionInput,
   CoverImage,
@@ -8,6 +7,7 @@ import type {
   Review,
   TableOfContents,
 } from "./types.js";
+import { ContentReconciler } from "./content.js";
 
 describe("ContentReconciler", () => {
   const reconciler = new ContentReconciler();
@@ -24,9 +24,7 @@ describe("ContentReconciler", () => {
 
   describe("normalizeDescription", () => {
     it("should normalize string descriptions", () => {
-      const result = reconciler.normalizeDescription(
-        "This is a great book about adventure.",
-      );
+      const result = reconciler.normalizeDescription("This is a great book about adventure.");
 
       expect(result.text).toBe("This is a great book about adventure.");
       expect(result.type).toBe("blurb");
@@ -35,23 +33,18 @@ describe("ContentReconciler", () => {
     });
 
     it("should clean description text", () => {
-      const dirtyText =
-        "  Description: This is a <b>great</b> book &amp; it's amazing!  \n\n\n  ";
+      const dirtyText = "  Description: This is a <b>great</b> book &amp; it's amazing!  \n\n\n  ";
       const result = reconciler.normalizeDescription(dirtyText);
 
       expect(result.text).toBe("This is a great book & it's amazing!");
     });
 
     it("should detect description types", () => {
-      expect(
-        reconciler.normalizeDescription("Synopsis: A tale of adventure").type,
-      ).toBe("synopsis");
-      expect(
-        reconciler.normalizeDescription("Summary: This book covers...").type,
-      ).toBe("summary");
-      expect(
-        reconciler.normalizeDescription("Short promotional text").type,
-      ).toBe("blurb");
+      expect(reconciler.normalizeDescription("Synopsis: A tale of adventure").type).toBe(
+        "synopsis",
+      );
+      expect(reconciler.normalizeDescription("Summary: This book covers...").type).toBe("summary");
+      expect(reconciler.normalizeDescription("Short promotional text").type).toBe("blurb");
     });
 
     it("should detect description lengths", () => {
@@ -99,16 +92,8 @@ Chapter 3: Conclusion .... 30`;
       const result = reconciler.normalizeTableOfContents(tocString);
 
       expect(result.entries).toHaveLength(3);
-      expect(result.entries[0]).toEqual({
-        title: "Introduction",
-        page: 1,
-        level: 0,
-      });
-      expect(result.entries[1]).toEqual({
-        title: "The Journey",
-        page: 15,
-        level: 0,
-      });
+      expect(result.entries[0]).toEqual({ title: "Introduction", page: 1, level: 0 });
+      expect(result.entries[1]).toEqual({ title: "The Journey", page: 15, level: 0 });
       expect(result.pageNumbers).toBe(true);
       expect(result.format).toBe("detailed");
     });
@@ -146,9 +131,7 @@ Conclusion`;
 
   describe("normalizeCoverImage", () => {
     it("should normalize string URLs", () => {
-      const result = reconciler.normalizeCoverImage(
-        "https://example.com/cover.jpg",
-      );
+      const result = reconciler.normalizeCoverImage("https://example.com/cover.jpg");
 
       expect(result.url).toBe("https://example.com/cover.jpg");
       expect(result.format).toBe("jpeg");
@@ -160,9 +143,7 @@ Conclusion`;
       expect(reconciler.normalizeCoverImage("test.png").format).toBe("png");
       expect(reconciler.normalizeCoverImage("test.webp").format).toBe("webp");
       expect(reconciler.normalizeCoverImage("test.gif").format).toBe("gif");
-      expect(reconciler.normalizeCoverImage("test.unknown").format).toBe(
-        "other",
-      );
+      expect(reconciler.normalizeCoverImage("test.unknown").format).toBe("other");
     });
 
     it("should handle CoverImage objects", () => {
@@ -193,10 +174,7 @@ Conclusion`;
   describe("reconcileDescriptions", () => {
     it("should select the highest quality description", () => {
       const inputs: ContentDescriptionInput[] = [
-        {
-          descriptions: ["Short desc"],
-          source: lowReliabilitySource,
-        },
+        { descriptions: ["Short desc"], source: lowReliabilitySource },
         {
           descriptions: [
             "This is a comprehensive and well-written description that provides excellent insight into the book's content and themes.",
@@ -231,9 +209,7 @@ Conclusion`;
     it("should detect conflicts between different descriptions", () => {
       const inputs: ContentDescriptionInput[] = [
         {
-          descriptions: [
-            "This book is about space exploration and the future of humanity.",
-          ],
+          descriptions: ["This book is about space exploration and the future of humanity."],
           source: highReliabilitySource,
         },
         {
@@ -253,10 +229,7 @@ Conclusion`;
   describe("reconcileTableOfContents", () => {
     it("should select the most complete table of contents", () => {
       const inputs: ContentDescriptionInput[] = [
-        {
-          tableOfContents: "Chapter 1\nChapter 2",
-          source: lowReliabilitySource,
-        },
+        { tableOfContents: "Chapter 1\nChapter 2", source: lowReliabilitySource },
         {
           tableOfContents: {
             entries: [
@@ -282,9 +255,7 @@ Conclusion`;
     });
 
     it("should handle missing table of contents", () => {
-      const inputs: ContentDescriptionInput[] = [
-        { source: highReliabilitySource },
-      ];
+      const inputs: ContentDescriptionInput[] = [{ source: highReliabilitySource }];
 
       const result = reconciler.reconcileTableOfContents(inputs);
 
@@ -297,12 +268,7 @@ Conclusion`;
   describe("reconcileReviews", () => {
     it("should sort reviews by quality indicators", () => {
       const reviews: Review[] = [
-        {
-          text: "Short review",
-          rating: 4,
-          scale: 5,
-          verified: false,
-        },
+        { text: "Short review", rating: 4, scale: 5, verified: false },
         {
           text: "This is a very detailed and helpful review that provides great insights into the book's strengths and weaknesses.",
           rating: 5,
@@ -321,9 +287,7 @@ Conclusion`;
         },
       ];
 
-      const inputs: ContentDescriptionInput[] = [
-        { reviews, source: highReliabilitySource },
-      ];
+      const inputs: ContentDescriptionInput[] = [{ reviews, source: highReliabilitySource }];
 
       const result = reconciler.reconcileReviews(inputs);
 
@@ -353,18 +317,9 @@ Conclusion`;
   describe("reconcileRating", () => {
     it("should calculate weighted average rating", () => {
       const inputs: ContentDescriptionInput[] = [
-        {
-          ratings: [{ value: 4.5, scale: 5, count: 100 }],
-          source: highReliabilitySource,
-        },
-        {
-          ratings: [{ value: 3.0, scale: 5, count: 10 }],
-          source: lowReliabilitySource,
-        },
-        {
-          ratings: [{ value: 8.0, scale: 10, count: 50 }],
-          source: mediumReliabilitySource,
-        },
+        { ratings: [{ value: 4.5, scale: 5, count: 100 }], source: highReliabilitySource },
+        { ratings: [{ value: 3.0, scale: 5, count: 10 }], source: lowReliabilitySource },
+        { ratings: [{ value: 8.0, scale: 10, count: 50 }], source: mediumReliabilitySource },
       ];
 
       const result = reconciler.reconcileRating(inputs);
@@ -378,14 +333,8 @@ Conclusion`;
 
     it("should detect rating conflicts", () => {
       const inputs: ContentDescriptionInput[] = [
-        {
-          ratings: [{ value: 5.0, scale: 5, count: 100 }],
-          source: highReliabilitySource,
-        },
-        {
-          ratings: [{ value: 2.0, scale: 5, count: 100 }],
-          source: mediumReliabilitySource,
-        },
+        { ratings: [{ value: 5.0, scale: 5, count: 100 }], source: highReliabilitySource },
+        { ratings: [{ value: 2.0, scale: 5, count: 100 }], source: mediumReliabilitySource },
       ];
 
       const result = reconciler.reconcileRating(inputs);
@@ -396,9 +345,7 @@ Conclusion`;
     });
 
     it("should handle missing ratings", () => {
-      const inputs: ContentDescriptionInput[] = [
-        { source: highReliabilitySource },
-      ];
+      const inputs: ContentDescriptionInput[] = [{ source: highReliabilitySource }];
 
       const result = reconciler.reconcileRating(inputs);
 
@@ -412,10 +359,7 @@ Conclusion`;
   describe("reconcileCoverImage", () => {
     it("should select the highest quality image", () => {
       const inputs: ContentDescriptionInput[] = [
-        {
-          coverImages: ["https://example.com/small.jpg"],
-          source: lowReliabilitySource,
-        },
+        { coverImages: ["https://example.com/small.jpg"], source: lowReliabilitySource },
         {
           coverImages: [
             {
@@ -453,14 +397,8 @@ Conclusion`;
 
     it("should detect image conflicts", () => {
       const inputs: ContentDescriptionInput[] = [
-        {
-          coverImages: ["https://example.com/image1.jpg"],
-          source: highReliabilitySource,
-        },
-        {
-          coverImages: ["https://example.com/image2.jpg"],
-          source: mediumReliabilitySource,
-        },
+        { coverImages: ["https://example.com/image1.jpg"], source: highReliabilitySource },
+        { coverImages: ["https://example.com/image2.jpg"], source: mediumReliabilitySource },
       ];
 
       const result = reconciler.reconcileCoverImage(inputs);
@@ -471,9 +409,7 @@ Conclusion`;
     });
 
     it("should handle missing cover images", () => {
-      const inputs: ContentDescriptionInput[] = [
-        { source: highReliabilitySource },
-      ];
+      const inputs: ContentDescriptionInput[] = [{ source: highReliabilitySource }];
 
       const result = reconciler.reconcileCoverImage(inputs);
 
@@ -486,10 +422,7 @@ Conclusion`;
   describe("reconcileExcerpt", () => {
     it("should select the best excerpt based on source reliability", () => {
       const inputs: ContentDescriptionInput[] = [
-        {
-          excerpt: "Short excerpt from unreliable source",
-          source: lowReliabilitySource,
-        },
+        { excerpt: "Short excerpt from unreliable source", source: lowReliabilitySource },
         {
           excerpt:
             "This is a high-quality excerpt from a reliable source that provides a good sample of the book's writing style and content.",
@@ -504,9 +437,7 @@ Conclusion`;
     });
 
     it("should handle missing excerpts", () => {
-      const inputs: ContentDescriptionInput[] = [
-        { source: highReliabilitySource },
-      ];
+      const inputs: ContentDescriptionInput[] = [{ source: highReliabilitySource }];
 
       const result = reconciler.reconcileExcerpt(inputs);
 
@@ -521,15 +452,9 @@ Conclusion`;
       const inputs: ContentDescriptionInput[] = [
         {
           descriptions: ["A comprehensive book about science and discovery."],
-          tableOfContents:
-            "Chapter 1: Introduction\nChapter 2: Methods\nChapter 3: Results",
+          tableOfContents: "Chapter 1: Introduction\nChapter 2: Methods\nChapter 3: Results",
           reviews: [
-            {
-              text: "Excellent book with great insights",
-              rating: 5,
-              scale: 5,
-              verified: true,
-            },
+            { text: "Excellent book with great insights", rating: 5, scale: 5, verified: true },
           ],
           ratings: [{ value: 4.5, scale: 5, count: 200 }],
           coverImages: [

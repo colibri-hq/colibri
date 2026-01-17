@@ -28,12 +28,7 @@ describe("Fuzzy Matching Integration", () => {
     });
 
     it("normalizes authors with titles consistently", () => {
-      const variants = [
-        "Dr. John Smith",
-        "John Smith",
-        "Dr John Smith",
-        "Smith, John",
-      ];
+      const variants = ["Dr. John Smith", "John Smith", "Dr John Smith", "Smith, John"];
 
       const normalized = variants.map(normalizeCreatorName);
 
@@ -92,12 +87,7 @@ describe("Fuzzy Matching Integration", () => {
     });
 
     it("handles initials with various spacing", () => {
-      const variants = [
-        "J.R.R. Tolkien",
-        "J. R. R. Tolkien",
-        "JRR Tolkien",
-        "Tolkien, J.R.R.",
-      ];
+      const variants = ["J.R.R. Tolkien", "J. R. R. Tolkien", "JRR Tolkien", "Tolkien, J.R.R."];
 
       const normalized = variants.map(normalizeCreatorName);
 
@@ -155,12 +145,7 @@ describe("Fuzzy Matching Integration", () => {
     });
 
     it("removes regional identifiers", () => {
-      const variants = [
-        "Penguin (US)",
-        "Penguin (UK)",
-        "Penguin Books",
-        "Penguin",
-      ];
+      const variants = ["Penguin (US)", "Penguin (UK)", "Penguin Books", "Penguin"];
 
       const normalized = variants.map(normalizePublisherName);
 
@@ -285,9 +270,7 @@ describe("Fuzzy Matching Integration", () => {
 
         // Log for manual verification
         // In actual use, pg_trgm similarity would be calculated
-        console.log(
-          `Should match: "${name1}" → "${norm1}" vs "${name2}" → "${norm2}"`,
-        );
+        console.log(`Should match: "${name1}" → "${norm1}" vs "${name2}" → "${norm2}"`);
       }
 
       // Creator names that should NOT match (< 70% similar)
@@ -301,9 +284,7 @@ describe("Fuzzy Matching Integration", () => {
         const norm2 = normalizeCreatorName(name2);
 
         expect(norm1).not.toBe(norm2);
-        console.log(
-          `Should NOT match: "${name1}" → "${norm1}" vs "${name2}" → "${norm2}"`,
-        );
+        console.log(`Should NOT match: "${name1}" → "${norm1}" vs "${name2}" → "${norm2}"`);
       }
     });
 
@@ -321,9 +302,7 @@ describe("Fuzzy Matching Integration", () => {
 
         // Log for manual verification
         // In actual use, pg_trgm similarity would be calculated
-        console.log(
-          `Should match: "${name1}" → "${norm1}" vs "${name2}" → "${norm2}"`,
-        );
+        console.log(`Should match: "${name1}" → "${norm1}" vs "${name2}" → "${norm2}"`);
       }
 
       // Publisher names that should NOT match (< 70% similar)
@@ -337,9 +316,7 @@ describe("Fuzzy Matching Integration", () => {
         const norm2 = normalizePublisherName(name2);
 
         expect(norm1).not.toBe(norm2);
-        console.log(
-          `Should NOT match: "${name1}" → "${norm1}" vs "${name2}" → "${norm2}"`,
-        );
+        console.log(`Should NOT match: "${name1}" → "${norm1}" vs "${name2}" → "${norm2}"`);
       }
     });
   });

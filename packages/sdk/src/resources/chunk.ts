@@ -132,23 +132,13 @@ export async function getUnindexedAssets(
   database: Kysely<Schema>,
   limit = 100,
 ): Promise<
-  {
-    id: string;
-    storage_reference: string;
-    media_type: string;
-    fts_config: string | null;
-  }[]
+  { id: string; storage_reference: string; media_type: string; fts_config: string | null }[]
 > {
   return database
     .selectFrom("asset")
     .innerJoin("edition", "edition.id", "asset.edition_id")
     .leftJoin("language", "language.iso_639_3", "edition.language")
-    .select([
-      "asset.id",
-      "asset.storage_reference",
-      "asset.media_type",
-      "language.fts_config",
-    ])
+    .select(["asset.id", "asset.storage_reference", "asset.media_type", "language.fts_config"])
     .where("asset.search_indexed_at", "is", null)
     .where("asset.search_index_error", "is", null)
     .limit(limit)

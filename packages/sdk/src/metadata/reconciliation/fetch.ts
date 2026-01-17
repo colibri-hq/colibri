@@ -62,10 +62,7 @@ export class MetadataCoordinator {
   private config: CoordinatorConfig;
   private providers: MetadataProvider[];
 
-  constructor(
-    providers: MetadataProvider[],
-    config: Partial<CoordinatorConfig> = {},
-  ) {
+  constructor(providers: MetadataProvider[], config: Partial<CoordinatorConfig> = {}) {
     this.providers = providers.sort((a, b) => b.priority - a.priority);
     this.config = {
       globalTimeout: 30000, // 30 seconds
@@ -84,15 +81,10 @@ export class MetadataCoordinator {
     const startTime = Date.now();
 
     // Create provider query promises with timeout
-    const providerPromises = this.providers.map((provider) =>
-      this.queryProvider(provider, query),
-    );
+    const providerPromises = this.providers.map((provider) => this.queryProvider(provider, query));
 
     // Execute queries with global timeout and concurrency control
-    const results = await this.executeWithTimeout(
-      providerPromises,
-      this.config.globalTimeout,
-    );
+    const results = await this.executeWithTimeout(providerPromises, this.config.globalTimeout);
 
     // Aggregate results
     const aggregatedRecords = this.aggregateRecords(results);
@@ -125,10 +117,7 @@ export class MetadataCoordinator {
           result = {
             ...fallbackResult,
             query: strategy.primary, // Keep original query for reference
-            providerResults: [
-              ...result.providerResults,
-              ...fallbackResult.providerResults,
-            ],
+            providerResults: [...result.providerResults, ...fallbackResult.providerResults],
             totalDuration: result.totalDuration + fallbackResult.totalDuration,
           };
           break;
@@ -143,9 +132,7 @@ export class MetadataCoordinator {
    * Get providers that support a specific metadata type
    */
   getProvidersForDataType(dataType: MetadataType): MetadataProvider[] {
-    return this.providers.filter((provider) =>
-      provider.supportsDataType(dataType),
-    );
+    return this.providers.filter((provider) => provider.supportsDataType(dataType));
   }
 
   /**
@@ -160,9 +147,7 @@ export class MetadataCoordinator {
     return this.providers.map((provider) => ({
       name: provider.name,
       priority: provider.priority,
-      supportedTypes: Object.values(MetadataType).filter((type) =>
-        provider.supportsDataType(type),
-      ),
+      supportedTypes: Object.values(MetadataType).filter((type) => provider.supportsDataType(type)),
       reliabilityScores: Object.values(MetadataType).reduce(
         (scores, type) => {
           scores[type] = provider.getReliabilityScore(type);
@@ -230,18 +215,13 @@ export class MetadataCoordinator {
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
           reject(
-            new Error(
-              `Provider ${provider.name} timed out after ${this.config.providerTimeout}ms`,
-            ),
+            new Error(`Provider ${provider.name} timed out after ${this.config.providerTimeout}ms`),
           );
         }, this.config.providerTimeout);
       });
 
       // Execute query with timeout
-      const records = await Promise.race([
-        provider.searchMultiCriteria(query),
-        timeoutPromise,
-      ]);
+      const records = await Promise.race([provider.searchMultiCriteria(query), timeoutPromise]);
 
       // Filter by minimum confidence
       const filteredRecords = records.filter(
@@ -281,10 +261,7 @@ export class MetadataCoordinator {
 
     try {
       // Execute all promises with global timeout
-      const results = await Promise.race([
-        Promise.allSettled(promises),
-        timeoutPromise,
-      ]);
+      const results = await Promise.race([Promise.allSettled(promises), timeoutPromise]);
 
       // Convert PromiseSettledResult to ProviderResult
       return results.map((result, index) => {

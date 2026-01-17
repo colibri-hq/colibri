@@ -5,6 +5,7 @@
  * duplicate detection, edition selection, and series relationships.
  */
 
+import type { MetadataPreview } from "./preview.js";
 import type {
   DuplicateMatch,
   EditionSelection,
@@ -13,7 +14,6 @@ import type {
   RecommendationAction,
   SeriesRelationship,
 } from "./types.js";
-import type { MetadataPreview } from "./preview.js";
 
 /**
  * Configuration for recommendation generation
@@ -32,13 +32,12 @@ export interface RecommendationGeneratorConfig {
 /**
  * Default configuration for recommendation generation
  */
-export const DEFAULT_RECOMMENDATION_GENERATOR_CONFIG: RecommendationGeneratorConfig =
-  {
-    includeDuplicateRecommendations: true,
-    includeEditionRecommendations: true,
-    includeSeriesRecommendations: true,
-    includeQualityRecommendations: true,
-  };
+export const DEFAULT_RECOMMENDATION_GENERATOR_CONFIG: RecommendationGeneratorConfig = {
+  includeDuplicateRecommendations: true,
+  includeEditionRecommendations: true,
+  includeSeriesRecommendations: true,
+  includeQualityRecommendations: true,
+};
 
 /**
  * RecommendationGenerator creates user recommendations based on metadata analysis
@@ -80,23 +79,17 @@ export class RecommendationGenerator {
 
     // Duplicate handling recommendations
     if (this.config.includeDuplicateRecommendations) {
-      recommendations.push(
-        ...this.generateDuplicateRecommendations(duplicates),
-      );
+      recommendations.push(...this.generateDuplicateRecommendations(duplicates));
     }
 
     // Edition recommendations
     if (this.config.includeEditionRecommendations) {
-      recommendations.push(
-        ...this.generateEditionRecommendations(editionSelection),
-      );
+      recommendations.push(...this.generateEditionRecommendations(editionSelection));
     }
 
     // Series completion recommendations
     if (this.config.includeSeriesRecommendations) {
-      recommendations.push(
-        ...this.generateSeriesRecommendations(seriesRelationships),
-      );
+      recommendations.push(...this.generateSeriesRecommendations(seriesRelationships));
     }
 
     // Metadata quality recommendations
@@ -110,9 +103,7 @@ export class RecommendationGenerator {
   /**
    * Generate recommendations for duplicate entries
    */
-  generateDuplicateRecommendations(
-    duplicates: DuplicateMatch[],
-  ): LibraryRecommendation[] {
+  generateDuplicateRecommendations(duplicates: DuplicateMatch[]): LibraryRecommendation[] {
     const recommendations: LibraryRecommendation[] = [];
 
     const exactDuplicates = duplicates.filter((d) => d.matchType === "exact");
@@ -121,8 +112,7 @@ export class RecommendationGenerator {
         type: "merge_duplicates",
         priority: "high",
         message: `Found ${exactDuplicates.length} exact duplicate(s) in your library`,
-        explanation:
-          "This book appears to already exist in your library with identical metadata.",
+        explanation: "This book appears to already exist in your library with identical metadata.",
         actions: this.createDuplicateActions(true),
       });
     }
@@ -145,9 +135,7 @@ export class RecommendationGenerator {
   /**
    * Generate recommendations for edition selection
    */
-  generateEditionRecommendations(
-    editionSelection: EditionSelection,
-  ): LibraryRecommendation[] {
+  generateEditionRecommendations(editionSelection: EditionSelection): LibraryRecommendation[] {
     const recommendations: LibraryRecommendation[] = [];
 
     if (editionSelection.alternatives.length > 0) {
@@ -155,14 +143,12 @@ export class RecommendationGenerator {
         type: "improve_metadata",
         priority: "low",
         message: `${editionSelection.alternatives.length} alternative edition(s) available`,
-        explanation:
-          "Other editions of this work might better suit your preferences.",
+        explanation: "Other editions of this work might better suit your preferences.",
         actions: [
           {
             type: "review",
             label: "Review editions",
-            description:
-              "Compare available editions and select your preferred one",
+            description: "Compare available editions and select your preferred one",
             isRecommended: false,
           },
           {
@@ -186,9 +172,7 @@ export class RecommendationGenerator {
   ): LibraryRecommendation[] {
     const recommendations: LibraryRecommendation[] = [];
 
-    const incompleteSeriesRelationships = seriesRelationships.filter(
-      (sr) => !sr.isSeriesComplete,
-    );
+    const incompleteSeriesRelationships = seriesRelationships.filter((sr) => !sr.isSeriesComplete);
 
     for (const relationship of incompleteSeriesRelationships) {
       if (relationship.missingWorks.length > 0) {
@@ -221,9 +205,7 @@ export class RecommendationGenerator {
   /**
    * Generate recommendations for metadata quality
    */
-  generateQualityRecommendations(
-    preview: MetadataPreview,
-  ): LibraryRecommendation[] {
+  generateQualityRecommendations(preview: MetadataPreview): LibraryRecommendation[] {
     const recommendations: LibraryRecommendation[] = [];
 
     if (preview.summary.overallQuality.level === "poor") {
@@ -231,14 +213,12 @@ export class RecommendationGenerator {
         type: "improve_metadata",
         priority: "medium",
         message: "Metadata quality could be improved",
-        explanation:
-          "This entry has limited or low-quality metadata that could be enhanced.",
+        explanation: "This entry has limited or low-quality metadata that could be enhanced.",
         actions: [
           {
             type: "update",
             label: "Search for better metadata",
-            description:
-              "Try additional metadata sources to improve data quality",
+            description: "Try additional metadata sources to improve data quality",
             isRecommended: true,
           },
           {
@@ -276,8 +256,7 @@ export class RecommendationGenerator {
         {
           type: "review",
           label: "Review differences",
-          description:
-            "Compare the entries to see if there are meaningful differences",
+          description: "Compare the entries to see if there are meaningful differences",
           isRecommended: false,
         },
       ];
@@ -287,8 +266,7 @@ export class RecommendationGenerator {
       {
         type: "review",
         label: "Review manually",
-        description:
-          "Compare entries and decide whether to merge or keep separate",
+        description: "Compare entries and decide whether to merge or keep separate",
         isRecommended: true,
       },
       {
@@ -303,12 +281,8 @@ export class RecommendationGenerator {
   /**
    * Sort recommendations by priority
    */
-  private sortByPriority(
-    recommendations: LibraryRecommendation[],
-  ): LibraryRecommendation[] {
+  private sortByPriority(recommendations: LibraryRecommendation[]): LibraryRecommendation[] {
     const priorityOrder = { high: 3, medium: 2, low: 1 };
-    return recommendations.sort(
-      (a, b) => priorityOrder[b.priority] - priorityOrder[a.priority],
-    );
+    return recommendations.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority]);
   }
 }

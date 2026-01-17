@@ -1,7 +1,7 @@
 import { sql, type InsertObject, type Selectable } from "kysely";
-import type { User } from "./authentication/user.js";
 import type { Database, Schema } from "../database.js";
 import type { DB } from "../schema.js";
+import type { User } from "./authentication/user.js";
 
 const table = "comment" as const;
 
@@ -70,12 +70,7 @@ export function loadWorkComments(
     .selectAll("comment")
     .select(({ fn, val }) =>
       fn
-        .coalesce(
-          fn
-            .jsonAgg("reactions")
-            .filterWhere("reactions.emoji", "is not", null),
-          val("[]"),
-        )
+        .coalesce(fn.jsonAgg("reactions").filterWhere("reactions.emoji", "is not", null), val("[]"))
         .as("reactions"),
     )
     .select(({ fn }) => fn.toJson("u").as("created_by"))
@@ -118,12 +113,7 @@ export function loadCreatorComments(
     .selectAll("comment")
     .select(({ fn, val }) =>
       fn
-        .coalesce(
-          fn
-            .jsonAgg("reactions")
-            .filterWhere("reactions.emoji", "is not", null),
-          val("[]"),
-        )
+        .coalesce(fn.jsonAgg("reactions").filterWhere("reactions.emoji", "is not", null), val("[]"))
         .as("reactions"),
     )
     .select(({ fn }) => fn.toJson("u").as("created_by"))
@@ -151,11 +141,7 @@ export function loadPublisherComments(
 ): Promise<CommentWithUserAndReactions[]> {
   return database
     .selectFrom("publisher")
-    .innerJoin(
-      "publisher_comment",
-      "publisher_comment.publisher_id",
-      "publisher.id",
-    )
+    .innerJoin("publisher_comment", "publisher_comment.publisher_id", "publisher.id")
     .innerJoin("comment", "publisher_comment.comment_id", "comment.id")
     .leftJoin("authentication.user as u", "u.id", "comment.created_by")
     .leftJoinLateral(
@@ -170,12 +156,7 @@ export function loadPublisherComments(
     .selectAll("comment")
     .select(({ fn, val }) =>
       fn
-        .coalesce(
-          fn
-            .jsonAgg("reactions")
-            .filterWhere("reactions.emoji", "is not", null),
-          val("[]"),
-        )
+        .coalesce(fn.jsonAgg("reactions").filterWhere("reactions.emoji", "is not", null), val("[]"))
         .as("reactions"),
     )
     .select(({ fn }) => fn.toJson("u").as("created_by"))
@@ -218,12 +199,7 @@ export function loadSeriesComments(
     .selectAll("comment")
     .select(({ fn, val }) =>
       fn
-        .coalesce(
-          fn
-            .jsonAgg("reactions")
-            .filterWhere("reactions.emoji", "is not", null),
-          val("[]"),
-        )
+        .coalesce(fn.jsonAgg("reactions").filterWhere("reactions.emoji", "is not", null), val("[]"))
         .as("reactions"),
     )
     .select(({ fn }) => fn.toJson("u").as("created_by"))
@@ -264,12 +240,7 @@ export function loadCommentReplies(
     .selectAll("comment")
     .select(({ fn, val }) =>
       fn
-        .coalesce(
-          fn
-            .jsonAgg("reactions")
-            .filterWhere("reactions.emoji", "is not", null),
-          val("[]"),
-        )
+        .coalesce(fn.jsonAgg("reactions").filterWhere("reactions.emoji", "is not", null), val("[]"))
         .as("reactions"),
     )
     .select(({ fn }) => fn.toJson("u").as("created_by"))
@@ -304,10 +275,7 @@ export async function addWorkComment(
 
     await transaction
       .insertInto("work_comment")
-      .values({
-        work_id: workId.toString(),
-        comment_id: id,
-      })
+      .values({ work_id: workId.toString(), comment_id: id })
       .execute();
 
     return id;
@@ -331,10 +299,7 @@ export async function addCreatorComment(
 
     await transaction
       .insertInto("creator_comment")
-      .values({
-        creator_id: creatorId.toString(),
-        comment_id: id,
-      })
+      .values({ creator_id: creatorId.toString(), comment_id: id })
       .execute();
 
     return id;
@@ -358,10 +323,7 @@ export async function addPublisherComment(
 
     await transaction
       .insertInto("publisher_comment")
-      .values({
-        publisher_id: publisherId.toString(),
-        comment_id: id,
-      })
+      .values({ publisher_id: publisherId.toString(), comment_id: id })
       .execute();
 
     return id;
@@ -385,10 +347,7 @@ export async function addSeriesComment(
 
     await transaction
       .insertInto("series_comment")
-      .values({
-        series_id: seriesId.toString(),
-        comment_id: id,
-      })
+      .values({ series_id: seriesId.toString(), comment_id: id })
       .execute();
 
     return id;
@@ -405,10 +364,7 @@ export async function updateComment(
 ): Promise<void> {
   await database
     .updateTable("comment")
-    .set({
-      content,
-      updated_at: new Date(),
-    })
+    .set({ content, updated_at: new Date() })
     .where("id", "=", commentId.toString())
     .execute();
 }
@@ -416,14 +372,8 @@ export async function updateComment(
 /**
  * Delete a comment (and its reactions via cascade)
  */
-export async function deleteComment(
-  database: Database,
-  commentId: number | string,
-): Promise<void> {
-  await database
-    .deleteFrom("comment")
-    .where("id", "=", commentId.toString())
-    .execute();
+export async function deleteComment(database: Database, commentId: number | string): Promise<void> {
+  await database.deleteFrom("comment").where("id", "=", commentId.toString()).execute();
 }
 
 /**
@@ -437,14 +387,8 @@ export async function addReaction(
 ): Promise<void> {
   await database
     .insertInto("comment_reaction")
-    .values({
-      comment_id: commentId.toString(),
-      user_id: userId,
-      emoji,
-    })
-    .onConflict((eb) =>
-      eb.constraint("comment_reaction_pkey").doUpdateSet({ emoji }),
-    )
+    .values({ comment_id: commentId.toString(), user_id: userId, emoji })
+    .onConflict((eb) => eb.constraint("comment_reaction_pkey").doUpdateSet({ emoji }))
     .execute();
 }
 
@@ -465,36 +409,19 @@ export async function removeReaction(
     .execute();
 }
 
-export type Comment = Omit<
-  Selectable<Schema[typeof table]>,
-  "created_at" | "updated_at"
-> & {
+export type Comment = Omit<Selectable<Schema[typeof table]>, "created_at" | "updated_at"> & {
   created_at: string | Date;
   updated_at: string | Date | null;
   parent_comment_id: string | null;
 };
-export type CommentWithUser = Omit<Comment, "created_by"> & {
-  created_by: User;
-};
-type Reaction = Omit<
-  Selectable<Schema["comment_reaction"]>,
-  "comment_id" | "created_at"
-> & {
+export type CommentWithUser = Omit<Comment, "created_by"> & { created_by: User };
+type Reaction = Omit<Selectable<Schema["comment_reaction"]>, "comment_id" | "created_at"> & {
   created_at: string | Date;
 };
-export type CommentWithReactions = Comment & {
-  reactions: Reaction[];
-};
+export type CommentWithReactions = Comment & { reactions: Reaction[] };
 export type CommentWithUserAndReactions = CommentWithUser &
-  Omit<CommentWithReactions, "created_by"> & {
-    reply_count: number | null;
-  };
-export type Commentable =
-  | "work"
-  | "collection"
-  | "creator"
-  | "publisher"
-  | "series";
+  Omit<CommentWithReactions, "created_by"> & { reply_count: number | null };
+export type Commentable = "work" | "collection" | "creator" | "publisher" | "series";
 
 // region Comment Moderation
 
@@ -535,11 +462,7 @@ export async function reportComment(
 ): Promise<void> {
   await database
     .insertInto("comment_report")
-    .values({
-      comment_id: commentId.toString(),
-      reported_by: userId,
-      reason,
-    })
+    .values({ comment_id: commentId.toString(), reported_by: userId, reason })
     .onConflict((eb) =>
       eb.constraint("comment_report_unique_per_user").doUpdateSet((eb) => ({
         reason,
@@ -579,16 +502,8 @@ export async function getCommentReports(
   let baseQuery = database
     .selectFrom("comment_report")
     .leftJoin("comment", "comment.id", "comment_report.comment_id")
-    .leftJoin(
-      "authentication.user as reporter",
-      "reporter.id",
-      "comment_report.reported_by",
-    )
-    .leftJoin(
-      "authentication.user as resolver",
-      "resolver.id",
-      "comment_report.resolved_by",
-    );
+    .leftJoin("authentication.user as reporter", "reporter.id", "comment_report.reported_by")
+    .leftJoin("authentication.user as resolver", "resolver.id", "comment_report.resolved_by");
 
   // Apply filters
   if (options.resolved === true) {
@@ -598,42 +513,25 @@ export async function getCommentReports(
   }
 
   if (options.resolution) {
-    baseQuery = baseQuery.where(
-      "comment_report.resolution",
-      "=",
-      options.resolution,
-    );
+    baseQuery = baseQuery.where("comment_report.resolution", "=", options.resolution);
   }
 
   if (options.reporterId) {
-    baseQuery = baseQuery.where(
-      "comment_report.reported_by",
-      "=",
-      options.reporterId,
-    );
+    baseQuery = baseQuery.where("comment_report.reported_by", "=", options.reporterId);
   }
 
   if (options.search) {
-    baseQuery = baseQuery.where(
-      "comment.content",
-      "ilike",
-      `%${options.search}%`,
-    );
+    baseQuery = baseQuery.where("comment.content", "ilike", `%${options.search}%`);
   }
 
   if (options.dateFrom) {
     const fromDate =
-      typeof options.dateFrom === "string"
-        ? new Date(options.dateFrom)
-        : options.dateFrom;
+      typeof options.dateFrom === "string" ? new Date(options.dateFrom) : options.dateFrom;
     baseQuery = baseQuery.where("comment_report.created_at", ">=", fromDate);
   }
 
   if (options.dateTo) {
-    const toDate =
-      typeof options.dateTo === "string"
-        ? new Date(options.dateTo)
-        : options.dateTo;
+    const toDate = typeof options.dateTo === "string" ? new Date(options.dateTo) : options.dateTo;
     baseQuery = baseQuery.where("comment_report.created_at", "<=", toDate);
   }
 
@@ -682,11 +580,7 @@ export async function resolveReport(
 ): Promise<void> {
   await database
     .updateTable("comment_report")
-    .set({
-      resolved_at: new Date(),
-      resolved_by: userId,
-      resolution,
-    })
+    .set({ resolved_at: new Date(), resolved_by: userId, resolution })
     .where("id", "=", reportId.toString())
     .execute();
 }
@@ -694,17 +588,10 @@ export async function resolveReport(
 /**
  * Reopen a resolved report (clear resolution fields)
  */
-export async function reopenReport(
-  database: Database,
-  reportId: number | string,
-): Promise<void> {
+export async function reopenReport(database: Database, reportId: number | string): Promise<void> {
   await database
     .updateTable("comment_report")
-    .set({
-      resolved_at: null,
-      resolved_by: null,
-      resolution: null,
-    })
+    .set({ resolved_at: null, resolved_by: null, resolution: null })
     .where("id", "=", reportId.toString())
     .execute();
 }
@@ -745,21 +632,13 @@ export async function bulkResolveReports(
   // Resolve all reports in a single query
   const result = await database
     .updateTable("comment_report")
-    .set({
-      resolved_at: new Date(),
-      resolved_by: userId,
-      resolution,
-    })
+    .set({ resolved_at: new Date(), resolved_by: userId, resolution })
     .where("id", "in", reportIds)
     .executeTakeFirst();
 
   const resolved = Number(result.numUpdatedRows);
 
-  return {
-    resolved,
-    failed: reportIds.length - resolved,
-    commentIds,
-  };
+  return { resolved, failed: reportIds.length - resolved, commentIds };
 }
 
 /**
@@ -772,16 +651,8 @@ export async function getReport(
   const result = await database
     .selectFrom("comment_report")
     .leftJoin("comment", "comment.id", "comment_report.comment_id")
-    .leftJoin(
-      "authentication.user as reporter",
-      "reporter.id",
-      "comment_report.reported_by",
-    )
-    .leftJoin(
-      "authentication.user as resolver",
-      "resolver.id",
-      "comment_report.resolved_by",
-    )
+    .leftJoin("authentication.user as reporter", "reporter.id", "comment_report.reported_by")
+    .leftJoin("authentication.user as resolver", "resolver.id", "comment_report.resolved_by")
     .selectAll("comment_report")
     .select(({ fn }) => fn.toJson("comment").as("comment"))
     .select(({ fn }) => fn.toJson("reporter").as("reporter"))
@@ -803,11 +674,7 @@ export async function hideComment(
 ): Promise<void> {
   await database
     .updateTable("comment")
-    .set({
-      hidden_at: new Date(),
-      hidden_by: userId,
-      hidden_reason: reason,
-    })
+    .set({ hidden_at: new Date(), hidden_by: userId, hidden_reason: reason })
     .where("id", "=", commentId.toString())
     .execute();
 }
@@ -815,17 +682,10 @@ export async function hideComment(
 /**
  * Unhide a comment
  */
-export async function unhideComment(
-  database: Database,
-  commentId: number | string,
-): Promise<void> {
+export async function unhideComment(database: Database, commentId: number | string): Promise<void> {
   await database
     .updateTable("comment")
-    .set({
-      hidden_at: null,
-      hidden_by: null,
-      hidden_reason: null,
-    })
+    .set({ hidden_at: null, hidden_by: null, hidden_reason: null })
     .where("id", "=", commentId.toString())
     .execute();
 }
@@ -852,12 +712,7 @@ export async function getHiddenComments(
     .selectAll("comment")
     .select(({ fn, val }) =>
       fn
-        .coalesce(
-          fn
-            .jsonAgg("reactions")
-            .filterWhere("reactions.emoji", "is not", null),
-          val("[]"),
-        )
+        .coalesce(fn.jsonAgg("reactions").filterWhere("reactions.emoji", "is not", null), val("[]"))
         .as("reactions"),
     )
     .select(({ fn }) => fn.toJson("u").as("created_by"))
@@ -889,27 +744,16 @@ export interface ModerationStats {
   unresolvedReports: number;
   resolvedThisWeek: number;
   resolvedThisMonth: number;
-  byResolution: {
-    dismissed: number;
-    hidden: number;
-    deleted: number;
-  };
+  byResolution: { dismissed: number; hidden: number; deleted: number };
   hiddenComments: number;
-  topReporters: Array<{
-    userId: string;
-    name: string;
-    email: string | null;
-    count: number;
-  }>;
+  topReporters: Array<{ userId: string; name: string; email: string | null; count: number }>;
   averageResolutionTimeHours: number | null;
 }
 
 /**
  * Get moderation statistics for the dashboard
  */
-export async function getModerationStats(
-  database: Database,
-): Promise<ModerationStats> {
+export async function getModerationStats(database: Database): Promise<ModerationStats> {
   const now = new Date();
   const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -948,14 +792,9 @@ export async function getModerationStats(
     .groupBy("resolution")
     .execute();
 
-  const byResolution = {
-    dismissed: 0,
-    hidden: 0,
-    deleted: 0,
-  };
+  const byResolution = { dismissed: 0, hidden: 0, deleted: 0 };
   for (const row of byResolutionResult) {
-    if (row.resolution === "dismissed")
-      byResolution.dismissed = Number(row.count);
+    if (row.resolution === "dismissed") byResolution.dismissed = Number(row.count);
     if (row.resolution === "hidden") byResolution.hidden = Number(row.count);
     if (row.resolution === "deleted") byResolution.deleted = Number(row.count);
   }
@@ -986,17 +825,11 @@ export async function getModerationStats(
   const avgResolutionResult = await database
     .selectFrom("comment_report")
     .where("resolved_at", "is not", null)
-    .select(
-      sql<number>`avg(extract(epoch from (resolved_at - created_at)))`.as(
-        "avg_seconds",
-      ),
-    )
+    .select(sql<number>`avg(extract(epoch from (resolved_at - created_at)))`.as("avg_seconds"))
     .executeTakeFirst();
 
   const avgSeconds = avgResolutionResult?.avg_seconds;
-  const averageResolutionTimeHours = avgSeconds
-    ? Number(avgSeconds) / 3600
-    : null;
+  const averageResolutionTimeHours = avgSeconds ? Number(avgSeconds) / 3600 : null;
 
   return {
     totalReports: Number(totalResult?.total ?? 0),
@@ -1093,50 +926,29 @@ export async function getModerationLog(
   // Build base query
   let baseQuery = database
     .selectFrom("moderation_log")
-    .leftJoin(
-      "authentication.user as performer",
-      "performer.id",
-      "moderation_log.performed_by",
-    );
+    .leftJoin("authentication.user as performer", "performer.id", "moderation_log.performed_by");
 
   // Apply filters
   if (options.actionType) {
-    baseQuery = baseQuery.where(
-      "moderation_log.action_type",
-      "=",
-      options.actionType,
-    );
+    baseQuery = baseQuery.where("moderation_log.action_type", "=", options.actionType);
   }
 
   if (options.targetType) {
-    baseQuery = baseQuery.where(
-      "moderation_log.target_type",
-      "=",
-      options.targetType,
-    );
+    baseQuery = baseQuery.where("moderation_log.target_type", "=", options.targetType);
   }
 
   if (options.performedBy) {
-    baseQuery = baseQuery.where(
-      "moderation_log.performed_by",
-      "=",
-      options.performedBy,
-    );
+    baseQuery = baseQuery.where("moderation_log.performed_by", "=", options.performedBy);
   }
 
   if (options.dateFrom) {
     const fromDate =
-      typeof options.dateFrom === "string"
-        ? new Date(options.dateFrom)
-        : options.dateFrom;
+      typeof options.dateFrom === "string" ? new Date(options.dateFrom) : options.dateFrom;
     baseQuery = baseQuery.where("moderation_log.created_at", ">=", fromDate);
   }
 
   if (options.dateTo) {
-    const toDate =
-      typeof options.dateTo === "string"
-        ? new Date(options.dateTo)
-        : options.dateTo;
+    const toDate = typeof options.dateTo === "string" ? new Date(options.dateTo) : options.dateTo;
     baseQuery = baseQuery.where("moderation_log.created_at", "<=", toDate);
   }
 

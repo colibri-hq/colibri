@@ -1,12 +1,7 @@
 import { read } from "$lib/server/storage";
 import { error, redirect, type RequestHandler } from "@sveltejs/kit";
 
-export const GET = async function ({
-  params,
-  request,
-  url,
-  locals: { database, storage },
-}) {
+export const GET = async function ({ params, request, url, locals: { database, storage } }) {
   const edition = url.searchParams.get("edition");
   const id = params.work;
 
@@ -42,9 +37,7 @@ export const GET = async function ({
   const coverTimestamp = cover.updated_at ?? cover.created_at;
 
   if (request.headers.has("if-modified-since")) {
-    const timestamp = new Date(
-      request.headers.get("if-modified-since") as string,
-    );
+    const timestamp = new Date(request.headers.get("if-modified-since") as string);
 
     if (coverTimestamp <= timestamp) {
       throw redirect(304, url.toString());

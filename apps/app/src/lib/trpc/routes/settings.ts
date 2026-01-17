@@ -1,5 +1,5 @@
-import { procedure, t } from "$lib/trpc/t";
 import { adminProcedure } from "$lib/trpc/middleware/admin";
+import { procedure, t } from "$lib/trpc/t";
 import {
   exportSettings,
   getAllSettingsFlat,
@@ -40,12 +40,7 @@ export const settings = t.router({
    * Admin only.
    */
   set: adminProcedure()
-    .input(
-      z.object({
-        key: z.string(),
-        value: z.unknown(),
-      }),
-    )
+    .input(z.object({ key: z.string(), value: z.unknown() }))
     .mutation(async ({ ctx, input }) => {
       if (!isValidSettingKey(input.key)) {
         throw new Error(`Unknown setting key: ${input.key}`);

@@ -6,8 +6,8 @@
  */
 
 import type { MetadataRecord } from "../providers/provider.js";
-import type { Edition, EditionAlternative, EditionSelection } from "./types.js";
 import type { MetadataPreview } from "./preview.js";
+import type { Edition, EditionAlternative, EditionSelection } from "./types.js";
 
 /**
  * Configuration for edition selection
@@ -53,10 +53,7 @@ export class EditionSelector {
    * @param rawMetadata - Raw metadata records from providers
    * @returns Edition selection with alternatives
    */
-  selectBestEdition(
-    preview: MetadataPreview,
-    rawMetadata: MetadataRecord[],
-  ): EditionSelection {
+  selectBestEdition(preview: MetadataPreview, rawMetadata: MetadataRecord[]): EditionSelection {
     // Extract all available editions from raw metadata
     const availableEditions: Edition[] = [];
 
@@ -86,10 +83,7 @@ export class EditionSelector {
       .slice(1, this.config.maxAlternatives + 1)
       .map((scored) => ({
         edition: scored.edition,
-        reason: this.getEditionAlternativeReason(
-          scored.edition,
-          selectedEdition,
-        ),
+        reason: this.getEditionAlternativeReason(scored.edition, selectedEdition),
         confidence: scored.score,
         advantages: this.getEditionAdvantages(scored.edition, selectedEdition),
       }));
@@ -97,10 +91,7 @@ export class EditionSelector {
     return {
       selectedEdition,
       availableEditions,
-      selectionReason: this.getEditionSelectionReason(
-        selectedEdition,
-        scoredEditions[0].score,
-      ),
+      selectionReason: this.getEditionSelectionReason(selectedEdition, scoredEditions[0].score),
       confidence: scoredEditions[0].score,
       alternatives,
     };
@@ -168,10 +159,7 @@ export class EditionSelector {
    * Get reason why an edition might be an alternative
    */
   getEditionAlternativeReason(alternative: Edition, selected: Edition): string {
-    if (
-      alternative.format?.binding === "hardcover" &&
-      selected.format?.binding !== "hardcover"
-    ) {
+    if (alternative.format?.binding === "hardcover" && selected.format?.binding !== "hardcover") {
       return "Hardcover edition might be preferred";
     }
     if (alternative.publicationDate?.year && selected.publicationDate?.year) {
@@ -191,17 +179,10 @@ export class EditionSelector {
   getEditionAdvantages(alternative: Edition, selected: Edition): string[] {
     const advantages: string[] = [];
 
-    if (
-      alternative.format?.binding === "hardcover" &&
-      selected.format?.binding !== "hardcover"
-    ) {
+    if (alternative.format?.binding === "hardcover" && selected.format?.binding !== "hardcover") {
       advantages.push("Hardcover binding");
     }
-    if (
-      alternative.pageCount &&
-      selected.pageCount &&
-      alternative.pageCount > selected.pageCount
-    ) {
+    if (alternative.pageCount && selected.pageCount && alternative.pageCount > selected.pageCount) {
       advantages.push("More pages (possibly unabridged)");
     }
     if (alternative.publicationDate?.year && selected.publicationDate?.year) {

@@ -11,15 +11,10 @@
  * instead of BaseMetadataProvider directly.
  */
 
-import { BaseMetadataProvider } from "./provider.js";
 import { globalRateLimiterRegistry } from "../rate-limiter.js";
 import { globalTimeoutManagerRegistry } from "../timeout-manager.js";
-import {
-  cleanIsbn,
-  normalizeDoi,
-  normalizeLanguageCode,
-  parseDate,
-} from "../utils/index.js";
+import { cleanIsbn, normalizeDoi, normalizeLanguageCode, parseDate } from "../utils/index.js";
+import { BaseMetadataProvider } from "./provider.js";
 
 /**
  * Configuration for retry behavior
@@ -76,14 +71,8 @@ export abstract class RetryableMetadataProvider extends BaseMetadataProvider {
     operationName: string,
     maxRetries: number = this.retryConfig.maxRetries,
   ): Promise<T> {
-    const rateLimiter = globalRateLimiterRegistry.getLimiter(
-      this.name,
-      this.rateLimit,
-    );
-    const timeoutManager = globalTimeoutManagerRegistry.getManager(
-      this.name,
-      this.timeout,
-    );
+    const rateLimiter = globalRateLimiterRegistry.getLimiter(this.name, this.rateLimit);
+    const timeoutManager = globalTimeoutManagerRegistry.getManager(this.name, this.timeout);
 
     let lastError: Error | undefined;
 

@@ -1,9 +1,5 @@
 import { env } from "$env/dynamic/public";
-import {
-  dispatchPasscode,
-  issueUserToken,
-  setJwtCookie,
-} from "$lib/server/auth";
+import { dispatchPasscode, issueUserToken, setJwtCookie } from "$lib/server/auth";
 import {
   redirectToPreviousLocation,
   resolvePreviousLocation,
@@ -37,17 +33,14 @@ export const actions = {
         email: z
           .string()
           .email({
-            message:
-              "The email address seems to be invalid. Please check it and try again.",
+            message: "The email address seems to be invalid. Please check it and try again.",
           })
           .toLowerCase(),
       })
       .safeParse(Object.fromEntries(body.entries()));
 
     if (!payload.success) {
-      return fail(400, {
-        issues: payload.error.errors,
-      });
+      return fail(400, { issues: payload.error.errors });
     }
 
     let user: User;
@@ -69,8 +62,7 @@ export const actions = {
           {
             code: "custom",
             path: ["email"],
-            message:
-              "The email address is unknown. Please check it and try again.",
+            message: "The email address is unknown. Please check it and try again.",
           } satisfies ZodIssue,
         ],
       });
@@ -86,16 +78,11 @@ export const actions = {
         throw err;
       }
 
-      return error(500, {
-        message: `Failed to dispatch passcode: ${err.message}`,
-      });
+      return error(500, { message: `Failed to dispatch passcode: ${err.message}` });
     }
     // endregion
 
-    return {
-      sent: true,
-      email: payload.data.email,
-    };
+    return { sent: true, email: payload.data.email };
   },
 
   /**
@@ -111,17 +98,12 @@ export const actions = {
       .object({
         previous: z.string().optional(),
         email: z.string().email().toLowerCase(),
-        passcode: z
-          .string()
-          .length(Number(env.PUBLIC_PASSCODE_LENGTH))
-          .regex(/^\d+$/),
+        passcode: z.string().length(Number(env.PUBLIC_PASSCODE_LENGTH)).regex(/^\d+$/),
       })
       .safeParse(Object.fromEntries(body.entries()));
 
     if (!payload.success) {
-      return fail(400, {
-        issues: payload.error.errors,
-      });
+      return fail(400, { issues: payload.error.errors });
     }
 
     const email = payload.data.email;
@@ -137,10 +119,7 @@ export const actions = {
       }
 
       if (cause instanceof NoResultError) {
-        return fail(400, {
-          error: "Passcode expired or invalid",
-          email,
-        });
+        return fail(400, { error: "Passcode expired or invalid", email });
       }
 
       throw error(401, { message: "Authentication failed" });

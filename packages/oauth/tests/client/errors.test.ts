@@ -161,10 +161,7 @@ describe("OAuth Client Errors", () => {
 
   describe("IssuerMismatchError", () => {
     it("should create with expected and received issuers", () => {
-      const error = new IssuerMismatchError(
-        "https://expected.com",
-        "https://received.com",
-      );
+      const error = new IssuerMismatchError("https://expected.com", "https://received.com");
       expect(error.code).toBe("invalid_request");
       expect(error.description).toContain("expected.com");
       expect(error.description).toContain("received.com");

@@ -89,11 +89,7 @@ describe("Open Library Client", () => {
 
   beforeEach(() => {
     mockFetch.mockReset();
-    client = new Client("test@colibri.dev", {
-      fetch: mockFetch,
-      baseUrl,
-      coversBaseUrl,
-    });
+    client = new Client("test@colibri.dev", { fetch: mockFetch, baseUrl, coversBaseUrl });
   });
 
   it("loads a work by id", async () => {
@@ -104,12 +100,7 @@ describe("Open Library Client", () => {
 
   it("returns null for 404 work", async () => {
     mockFetch.mockImplementation(() =>
-      Promise.resolve({
-        ok: false,
-        status: 404,
-        statusText: "Not Found",
-        json: vi.fn(),
-      }),
+      Promise.resolve({ ok: false, status: 404, statusText: "Not Found", json: vi.fn() }),
     );
 
     await expect(client.loadWork("OL404W")).resolves.toBeNull();
@@ -126,9 +117,7 @@ describe("Open Library Client", () => {
   it("loads ratings by work id", async () => {
     mockFetch.mockImplementation(() => mockResponse(sampleRatings));
 
-    await expect(client.loadRatingsByWorkId("OL123W")).resolves.toEqual(
-      sampleRatings,
-    );
+    await expect(client.loadRatingsByWorkId("OL123W")).resolves.toEqual(sampleRatings);
   });
 
   it("loads an edition by id", async () => {
@@ -140,9 +129,7 @@ describe("Open Library Client", () => {
   it("loads editions by work id (async generator)", async () => {
     mockFetch.mockImplementation(() => mockResponse(sampleEditionsPayload));
 
-    const editions = await Array.fromAsync(
-      client.loadEditionsByWorkId("OL123W"),
-    );
+    const editions = await Array.fromAsync(client.loadEditionsByWorkId("OL123W"));
 
     expect(editions).toEqual([sampleEdition]);
   });
@@ -150,9 +137,7 @@ describe("Open Library Client", () => {
   it("loads an edition by ISBN", async () => {
     mockFetch.mockImplementation(() => mockResponse(sampleIsbn));
 
-    await expect(client.loadEditionByIsbn("1234567890")).resolves.toEqual(
-      sampleIsbn,
-    );
+    await expect(client.loadEditionByIsbn("1234567890")).resolves.toEqual(sampleIsbn);
   });
 
   it("loads an author by id", async () => {
@@ -165,13 +150,9 @@ describe("Open Library Client", () => {
     // First page of results
     mockFetch.mockImplementationOnce(() => mockResponse(sampleWorksByAuthor));
     // Second page of results (for pagination test)
-    mockFetch.mockImplementationOnce(() =>
-      mockResponse(sampleWorksByAuthorPage2),
-    );
+    mockFetch.mockImplementationOnce(() => mockResponse(sampleWorksByAuthorPage2));
 
-    const works = await Array.fromAsync(
-      client.loadWorksByAuthorId("OL1A", { limit: 2 }),
-    );
+    const works = await Array.fromAsync(client.loadWorksByAuthorId("OL1A", { limit: 2 }));
 
     expect(works).toEqual([
       { key: "/works/OL123W", title: "First Work" },
@@ -179,12 +160,8 @@ describe("Open Library Client", () => {
       { key: "/works/OL789W", title: "Third Work" },
     ]);
     expect(mockFetch).toHaveBeenCalledTimes(2);
-    expect(mockFetch.mock.calls[0][0].url).toContain(
-      "/authors/OL1A/works.json",
-    );
-    expect(mockFetch.mock.calls[1][0].url).toContain(
-      "/authors/OL1A/works.json?offset=2&limit=2",
-    );
+    expect(mockFetch.mock.calls[0][0].url).toContain("/authors/OL1A/works.json");
+    expect(mockFetch.mock.calls[1][0].url).toContain("/authors/OL1A/works.json?offset=2&limit=2");
   });
 
   it("searches authors (async generator)", async () => {
@@ -213,9 +190,7 @@ describe("Open Library Client", () => {
       }),
     );
 
-    const books = await Array.fromAsync(
-      client.searchBook("Book", { limit: 1 }),
-    );
+    const books = await Array.fromAsync(client.searchBook("Book", { limit: 1 }));
 
     expect(books.length).toBe(1);
   });
@@ -247,26 +222,19 @@ describe("Open Library Client", () => {
     mockFetch.mockImplementation(() => mockResponse(sampleSearchAuthorPayload));
 
     await Array.fromAsync(
-      client.searchAuthor({
-        name: "Jane Austen",
-        birth_date: { from: "1700", to: "1900" },
-      }),
+      client.searchAuthor({ name: "Jane Austen", birth_date: { from: "1700", to: "1900" } }),
     );
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
     const url = new URL(mockFetch.mock.calls[0][0].url);
     expect(url.pathname).toBe("/authors/search.json");
-    expect(url.searchParams.get("q")).toBe(
-      'name:"Jane Austen" AND birth_date:[1700 TO 1900]',
-    );
+    expect(url.searchParams.get("q")).toBe('name:"Jane Austen" AND birth_date:[1700 TO 1900]');
   });
 
   it("loads cover metadata", async () => {
     mockFetch.mockImplementation(() => mockResponse(sampleCoverMetadata));
 
-    await expect(client.loadCoverMetadata("OL123M")).resolves.toEqual(
-      sampleCoverMetadata,
-    );
+    await expect(client.loadCoverMetadata("OL123M")).resolves.toEqual(sampleCoverMetadata);
   });
 
   it("loads author photo metadata", async () => {
@@ -306,11 +274,7 @@ describe("Open Library Client", () => {
 
   it("returns null for non-existent cover", async () => {
     mockFetch.mockImplementation(() =>
-      Promise.resolve({
-        ok: false,
-        status: 404,
-        statusText: "Not Found",
-      }),
+      Promise.resolve({ ok: false, status: 404, statusText: "Not Found" }),
     );
 
     await expect(client.loadCover("NonExistentCover")).resolves.toBeNull();
@@ -334,9 +298,7 @@ describe("Open Library Client", () => {
     mockFetch.mockImplementation(() => mockBlobResponse(mockImageBlob));
 
     await client.loadCover("9781234567890", { type: "isbn" });
-    expect(mockFetch.mock.calls[0][0].url).toContain(
-      "/b/isbn/9781234567890-M.jpg",
-    );
+    expect(mockFetch.mock.calls[0][0].url).toContain("/b/isbn/9781234567890-M.jpg");
 
     mockFetch.mockClear();
 
@@ -345,9 +307,7 @@ describe("Open Library Client", () => {
   });
 
   it("throws on network error", async () => {
-    mockFetch.mockImplementation(() =>
-      Promise.reject(new Error("Network fail")),
-    );
+    mockFetch.mockImplementation(() => Promise.reject(new Error("Network fail")));
 
     await expect(client.loadWork("OL123W")).rejects.toThrow("Network fail");
   });
@@ -376,15 +336,11 @@ describe("Open Library Client", () => {
       }),
     );
 
-    await expect(client.loadWork("OL123W")).rejects.toThrow(
-      "Request failed with status 500",
-    );
+    await expect(client.loadWork("OL123W")).rejects.toThrow("Request failed with status 500");
   });
 
   it("handles timeout errors gracefully", async () => {
-    mockFetch.mockImplementation(() =>
-      Promise.reject(new Error("The operation was aborted. ")),
-    );
+    mockFetch.mockImplementation(() => Promise.reject(new Error("The operation was aborted. ")));
 
     await expect(client.loadWork("OL123W")).rejects.toThrow("aborted");
   });
@@ -401,9 +357,7 @@ describe("Open Library Client", () => {
       }),
     );
 
-    await expect(client.loadWork("OL123W")).rejects.toThrow(
-      "Invalid response format",
-    );
+    await expect(client.loadWork("OL123W")).rejects.toThrow("Invalid response format");
   });
 
   it("handles unexpected API response structure", async () => {
@@ -442,9 +396,7 @@ describe("Open Library Client", () => {
     );
 
     // Only process first page to avoid infinite loop in test
-    const books = await Array.fromAsync(
-      client.searchBook("common term", { limit: 50 }),
-    );
+    const books = await Array.fromAsync(client.searchBook("common term", { limit: 50 }));
 
     expect(books).toHaveLength(50);
     expect(books[0].key).toBe("/works/OL0W");
@@ -453,17 +405,10 @@ describe("Open Library Client", () => {
 
   it("handles empty search results gracefully", async () => {
     mockFetch.mockImplementation(() =>
-      mockResponse({
-        docs: [],
-        numFound: 0,
-        start: 0,
-        num_found: 0,
-      }),
+      mockResponse({ docs: [], numFound: 0, start: 0, num_found: 0 }),
     );
 
-    const books = await Array.fromAsync(
-      client.searchBook("nonexistentbook12345"),
-    );
+    const books = await Array.fromAsync(client.searchBook("nonexistentbook12345"));
     expect(books).toEqual([]);
     expect(books).toHaveLength(0);
   });
@@ -490,9 +435,7 @@ describe("Open Library Client", () => {
   });
 
   it("handles broken cover image URLs", async () => {
-    mockFetch.mockImplementation(() =>
-      Promise.resolve(mockBlobResponse(new Blob())),
-    );
+    mockFetch.mockImplementation(() => Promise.resolve(mockBlobResponse(new Blob())));
 
     const result = await client.loadCover("OL123M");
     expect(result).toBeInstanceOf(File);

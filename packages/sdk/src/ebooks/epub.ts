@@ -1,13 +1,7 @@
-import { Epub } from "./epub/legacy.js";
-import type { Identifier, Metadata } from "./metadata.js";
 import { wrapArray } from "@colibri-hq/shared";
-import {
-  BlobReader,
-  BlobWriter,
-  TextWriter,
-  Writer,
-  ZipReader,
-} from "@zip.js/zip.js";
+import { BlobReader, BlobWriter, TextWriter, Writer, ZipReader } from "@zip.js/zip.js";
+import type { Identifier, Metadata } from "./metadata.js";
+import { Epub } from "./epub/legacy.js";
 
 /** ZIP file magic number (PK\x03\x04) */
 const ZIP_MAGIC = [0x50, 0x4b, 0x03, 0x04] as const;
@@ -17,10 +11,7 @@ export async function isZipFile(file: File): Promise<boolean> {
   return ZIP_MAGIC.every((byte, i) => header[i] === byte);
 }
 
-export async function loadEpubMetadata(
-  file: File,
-  signal?: AbortSignal,
-): Promise<Metadata> {
+export async function loadEpubMetadata(file: File, signal?: AbortSignal): Promise<Metadata> {
   const book = await loadEpub(file, signal);
   await book.load();
   const cover = await book.getCover();
@@ -57,9 +48,7 @@ export async function loadEpubMetadata(
   } as Metadata;
 }
 
-function loadIdentifiers({
-  identifier = [],
-}: Pick<Awaited<Epub["metadata"]>, "identifier">) {
+function loadIdentifiers({ identifier = [] }: Pick<Awaited<Epub["metadata"]>, "identifier">) {
   return wrapArray(identifier)
     .filter((value) => !!value)
     .map((rawValue) => {
@@ -72,15 +61,10 @@ function loadIdentifiers({
       }
 
       // Strip optional "urn:" prefix
-      const normalizedValue = rawValue.startsWith("urn:")
-        ? rawValue.slice(4)
-        : rawValue;
+      const normalizedValue = rawValue.startsWith("urn:") ? rawValue.slice(4) : rawValue;
 
       const [type, ...rest] = normalizedValue.split(":");
-      return {
-        type: type.toLowerCase() as Identifier["type"],
-        value: rest.join(":"),
-      };
+      return { type: type.toLowerCase() as Identifier["type"], value: rest.join(":") };
     });
 }
 
@@ -91,11 +75,7 @@ function loadContributors({
   return [...contributors, publisher]
     .filter((contributor) => contributor !== undefined)
     .filter(({ name }) => !name.endsWith("[https://calibre-ebook.com]"))
-    .map(({ name, roles, sortAs }) => ({
-      name,
-      roles: wrapArray(roles),
-      sortingKey: sortAs,
-    }));
+    .map(({ name, roles, sortAs }) => ({ name, roles: wrapArray(roles), sortingKey: sortAs }));
 }
 
 /**
@@ -103,11 +83,7 @@ function loadContributors({
  * Handles compound subjects like "Fiction / Fantasy / Epic"
  */
 function loadSubjects(
-  subjects: Array<{
-    name: string;
-    term?: string | undefined;
-    authority?: string | undefined;
-  }>,
+  subjects: Array<{ name: string; term?: string | undefined; authority?: string | undefined }>,
 ): string[] {
   const allSubjects = subjects.flatMap((subject) => {
     const subjectText = subject.term ?? subject.name;
@@ -122,10 +98,7 @@ function loadSubjects(
   return [...new Set(allSubjects)].filter((s) => s.length > 0);
 }
 
-export async function loadEpub(
-  file: File,
-  signal?: AbortSignal,
-): Promise<Epub> {
+export async function loadEpub(file: File, signal?: AbortSignal): Promise<Epub> {
   const options = signal ? { signal } : {};
   const reader = new ZipReader(new BlobReader(file), options);
   const entries = await reader.getEntries();

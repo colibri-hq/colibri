@@ -16,9 +16,7 @@ test.describe("Authentication Guards", () => {
   test.describe("Unauthenticated Access", () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
-    test("redirects to login when accessing protected route", async ({
-      page,
-    }) => {
+    test("redirects to login when accessing protected route", async ({ page }) => {
       // Try to access a protected route without authentication
       await page.goto("/works");
 
@@ -42,8 +40,7 @@ test.describe("Authentication Guards", () => {
       const previousParam = url.searchParams.get("previous");
 
       const hasPreviousLocation =
-        previousCookie?.value.includes("/collections") ||
-        previousParam?.includes("/collections");
+        previousCookie?.value.includes("/collections") || previousParam?.includes("/collections");
 
       expect(hasPreviousLocation).toBe(true);
     });
@@ -67,10 +64,7 @@ test.describe("Authentication Guards", () => {
       await expect(page).toHaveURL("/instance/moderation");
     });
 
-    test("non-admin user receives 403 on moderation page", async ({
-      page,
-      context,
-    }) => {
+    test("non-admin user receives 403 on moderation page", async ({ page, context }) => {
       // Clear existing auth and set up a non-admin user
       await context.clearCookies();
 
@@ -107,9 +101,7 @@ test.describe("Authentication Guards", () => {
       await expect(page).toHaveURL("/works");
     });
 
-    test("authenticated user can access instance settings", async ({
-      page,
-    }) => {
+    test("authenticated user can access instance settings", async ({ page }) => {
       const response = await page.goto("/instance/settings");
 
       expect(response?.status()).toBe(200);

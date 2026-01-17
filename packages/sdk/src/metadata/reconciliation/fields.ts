@@ -78,8 +78,6 @@ export function getDuplicateFieldWeight(fieldName: string): number {
 /**
  * Get field name by index in the METADATA_FIELDS array
  */
-export function getFieldNameByIndex(
-  index: number,
-): MetadataFieldName | "unknown" {
+export function getFieldNameByIndex(index: number): MetadataFieldName | "unknown" {
   return METADATA_FIELDS[index] ?? "unknown";
 }

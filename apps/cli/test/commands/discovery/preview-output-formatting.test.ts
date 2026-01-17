@@ -57,30 +57,13 @@ class TestCLIFormatter {
 
     // Display best result
     const bestResult = results[0];
-    this.log(
-      `Best Match (Confidence: ${(bestResult.confidence * 100).toFixed(1)}%):`,
-    );
+    this.log(`Best Match (Confidence: ${(bestResult.confidence * 100).toFixed(1)}%):`);
     this.log("");
 
     // Display core metadata fields
-    this.displayMetadataField(
-      "Title",
-      bestResult.title,
-      bestResult.confidence,
-      showConfidence,
-    );
-    this.displayMetadataField(
-      "Authors",
-      bestResult.authors,
-      bestResult.confidence,
-      showConfidence,
-    );
-    this.displayMetadataField(
-      "ISBN",
-      bestResult.isbn,
-      bestResult.confidence,
-      showConfidence,
-    );
+    this.displayMetadataField("Title", bestResult.title, bestResult.confidence, showConfidence);
+    this.displayMetadataField("Authors", bestResult.authors, bestResult.confidence, showConfidence);
+    this.displayMetadataField("ISBN", bestResult.isbn, bestResult.confidence, showConfidence);
     this.displayMetadataField(
       "Publisher",
       bestResult.publisher,
@@ -116,11 +99,8 @@ class TestCLIFormatter {
           this.log(`  Records Found: ${result.records.length}`);
           if (result.records.length > 0) {
             const avgConfidence =
-              result.records.reduce((sum, r) => sum + r.confidence, 0) /
-              result.records.length;
-            this.log(
-              `  Average Confidence: ${(avgConfidence * 100).toFixed(1)}%`,
-            );
+              result.records.reduce((sum, r) => sum + r.confidence, 0) / result.records.length;
+            this.log(`  Average Confidence: ${(avgConfidence * 100).toFixed(1)}%`);
           }
         } else if (result.error) {
           this.log(`  Error: ${result.error.message}`);
@@ -133,9 +113,7 @@ class TestCLIFormatter {
       this.log("\n=== All Results Summary ===");
       this.log(`Found ${results.length} results:`);
       for (const [index, record] of results.slice(0, 5).entries()) {
-        const confidenceStr = showConfidence
-          ? ` (${(record.confidence * 100).toFixed(1)}%)`
-          : "";
+        const confidenceStr = showConfidence ? ` (${(record.confidence * 100).toFixed(1)}%)` : "";
         this.log(
           `  ${index + 1}. ${record.title || "Unknown Title"}${confidenceStr} - ${record.source}`,
         );
@@ -277,11 +255,8 @@ class TestCLIFormatter {
     this.log(`${label}: ${displayValue}`);
 
     if (showConfidence) {
-      const confidenceIcon =
-        confidence >= 0.8 ? "🟢" : confidence > 0.5 ? "🟡" : "🔴";
-      this.log(
-        `  ${confidenceIcon} Confidence: ${(confidence * 100).toFixed(1)}%`,
-      );
+      const confidenceIcon = confidence >= 0.8 ? "🟢" : confidence > 0.5 ? "🟡" : "🔴";
+      this.log(`  ${confidenceIcon} Confidence: ${(confidence * 100).toFixed(1)}%`);
     }
   }
 }
@@ -306,11 +281,7 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
     it("should verify WikiData results are formatted correctly in CLI output", async () => {
       // Mock WikiData response with comprehensive metadata
       const mockBinding = {
-        authorLabel: {
-          type: "literal",
-          value: "George Orwell",
-          "xml:lang": "en",
-        },
+        authorLabel: { type: "literal", value: "George Orwell", "xml:lang": "en" },
         book: { type: "uri", value: "http://www.wikidata.org/entity/Q8261" },
         isbn: { type: "literal", value: "9780451524935" },
         publishDate: {
@@ -318,11 +289,7 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
           type: "literal",
           value: "1949-06-08T00:00:00Z",
         },
-        publisherLabel: {
-          type: "literal",
-          value: "Secker & Warburg",
-          "xml:lang": "en",
-        },
+        publisherLabel: { type: "literal", value: "Secker & Warburg", "xml:lang": "en" },
         title: { type: "literal", value: "1984", "xml:lang": "en" },
       };
 
@@ -331,21 +298,13 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
         ok: true,
       });
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "1984",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "1984" };
 
       const results = await wikidataProvider.searchMultiCriteria(query);
 
       // Mock provider results for display
       const providerResults = [
-        {
-          duration: 1250,
-          provider: "WikiData",
-          records: results,
-          success: true,
-        },
+        { duration: 1250, provider: "WikiData", records: results, success: true },
       ];
 
       // Test detailed output formatting
@@ -356,25 +315,15 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
       expect(logs).toContain("=== Detailed Metadata Results ===");
 
       // Verify best match confidence is displayed
-      expect(logs.some((log) => log.includes("Best Match (Confidence:"))).toBe(
-        true,
-      );
+      expect(logs.some((log) => log.includes("Best Match (Confidence:"))).toBe(true);
       expect(logs.some((log) => log.includes("%):"))).toBe(true);
 
       // Verify core metadata fields are displayed
       expect(logs.some((log) => log.includes("Title: 1984"))).toBe(true);
-      expect(logs.some((log) => log.includes("Authors: George Orwell"))).toBe(
-        true,
-      );
-      expect(logs.some((log) => log.includes("ISBN: 9780451524935"))).toBe(
-        true,
-      );
-      expect(
-        logs.some((log) => log.includes("Publisher: Secker & Warburg")),
-      ).toBe(true);
-      expect(logs.some((log) => log.includes("Publication Date: 1949"))).toBe(
-        true,
-      );
+      expect(logs.some((log) => log.includes("Authors: George Orwell"))).toBe(true);
+      expect(logs.some((log) => log.includes("ISBN: 9780451524935"))).toBe(true);
+      expect(logs.some((log) => log.includes("Publisher: Secker & Warburg"))).toBe(true);
+      expect(logs.some((log) => log.includes("Publication Date: 1949"))).toBe(true);
 
       // Verify WikiData source is properly attributed
       expect(results[0].source).toBe("WikiData");
@@ -384,11 +333,7 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
     it("should verify confidence scores are displayed correctly", async () => {
       // Mock WikiData response with high confidence data (ISBN search)
       const mockBinding = {
-        authorLabel: {
-          type: "literal",
-          value: "F. Scott Fitzgerald",
-          "xml:lang": "en",
-        },
+        authorLabel: { type: "literal", value: "F. Scott Fitzgerald", "xml:lang": "en" },
         book: { type: "uri", value: "http://www.wikidata.org/entity/Q74287" },
         isbn: { type: "literal", value: "9780743273565" },
         publishDate: {
@@ -396,11 +341,7 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
           type: "literal",
           value: "1925-04-10T00:00:00Z",
         },
-        publisherLabel: {
-          type: "literal",
-          value: "Charles Scribner's Sons",
-          "xml:lang": "en",
-        },
+        publisherLabel: { type: "literal", value: "Charles Scribner's Sons", "xml:lang": "en" },
         title: { type: "literal", value: "The Great Gatsby", "xml:lang": "en" },
       };
 
@@ -417,12 +358,7 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
       const results = await wikidataProvider.searchMultiCriteria(query);
 
       const providerResults = [
-        {
-          duration: 890,
-          provider: "WikiData",
-          records: results,
-          success: true,
-        },
+        { duration: 890, provider: "WikiData", records: results, success: true },
       ];
 
       // Test with confidence display enabled
@@ -491,16 +427,8 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
           type: "literal",
           value: "1960-07-11T00:00:00Z",
         },
-        publisherLabel: {
-          type: "literal",
-          value: "J. B. Lippincott & Co.",
-          "xml:lang": "en",
-        },
-        title: {
-          type: "literal",
-          value: "To Kill a Mockingbird",
-          "xml:lang": "en",
-        },
+        publisherLabel: { type: "literal", value: "J. B. Lippincott & Co.", "xml:lang": "en" },
+        title: { type: "literal", value: "To Kill a Mockingbird", "xml:lang": "en" },
       };
 
       mockFetch.mockResolvedValueOnce({
@@ -508,10 +436,7 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
         ok: true,
       });
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "To Kill a Mockingbird",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "To Kill a Mockingbird" };
 
       const results = await wikidataProvider.searchMultiCriteria(query);
 
@@ -545,29 +470,17 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
       expect(logs).toContain("=== Provider Performance Metrics ===");
 
       // Verify WikiData performance metrics
-      expect(
-        logs.some((log) => log.includes("WikiData: ✅ Success (1450ms)")),
-      ).toBe(true);
+      expect(logs.some((log) => log.includes("WikiData: ✅ Success (1450ms)"))).toBe(true);
       expect(logs.some((log) => log.includes("Records Found: 1"))).toBe(true);
-      expect(logs.some((log) => log.includes("Average Confidence:"))).toBe(
-        true,
-      );
+      expect(logs.some((log) => log.includes("Average Confidence:"))).toBe(true);
 
       // Verify OpenLibrary performance metrics
-      expect(
-        logs.some((log) => log.includes("OpenLibrary: ✅ Success (2100ms)")),
-      ).toBe(true);
+      expect(logs.some((log) => log.includes("OpenLibrary: ✅ Success (2100ms)"))).toBe(true);
       expect(logs.some((log) => log.includes("Records Found: 0"))).toBe(true);
 
       // Verify failed provider metrics
-      expect(
-        logs.some((log) => log.includes("TestProvider: ❌ Failed (500ms)")),
-      ).toBe(true);
-      expect(
-        logs.some((log) =>
-          log.includes("Error: Service temporarily unavailable"),
-        ),
-      ).toBe(true);
+      expect(logs.some((log) => log.includes("TestProvider: ❌ Failed (500ms)"))).toBe(true);
+      expect(logs.some((log) => log.includes("Error: Service temporarily unavailable"))).toBe(true);
 
       // Verify duration formatting is correct
       const durationLogs = logs.filter((log) => log.includes("ms)"));
@@ -583,11 +496,7 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
       // Mock multiple WikiData results
       const mockBindings = [
         {
-          authorLabel: {
-            type: "literal",
-            value: "J.R.R. Tolkien",
-            "xml:lang": "en",
-          },
+          authorLabel: { type: "literal", value: "J.R.R. Tolkien", "xml:lang": "en" },
           book: { type: "uri", value: "http://www.wikidata.org/entity/Q15228" },
           isbn: { type: "literal", value: "9780544003415" },
           publishDate: {
@@ -595,23 +504,11 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
             type: "literal",
             value: "1954-07-29T00:00:00Z",
           },
-          publisherLabel: {
-            type: "literal",
-            value: "George Allen & Unwin",
-            "xml:lang": "en",
-          },
-          title: {
-            type: "literal",
-            value: "The Lord of the Rings",
-            "xml:lang": "en",
-          },
+          publisherLabel: { type: "literal", value: "George Allen & Unwin", "xml:lang": "en" },
+          title: { type: "literal", value: "The Lord of the Rings", "xml:lang": "en" },
         },
         {
-          authorLabel: {
-            type: "literal",
-            value: "J.R.R. Tolkien",
-            "xml:lang": "en",
-          },
+          authorLabel: { type: "literal", value: "J.R.R. Tolkien", "xml:lang": "en" },
           book: { type: "uri", value: "http://www.wikidata.org/entity/Q74287" },
           isbn: { type: "literal", value: "9780547928227" },
           publishDate: {
@@ -619,11 +516,7 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
             type: "literal",
             value: "1937-09-21T00:00:00Z",
           },
-          publisherLabel: {
-            type: "literal",
-            value: "George Allen & Unwin",
-            "xml:lang": "en",
-          },
+          publisherLabel: { type: "literal", value: "George Allen & Unwin", "xml:lang": "en" },
           title: { type: "literal", value: "The Hobbit", "xml:lang": "en" },
         },
       ];
@@ -633,10 +526,7 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
         ok: true,
       });
 
-      const query: MultiCriteriaQuery = {
-        authors: ["J.R.R. Tolkien"],
-        fuzzy: false,
-      };
+      const query: MultiCriteriaQuery = { authors: ["J.R.R. Tolkien"], fuzzy: false };
 
       const results = await wikidataProvider.searchMultiCriteria(query);
 
@@ -648,42 +538,26 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
       expect(logsWithConfidence).toContain("=== Table Format Results ===");
       expect(
         logsWithConfidence.some((log) =>
-          log.includes(
-            "# | Title | Authors | Publisher | Year | Confidence | Source",
-          ),
+          log.includes("# | Title | Authors | Publisher | Year | Confidence | Source"),
         ),
       ).toBe(true);
 
       // Verify table separator line
-      expect(
-        logsWithConfidence.some((log) => log.includes("-".repeat(10))),
-      ).toBe(true);
+      expect(logsWithConfidence.some((log) => log.includes("-".repeat(10)))).toBe(true);
 
       // Verify table rows contain WikiData results
-      expect(
-        logsWithConfidence.some((log) =>
-          log.includes("1 | The Lord of the Rings"),
-        ),
-      ).toBe(true);
-      expect(
-        logsWithConfidence.some((log) => log.includes("2 | The Hobbit")),
-      ).toBe(true);
-      expect(
-        logsWithConfidence.some((log) => log.includes("J.R.R. Tolkien")),
-      ).toBe(true);
-      expect(
-        logsWithConfidence.some((log) => log.includes("George Allen & Unwin")),
-      ).toBe(true);
+      expect(logsWithConfidence.some((log) => log.includes("1 | The Lord of the Rings"))).toBe(
+        true,
+      );
+      expect(logsWithConfidence.some((log) => log.includes("2 | The Hobbit"))).toBe(true);
+      expect(logsWithConfidence.some((log) => log.includes("J.R.R. Tolkien"))).toBe(true);
+      expect(logsWithConfidence.some((log) => log.includes("George Allen & Unwin"))).toBe(true);
       expect(logsWithConfidence.some((log) => log.includes("1954"))).toBe(true);
       expect(logsWithConfidence.some((log) => log.includes("1937"))).toBe(true);
-      expect(logsWithConfidence.some((log) => log.includes("WikiData"))).toBe(
-        true,
-      );
+      expect(logsWithConfidence.some((log) => log.includes("WikiData"))).toBe(true);
 
       // Verify confidence percentages are displayed
-      expect(logsWithConfidence.some((log) => log.match(/\d+\.\d%/))).toBe(
-        true,
-      );
+      expect(logsWithConfidence.some((log) => log.match(/\d+\.\d%/))).toBe(true);
 
       // Test table output without confidence
       formatter.clearLogs();
@@ -692,26 +566,16 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
 
       // Verify table header without confidence columns
       expect(
-        logsWithoutConfidence.some((log) =>
-          log.includes("# | Title | Authors | Publisher | Year"),
-        ),
+        logsWithoutConfidence.some((log) => log.includes("# | Title | Authors | Publisher | Year")),
       ).toBe(true);
-      expect(
-        logsWithoutConfidence.some((log) => log.includes("Confidence")),
-      ).toBe(false);
-      expect(logsWithoutConfidence.some((log) => log.includes("Source"))).toBe(
-        false,
-      );
+      expect(logsWithoutConfidence.some((log) => log.includes("Confidence"))).toBe(false);
+      expect(logsWithoutConfidence.some((log) => log.includes("Source"))).toBe(false);
     });
 
     it("should format JSON output correctly for WikiData results", async () => {
       // Mock WikiData response
       const mockBinding = {
-        authorLabel: {
-          type: "literal",
-          value: "Jane Austen",
-          "xml:lang": "en",
-        },
+        authorLabel: { type: "literal", value: "Jane Austen", "xml:lang": "en" },
         book: { type: "uri", value: "http://www.wikidata.org/entity/Q170583" },
         isbn: { type: "literal", value: "9780141439518" },
         publishDate: {
@@ -719,16 +583,8 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
           type: "literal",
           value: "1813-01-28T00:00:00Z",
         },
-        publisherLabel: {
-          type: "literal",
-          value: "T. Egerton",
-          "xml:lang": "en",
-        },
-        title: {
-          type: "literal",
-          value: "Pride and Prejudice",
-          "xml:lang": "en",
-        },
+        publisherLabel: { type: "literal", value: "T. Egerton", "xml:lang": "en" },
+        title: { type: "literal", value: "Pride and Prejudice", "xml:lang": "en" },
       };
 
       mockFetch.mockResolvedValueOnce({
@@ -736,20 +592,12 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
         ok: true,
       });
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Pride and Prejudice",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Pride and Prejudice" };
 
       const results = await wikidataProvider.searchMultiCriteria(query);
 
       const providerResults = [
-        {
-          duration: 1100,
-          provider: "WikiData",
-          records: results,
-          success: true,
-        },
+        { duration: 1100, provider: "WikiData", records: results, success: true },
       ];
 
       formatter.displayJsonOutput(results, providerResults, 1200);
@@ -798,9 +646,7 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
       expect(result.confidence).toBeLessThanOrEqual(1);
 
       // Verify timestamp is ISO string
-      expect(result.timestamp).toMatch(
-        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-      );
+      expect(result.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
 
     it("should handle empty results gracefully in all output formats", async () => {
@@ -810,21 +656,13 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
         ok: true,
       });
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Nonexistent Book Title",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Nonexistent Book Title" };
 
       const results = await wikidataProvider.searchMultiCriteria(query);
       expect(results).toHaveLength(0);
 
       const providerResults = [
-        {
-          duration: 800,
-          provider: "WikiData",
-          records: results,
-          success: true,
-        },
+        { duration: 800, provider: "WikiData", records: results, success: true },
       ];
 
       // Test detailed output with empty results
@@ -883,10 +721,7 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
         ok: true,
       });
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Very Long Book Title",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Very Long Book Title" };
 
       const results = await wikidataProvider.searchMultiCriteria(query);
 
@@ -911,12 +746,7 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
       // Test detailed output truncation (200 character limit)
       formatter.clearLogs();
       const providerResults = [
-        {
-          duration: 1000,
-          provider: "WikiData",
-          records: results,
-          success: true,
-        },
+        { duration: 1000, provider: "WikiData", records: results, success: true },
       ];
 
       formatter.displayDetailedOutput(results, providerResults, true);
@@ -925,16 +755,12 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
       // In detailed view, full values should be shown (under 200 char limit)
       expect(
         detailedLogs.some((log) =>
-          log.includes(
-            "Very Long Book Title That Exceeds Normal Display Limits",
-          ),
+          log.includes("Very Long Book Title That Exceeds Normal Display Limits"),
         ),
       ).toBe(true);
       expect(
         detailedLogs.some((log) =>
-          log.includes(
-            "Very Long Author Name That Exceeds Normal Length Limits",
-          ),
+          log.includes("Very Long Author Name That Exceeds Normal Length Limits"),
         ),
       ).toBe(true);
     });
@@ -943,31 +769,19 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
       // Mock multiple WikiData results with different confidence levels
       const mockBindings = [
         {
-          authorLabel: {
-            type: "literal",
-            value: "Author One",
-            "xml:lang": "en",
-          },
+          authorLabel: { type: "literal", value: "Author One", "xml:lang": "en" },
           book: { type: "uri", value: "http://www.wikidata.org/entity/Q1" },
           isbn: { type: "literal", value: "9781111111111" },
           title: { type: "literal", value: "Book One", "xml:lang": "en" },
         },
         {
-          authorLabel: {
-            type: "literal",
-            value: "Author Two",
-            "xml:lang": "en",
-          },
+          authorLabel: { type: "literal", value: "Author Two", "xml:lang": "en" },
           book: { type: "uri", value: "http://www.wikidata.org/entity/Q2" },
           isbn: { type: "literal", value: "9782222222222" },
           title: { type: "literal", value: "Book Two", "xml:lang": "en" },
         },
         {
-          authorLabel: {
-            type: "literal",
-            value: "Author Three",
-            "xml:lang": "en",
-          },
+          authorLabel: { type: "literal", value: "Author Three", "xml:lang": "en" },
           book: { type: "uri", value: "http://www.wikidata.org/entity/Q3" },
           title: { type: "literal", value: "Book Three", "xml:lang": "en" },
         },
@@ -978,40 +792,26 @@ describe("CLI Output Formatting and Display - WikiData Integration", () => {
         ok: true,
       });
 
-      const query: MultiCriteriaQuery = {
-        fuzzy: false,
-        title: "Book",
-      };
+      const query: MultiCriteriaQuery = { fuzzy: false, title: "Book" };
 
       const results = await wikidataProvider.searchMultiCriteria(query);
       expect(results.length).toBeGreaterThan(1);
 
       // Results should be sorted by confidence (highest first)
       for (let i = 0; i < results.length - 1; i++) {
-        expect(results[i].confidence).toBeGreaterThanOrEqual(
-          results[i + 1].confidence,
-        );
+        expect(results[i].confidence).toBeGreaterThanOrEqual(results[i + 1].confidence);
       }
 
       const providerResults = [
-        {
-          duration: 1300,
-          provider: "WikiData",
-          records: results,
-          success: true,
-        },
+        { duration: 1300, provider: "WikiData", records: results, success: true },
       ];
 
       formatter.displayDetailedOutput(results, providerResults, true);
       const logs = formatter.getLogs();
 
       // Verify all results summary is displayed
-      expect(
-        logs.some((log) => log.includes("=== All Results Summary ===")),
-      ).toBe(true);
-      expect(
-        logs.some((log) => log.includes(`Found ${results.length} results:`)),
-      ).toBe(true);
+      expect(logs.some((log) => log.includes("=== All Results Summary ==="))).toBe(true);
+      expect(logs.some((log) => log.includes(`Found ${results.length} results:`))).toBe(true);
 
       // Verify results are listed with confidence scores
       expect(

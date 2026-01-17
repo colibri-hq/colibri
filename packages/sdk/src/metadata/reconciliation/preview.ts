@@ -21,21 +21,14 @@ import type {
   Subject,
   Work,
 } from "./types.js";
-import { CORE_FIELDS, getFieldNameByIndex, METADATA_FIELDS } from "./fields.js";
+import { ConflictDisplayFormatter, type FormattedConflictSummary } from "./conflict-format.js";
 import { ConflictDetector, type ConflictSummary } from "./conflicts.js";
-import {
-  ConflictDisplayFormatter,
-  type FormattedConflictSummary,
-} from "./conflict-format.js";
 import { DuplicateDetector } from "./duplicates.js";
 import { EditionSelector } from "./editions.js";
-import { SeriesAnalyzer } from "./series-analysis.js";
-import {
-  type FieldQuality,
-  QualityAssessor,
-  type SourceAttribution,
-} from "./quality.js";
+import { CORE_FIELDS, getFieldNameByIndex, METADATA_FIELDS } from "./fields.js";
+import { type FieldQuality, QualityAssessor, type SourceAttribution } from "./quality.js";
 import { RecommendationGenerator } from "./recommendations.js";
+import { SeriesAnalyzer } from "./series-analysis.js";
 
 /**
  * Consolidated metadata preview with source attribution and confidence scoring
@@ -98,11 +91,7 @@ export interface PreviewField<T> {
 }
 
 // Re-export types from quality-assessor for backwards compatibility
-export type {
-  SourceAttribution,
-  FieldQuality,
-  QualityFactor,
-} from "./quality.js";
+export type { SourceAttribution, FieldQuality, QualityFactor } from "./quality.js";
 
 /**
  * Summary of the preview
@@ -235,8 +224,7 @@ export class PreviewGenerator {
 
     // Create preview fields from reconciled data or raw metadata
     const title = this.createPreviewField(
-      reconciledData?.title ??
-        this.createFallbackField<string>("title", rawMetadata, sources),
+      reconciledData?.title ?? this.createFallbackField<string>("title", rawMetadata, sources),
       "title",
       rawMetadata,
     );
@@ -249,19 +237,14 @@ export class PreviewGenerator {
     );
 
     const isbn = this.createPreviewField(
-      reconciledData?.isbn ??
-        this.createFallbackField<string[]>("isbn", rawMetadata, sources),
+      reconciledData?.isbn ?? this.createFallbackField<string[]>("isbn", rawMetadata, sources),
       "isbn",
       rawMetadata,
     );
 
     const publicationDate = this.createPreviewField(
       reconciledData?.publicationDate ??
-        this.createFallbackField<PublicationDate>(
-          "publicationDate",
-          rawMetadata,
-          sources,
-        ),
+        this.createFallbackField<PublicationDate>("publicationDate", rawMetadata, sources),
       "publicationDate",
       rawMetadata,
     );
@@ -275,11 +258,7 @@ export class PreviewGenerator {
 
     const description = this.createPreviewField(
       reconciledData?.description ??
-        this.createFallbackField<Description>(
-          "description",
-          rawMetadata,
-          sources,
-        ),
+        this.createFallbackField<Description>("description", rawMetadata, sources),
       "description",
       rawMetadata,
     );
@@ -299,66 +278,47 @@ export class PreviewGenerator {
     );
 
     const series = this.createPreviewField(
-      reconciledData?.series ??
-        this.createFallbackField<Series[]>("series", rawMetadata, sources),
+      reconciledData?.series ?? this.createFallbackField<Series[]>("series", rawMetadata, sources),
       "series",
       rawMetadata,
     );
 
     const identifiers = this.createPreviewField(
       reconciledData?.identifiers ??
-        this.createFallbackField<Identifier[]>(
-          "identifiers",
-          rawMetadata,
-          sources,
-        ),
+        this.createFallbackField<Identifier[]>("identifiers", rawMetadata, sources),
       "identifiers",
       rawMetadata,
     );
 
     const physicalDescription = this.createPreviewField(
       reconciledData?.physicalDescription ??
-        this.createFallbackField<PhysicalDescription>(
-          "physicalDescription",
-          rawMetadata,
-          sources,
-        ),
+        this.createFallbackField<PhysicalDescription>("physicalDescription", rawMetadata, sources),
       "physicalDescription",
       rawMetadata,
     );
 
     const coverImage = this.createPreviewField(
       reconciledData?.coverImage ??
-        this.createFallbackField<CoverImage>(
-          "coverImage",
-          rawMetadata,
-          sources,
-        ),
+        this.createFallbackField<CoverImage>("coverImage", rawMetadata, sources),
       "coverImage",
       rawMetadata,
     );
 
     const work = this.createPreviewField(
-      reconciledData?.work ??
-        this.createFallbackField<Work>("work", rawMetadata, sources),
+      reconciledData?.work ?? this.createFallbackField<Work>("work", rawMetadata, sources),
       "work",
       rawMetadata,
     );
 
     const edition = this.createPreviewField(
-      reconciledData?.edition ??
-        this.createFallbackField<Edition>("edition", rawMetadata, sources),
+      reconciledData?.edition ?? this.createFallbackField<Edition>("edition", rawMetadata, sources),
       "edition",
       rawMetadata,
     );
 
     const relatedWorks = this.createPreviewField(
       reconciledData?.relatedWorks ??
-        this.createFallbackField<RelatedWork[]>(
-          "relatedWorks",
-          rawMetadata,
-          sources,
-        ),
+        this.createFallbackField<RelatedWork[]>("relatedWorks", rawMetadata, sources),
       "relatedWorks",
       rawMetadata,
     );
@@ -445,10 +405,7 @@ export class PreviewGenerator {
 
     if (this.config.enableConflictDetection) {
       // Prepare reconciled fields for conflict analysis
-      const reconciledFields = this.extractReconciledFields(
-        basePreview,
-        reconciledData,
-      );
+      const reconciledFields = this.extractReconciledFields(basePreview, reconciledData);
 
       // Prepare raw metadata grouped by field
       const rawMetadataByField = this.groupRawMetadataByField(rawMetadata);
@@ -461,8 +418,7 @@ export class PreviewGenerator {
 
       // Format conflicts for display if enabled
       if (this.config.includeConflictDisplay) {
-        conflictDisplay =
-          this.conflictDisplayFormatter.formatConflictSummary(conflictAnalysis);
+        conflictDisplay = this.conflictDisplayFormatter.formatConflictSummary(conflictAnalysis);
       } else {
         conflictDisplay = this.createEmptyConflictDisplay();
       }
@@ -487,12 +443,7 @@ export class PreviewGenerator {
       };
     }
 
-    return {
-      ...basePreview,
-      conflictAnalysis,
-      conflictDisplay,
-      conflictDetectionMetadata,
-    };
+    return { ...basePreview, conflictAnalysis, conflictDisplay, conflictDetectionMetadata };
   }
 
   /**
@@ -503,9 +454,7 @@ export class PreviewGenerator {
       return "Conflict display is disabled. Enable it in configuration to see detailed conflict information.";
     }
 
-    return this.conflictDisplayFormatter.generateConflictReport(
-      enhancedPreview.conflictAnalysis,
-    );
+    return this.conflictDisplayFormatter.generateConflictReport(enhancedPreview.conflictAnalysis);
   }
 
   /**
@@ -540,16 +489,10 @@ export class PreviewGenerator {
     const proposedEntry = this.createLibraryEntry(metadataPreview);
 
     // Detect duplicates against existing library (delegate to DuplicateDetector)
-    const duplicates = this.duplicateDetector.detectDuplicates(
-      proposedEntry,
-      existingLibrary,
-    );
+    const duplicates = this.duplicateDetector.detectDuplicates(proposedEntry, existingLibrary);
 
     // Perform edition selection (delegate to EditionSelector)
-    const editionSelection = this.editionSelector.selectBestEdition(
-      metadataPreview,
-      rawMetadata,
-    );
+    const editionSelection = this.editionSelector.selectBestEdition(metadataPreview, rawMetadata);
 
     // Detect series relationships (delegate to SeriesAnalyzer)
     const seriesRelationships = this.seriesAnalyzer.detectSeriesRelationships(
@@ -585,14 +528,8 @@ export class PreviewGenerator {
    * Detect duplicate entries in the existing library
    * @deprecated Use DuplicateDetector directly for more control
    */
-  detectDuplicates(
-    proposedEntry: LibraryEntry,
-    existingLibrary: LibraryEntry[],
-  ): DuplicateMatch[] {
-    return this.duplicateDetector.detectDuplicates(
-      proposedEntry,
-      existingLibrary,
-    );
+  detectDuplicates(proposedEntry: LibraryEntry, existingLibrary: LibraryEntry[]): DuplicateMatch[] {
+    return this.duplicateDetector.detectDuplicates(proposedEntry, existingLibrary);
   }
 
   /**
@@ -635,11 +572,7 @@ export class PreviewGenerator {
       return [];
     }
 
-    return this.conflictDetector.detectFieldConflicts(
-      field,
-      fieldName,
-      rawValues,
-    );
+    return this.conflictDetector.detectFieldConflicts(field, fieldName, rawValues);
   }
 
   /**
@@ -718,9 +651,7 @@ export class PreviewGenerator {
     }
 
     // Use the value from the most reliable source
-    const sortedValues = values.sort(
-      (a, b) => b.source.reliability - a.source.reliability,
-    );
+    const sortedValues = values.sort((a, b) => b.source.reliability - a.source.reliability);
     const primaryValue = sortedValues[0];
 
     return {
@@ -744,12 +675,8 @@ export class PreviewGenerator {
       fieldName,
       rawMetadata,
     );
-    const quality = this.assessFieldQuality(
-      reconciledField,
-      sourceAttributions,
-    );
-    const isHighConfidence =
-      reconciledField.confidence >= this.config.highConfidenceThreshold;
+    const quality = this.assessFieldQuality(reconciledField, sourceAttributions);
+    const isHighConfidence = reconciledField.confidence >= this.config.highConfidenceThreshold;
     const hasConflicts = (reconciledField.conflicts?.length || 0) > 0;
 
     return {
@@ -779,25 +706,18 @@ export class PreviewGenerator {
 
     // Find the primary source (highest reliability)
     const primarySource = fieldSources.reduce(
-      (prev, current) =>
-        current.reliability > prev.reliability ? current : prev,
+      (prev, current) => (current.reliability > prev.reliability ? current : prev),
       fieldSources[0],
     );
 
     for (const source of fieldSources) {
       // Find the original value from this source
       const originalRecord = rawMetadata.find((r) => r.source === source.name);
-      const originalValue = originalRecord
-        ? (originalRecord as any)[fieldName]
-        : null;
+      const originalValue = originalRecord ? (originalRecord as any)[fieldName] : null;
 
       // Calculate weight based on source reliability
-      const totalReliability = fieldSources.reduce(
-        (sum, s) => sum + s.reliability,
-        0,
-      );
-      const weight =
-        totalReliability > 0 ? source.reliability / totalReliability : 0;
+      const totalReliability = fieldSources.reduce((sum, s) => sum + s.reliability, 0);
+      const weight = totalReliability > 0 ? source.reliability / totalReliability : 0;
 
       attributions.push({
         source,
@@ -821,19 +741,14 @@ export class PreviewGenerator {
     reconciledField: ReconciledField<T>,
     sourceAttributions: SourceAttribution[],
   ): FieldQuality {
-    return this.qualityAssessor.assessFieldQuality(
-      reconciledField,
-      sourceAttributions,
-    );
+    return this.qualityAssessor.assessFieldQuality(reconciledField, sourceAttributions);
   }
 
   /**
    * Calculate overall confidence across all fields
    */
   private calculateOverallConfidence(fields: PreviewField<any>[]): number {
-    const fieldsWithData = fields.filter(
-      (f) => f.value !== null && f.value !== undefined,
-    );
+    const fieldsWithData = fields.filter((f) => f.value !== null && f.value !== undefined);
 
     if (fieldsWithData.length === 0) {
       return 0.1;
@@ -847,9 +762,7 @@ export class PreviewGenerator {
       const field = fields[i];
       if (field.value !== null && field.value !== undefined) {
         const fieldName = getFieldNameByIndex(i);
-        const weight = (CORE_FIELDS as readonly string[]).includes(fieldName)
-          ? 2
-          : 1;
+        const weight = (CORE_FIELDS as readonly string[]).includes(fieldName) ? 2 : 1;
         weightedSum += field.confidence * weight;
         totalWeight += weight;
       }
@@ -861,26 +774,18 @@ export class PreviewGenerator {
   /**
    * Generate summary of the preview
    */
-  private generateSummary(
-    fields: PreviewField<any>[],
-    sources: MetadataSource[],
-  ): PreviewSummary {
-    const fieldsWithData = fields.filter(
-      (f) => f.value !== null && f.value !== undefined,
-    );
+  private generateSummary(fields: PreviewField<any>[], sources: MetadataSource[]): PreviewSummary {
+    const fieldsWithData = fields.filter((f) => f.value !== null && f.value !== undefined);
     const highConfidenceFields = fields.filter((f) => f.isHighConfidence);
     const conflictedFields = fields.filter((f) => f.hasConflicts);
 
     // Find most and least reliable sources
-    const sortedSources = [...sources].sort(
-      (a, b) => b.reliability - a.reliability,
-    );
+    const sortedSources = [...sources].sort((a, b) => b.reliability - a.reliability);
     const mostReliableSource = sortedSources[0];
     const leastReliableSource = sortedSources[sortedSources.length - 1];
 
     // Calculate overall quality
-    const avgQualityScore =
-      fields.reduce((sum, f) => sum + f.quality.score, 0) / fields.length;
+    const avgQualityScore = fields.reduce((sum, f) => sum + f.quality.score, 0) / fields.length;
     const overallQuality: FieldQuality = {
       score: avgQualityScore,
       level:
@@ -899,8 +804,7 @@ export class PreviewGenerator {
         },
         {
           name: "confidence",
-          impact:
-            (highConfidenceFields.length / fieldsWithData.length - 0.5) * 0.3,
+          impact: (highConfidenceFields.length / fieldsWithData.length - 0.5) * 0.3,
           description: `${highConfidenceFields.length}/${fieldsWithData.length} fields have high confidence`,
         },
       ],
@@ -981,10 +885,7 @@ export class PreviewGenerator {
   private groupRawMetadataByField(
     rawMetadata: MetadataRecord[],
   ): Record<string, Array<{ value: any; source: MetadataSource }>> {
-    const grouped: Record<
-      string,
-      Array<{ value: any; source: MetadataSource }>
-    > = {};
+    const grouped: Record<string, Array<{ value: any; source: MetadataSource }>> = {};
 
     // Initialize all fields
     for (const fieldName of METADATA_FIELDS) {
@@ -1016,12 +917,7 @@ export class PreviewGenerator {
   private createEmptyConflictAnalysis(): ConflictSummary {
     return {
       totalConflicts: 0,
-      bySeverity: {
-        critical: [],
-        major: [],
-        minor: [],
-        informational: [],
-      },
+      bySeverity: { critical: [], major: [], minor: [], informational: [] },
       byType: {
         value_mismatch: [],
         format_difference: [],
@@ -1050,15 +946,8 @@ export class PreviewGenerator {
       severityBreakdown: "",
       typeBreakdown: "",
       fieldBreakdown: "",
-      recommendations: [
-        "Enable conflict display formatting to see detailed information",
-      ],
-      quickStats: {
-        total: 0,
-        critical: 0,
-        autoResolvable: 0,
-        manualReview: 0,
-      },
+      recommendations: ["Enable conflict display formatting to see detailed information"],
+      quickStats: { total: 0, critical: 0, autoResolvable: 0, manualReview: 0 },
     };
   }
 
@@ -1112,10 +1001,7 @@ export class PreviewGenerator {
   /**
    * Assess the quality of the library entry
    */
-  private assessLibraryQuality(
-    entry: LibraryEntry,
-    preview: MetadataPreview,
-  ): LibraryQuality {
+  private assessLibraryQuality(entry: LibraryEntry, preview: MetadataPreview): LibraryQuality {
     // Collect quality scores from preview fields
     const qualityScores = [
       preview.title.quality.score,

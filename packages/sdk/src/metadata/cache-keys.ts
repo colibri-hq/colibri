@@ -75,9 +75,7 @@ export function generateCacheKey(
       case "authors":
       case "creators":
         if (Array.isArray(value)) {
-          normalizedValue = value
-            .map((v) => normalizeAuthorName(String(v)))
-            .join(",");
+          normalizedValue = value.map((v) => normalizeAuthorName(String(v))).join(",");
         } else {
           normalizedValue = normalizeAuthorName(String(value));
         }
@@ -100,9 +98,7 @@ export function generateCacheKey(
 
   // Sort keys for consistent ordering
   const sortedKeys = Object.keys(normalizedParams).sort();
-  const paramString = sortedKeys
-    .map((key) => `${key}:${normalizedParams[key]}`)
-    .join("|");
+  const paramString = sortedKeys.map((key) => `${key}:${normalizedParams[key]}`).join("|");
 
   const baseKey = `${operation}|${paramString}`;
 
@@ -121,9 +117,6 @@ export function createProviderCacheKeyGenerator(providerName: string) {
     params: Record<string, unknown>,
     options: Omit<CacheKeyOptions, "prefix"> = {},
   ): string => {
-    return generateCacheKey(operation, params, {
-      ...options,
-      prefix: providerName.toLowerCase(),
-    });
+    return generateCacheKey(operation, params, { ...options, prefix: providerName.toLowerCase() });
   };
 }

@@ -41,11 +41,7 @@ export async function withConfirmation<
     abortMessage = "Aborted.",
     default: defaultValue = false,
     shortCircuit = false,
-  }: {
-    abortMessage?: string;
-    default?: boolean | string;
-    shortCircuit?: boolean;
-  } = {},
+  }: { abortMessage?: string; default?: boolean | string; shortCircuit?: boolean } = {},
 ): Promise<() => Promise<Awaited<ReturnType<O>>>> {
   if (!shortCircuit) {
     const confirmation =
@@ -62,15 +58,10 @@ export async function withConfirmation<
               return `Please type "${defaultValue}" to confirm.`;
             },
           })
-        : await confirm({
-            default: defaultValue,
-            message: prompt,
-          });
+        : await confirm({ default: defaultValue, message: prompt });
 
     if (!confirmation) {
-      throw new Error(abortMessage, {
-        cause: Aborted,
-      });
+      throw new Error(abortMessage, { cause: Aborted });
     }
   }
 

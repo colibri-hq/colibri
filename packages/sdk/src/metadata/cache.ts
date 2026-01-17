@@ -1,7 +1,4 @@
-import type {
-  MetadataRecord,
-  MultiCriteriaQuery,
-} from "./providers/provider.js";
+import type { MetadataRecord, MultiCriteriaQuery } from "./providers/provider.js";
 
 /**
  * Cache entry for metadata records
@@ -86,11 +83,7 @@ export const DEFAULT_CACHE_CONFIG: CacheConfig = {
 export class MetadataCache<T = any> {
   private cache = new Map<string, CacheEntry<T>>();
   private config: CacheConfig;
-  private stats = {
-    hits: 0,
-    misses: 0,
-    evictions: 0,
-  };
+  private stats = { hits: 0, misses: 0, evictions: 0 };
   private cleanupTimer: NodeJS.Timeout | undefined;
 
   constructor(config: Partial<CacheConfig> = {}) {
@@ -242,9 +235,7 @@ export class MetadataCache<T = any> {
         break;
       case EvictionStrategy.TTL_ONLY:
         // Only evict expired entries
-        const expiredEntries = entries.filter(([, entry]) =>
-          this.isExpired(entry),
-        );
+        const expiredEntries = entries.filter(([, entry]) => this.isExpired(entry));
         for (let i = 0; i < Math.min(count, expiredEntries.length); i++) {
           this.cache.delete(expiredEntries[i][0]);
           this.stats.evictions++;
@@ -296,10 +287,7 @@ export class MetadataRecordCache extends MetadataCache<MetadataRecord[]> {
   /**
    * Generate a cache key for a query
    */
-  static generateQueryKey(
-    providerName: string,
-    query: MultiCriteriaQuery,
-  ): string {
+  static generateQueryKey(providerName: string, query: MultiCriteriaQuery): string {
     const queryParts = [
       providerName,
       query.title || "",
@@ -331,10 +319,7 @@ export class MetadataRecordCache extends MetadataCache<MetadataRecord[]> {
   /**
    * Get cached metadata records for a query
    */
-  getCachedQuery(
-    providerName: string,
-    query: MultiCriteriaQuery,
-  ): MetadataRecord[] | undefined {
+  getCachedQuery(providerName: string, query: MultiCriteriaQuery): MetadataRecord[] | undefined {
     const key = MetadataRecordCache.generateQueryKey(providerName, query);
     return this.get(key);
   }

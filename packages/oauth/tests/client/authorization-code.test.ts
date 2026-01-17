@@ -162,7 +162,9 @@ describe("AuthorizationCodeClient", () => {
         serverMetadata: mockMetadata,
       });
 
-      const result = await client.createAuthorizationUrl({ scopes: ["openid", "profile", "email"] });
+      const result = await client.createAuthorizationUrl({
+        scopes: ["openid", "profile", "email"],
+      });
 
       expect(result.url.searchParams.get("scope")).toBe("openid profile email");
     });
@@ -225,10 +227,7 @@ describe("AuthorizationCodeClient", () => {
       });
 
       const result = await client.createAuthorizationUrl({
-        additionalParams: {
-          login_hint: "user@example.com",
-          prompt: "consent",
-        },
+        additionalParams: { login_hint: "user@example.com", prompt: "consent" },
       });
 
       expect(result.url.searchParams.get("login_hint")).toBe("user@example.com");
@@ -241,10 +240,7 @@ describe("AuthorizationCodeClient", () => {
         clientId: "test-client",
         redirectUri: "https://app.example.com/callback",
         fetch: mockFetch,
-        serverMetadata: {
-          ...mockMetadata,
-          require_pushed_authorization_requests: true,
-        },
+        serverMetadata: { ...mockMetadata, require_pushed_authorization_requests: true },
         usePAR: false,
       });
 
@@ -382,21 +378,23 @@ describe("AuthorizationCodeClient", () => {
 
     it("should send correct grant_type and code_verifier", async () => {
       const mockFetchWithValidation = createMockFetch();
-      mockFetchWithValidation.mockImplementation(async (url: RequestInfo | URL, init?: RequestInit) => {
-        const urlString = url.toString();
-        if (urlString.includes("/.well-known/")) {
-          return createJsonResponse(mockMetadata);
-        }
-        if (urlString.includes("/token")) {
-          const body = init?.body as string;
-          expect(body).toContain("grant_type=authorization_code");
-          expect(body).toContain("code=auth-code-123");
-          expect(body).toContain("code_verifier=code-verifier-456");
-          expect(body).toContain("redirect_uri=https%3A%2F%2Fapp.example.com%2Fcallback");
-          return createJsonResponse(mockTokenResponse());
-        }
-        return new Response("Not Found", { status: 404 });
-      });
+      mockFetchWithValidation.mockImplementation(
+        async (url: RequestInfo | URL, init?: RequestInit) => {
+          const urlString = url.toString();
+          if (urlString.includes("/.well-known/")) {
+            return createJsonResponse(mockMetadata);
+          }
+          if (urlString.includes("/token")) {
+            const body = init?.body as string;
+            expect(body).toContain("grant_type=authorization_code");
+            expect(body).toContain("code=auth-code-123");
+            expect(body).toContain("code_verifier=code-verifier-456");
+            expect(body).toContain("redirect_uri=https%3A%2F%2Fapp.example.com%2Fcallback");
+            return createJsonResponse(mockTokenResponse());
+          }
+          return new Response("Not Found", { status: 404 });
+        },
+      );
 
       const client = new AuthorizationCodeClient({
         issuer: "https://auth.example.com",
@@ -423,7 +421,9 @@ describe("AuthorizationCodeClient", () => {
         serverMetadata: mockMetadata,
       });
 
-      await expect(client.exchangeCode("expired-code", "verifier")).rejects.toThrow(OAuthClientError);
+      await expect(client.exchangeCode("expired-code", "verifier")).rejects.toThrow(
+        OAuthClientError,
+      );
     });
   });
 
@@ -441,7 +441,8 @@ describe("AuthorizationCodeClient", () => {
         serverMetadata: mockMetadata,
       });
 
-      const callbackUrl = "https://app.example.com/callback?code=auth-code-123&state=expected-state";
+      const callbackUrl =
+        "https://app.example.com/callback?code=auth-code-123&state=expected-state";
       const result = await client.handleCallback(callbackUrl, "code-verifier", "expected-state");
 
       expect(result.access_token).toBe(tokenResponse.access_token);
@@ -475,7 +476,9 @@ describe("AuthorizationCodeClient", () => {
       const callbackUrl =
         "https://app.example.com/callback?error=access_denied&error_description=User+denied+access";
 
-      await expect(client.handleCallback(callbackUrl, "code-verifier")).rejects.toThrow(OAuthClientError);
+      await expect(client.handleCallback(callbackUrl, "code-verifier")).rejects.toThrow(
+        OAuthClientError,
+      );
     });
 
     it("should accept URL object as callback URL", async () => {
@@ -525,7 +528,9 @@ describe("AuthorizationCodeClient", () => {
 
       const callbackUrl = "https://app.example.com/callback?code=auth-code&state=wrong-state";
 
-      expect(() => client.validateCallback(callbackUrl, "expected-state")).toThrow(StateMismatchError);
+      expect(() => client.validateCallback(callbackUrl, "expected-state")).toThrow(
+        StateMismatchError,
+      );
     });
 
     it("should throw OAuthClientError when error is in callback", () => {
@@ -626,10 +631,7 @@ describe("AuthorizationCodeClient", () => {
         clientId: "test-client",
         redirectUri: "https://app.example.com/callback",
         fetch: mockFetch,
-        serverMetadata: {
-          ...mockMetadata,
-          code_challenge_methods_supported: ["plain"],
-        },
+        serverMetadata: { ...mockMetadata, code_challenge_methods_supported: ["plain"] },
         codeChallengeMethod: "S256",
       });
 

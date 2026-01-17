@@ -24,9 +24,7 @@ export class DateReconciler {
   /**
    * Reconcile multiple publication dates using conflict resolution rules
    */
-  reconcileDates(
-    inputs: PublicationInfoInput[],
-  ): ReconciledField<PublicationDate> {
+  reconcileDates(inputs: PublicationInfoInput[]): ReconciledField<PublicationDate> {
     if (inputs.length === 0) {
       throw new Error("No publication dates to reconcile");
     }
@@ -54,8 +52,7 @@ export class DateReconciler {
       .sort((a, b) => {
         // Sort by precision (more specific first), then by source reliability
         const precisionOrder = { day: 3, month: 2, year: 1, unknown: 0 };
-        const precisionDiff =
-          precisionOrder[b.date.precision] - precisionOrder[a.date.precision];
+        const precisionDiff = precisionOrder[b.date.precision] - precisionOrder[a.date.precision];
         if (precisionDiff !== 0) return precisionDiff;
 
         return b.source.reliability - a.source.reliability;
@@ -100,10 +97,7 @@ export class DateReconciler {
 
     // Select the best candidate (first in sorted order)
     const bestCandidate = candidates[0];
-    const confidence = this.calculateDateConfidence(
-      bestCandidate.date,
-      bestCandidate.source,
-    );
+    const confidence = this.calculateDateConfidence(bestCandidate.date, bestCandidate.source);
 
     return {
       value: bestCandidate.date,
@@ -166,38 +160,24 @@ export class DateReconciler {
     const yearMatch = dateStr.match(/^(\d{4})$/);
     if (yearMatch) {
       const [, year] = yearMatch;
-      return {
-        year: parseInt(year, 10),
-        raw: dateStr,
-        precision: "year",
-      };
+      return { year: parseInt(year, 10), raw: dateStr, precision: "year" };
     }
 
     // Try to extract year from longer strings
     const yearInString = dateStr.match(/\b(19|20)\d{2}\b/);
     if (yearInString) {
-      return {
-        year: parseInt(yearInString[0], 10),
-        raw: dateStr,
-        precision: "year",
-      };
+      return { year: parseInt(yearInString[0], 10), raw: dateStr, precision: "year" };
     }
 
     // Fallback - return unknown precision
-    return {
-      raw: dateStr,
-      precision: "unknown",
-    };
+    return { raw: dateStr, precision: "unknown" };
   }
 
   /**
    * Validate and normalize a PublicationDate object
    */
   private validatePublicationDate(date: PublicationDate): PublicationDate {
-    const result: PublicationDate = {
-      raw: date.raw,
-      precision: date.precision || "unknown",
-    };
+    const result: PublicationDate = { raw: date.raw, precision: date.precision || "unknown" };
 
     // Validate year
     if (date.year !== undefined) {
@@ -224,11 +204,7 @@ export class DateReconciler {
     // Validate day
     if (date.day !== undefined && result.month !== undefined) {
       const day = Math.floor(date.day);
-      const daysInMonth = new Date(
-        result.year || 2000,
-        result.month,
-        0,
-      ).getDate();
+      const daysInMonth = new Date(result.year || 2000, result.month, 0).getDate();
       if (day >= 1 && day <= daysInMonth) {
         result.day = day;
         result.precision = "day";
@@ -236,11 +212,7 @@ export class DateReconciler {
     }
 
     // If month was invalid, reset precision
-    if (
-      date.month !== undefined &&
-      result.month === undefined &&
-      result.precision !== "year"
-    ) {
+    if (date.month !== undefined && result.month === undefined && result.precision !== "year") {
       result.precision = "year";
     }
 
@@ -261,10 +233,7 @@ export class DateReconciler {
   /**
    * Calculate confidence score for a publication date
    */
-  private calculateDateConfidence(
-    date: PublicationDate,
-    source: MetadataSource,
-  ): number {
+  private calculateDateConfidence(date: PublicationDate, source: MetadataSource): number {
     let confidence = source.reliability;
 
     // Adjust based on precision
@@ -284,11 +253,7 @@ export class DateReconciler {
     }
 
     // Adjust based on date validity
-    if (
-      date.year &&
-      date.year > 0 &&
-      date.year <= new Date().getFullYear() + 10
-    ) {
+    if (date.year && date.year > 0 && date.year <= new Date().getFullYear() + 10) {
       confidence *= 1.0;
     } else {
       confidence *= 0.5;

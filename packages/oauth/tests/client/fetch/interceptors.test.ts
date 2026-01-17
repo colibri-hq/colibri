@@ -136,11 +136,7 @@ describe("InterceptorManager", () => {
       manager.addResponseInterceptor(async (res) => {
         const headers = new Headers(res.headers);
         headers.set("X-Modified", "true");
-        return new Response(res.body, {
-          status: res.status,
-          statusText: res.statusText,
-          headers,
-        });
+        return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
       });
 
       const response = new Response("test");

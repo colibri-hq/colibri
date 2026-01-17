@@ -26,7 +26,7 @@
   }
 
   & .sbdocs.sbdocs-preview {
-    @apply dark:bg-gray-950 dark:text-gray-200 dark:shadow-none dark:border-gray-800;
+    @apply dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:shadow-none;
 
     & .sb-bar {
       @apply dark:bg-gray-900 dark:text-gray-200;
@@ -55,7 +55,7 @@
     }
 
     & .css-o1d7ko {
-      @apply dark:bg-gray-900 dark:text-gray-200 dark:border-gray-800/50;
+      @apply dark:border-gray-800/50 dark:bg-gray-900 dark:text-gray-200;
     }
 
     & .css-1vgq5xr,
@@ -84,7 +84,7 @@
 
       & input:checked ~ span:last-of-type,
       & input:not(:checked) ~ span:first-of-type {
-        @apply dark:bg-gray-800 dark:border-gray-800;
+        @apply dark:border-gray-800 dark:bg-gray-800;
       }
 
       & input {
@@ -95,7 +95,7 @@
     }
 
     & .css-18pz2h2 code {
-      @apply dark:bg-gray-900 dark:text-gray-200 dark:border-gray-800;
+      @apply dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200;
     }
   }
 

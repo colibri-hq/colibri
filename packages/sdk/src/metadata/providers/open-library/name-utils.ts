@@ -32,18 +32,7 @@ const NAME_PREFIXES = [
 /**
  * Common name suffixes
  */
-const NAME_SUFFIXES = [
-  "jr",
-  "sr",
-  "ii",
-  "iii",
-  "iv",
-  "v",
-  "phd",
-  "md",
-  "esq",
-  "cpa",
-];
+const NAME_SUFFIXES = ["jr", "sr", "ii", "iii", "iv", "v", "phd", "md", "esq", "cpa"];
 
 /**
  * Dutch/German/Spanish particles that are part of the last name
@@ -92,14 +81,7 @@ export function parseNameComponents(name: string): NameComponents {
 
   // Handle empty or invalid names
   if (!trimmed) {
-    return {
-      first: "",
-      middle: [],
-      last: "",
-      prefixes: [],
-      suffixes: [],
-      original: name,
-    };
+    return { first: "", middle: [], last: "", prefixes: [], suffixes: [], original: name };
   }
 
   const parts = trimmed.split(/\s+/);
@@ -107,10 +89,7 @@ export function parseNameComponents(name: string): NameComponents {
   const foundSuffixes: string[] = [];
 
   // Extract prefixes from the beginning
-  while (
-    parts.length > 0 &&
-    NAME_PREFIXES.includes(parts[0].toLowerCase().replace(/[.,]/g, ""))
-  ) {
+  while (parts.length > 0 && NAME_PREFIXES.includes(parts[0].toLowerCase().replace(/[.,]/g, ""))) {
     foundPrefixes.push(parts.shift()!);
   }
 
@@ -313,10 +292,8 @@ export function matchesWithInitials(
     first1 === first2 ||
     (first1.length === 1 && first2.startsWith(first1)) ||
     (first2.length === 1 && first1.startsWith(first2)) ||
-    (first1.length <= 2 &&
-      first1.replace(/\./g, "") === first2.charAt(0).toLowerCase()) ||
-    (first2.length <= 2 &&
-      first2.replace(/\./g, "") === first1.charAt(0).toLowerCase());
+    (first1.length <= 2 && first1.replace(/\./g, "") === first2.charAt(0).toLowerCase()) ||
+    (first2.length <= 2 && first2.replace(/\./g, "") === first1.charAt(0).toLowerCase());
 
   if (!firstMatches) return false;
 
@@ -367,12 +344,8 @@ export function areNamesEquivalent(name1: string, name2: string): boolean {
   if (matchesWithInitials(components1, components2)) return true;
 
   // Check for reversed format matching
-  const reversed1 = `${components1.last} ${components1.first}`
-    .toLowerCase()
-    .trim();
-  const reversed2 = `${components2.last} ${components2.first}`
-    .toLowerCase()
-    .trim();
+  const reversed1 = `${components1.last} ${components1.first}`.toLowerCase().trim();
+  const reversed2 = `${components2.last} ${components2.first}`.toLowerCase().trim();
 
   return reversed1 === core2 || reversed2 === core1;
 }

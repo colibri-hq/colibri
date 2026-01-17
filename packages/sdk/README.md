@@ -67,10 +67,7 @@ latter is primarily useful for Colibri itself, the OAuth client allows authentic
 ```typescript
 import { client } from "@colibri-hq/sdk/oauth";
 
-const oauth = client({
-  clientId: "your-client-id",
-  clientSecret: "your-client-secret",
-});
+const oauth = client({ clientId: "your-client-id", clientSecret: "your-client-secret" });
 
 const { accessToken } = await oauth.authorize();
 ```

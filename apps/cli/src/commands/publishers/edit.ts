@@ -1,9 +1,4 @@
-import {
-  loadPublisher,
-  NoResultError,
-  type Publisher,
-  updatePublisher,
-} from "@colibri-hq/sdk";
+import { loadPublisher, NoResultError, type Publisher, updatePublisher } from "@colibri-hq/sdk";
 import { Args, Flags } from "@oclif/core";
 import { bold, dim } from "ansis";
 import { BaseCommand } from "../../command.js";
@@ -28,11 +23,7 @@ export class Edit extends BaseCommand<typeof Edit> {
       name: "description",
       required: false,
     }),
-    image: Flags.file({
-      char: "I",
-      description: "Image file for the publisher",
-      required: false,
-    }),
+    image: Flags.file({ char: "I", description: "Image file for the publisher", required: false }),
     name: Flags.string({
       char: "n",
       description: "New name for the publisher",
@@ -44,18 +35,12 @@ export class Edit extends BaseCommand<typeof Edit> {
       description: "Key used for sorting. Defaults to the publisher's name",
       required: false,
     }),
-    url: Flags.url({
-      char: "u",
-      description: "URL to publisher's website",
-      required: false,
-    }),
+    url: Flags.url({ char: "u", description: "URL to publisher's website", required: false }),
     "wikipedia-url": Flags.url({
       char: "w",
       description: "URL to publisher's Wikipedia page",
       async parse(input: string) {
-        if (
-          !/^(https?:\/\/)?((www|[a-z]+)\.)?wikipedia\.org\/wiki\//.test(input)
-        ) {
+        if (!/^(https?:\/\/)?((www|[a-z]+)\.)?wikipedia\.org\/wiki\//.test(input)) {
           throw new Error("Invalid Wikipedia URL");
         }
 

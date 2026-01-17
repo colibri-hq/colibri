@@ -8,6 +8,8 @@
  * @see https://datatracker.ietf.org/doc/rfc9700/
  */
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import type { AuthorizationServerMetadata } from "../../src/types.js";
+import { AuthorizationCodeClient } from "../../src/client/authorization-code.js";
 import {
   discoverServer,
   resolveEndpoint,
@@ -19,9 +21,7 @@ import {
   getIntrospectionEndpoint,
   getUserInfoEndpoint,
 } from "../../src/client/discovery.js";
-import { AuthorizationCodeClient } from "../../src/client/authorization-code.js";
 import { DiscoveryError } from "../../src/client/errors.js";
-import type { AuthorizationServerMetadata } from "../../src/types.js";
 import {
   createFullMockFetch,
   createMockTokenStore,
@@ -49,11 +49,7 @@ describe("Extended Discovery Tests", () => {
       "urn:ietf:params:oauth:grant-type:device_code",
     ],
     code_challenge_methods_supported: ["S256", "plain"],
-    token_endpoint_auth_methods_supported: [
-      "client_secret_basic",
-      "client_secret_post",
-      "none",
-    ],
+    token_endpoint_auth_methods_supported: ["client_secret_basic", "client_secret_post", "none"],
     scopes_supported: ["openid", "profile", "email", "offline_access"],
     require_pushed_authorization_requests: false,
     subject_types_supported: ["public"],
@@ -171,10 +167,7 @@ describe("Extended Discovery Tests", () => {
 
   describe("timeout handling", () => {
     it("should timeout slow discovery requests", async () => {
-      const slowFetch = async (
-        _url: RequestInfo | URL,
-        init?: RequestInit,
-      ): Promise<Response> => {
+      const slowFetch = async (_url: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
         // Simulate slow request that respects abort signal
         return new Promise((resolve, reject) => {
           const timeoutId = setTimeout(() => {
@@ -202,10 +195,7 @@ describe("Extended Discovery Tests", () => {
     });
 
     it("should complete before timeout for fast responses", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(fullMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(fullMetadata) });
 
       const result = await discoverServer("https://auth.example.com", {
         fetch: mockFetch,
@@ -244,10 +234,7 @@ describe("Extended Discovery Tests", () => {
     });
 
     it("should handle URL objects as issuer", () => {
-      const endpoint = resolveEndpoint(
-        "/oauth/token",
-        new URL("https://auth.example.com"),
-      );
+      const endpoint = resolveEndpoint("/oauth/token", new URL("https://auth.example.com"));
       expect(endpoint?.toString()).toBe("https://auth.example.com/oauth/token");
     });
   });
@@ -261,35 +248,23 @@ describe("Extended Discovery Tests", () => {
     };
 
     it("should return undefined for missing revocation endpoint", () => {
-      const endpoint = getRevocationEndpoint(
-        minimalMetadata,
-        "https://auth.example.com",
-      );
+      const endpoint = getRevocationEndpoint(minimalMetadata, "https://auth.example.com");
       expect(endpoint).toBeUndefined();
     });
 
     it("should return undefined for missing introspection endpoint", () => {
-      const endpoint = getIntrospectionEndpoint(
-        minimalMetadata,
-        "https://auth.example.com",
-      );
+      const endpoint = getIntrospectionEndpoint(minimalMetadata, "https://auth.example.com");
       expect(endpoint).toBeUndefined();
     });
 
     it("should return undefined for missing userinfo endpoint", () => {
-      const endpoint = getUserInfoEndpoint(
-        minimalMetadata,
-        "https://auth.example.com",
-      );
+      const endpoint = getUserInfoEndpoint(minimalMetadata, "https://auth.example.com");
       expect(endpoint).toBeUndefined();
     });
 
     it("should throw for missing PAR endpoint when required", () => {
       expect(() =>
-        getPushedAuthorizationRequestEndpoint(
-          minimalMetadata,
-          "https://auth.example.com",
-        ),
+        getPushedAuthorizationRequestEndpoint(minimalMetadata, "https://auth.example.com"),
       ).toThrow(DiscoveryError);
     });
 
@@ -314,10 +289,7 @@ describe("Extended Discovery Tests", () => {
         // Missing response_types_supported
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(invalidMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(invalidMetadata) });
 
       await expect(
         discoverServer("https://auth.example.com", { fetch: mockFetch }),
@@ -331,10 +303,7 @@ describe("Extended Discovery Tests", () => {
         response_types_supported: "code", // Should be array
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(invalidMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(invalidMetadata) });
 
       await expect(
         discoverServer("https://auth.example.com", { fetch: mockFetch }),
@@ -348,14 +317,9 @@ describe("Extended Discovery Tests", () => {
         response_types_supported: ["code"],
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(validMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(validMetadata) });
 
-      const result = await discoverServer("https://auth.example.com", {
-        fetch: mockFetch,
-      });
+      const result = await discoverServer("https://auth.example.com", { fetch: mockFetch });
 
       expect(result.response_types_supported).toEqual(["code"]);
     });
@@ -379,9 +343,9 @@ describe("Extended Discovery Tests", () => {
       expect(supportsGrantType(fullMetadata, "authorization_code")).toBe(true);
       expect(supportsGrantType(fullMetadata, "refresh_token")).toBe(true);
       expect(supportsGrantType(fullMetadata, "client_credentials")).toBe(true);
-      expect(
-        supportsGrantType(fullMetadata, "urn:ietf:params:oauth:grant-type:device_code"),
-      ).toBe(true);
+      expect(supportsGrantType(fullMetadata, "urn:ietf:params:oauth:grant-type:device_code")).toBe(
+        true,
+      );
       expect(supportsGrantType(fullMetadata, "password")).toBe(false);
       expect(supportsGrantType(fullMetadata, "implicit")).toBe(false);
     });
@@ -449,14 +413,9 @@ describe("Extended Discovery Tests", () => {
 
   describe("token_endpoint_auth_methods_supported", () => {
     it("should include supported authentication methods in metadata", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(fullMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(fullMetadata) });
 
-      const result = await discoverServer("https://auth.example.com", {
-        fetch: mockFetch,
-      });
+      const result = await discoverServer("https://auth.example.com", { fetch: mockFetch });
 
       expect(result.token_endpoint_auth_methods_supported).toEqual([
         "client_secret_basic",
@@ -468,14 +427,9 @@ describe("Extended Discovery Tests", () => {
 
   describe("JWKS URI handling", () => {
     it("should include jwks_uri in discovered metadata", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(fullMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(fullMetadata) });
 
-      const result = await discoverServer("https://auth.example.com", {
-        fetch: mockFetch,
-      });
+      const result = await discoverServer("https://auth.example.com", { fetch: mockFetch });
 
       expect(result.jwks_uri).toBe("https://auth.example.com/.well-known/jwks.json");
     });
@@ -493,9 +447,7 @@ describe("Extended Discovery Tests", () => {
         json: () => Promise.resolve(metadataWithoutJwks),
       });
 
-      const result = await discoverServer("https://auth.example.com", {
-        fetch: mockFetch,
-      });
+      const result = await discoverServer("https://auth.example.com", { fetch: mockFetch });
 
       expect(result.jwks_uri).toBeUndefined();
     });
@@ -509,10 +461,7 @@ describe("Extended Discovery Tests", () => {
         response_types_supported: ["code"],
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(invalidMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(invalidMetadata) });
 
       await expect(
         discoverServer("https://auth.example.com", { fetch: mockFetch }),
@@ -532,9 +481,7 @@ describe("Extended Discovery Tests", () => {
       });
 
       // Issuer without trailing slash should match metadata with trailing slash
-      const result = await discoverServer("https://auth.example.com", {
-        fetch: mockFetch,
-      });
+      const result = await discoverServer("https://auth.example.com", { fetch: mockFetch });
 
       expect(result.issuer).toBe("https://auth.example.com/");
     });
@@ -546,14 +493,9 @@ describe("Extended Discovery Tests", () => {
         response_types_supported: ["code"],
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(metadataWithPath),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(metadataWithPath) });
 
-      const result = await discoverServer("https://example.com/auth", {
-        fetch: mockFetch,
-      });
+      const result = await discoverServer("https://example.com/auth", { fetch: mockFetch });
 
       expect(result.issuer).toBe("https://example.com/auth");
     });
@@ -561,10 +503,7 @@ describe("Extended Discovery Tests", () => {
 
   describe("discovery URL construction", () => {
     it("should use OAuth discovery path first", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(fullMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(fullMetadata) });
 
       await discoverServer("https://auth.example.com", { fetch: mockFetch });
 
@@ -577,10 +516,7 @@ describe("Extended Discovery Tests", () => {
     it("should fallback to OpenID Connect path on OAuth failure", async () => {
       mockFetch
         .mockResolvedValueOnce({ ok: false, status: 404, statusText: "Not Found" })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(fullMetadata),
-        });
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(fullMetadata) });
 
       await discoverServer("https://auth.example.com", { fetch: mockFetch });
 
@@ -603,10 +539,7 @@ describe("Extended Discovery Tests", () => {
         response_types_supported: ["code"],
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(pathBasedMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(pathBasedMetadata) });
 
       await discoverServer("https://example.com/tenant1", { fetch: mockFetch });
 
@@ -626,10 +559,7 @@ describe("Extended Discovery Tests", () => {
       });
 
       await expect(
-        discoverServer("https://auth.example.com", {
-          fetch: mockFetch,
-          fallbackToOpenId: false,
-        }),
+        discoverServer("https://auth.example.com", { fetch: mockFetch, fallbackToOpenId: false }),
       ).rejects.toThrow(DiscoveryError);
     });
 
@@ -641,10 +571,7 @@ describe("Extended Discovery Tests", () => {
       });
 
       await expect(
-        discoverServer("https://auth.example.com", {
-          fetch: mockFetch,
-          fallbackToOpenId: false,
-        }),
+        discoverServer("https://auth.example.com", { fetch: mockFetch, fallbackToOpenId: false }),
       ).rejects.toThrow(DiscoveryError);
     });
 
@@ -655,93 +582,52 @@ describe("Extended Discovery Tests", () => {
       });
 
       await expect(
-        discoverServer("https://auth.example.com", {
-          fetch: mockFetch,
-          fallbackToOpenId: false,
-        }),
+        discoverServer("https://auth.example.com", { fetch: mockFetch, fallbackToOpenId: false }),
       ).rejects.toThrow(DiscoveryError);
     });
   });
 
   describe("scopes_supported", () => {
     it("should include scopes_supported in metadata", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(fullMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(fullMetadata) });
 
-      const result = await discoverServer("https://auth.example.com", {
-        fetch: mockFetch,
-      });
+      const result = await discoverServer("https://auth.example.com", { fetch: mockFetch });
 
-      expect(result.scopes_supported).toEqual([
-        "openid",
-        "profile",
-        "email",
-        "offline_access",
-      ]);
+      expect(result.scopes_supported).toEqual(["openid", "profile", "email", "offline_access"]);
     });
   });
 
   describe("OpenID Connect specific fields", () => {
     it("should include subject_types_supported", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(fullMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(fullMetadata) });
 
-      const result = await discoverServer("https://auth.example.com", {
-        fetch: mockFetch,
-      });
+      const result = await discoverServer("https://auth.example.com", { fetch: mockFetch });
 
       expect(result.subject_types_supported).toEqual(["public"]);
     });
 
     it("should include id_token_signing_alg_values_supported", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(fullMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(fullMetadata) });
 
-      const result = await discoverServer("https://auth.example.com", {
-        fetch: mockFetch,
-      });
+      const result = await discoverServer("https://auth.example.com", { fetch: mockFetch });
 
       expect(result.id_token_signing_alg_values_supported).toEqual(["RS256", "ES256"]);
     });
 
     it("should include claims_supported", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(fullMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(fullMetadata) });
 
-      const result = await discoverServer("https://auth.example.com", {
-        fetch: mockFetch,
-      });
+      const result = await discoverServer("https://auth.example.com", { fetch: mockFetch });
 
-      expect(result.claims_supported).toEqual([
-        "sub",
-        "iss",
-        "aud",
-        "exp",
-        "iat",
-        "name",
-        "email",
-      ]);
+      expect(result.claims_supported).toEqual(["sub", "iss", "aud", "exp", "iat", "name", "email"]);
     });
   });
 
   describe("response_modes_supported", () => {
     it("should include response_modes_supported in metadata", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(fullMetadata),
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(fullMetadata) });
 
-      const result = await discoverServer("https://auth.example.com", {
-        fetch: mockFetch,
-      });
+      const result = await discoverServer("https://auth.example.com", { fetch: mockFetch });
 
       expect(result.response_modes_supported).toEqual(["query", "fragment"]);
     });

@@ -1,3 +1,4 @@
+import { cleanIsbn } from "../utils/normalization.js";
 import {
   type CreatorQuery,
   type MetadataRecord,
@@ -8,7 +9,6 @@ import {
   type TitleQuery,
 } from "./provider.js";
 import { RetryableMetadataProvider } from "./retryable-provider.js";
-import { cleanIsbn } from "../utils/normalization.js";
 
 type Fetch = typeof globalThis.fetch;
 
@@ -16,10 +16,7 @@ type Fetch = typeof globalThis.fetch;
  * Internet Archive API response interfaces
  */
 interface IASearchResponse {
-  response: {
-    numFound: number;
-    docs: IADocument[];
-  };
+  response: { numFound: number; docs: IADocument[] };
 }
 
 interface IADocument {
@@ -190,9 +187,7 @@ export class InternetArchiveMetadataProvider extends RetryableMetadataProvider {
   /**
    * Search using multiple criteria
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     return this.executeWithRetry(async () => {
       const searchParts: string[] = [];
 
@@ -208,9 +203,7 @@ export class InternetArchiveMetadataProvider extends RetryableMetadataProvider {
 
       if (query.isbn) {
         const cleanedIsbn = cleanIsbn(query.isbn);
-        searchParts.push(
-          `(identifier:isbn_${cleanedIsbn} OR isbn:${cleanedIsbn})`,
-        );
+        searchParts.push(`(identifier:isbn_${cleanedIsbn} OR isbn:${cleanedIsbn})`);
       }
 
       if (query.subjects && query.subjects.length > 0) {
@@ -224,9 +217,7 @@ export class InternetArchiveMetadataProvider extends RetryableMetadataProvider {
 
       if (query.yearRange) {
         // Internet Archive supports date range queries
-        searchParts.push(
-          `date:[${query.yearRange[0]}-01-01 TO ${query.yearRange[1]}-12-31]`,
-        );
+        searchParts.push(`date:[${query.yearRange[0]}-01-01 TO ${query.yearRange[1]}-12-31]`);
       }
 
       // Always filter to books/texts
@@ -287,22 +278,13 @@ export class InternetArchiveMetadataProvider extends RetryableMetadataProvider {
     const url = `${this.baseUrl}/advancedsearch.php?${params.toString()}`;
 
     const response = await this.#fetch(url, {
-      headers: {
-        Accept: "application/json",
-        "User-Agent": this.userAgent,
-      },
+      headers: { Accept: "application/json", "User-Agent": this.userAgent },
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Internet Archive API error: ${response.status} ${response.statusText}`,
-        {
-          cause: {
-            status: response.status,
-            statusText: response.statusText,
-          },
-        },
-      );
+      throw new Error(`Internet Archive API error: ${response.status} ${response.statusText}`, {
+        cause: { status: response.status, statusText: response.statusText },
+      });
     }
 
     const data = (await response.json()) as IASearchResponse;
@@ -411,12 +393,9 @@ export class InternetArchiveMetadataProvider extends RetryableMetadataProvider {
    */
   #mapIADocumentToMetadata(
     doc: IADocument,
-  ): Partial<
-    Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">
-  > {
-    const metadata: Partial<
-      Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">
-    > = {};
+  ): Partial<Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">> {
+    const metadata: Partial<Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">> =
+      {};
 
     // Title
     if (doc.title) {
@@ -425,9 +404,7 @@ export class InternetArchiveMetadataProvider extends RetryableMetadataProvider {
 
     // Authors - normalize to array
     if (doc.creator) {
-      metadata.authors = Array.isArray(doc.creator)
-        ? doc.creator
-        : [doc.creator];
+      metadata.authors = Array.isArray(doc.creator) ? doc.creator : [doc.creator];
     }
 
     // ISBN - normalize to array
@@ -457,16 +434,12 @@ export class InternetArchiveMetadataProvider extends RetryableMetadataProvider {
 
     // Subjects - normalize to array
     if (doc.subject) {
-      metadata.subjects = Array.isArray(doc.subject)
-        ? doc.subject
-        : [doc.subject];
+      metadata.subjects = Array.isArray(doc.subject) ? doc.subject : [doc.subject];
     }
 
     // Description - normalize to string
     if (doc.description) {
-      metadata.description = Array.isArray(doc.description)
-        ? doc.description[0]
-        : doc.description;
+      metadata.description = Array.isArray(doc.description) ? doc.description[0] : doc.description;
     }
 
     // Language - convert ISO 639-2 to 639-1
@@ -477,9 +450,7 @@ export class InternetArchiveMetadataProvider extends RetryableMetadataProvider {
 
     // Publisher - normalize to string
     if (doc.publisher) {
-      metadata.publisher = Array.isArray(doc.publisher)
-        ? doc.publisher[0]
-        : doc.publisher;
+      metadata.publisher = Array.isArray(doc.publisher) ? doc.publisher[0] : doc.publisher;
     }
 
     // Edition
@@ -495,9 +466,7 @@ export class InternetArchiveMetadataProvider extends RetryableMetadataProvider {
 
     // Cover image
     if (doc.identifier) {
-      metadata.coverImage = {
-        url: `${this.baseUrl}/services/img/${doc.identifier}`,
-      };
+      metadata.coverImage = { url: `${this.baseUrl}/services/img/${doc.identifier}` };
     }
 
     // Store Internet Archive specific data
@@ -590,11 +559,7 @@ export class InternetArchiveMetadataProvider extends RetryableMetadataProvider {
 
     const checkField = (field: any) => {
       fieldCount++;
-      if (
-        field &&
-        (typeof field !== "object" ||
-          (Array.isArray(field) && field.length > 0))
-      ) {
+      if (field && (typeof field !== "object" || (Array.isArray(field) && field.length > 0))) {
         filledFields++;
       }
     };
@@ -635,10 +600,7 @@ export class InternetArchiveMetadataProvider extends RetryableMetadataProvider {
 
       if (query.title) {
         totalCriteria++;
-        if (
-          doc.title &&
-          doc.title.toLowerCase().includes(query.title.toLowerCase())
-        ) {
+        if (doc.title && doc.title.toLowerCase().includes(query.title.toLowerCase())) {
           matchedCriteria++;
         }
       }
@@ -663,11 +625,7 @@ export class InternetArchiveMetadataProvider extends RetryableMetadataProvider {
 
       if (query.isbn) {
         totalCriteria++;
-        const isbns = Array.isArray(doc.isbn)
-          ? doc.isbn
-          : doc.isbn
-            ? [doc.isbn]
-            : [];
+        const isbns = Array.isArray(doc.isbn) ? doc.isbn : doc.isbn ? [doc.isbn] : [];
         if (isbns.some((i) => i.includes(cleanIsbn(query.isbn!)))) {
           matchedCriteria++;
         }
@@ -681,11 +639,7 @@ export class InternetArchiveMetadataProvider extends RetryableMetadataProvider {
     // Calculate final confidence, capped at 0.88
     const finalConfidence = Math.min(
       0.88,
-      baseConfidence +
-        completenessBoost +
-        coverBoost +
-        popularityBoost +
-        criteriaMatchBoost,
+      baseConfidence + completenessBoost + coverBoost + popularityBoost + criteriaMatchBoost,
     );
 
     return Math.round(finalConfidence * 100) / 100; // Round to 2 decimal places

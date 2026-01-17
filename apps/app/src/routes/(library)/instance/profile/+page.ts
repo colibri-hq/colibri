@@ -9,11 +9,5 @@ export const load: PageLoad = async (event) => {
     trpc(event).notifications.getPreferences.query(),
   ]);
 
-  return {
-    ...event.data,
-    ...pageData,
-    user,
-    authenticators,
-    notificationPreferences,
-  };
+  return { ...event.data, ...pageData, user, authenticators, notificationPreferences };
 };

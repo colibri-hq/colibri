@@ -1,5 +1,5 @@
-import { browser } from "$app/environment";
 import type { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/browser";
+import { browser } from "$app/environment";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async function load({ fetch, parent }) {
@@ -14,8 +14,7 @@ export const load: PageLoad = async function load({ fetch, parent }) {
 
   try {
     const attestationResponse = await fetch("/auth/attestation/generate");
-    options =
-      (await attestationResponse.json()) as PublicKeyCredentialCreationOptionsJSON;
+    options = (await attestationResponse.json()) as PublicKeyCredentialCreationOptionsJSON;
   } catch (error) {
     console.error("Failed to generate attestation options", { error });
 

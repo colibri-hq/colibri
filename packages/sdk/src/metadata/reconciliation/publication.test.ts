@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { PublicationReconciler } from "./publication.js";
 import type { MetadataSource, PublicationInfoInput } from "./types.js";
+import { PublicationReconciler } from "./publication.js";
 
 describe("PublicationReconciler", () => {
   const reconciler = new PublicationReconciler();
@@ -26,12 +26,7 @@ describe("PublicationReconciler", () => {
           place: "New York",
           source: mockSource1,
         },
-        {
-          date: "2023",
-          publisher: "Penguin",
-          place: "NYC",
-          source: mockSource2,
-        },
+        { date: "2023", publisher: "Penguin", place: "NYC", source: mockSource2 },
       ];
 
       const result = reconciler.reconcilePublicationInfo(inputs);
@@ -44,14 +39,8 @@ describe("PublicationReconciler", () => {
 
     it("should handle partial information", () => {
       const inputs: PublicationInfoInput[] = [
-        {
-          date: "2023",
-          source: mockSource1,
-        },
-        {
-          publisher: "Example Press",
-          source: mockSource2,
-        },
+        { date: "2023", source: mockSource1 },
+        { publisher: "Example Press", source: mockSource2 },
       ];
 
       const result = reconciler.reconcilePublicationInfo(inputs);
@@ -62,12 +51,7 @@ describe("PublicationReconciler", () => {
     });
 
     it("should handle missing information gracefully", () => {
-      const inputs: PublicationInfoInput[] = [
-        {
-          date: "2023",
-          source: mockSource1,
-        },
-      ];
+      const inputs: PublicationInfoInput[] = [{ date: "2023", source: mockSource1 }];
 
       const result = reconciler.reconcilePublicationInfo(inputs);
 
@@ -85,11 +69,7 @@ describe("PublicationReconciler", () => {
     });
 
     it("should throw error for no valid information", () => {
-      const inputs: PublicationInfoInput[] = [
-        {
-          source: mockSource1,
-        },
-      ];
+      const inputs: PublicationInfoInput[] = [{ source: mockSource1 }];
 
       expect(() => reconciler.reconcilePublicationInfo(inputs)).toThrow(
         "No valid publication information found",
@@ -125,21 +105,9 @@ describe("PublicationReconciler", () => {
 
     it("should handle zero confidence values", () => {
       const reconciledInfo = {
-        date: {
-          value: { precision: "unknown" as const },
-          confidence: 0,
-          sources: [],
-        },
-        publisher: {
-          value: { name: "", normalized: "" },
-          confidence: 0,
-          sources: [],
-        },
-        place: {
-          value: { name: "", normalized: "" },
-          confidence: 0,
-          sources: [],
-        },
+        date: { value: { precision: "unknown" as const }, confidence: 0, sources: [] },
+        publisher: { value: { name: "", normalized: "" }, confidence: 0, sources: [] },
+        place: { value: { name: "", normalized: "" }, confidence: 0, sources: [] },
       };
 
       const overallConfidence = reconciler.getOverallConfidence(reconciledInfo);
@@ -239,21 +207,9 @@ describe("PublicationReconciler", () => {
 
     it("should handle empty sources", () => {
       const reconciledInfo = {
-        date: {
-          value: { precision: "unknown" as const },
-          confidence: 0,
-          sources: [],
-        },
-        publisher: {
-          value: { name: "", normalized: "" },
-          confidence: 0,
-          sources: [],
-        },
-        place: {
-          value: { name: "", normalized: "" },
-          confidence: 0,
-          sources: [],
-        },
+        date: { value: { precision: "unknown" as const }, confidence: 0, sources: [] },
+        publisher: { value: { name: "", normalized: "" }, confidence: 0, sources: [] },
+        place: { value: { name: "", normalized: "" }, confidence: 0, sources: [] },
       };
 
       const sources = reconciler.getAllSources(reconciledInfo);

@@ -1,10 +1,10 @@
 import { sveltekit } from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
-import { defineConfig, searchForWorkspaceRoot } from "vite";
-import { pagefindPlugin } from "./src/build/vite-plugin-pagefind.ts";
-import packageJson from "./package.json" with { type: "json" };
-import { cwd } from "node:process";
 import { resolve } from "node:path";
+import { cwd } from "node:process";
+import { defineConfig, searchForWorkspaceRoot } from "vite";
+import packageJson from "./package.json" with { type: "json" };
+import { pagefindPlugin } from "./src/build/vite-plugin-pagefind.ts";
 
 const {
   bugs,
@@ -28,11 +28,7 @@ export default defineConfig({
     CONTENT_ROOT_DIR: `"${contentRoot.replace(import.meta.dirname, "")}"`,
     CONTENT_ROOT_REPOSITORY_PATH: `"${contentRoot.replace(resolve(import.meta.dirname, "../../"), "")}"`,
   },
-  plugins: [
-    tailwindcss(),
-    sveltekit(),
-    pagefindPlugin({ contentDir: contentRoot }),
-  ],
+  plugins: [tailwindcss(), sveltekit(), pagefindPlugin({ contentDir: contentRoot })],
   resolve: {
     alias: {
       $content: contentRoot,
@@ -41,9 +37,7 @@ export default defineConfig({
     },
   },
   server: {
-    fs: {
-      allow: [searchForWorkspaceRoot(cwd())],
-    },
+    fs: { allow: [searchForWorkspaceRoot(cwd())] },
     open: false,
     port: 5174,
     strictPort: true,

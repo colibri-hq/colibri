@@ -1,5 +1,5 @@
-import type { BookMetadata, BookMetadataProvider } from "./types.js";
 import type { LoosePartial } from "@colibri-hq/shared";
+import type { BookMetadata, BookMetadataProvider } from "./types.js";
 
 export { ViafMetadataProvider } from "./providers/viaf.js";
 export { OpenLibraryMetadataProvider } from "./providers/open-library.js";
@@ -33,15 +33,8 @@ export {
   type RetryConfig,
   DEFAULT_RETRY_CONFIG,
 } from "./providers/retryable-provider.js";
-export {
-  MetadataProviderRegistry,
-  globalProviderRegistry,
-} from "./registry.js";
-export {
-  RateLimiter,
-  RateLimiterRegistry,
-  globalRateLimiterRegistry,
-} from "./rate-limiter.js";
+export { MetadataProviderRegistry, globalProviderRegistry } from "./registry.js";
+export { RateLimiter, RateLimiterRegistry, globalRateLimiterRegistry } from "./rate-limiter.js";
 export {
   TimeoutManager,
   TimeoutManagerRegistry,
@@ -51,20 +44,12 @@ export {
 
 // Configuration system
 export type { ProviderConfig, MetadataSystemConfig } from "./config.js";
-export {
-  MetadataConfigManager,
-  globalConfigManager,
-  DEFAULT_METADATA_CONFIG,
-} from "./config.js";
+export { MetadataConfigManager, globalConfigManager, DEFAULT_METADATA_CONFIG } from "./config.js";
 export { ConfigurableMetadataProvider } from "./providers/configurable-provider.js";
 
 // Caching and performance optimization
 export type { CacheEntry, CacheStats, CacheConfig } from "./cache.js";
-export type {
-  PerformanceMetrics,
-  PerformanceStats,
-  PerformanceConfig,
-} from "./performance.js";
+export type { PerformanceMetrics, PerformanceStats, PerformanceConfig } from "./performance.js";
 export {
   MetadataCache,
   MetadataRecordCache,

@@ -1,10 +1,4 @@
-import {
-  paginatable,
-  paginatedResults,
-  procedure,
-  t,
-  unguardedProcedure,
-} from "$lib/trpc/t";
+import { paginatable, paginatedResults, procedure, t, unguardedProcedure } from "$lib/trpc/t";
 import {
   createCreator,
   deleteCreator,
@@ -24,9 +18,7 @@ export const creators = t.router({
 
   load: procedure()
     .input(z.object({ id: z.string() }))
-    .query(async ({ input: { id }, ctx: { database } }) =>
-      loadCreator(database, id),
-    ),
+    .query(async ({ input: { id }, ctx: { database } }) => loadCreator(database, id)),
 
   loadContributions: procedure()
     .input(z.object({ id: z.string() }))
@@ -52,10 +44,7 @@ export const creators = t.router({
       .select(["id", "name"])
       .orderBy("name", "asc")
       .execute();
-    return creators.map(({ id, name }) => ({
-      label: name,
-      value: id,
-    }));
+    return creators.map(({ id, name }) => ({ label: name, value: id }));
   }),
 
   update: procedure()
@@ -79,25 +68,13 @@ export const creators = t.router({
         description: z.string().nullable(),
       }),
     )
-    .mutation(
-      async ({
-        input: { id, name, description },
-        ctx: { database, userId },
-      }) => {
-        if (id) {
-          await updateCreator(database, id, {
-            name,
-            description: description ?? undefined,
-            userId,
-          });
-        } else {
-          await createCreator(database, name, {
-            description: description ?? undefined,
-            userId,
-          });
-        }
-      },
-    ),
+    .mutation(async ({ input: { id, name, description }, ctx: { database, userId } }) => {
+      if (id) {
+        await updateCreator(database, id, { name, description: description ?? undefined, userId });
+      } else {
+        await createCreator(database, name, { description: description ?? undefined, userId });
+      }
+    }),
 
   delete: procedure()
     .input(z.string())

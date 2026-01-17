@@ -1,3 +1,4 @@
+import type { Handle } from "@sveltejs/kit";
 import { dev } from "$app/environment";
 import { env } from "$env/dynamic/private";
 import { log } from "$lib/logging";
@@ -6,7 +7,6 @@ import { createContext } from "$lib/trpc/context";
 import { router } from "$lib/trpc/router";
 import { initialize as database } from "@colibri-hq/sdk";
 import { storage } from "@colibri-hq/sdk/storage";
-import type { Handle } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { hrtime } from "node:process";
 import { createTRPCHandle } from "trpc-sveltekit";
@@ -20,10 +20,7 @@ const handlers = [
     //       This may not be what we want; investigation pending.
     Object.defineProperty(event.locals, "database", {
       get() {
-        return database(env.DB_URL, {
-          certificate: env.DATABASE_CERTIFICATE,
-          debug: dev,
-        });
+        return database(env.DB_URL, { certificate: env.DATABASE_CERTIFICATE, debug: dev });
       },
     });
     Object.defineProperty(event.locals, "storage", {
@@ -61,8 +58,7 @@ const handlers = [
     createContext,
     onError: dev
       ? ({ error, type, path }) => {
-          const stack =
-            error.stack?.split("\n").slice(1).join("\n") ?? "(no stack trace)";
+          const stack = error.stack?.split("\n").slice(1).join("\n") ?? "(no stack trace)";
           const message = `${path}: ${error.message}\n${stack}`;
 
           log(`trpc:${type}`, "error", message);
@@ -78,19 +74,12 @@ if (dev) {
     const start = hrtime.bigint();
     const uri = event.url.toString().replace(event.url.origin, "");
     const response = await resolve(event);
-    const duration = (Number(hrtime.bigint() - start) / 1e6).toLocaleString(
-      undefined,
-      {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      },
-    );
+    const duration = (Number(hrtime.bigint() - start) / 1e6).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
 
-    log(
-      "http:request",
-      "debug",
-      `${event.request.method} ${uri} \x1b[2m(${duration}ms)\x1b[0m`,
-    );
+    log("http:request", "debug", `${event.request.method} ${uri} \x1b[2m(${duration}ms)\x1b[0m`);
 
     return response;
   } satisfies Handle;

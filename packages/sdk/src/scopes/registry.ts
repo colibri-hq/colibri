@@ -74,12 +74,7 @@ export const SCOPE_REGISTRY = {
   // Admin scope - grants everything
   admin: {
     description: "Full administrative access",
-    implies: [
-      "library:write",
-      "library:download",
-      "progress:write",
-      "instance:write",
-    ],
+    implies: ["library:write", "library:download", "progress:write", "instance:write"],
     category: "admin",
     apiKeyAllowed: true,
   },

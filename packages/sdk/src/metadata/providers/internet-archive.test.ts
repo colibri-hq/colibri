@@ -17,9 +17,7 @@ const mockIASearchResponse = {
         date: "2021-01-01",
         publisher: ["Example Press"],
         subject: ["Adventure", "Fiction"],
-        description: [
-          "A thrilling adventure story about courage and friendship.",
-        ],
+        description: ["A thrilling adventure story about courage and friendship."],
         language: ["eng"],
         isbn: ["9781234567890"],
         imagecount: 256,
@@ -45,12 +43,7 @@ const mockIASearchResponse = {
   },
 };
 
-const mockEmptyIASearchResponse = {
-  response: {
-    numFound: 0,
-    docs: [],
-  },
-};
+const mockEmptyIASearchResponse = { response: { numFound: 0, docs: [] } };
 
 describe("InternetArchiveMetadataProvider", () => {
   let provider: InternetArchiveMetadataProvider;
@@ -87,9 +80,7 @@ describe("InternetArchiveMetadataProvider", () => {
       expect(provider.getReliabilityScore(MetadataType.TITLE)).toBe(0.85);
       expect(provider.getReliabilityScore(MetadataType.AUTHORS)).toBe(0.8);
       expect(provider.getReliabilityScore(MetadataType.ISBN)).toBe(0.75);
-      expect(provider.getReliabilityScore(MetadataType.PUBLICATION_DATE)).toBe(
-        0.8,
-      );
+      expect(provider.getReliabilityScore(MetadataType.PUBLICATION_DATE)).toBe(0.8);
       expect(provider.getReliabilityScore(MetadataType.COVER_IMAGE)).toBe(0.8);
     });
 
@@ -104,9 +95,7 @@ describe("InternetArchiveMetadataProvider", () => {
       expect(provider.supportsDataType(MetadataType.AUTHORS)).toBe(true);
       expect(provider.supportsDataType(MetadataType.ISBN)).toBe(true);
       expect(provider.supportsDataType(MetadataType.SUBJECTS)).toBe(true);
-      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(
-        true,
-      );
+      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.PUBLISHER)).toBe(true);
       expect(provider.supportsDataType(MetadataType.LANGUAGE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.COVER_IMAGE)).toBe(true);
@@ -119,22 +108,15 @@ describe("InternetArchiveMetadataProvider", () => {
 
   describe("Title Search", () => {
     it("should search by title successfully", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockIASearchResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockIASearchResponse });
 
-      const results = await provider.searchByTitle({
-        title: "The great adventure",
-      });
+      const results = await provider.searchByTitle({ title: "The great adventure" });
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("advancedsearch.php"),
         expect.objectContaining({
-          headers: expect.objectContaining({
-            Accept: "application/json",
-          }),
+          headers: expect.objectContaining({ Accept: "application/json" }),
         }),
       );
 
@@ -152,14 +134,9 @@ describe("InternetArchiveMetadataProvider", () => {
     });
 
     it("should return empty array for no results", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockEmptyIASearchResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockEmptyIASearchResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Nonexistent Book",
-      });
+      const results = await provider.searchByTitle({ title: "Nonexistent Book" });
 
       expect(results).toEqual([]);
     });
@@ -167,9 +144,7 @@ describe("InternetArchiveMetadataProvider", () => {
     it("should handle fetch errors gracefully", async () => {
       mockFetch.mockRejectedValueOnce(new Error("Network error"));
 
-      const results = await provider.searchByTitle({
-        title: "Test Book",
-      });
+      const results = await provider.searchByTitle({ title: "Test Book" });
 
       expect(results).toEqual([]);
     });
@@ -177,10 +152,7 @@ describe("InternetArchiveMetadataProvider", () => {
 
   describe("ISBN Search", () => {
     it("should search by ISBN successfully", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockIASearchResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockIASearchResponse });
 
       const results = await provider.searchByISBN("978-1-234-56789-0");
 
@@ -199,10 +171,7 @@ describe("InternetArchiveMetadataProvider", () => {
     });
 
     it("should clean ISBN before searching", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockEmptyIASearchResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockEmptyIASearchResponse });
 
       await provider.searchByISBN("978-1-234-56789-0");
 
@@ -214,14 +183,9 @@ describe("InternetArchiveMetadataProvider", () => {
 
   describe("Creator Search", () => {
     it("should search by creator successfully", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockIASearchResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockIASearchResponse });
 
-      const results = await provider.searchByCreator({
-        name: "John Smith",
-      });
+      const results = await provider.searchByCreator({ name: "John Smith" });
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
 
@@ -237,10 +201,7 @@ describe("InternetArchiveMetadataProvider", () => {
 
   describe("Multi-Criteria Search", () => {
     it("should search with multiple criteria", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockIASearchResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockIASearchResponse });
 
       const results = await provider.searchMultiCriteria({
         title: "The great adventure",
@@ -265,10 +226,7 @@ describe("InternetArchiveMetadataProvider", () => {
     });
 
     it("should handle year range queries", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockIASearchResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockIASearchResponse });
 
       const results = await provider.searchMultiCriteria({
         title: "Test",
@@ -293,14 +251,9 @@ describe("InternetArchiveMetadataProvider", () => {
 
   describe("Metadata Mapping", () => {
     it("should correctly map all metadata fields", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockIASearchResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockIASearchResponse });
 
-      const results = await provider.searchByTitle({
-        title: "The great adventure",
-      });
+      const results = await provider.searchByTitle({ title: "The great adventure" });
 
       const result = results[0];
 
@@ -309,9 +262,7 @@ describe("InternetArchiveMetadataProvider", () => {
       expect(result.isbn).toEqual(["9781234567890"]);
       expect(result.publicationDate).toEqual(new Date("2021-01-01"));
       expect(result.subjects).toEqual(["Adventure", "Fiction"]);
-      expect(result.description).toBe(
-        "A thrilling adventure story about courage and friendship.",
-      );
+      expect(result.description).toBe("A thrilling adventure story about courage and friendship.");
       expect(result.language).toBe("en"); // Converted from "eng"
       expect(result.publisher).toBe("Example Press");
       expect(result.edition).toBe("1st ed.");
@@ -340,10 +291,7 @@ describe("InternetArchiveMetadataProvider", () => {
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => singleItemResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => singleItemResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -358,45 +306,24 @@ describe("InternetArchiveMetadataProvider", () => {
       const yearOnlyResponse = {
         response: {
           numFound: 1,
-          docs: [
-            {
-              identifier: "test456",
-              title: "Old Book",
-              year: "1920",
-              mediatype: "texts",
-            },
-          ],
+          docs: [{ identifier: "test456", title: "Old Book", year: "1920", mediatype: "texts" }],
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => yearOnlyResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => yearOnlyResponse });
 
       const results = await provider.searchByTitle({ title: "Old" });
 
       const expectedDate = new Date(1920, 0, 1);
-      expect(results[0].publicationDate?.getFullYear()).toBe(
-        expectedDate.getFullYear(),
-      );
-      expect(results[0].publicationDate?.getMonth()).toBe(
-        expectedDate.getMonth(),
-      );
-      expect(results[0].publicationDate?.getDate()).toBe(
-        expectedDate.getDate(),
-      );
+      expect(results[0].publicationDate?.getFullYear()).toBe(expectedDate.getFullYear());
+      expect(results[0].publicationDate?.getMonth()).toBe(expectedDate.getMonth());
+      expect(results[0].publicationDate?.getDate()).toBe(expectedDate.getDate());
     });
 
     it("should store provider-specific data", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockIASearchResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockIASearchResponse });
 
-      const results = await provider.searchByTitle({
-        title: "The great adventure",
-      });
+      const results = await provider.searchByTitle({ title: "The great adventure" });
 
       expect(results[0].providerData).toMatchObject({
         identifier: "greatadventure00smit",
@@ -427,10 +354,7 @@ describe("InternetArchiveMetadataProvider", () => {
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => response,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => response });
 
       const results = await provider.searchByTitle({ title: "Test" });
       expect(results[0]?.language).toBe("en");
@@ -440,21 +364,11 @@ describe("InternetArchiveMetadataProvider", () => {
       const response = {
         response: {
           numFound: 1,
-          docs: [
-            {
-              identifier: "test_en",
-              title: "Test",
-              language: ["en"],
-              mediatype: "texts",
-            },
-          ],
+          docs: [{ identifier: "test_en", title: "Test", language: ["en"], mediatype: "texts" }],
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => response,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => response });
 
       const results = await provider.searchByTitle({ title: "Test" });
       expect(results[0]?.language).toBe("en");
@@ -464,21 +378,11 @@ describe("InternetArchiveMetadataProvider", () => {
       const response = {
         response: {
           numFound: 1,
-          docs: [
-            {
-              identifier: "test_xyz",
-              title: "Test",
-              language: ["xyz"],
-              mediatype: "texts",
-            },
-          ],
+          docs: [{ identifier: "test_xyz", title: "Test", language: ["xyz"], mediatype: "texts" }],
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => response,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => response });
 
       const results = await provider.searchByTitle({ title: "Test" });
       expect(results[0]?.language).toBe("xyz");
@@ -492,9 +396,7 @@ describe("InternetArchiveMetadataProvider", () => {
         json: async () => mockIASearchResponse, // Has 2 similar items
       });
 
-      const results = await provider.searchByTitle({
-        title: "The great adventure",
-      });
+      const results = await provider.searchByTitle({ title: "The great adventure" });
 
       // Should deduplicate to 1 result
       expect(results).toHaveLength(1);
@@ -531,10 +433,7 @@ describe("InternetArchiveMetadataProvider", () => {
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => responseWithDuplicates,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => responseWithDuplicates });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -547,26 +446,13 @@ describe("InternetArchiveMetadataProvider", () => {
         response: {
           numFound: 2,
           docs: [
-            {
-              identifier: "book1",
-              title: "Book One",
-              creator: ["Author One"],
-              mediatype: "texts",
-            },
-            {
-              identifier: "book2",
-              title: "Book Two",
-              creator: ["Author Two"],
-              mediatype: "texts",
-            },
+            { identifier: "book1", title: "Book One", creator: ["Author One"], mediatype: "texts" },
+            { identifier: "book2", title: "Book Two", creator: ["Author Two"], mediatype: "texts" },
           ],
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => differentBooksResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => differentBooksResponse });
 
       const results = await provider.searchByTitle({ title: "Book" });
 
@@ -576,10 +462,7 @@ describe("InternetArchiveMetadataProvider", () => {
 
   describe("Confidence Calculation", () => {
     it("should give higher confidence for ISBN searches", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockIASearchResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockIASearchResponse });
 
       const results = await provider.searchByISBN("9781234567890");
 
@@ -608,10 +491,7 @@ describe("InternetArchiveMetadataProvider", () => {
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => completeResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => completeResponse });
 
       const results = await provider.searchByTitle({ title: "Complete" });
 
@@ -636,10 +516,7 @@ describe("InternetArchiveMetadataProvider", () => {
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => popularResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => popularResponse });
 
       const results = await provider.searchByTitle({ title: "Popular" });
 
@@ -647,10 +524,7 @@ describe("InternetArchiveMetadataProvider", () => {
     });
 
     it("should cap confidence at 0.88", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockIASearchResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockIASearchResponse });
 
       const results = await provider.searchByISBN("9781234567890");
 
@@ -666,9 +540,7 @@ describe("InternetArchiveMetadataProvider", () => {
         statusText: "Internal Server Error",
       });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results).toEqual([]);
     });
@@ -681,9 +553,7 @@ describe("InternetArchiveMetadataProvider", () => {
         },
       });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results).toEqual([]);
     });
@@ -691,16 +561,10 @@ describe("InternetArchiveMetadataProvider", () => {
     it("should handle missing response.docs", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({
-          response: {
-            numFound: 0,
-          },
-        }),
+        json: async () => ({ response: { numFound: 0 } }),
       });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results).toEqual([]);
     });
@@ -708,14 +572,9 @@ describe("InternetArchiveMetadataProvider", () => {
     it("should retry on network errors", async () => {
       mockFetch
         .mockRejectedValueOnce(new Error("Network timeout"))
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockIASearchResponse,
-        });
+        .mockResolvedValueOnce({ ok: true, json: async () => mockIASearchResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(mockFetch).toHaveBeenCalledTimes(2);
       expect(results).toHaveLength(1);
@@ -736,14 +595,9 @@ describe("InternetArchiveMetadataProvider", () => {
 
   describe("Provider Data", () => {
     it("should include download and access URLs", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockIASearchResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockIASearchResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results[0].providerData).toMatchObject({
         identifier: "greatadventure00smit",
@@ -753,14 +607,9 @@ describe("InternetArchiveMetadataProvider", () => {
     });
 
     it("should include statistics and metrics", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockIASearchResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockIASearchResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results[0].providerData).toMatchObject({
         downloads: 1500,

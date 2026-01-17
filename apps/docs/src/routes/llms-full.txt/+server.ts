@@ -1,4 +1,3 @@
-import { text } from "@sveltejs/kit";
 import {
   type Directory,
   getContentTree,
@@ -6,6 +5,7 @@ import {
   isPage,
   type Page,
 } from "$lib/content/content.js";
+import { text } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types.js";
 
 export const prerender = true;

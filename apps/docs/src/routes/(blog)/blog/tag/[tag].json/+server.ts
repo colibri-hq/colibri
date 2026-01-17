@@ -1,9 +1,5 @@
+import { type BlogPost, getBlogTags, getPostsByTag } from "$lib/content/blog.js";
 import { error, json } from "@sveltejs/kit";
-import {
-  type BlogPost,
-  getBlogTags,
-  getPostsByTag,
-} from "$lib/content/blog.js";
 import type { EntryGenerator, RequestHandler } from "./$types.js";
 
 export const prerender = true;
@@ -41,9 +37,7 @@ export const GET = async function GET({ params, url }) {
 export const entries = function entries() {
   const tags = getBlogTags();
 
-  return Array.from(tags.keys()).map((tag) => ({
-    tag: encodeURIComponent(tag),
-  }));
+  return Array.from(tags.keys()).map((tag) => ({ tag: encodeURIComponent(tag) }));
 } satisfies EntryGenerator;
 
 function summarizePost(post: BlogPost): BlogPostSummary {
@@ -73,9 +67,5 @@ type TagPostsResponse = {
   tag: string;
   posts: BlogPostSummary[];
   total: number;
-  links: {
-    html: string;
-    json: string;
-    tagListing: string;
-  };
+  links: { html: string; json: string; tagListing: string };
 };

@@ -97,12 +97,7 @@ export interface FormattedConflictSummary {
   /** Recommendations */
   recommendations: string[];
   /** Quick stats */
-  quickStats: {
-    total: number;
-    critical: number;
-    autoResolvable: number;
-    manualReview: number;
-  };
+  quickStats: { total: number; critical: number; autoResolvable: number; manualReview: number };
 }
 
 /**
@@ -245,9 +240,7 @@ export class ConflictDisplayFormatter {
     lines.push(
       `Total Conflicts: ${this.colorize(formatted.quickStats.total.toString(), "yellow")}`,
     );
-    lines.push(
-      `Critical: ${this.colorize(formatted.quickStats.critical.toString(), "red")}`,
-    );
+    lines.push(`Critical: ${this.colorize(formatted.quickStats.critical.toString(), "red")}`);
     lines.push(
       `Auto-Resolvable: ${this.colorize(formatted.quickStats.autoResolvable.toString(), "green")}`,
     );
@@ -403,23 +396,14 @@ export class ConflictDisplayFormatter {
   /**
    * Format conflicting values
    */
-  private formatConflictValues(
-    conflict: DetailedConflict,
-  ): ConflictValueDisplay[] {
+  private formatConflictValues(conflict: DetailedConflict): ConflictValueDisplay[] {
     return conflict.values.map((valueItem) => {
       const formattedValue = this.formatValue(valueItem.value);
       const source = this.formatSource(valueItem.source);
       const isResolved = false; // Would need additional logic to determine this
-      const confidenceIndicator = this.formatConfidenceIndicator(
-        valueItem.source.reliability,
-      );
+      const confidenceIndicator = this.formatConfidenceIndicator(valueItem.source.reliability);
 
-      return {
-        value: formattedValue,
-        source,
-        isResolved,
-        confidenceIndicator,
-      };
+      return { value: formattedValue, source, isResolved, confidenceIndicator };
     });
   }
 
@@ -449,9 +433,7 @@ export class ConflictDisplayFormatter {
       }
       const items = value.slice(0, 3).map((item) => this.formatValue(item));
       const display = items.join(", ");
-      return value.length > 3
-        ? `[${display}, ...${value.length - 3} more]`
-        : `[${display}]`;
+      return value.length > 3 ? `[${display}, ...${value.length - 3} more]` : `[${display}]`;
     }
 
     if (typeof value === "object") {
@@ -495,18 +477,11 @@ export class ConflictDisplayFormatter {
    * Format source information
    */
   private formatSource(source: MetadataSource): SourceDisplay {
-    const reliabilityIndicator = this.formatReliabilityIndicator(
-      source.reliability,
-    );
+    const reliabilityIndicator = this.formatReliabilityIndicator(source.reliability);
     const reliabilityText = `${(source.reliability * 100).toFixed(0)}%`;
     const timestamp = source.timestamp.toISOString().split("T")[0];
 
-    return {
-      name: source.name,
-      reliabilityIndicator,
-      reliabilityText,
-      timestamp,
-    };
+    return { name: source.name, reliabilityIndicator, reliabilityText, timestamp };
   }
 
   /**
@@ -557,9 +532,7 @@ export class ConflictDisplayFormatter {
     const impact = conflict.impact;
     const scoreText = `Impact: ${(impact.score * 100).toFixed(0)}%`;
     const areasText =
-      impact.affectedAreas.length > 0
-        ? ` (affects: ${impact.affectedAreas.join(", ")})`
-        : "";
+      impact.affectedAreas.length > 0 ? ` (affects: ${impact.affectedAreas.join(", ")})` : "";
 
     return `${scoreText}${areasText}`;
   }
@@ -624,9 +597,7 @@ export class ConflictDisplayFormatter {
   /**
    * Format type breakdown
    */
-  private formatTypeBreakdown(
-    byType: Record<ConflictType, DetailedConflict[]>,
-  ): string {
+  private formatTypeBreakdown(byType: Record<ConflictType, DetailedConflict[]>): string {
     const lines: string[] = [];
 
     Object.entries(byType).forEach(([type, conflicts]) => {
@@ -643,9 +614,7 @@ export class ConflictDisplayFormatter {
   /**
    * Format field breakdown
    */
-  private formatFieldBreakdown(
-    byField: Record<string, DetailedConflict[]>,
-  ): string {
+  private formatFieldBreakdown(byField: Record<string, DetailedConflict[]>): string {
     const lines: string[] = [];
 
     // Sort fields by number of conflicts (descending)
@@ -655,13 +624,9 @@ export class ConflictDisplayFormatter {
 
     sortedFields.forEach(([field, conflicts]) => {
       const displayField = field.replace(/([A-Z])/g, " $1").toLowerCase();
-      const criticalCount = conflicts.filter(
-        (c) => c.severity === "critical",
-      ).length;
+      const criticalCount = conflicts.filter((c) => c.severity === "critical").length;
       const criticalText =
-        criticalCount > 0
-          ? this.colorize(` (${criticalCount} critical)`, "red")
-          : "";
+        criticalCount > 0 ? this.colorize(` (${criticalCount} critical)`, "red") : "";
       lines.push(`📝 ${displayField}: ${conflicts.length}${criticalText}`);
     });
 
@@ -676,12 +641,7 @@ export class ConflictDisplayFormatter {
     const formatted = this.formatConflict(conflict);
 
     // Header
-    lines.push(
-      this.colorize(
-        `${formatted.severityIndicator} ${formatted.title}`,
-        "bright",
-      ),
-    );
+    lines.push(this.colorize(`${formatted.severityIndicator} ${formatted.title}`, "bright"));
 
     // Type and auto-resolve status
     const autoStatus = conflict.autoResolvable
@@ -716,10 +676,7 @@ export class ConflictDisplayFormatter {
     lines.push(this.wrapText(formatted.impactSummary, 2));
 
     // Suggestions
-    if (
-      formatted.suggestions.length > 0 &&
-      this.config.showResolutionSuggestions
-    ) {
+    if (formatted.suggestions.length > 0 && this.config.showResolutionSuggestions) {
       lines.push("");
       lines.push(this.colorize("Suggestions:", "bright"));
       formatted.suggestions.forEach((suggestion) => {
@@ -733,9 +690,7 @@ export class ConflictDisplayFormatter {
   /**
    * Get color for severity level
    */
-  private getSeverityColor(
-    severity: ConflictSeverity,
-  ): keyof typeof this.colors {
+  private getSeverityColor(severity: ConflictSeverity): keyof typeof this.colors {
     switch (severity) {
       case "critical":
         return "red";

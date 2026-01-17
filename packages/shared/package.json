@@ -97,6 +97,7 @@
     "oxfmt": "catalog:",
     "oxlint": "^1.39.0",
     "rimraf": "catalog:",
+    "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vitest": "catalog:"

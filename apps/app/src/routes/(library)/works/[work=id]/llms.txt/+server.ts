@@ -9,9 +9,7 @@ import { error, type RequestHandler } from "@sveltejs/kit";
  */
 export const GET = async function ({ params, locals: { database } }) {
   if (!env.LLMS_TXT_ENABLED) {
-    throw error(404, {
-      message: "The /llms.txt feature is not enabled on this Colibri instance.",
-    });
+    throw error(404, { message: "The /llms.txt feature is not enabled on this Colibri instance." });
   }
 
   const workId = params.work!;
@@ -25,9 +23,7 @@ export const GET = async function ({ params, locals: { database } }) {
     ]);
   } catch (cause) {
     if (cause instanceof NoResultError) {
-      throw error(404, {
-        message: "Book not found",
-      });
+      throw error(404, { message: "Book not found" });
     }
 
     throw error;

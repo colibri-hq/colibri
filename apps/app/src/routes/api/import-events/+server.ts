@@ -1,7 +1,4 @@
-import {
-  type ImportEvent,
-  subscribeToImportEvents,
-} from "$lib/server/import-events";
+import { type ImportEvent, subscribeToImportEvents } from "$lib/server/import-events";
 import type { RequestHandler } from "./$types";
 
 /**
@@ -53,19 +50,16 @@ export const GET: RequestHandler = async ({ request, locals }) => {
       controller.enqueue(encoder.encode(connectEvent));
 
       // Subscribe to import events for this user
-      const unsubscribe = subscribeToImportEvents(
-        userId,
-        (event: ImportEvent) => {
-          if (isClosed) return;
-          try {
-            const sseEvent = `data: ${JSON.stringify(event)}\n\n`;
-            controller.enqueue(encoder.encode(sseEvent));
-          } catch {
-            // Client disconnected, clean up
-            cleanup();
-          }
-        },
-      );
+      const unsubscribe = subscribeToImportEvents(userId, (event: ImportEvent) => {
+        if (isClosed) return;
+        try {
+          const sseEvent = `data: ${JSON.stringify(event)}\n\n`;
+          controller.enqueue(encoder.encode(sseEvent));
+        } catch {
+          // Client disconnected, clean up
+          cleanup();
+        }
+      });
 
       // Send keepalive every 30 seconds to prevent connection timeout
       const keepaliveInterval = setInterval(() => {

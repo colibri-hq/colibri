@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach, vi } from "vitest";
-import { LocalStorageTokenStore } from "../../../src/client/storage/local-storage.js";
 import type { StoredTokens } from "../../../src/client/types.js";
+import { LocalStorageTokenStore } from "../../../src/client/storage/local-storage.js";
 
 /**
  * Mock Storage implementation for testing
@@ -72,10 +72,7 @@ describe("LocalStorageTokenStore", () => {
     });
 
     it("should accept custom prefix", () => {
-      const store = new LocalStorageTokenStore({
-        storage: mockStorage,
-        prefix: "custom_prefix_",
-      });
+      const store = new LocalStorageTokenStore({ storage: mockStorage, prefix: "custom_prefix_" });
       expect(store).toBeInstanceOf(LocalStorageTokenStore);
     });
   });
@@ -94,10 +91,7 @@ describe("LocalStorageTokenStore", () => {
       // Pre-populate storage
       mockStorage.setItem(
         "oauth_tokens_test-client",
-        JSON.stringify({
-          ...tokens,
-          expiresAt: tokens.expiresAt.toISOString(),
-        }),
+        JSON.stringify({ ...tokens, expiresAt: tokens.expiresAt.toISOString() }),
       );
 
       const result = await store.get("test-client");
@@ -123,18 +117,12 @@ describe("LocalStorageTokenStore", () => {
     });
 
     it("should use custom prefix when retrieving", async () => {
-      const store = new LocalStorageTokenStore({
-        storage: mockStorage,
-        prefix: "my_app_",
-      });
+      const store = new LocalStorageTokenStore({ storage: mockStorage, prefix: "my_app_" });
       const tokens = createSampleTokens();
 
       mockStorage.setItem(
         "my_app_test-client",
-        JSON.stringify({
-          ...tokens,
-          expiresAt: tokens.expiresAt.toISOString(),
-        }),
+        JSON.stringify({ ...tokens, expiresAt: tokens.expiresAt.toISOString() }),
       );
 
       const result = await store.get("test-client");
@@ -199,10 +187,7 @@ describe("LocalStorageTokenStore", () => {
     });
 
     it("should use custom prefix when storing", async () => {
-      const store = new LocalStorageTokenStore({
-        storage: mockStorage,
-        prefix: "custom_",
-      });
+      const store = new LocalStorageTokenStore({ storage: mockStorage, prefix: "custom_" });
       const tokens = createSampleTokens();
 
       await store.set("test-client", tokens);
@@ -254,10 +239,7 @@ describe("LocalStorageTokenStore", () => {
     });
 
     it("should use custom prefix when clearing", async () => {
-      const store = new LocalStorageTokenStore({
-        storage: mockStorage,
-        prefix: "custom_",
-      });
+      const store = new LocalStorageTokenStore({ storage: mockStorage, prefix: "custom_" });
       const tokens = createSampleTokens();
 
       await store.set("test-client", tokens);
@@ -302,14 +284,8 @@ describe("LocalStorageTokenStore", () => {
     });
 
     it("should only remove keys with matching custom prefix", async () => {
-      const store1 = new LocalStorageTokenStore({
-        storage: mockStorage,
-        prefix: "app1_",
-      });
-      const store2 = new LocalStorageTokenStore({
-        storage: mockStorage,
-        prefix: "app2_",
-      });
+      const store1 = new LocalStorageTokenStore({ storage: mockStorage, prefix: "app1_" });
+      const store2 = new LocalStorageTokenStore({ storage: mockStorage, prefix: "app2_" });
       const tokens = createSampleTokens();
 
       await store1.set("client", tokens);

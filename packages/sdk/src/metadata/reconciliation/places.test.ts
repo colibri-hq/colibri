@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { PlaceReconciler } from "./places.js";
 import type { MetadataSource, PublicationInfoInput } from "./types.js";
+import { PlaceReconciler } from "./places.js";
 
 describe("PlaceReconciler", () => {
   const reconciler = new PlaceReconciler();
@@ -28,11 +28,7 @@ describe("PlaceReconciler", () => {
     });
 
     it("should normalize London variations", () => {
-      const variations = [
-        "London, England",
-        "London, UK",
-        "London, Great Britain",
-      ];
+      const variations = ["London, England", "London, UK", "London, Great Britain"];
 
       for (const variation of variations) {
         const result = reconciler.normalizePlace(variation);
@@ -65,10 +61,7 @@ describe("PlaceReconciler", () => {
     });
 
     it("should handle PublicationPlace objects", () => {
-      const input = {
-        name: "New York City",
-        location: "USA",
-      };
+      const input = { name: "New York City", location: "USA" };
 
       const result = reconciler.normalizePlace(input);
       expect(result.name).toBe("New York City");
@@ -85,12 +78,7 @@ describe("PlaceReconciler", () => {
 
   describe("reconcilePlaces", () => {
     it("should handle single place input", () => {
-      const inputs: PublicationInfoInput[] = [
-        {
-          place: "New York",
-          source: mockSource1,
-        },
-      ];
+      const inputs: PublicationInfoInput[] = [{ place: "New York", source: mockSource1 }];
 
       const result = reconciler.reconcilePlaces(inputs);
       expect(result.value.name).toBe("New York");
@@ -102,14 +90,8 @@ describe("PlaceReconciler", () => {
 
     it("should deduplicate similar place names", () => {
       const inputs: PublicationInfoInput[] = [
-        {
-          place: "New York City",
-          source: mockSource1,
-        },
-        {
-          place: "NYC",
-          source: mockSource2,
-        },
+        { place: "New York City", source: mockSource1 },
+        { place: "NYC", source: mockSource2 },
       ];
 
       const result = reconciler.reconcilePlaces(inputs);
@@ -136,24 +118,14 @@ describe("PlaceReconciler", () => {
     });
 
     it("should boost confidence for major publishing centers", () => {
-      const inputs: PublicationInfoInput[] = [
-        {
-          place: "London",
-          source: mockSource1,
-        },
-      ];
+      const inputs: PublicationInfoInput[] = [{ place: "London", source: mockSource1 }];
 
       const result = reconciler.reconcilePlaces(inputs);
       expect(result.confidence).toBeGreaterThan(mockSource1.reliability);
     });
 
     it("should boost confidence when country is identified", () => {
-      const inputs: PublicationInfoInput[] = [
-        {
-          place: "Paris, France",
-          source: mockSource1,
-        },
-      ];
+      const inputs: PublicationInfoInput[] = [{ place: "Paris, France", source: mockSource1 }];
 
       const result = reconciler.reconcilePlaces(inputs);
       expect(result.value.country).toBe("france");
@@ -161,9 +133,7 @@ describe("PlaceReconciler", () => {
     });
 
     it("should throw error for no places", () => {
-      expect(() => reconciler.reconcilePlaces([])).toThrow(
-        "No publication places to reconcile",
-      );
+      expect(() => reconciler.reconcilePlaces([])).toThrow("No publication places to reconcile");
     });
 
     it("should throw error for no valid places", () => {
@@ -174,9 +144,7 @@ describe("PlaceReconciler", () => {
         },
       ];
 
-      expect(() => reconciler.reconcilePlaces(inputs)).toThrow(
-        "No valid publication places found",
-      );
+      expect(() => reconciler.reconcilePlaces(inputs)).toThrow("No valid publication places found");
     });
   });
 });

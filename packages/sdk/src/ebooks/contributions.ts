@@ -2403,8 +2403,5 @@ export const relatorLabels: Record<Relator, string> = {
   prd: "Production personnel",
 };
 
-export const relatorRoles = Object.keys(relatorLabels) as [
-  Relator,
-  ...Relator[],
-];
+export const relatorRoles = Object.keys(relatorLabels) as [Relator, ...Relator[]];
 //endregion

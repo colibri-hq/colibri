@@ -13,10 +13,7 @@ export class IdentifierReconciler {
   /**
    * Normalize an identifier string or object into a standardized Identifier
    */
-  normalizeIdentifier(
-    input: string | Identifier,
-    type?: Identifier["type"],
-  ): Identifier {
+  normalizeIdentifier(input: string | Identifier, type?: Identifier["type"]): Identifier {
     if (typeof input === "object" && input !== null) {
       return this.validateIdentifier(input);
     }
@@ -35,18 +32,13 @@ export class IdentifierReconciler {
   /**
    * Reconcile multiple identifier inputs using deduplication and validation
    */
-  reconcileIdentifiers(
-    inputs: IdentifierInput[],
-  ): ReconciledField<Identifier[]> {
+  reconcileIdentifiers(inputs: IdentifierInput[]): ReconciledField<Identifier[]> {
     if (inputs.length === 0) {
       throw new Error("No identifiers to reconcile");
     }
 
     // Collect all identifiers from all inputs
-    const allIdentifiers: Array<{
-      identifier: Identifier;
-      source: MetadataSource;
-    }> = [];
+    const allIdentifiers: Array<{ identifier: Identifier; source: MetadataSource }> = [];
 
     for (const input of inputs) {
       // Process explicit identifiers array
@@ -58,10 +50,7 @@ export class IdentifierReconciler {
       }
 
       // Process specific identifier types
-      const specificTypes: Array<{
-        key: keyof IdentifierInput;
-        type: Identifier["type"];
-      }> = [
+      const specificTypes: Array<{ key: keyof IdentifierInput; type: Identifier["type"] }> = [
         { key: "isbn", type: "isbn" },
         { key: "oclc", type: "oclc" },
         { key: "lccn", type: "lccn" },
@@ -77,10 +66,7 @@ export class IdentifierReconciler {
           const values = Array.isArray(value) ? value : [value];
           for (const v of values) {
             const normalized = this.normalizeIdentifier(v as string, type);
-            allIdentifiers.push({
-              identifier: normalized,
-              source: input.source,
-            });
+            allIdentifiers.push({ identifier: normalized, source: input.source });
           }
         }
       }
@@ -96,10 +82,7 @@ export class IdentifierReconciler {
     }
 
     // Deduplicate identifiers by normalized value and type
-    const uniqueIdentifiers = new Map<
-      string,
-      { identifier: Identifier; source: MetadataSource }
-    >();
+    const uniqueIdentifiers = new Map<string, { identifier: Identifier; source: MetadataSource }>();
     const conflicts: Conflict[] = [];
 
     for (const item of allIdentifiers) {
@@ -140,45 +123,32 @@ export class IdentifierReconciler {
       other: 1,
     };
 
-    const sortedIdentifiers = Array.from(uniqueIdentifiers.values()).sort(
-      (a, b) => {
-        // Sort by validity first
-        if (a.identifier.valid !== b.identifier.valid) {
-          return (b.identifier.valid ? 1 : 0) - (a.identifier.valid ? 1 : 0);
-        }
+    const sortedIdentifiers = Array.from(uniqueIdentifiers.values()).sort((a, b) => {
+      // Sort by validity first
+      if (a.identifier.valid !== b.identifier.valid) {
+        return (b.identifier.valid ? 1 : 0) - (a.identifier.valid ? 1 : 0);
+      }
 
-        // Then by type priority
-        const priorityDiff =
-          typePriority[b.identifier.type] - typePriority[a.identifier.type];
-        if (priorityDiff !== 0) return priorityDiff;
+      // Then by type priority
+      const priorityDiff = typePriority[b.identifier.type] - typePriority[a.identifier.type];
+      if (priorityDiff !== 0) return priorityDiff;
 
-        // Finally by source reliability
-        return b.source.reliability - a.source.reliability;
-      },
-    );
+      // Finally by source reliability
+      return b.source.reliability - a.source.reliability;
+    });
 
     // Calculate confidence based on validity and source reliability
-    const validCount = sortedIdentifiers.filter(
-      (item) => item.identifier.valid,
-    ).length;
+    const validCount = sortedIdentifiers.filter((item) => item.identifier.valid).length;
     const totalCount = sortedIdentifiers.length;
     const avgReliability =
-      sortedIdentifiers.reduce(
-        (sum, item) => sum + item.source.reliability,
-        0,
-      ) / totalCount;
+      sortedIdentifiers.reduce((sum, item) => sum + item.source.reliability, 0) / totalCount;
 
-    const confidence = Math.min(
-      1,
-      (validCount / totalCount) * avgReliability * 0.9 + 0.1,
-    );
+    const confidence = Math.min(1, (validCount / totalCount) * avgReliability * 0.9 + 0.1);
 
     return {
       value: sortedIdentifiers.map((item) => item.identifier),
       confidence,
-      sources: Array.from(
-        new Set(sortedIdentifiers.map((item) => item.source)),
-      ),
+      sources: Array.from(new Set(sortedIdentifiers.map((item) => item.source))),
       conflicts: conflicts.length > 0 ? conflicts : undefined,
       reasoning:
         conflicts.length > 0
@@ -194,11 +164,7 @@ export class IdentifierReconciler {
     const cleaned = value.replace(/[\s\-]/g, "");
 
     // DOI patterns (check before ISBN since DOI is more specific)
-    if (
-      /^10\.\d{4,}\//.test(value) ||
-      /^doi:/i.test(value) ||
-      value.includes("doi.org")
-    ) {
+    if (/^10\.\d{4,}\//.test(value) || /^doi:/i.test(value) || value.includes("doi.org")) {
       return "doi";
     }
 
@@ -213,11 +179,7 @@ export class IdentifierReconciler {
     }
 
     // Amazon ASIN patterns (check URLs first)
-    if (
-      /^amazon:/i.test(value) ||
-      value.includes("amazon.com") ||
-      /^[A-Z0-9]{10}$/.test(cleaned)
-    ) {
+    if (/^amazon:/i.test(value) || value.includes("amazon.com") || /^[A-Z0-9]{10}$/.test(cleaned)) {
       return "amazon";
     }
 
@@ -232,10 +194,7 @@ export class IdentifierReconciler {
     }
 
     // LCCN patterns (more flexible)
-    if (
-      /^\d{10,11}$/.test(cleaned) ||
-      /^[a-z]{1,3}\d{8,10}$/.test(cleaned.toLowerCase())
-    ) {
+    if (/^\d{10,11}$/.test(cleaned) || /^[a-z]{1,3}\d{8,10}$/.test(cleaned.toLowerCase())) {
       return "lccn";
     }
 
@@ -355,10 +314,7 @@ export class IdentifierReconciler {
    */
   private normalizeGoogle(google: string): string {
     let normalized = google.replace(/^google:/i, "");
-    normalized = normalized.replace(
-      /.*books\.google\.com.*[?&]id=([^&]+).*/,
-      "$1",
-    );
+    normalized = normalized.replace(/.*books\.google\.com.*[?&]id=([^&]+).*/, "$1");
     return normalized;
   }
 
@@ -438,10 +394,6 @@ export class IdentifierReconciler {
     const normalized = this.normalizeByType(identifier.value, identifier.type);
     const valid = this.validateByType(normalized, identifier.type);
 
-    return {
-      ...identifier,
-      normalized,
-      valid,
-    };
+    return { ...identifier, normalized, valid };
   }
 }

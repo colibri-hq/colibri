@@ -72,107 +72,42 @@ export class PublisherReconciler {
     // Major publishers with common variations
     [
       "penguin random house",
-      [
-        "penguin",
-        "random house",
-        "bantam",
-        "dell",
-        "doubleday",
-        "knopf",
-        "pantheon",
-        "vintage",
-      ],
+      ["penguin", "random house", "bantam", "dell", "doubleday", "knopf", "pantheon", "vintage"],
     ],
     [
       "harpercollins",
-      [
-        "harper",
-        "collins",
-        "harper & row",
-        "harper collins",
-        "harpercollins publishers",
-      ],
+      ["harper", "collins", "harper & row", "harper collins", "harpercollins publishers"],
     ],
     [
       "simon & schuster",
-      [
-        "simon and schuster",
-        "simon schuster",
-        "scribner",
-        "atria",
-        "pocket books",
-      ],
+      ["simon and schuster", "simon schuster", "scribner", "atria", "pocket books"],
     ],
     [
       "macmillan",
-      [
-        "macmillan publishers",
-        "st. martins press",
-        "farrar straus giroux",
-        "henry holt",
-        "tor",
-      ],
+      ["macmillan publishers", "st. martins press", "farrar straus giroux", "henry holt", "tor"],
     ],
-    [
-      "hachette",
-      [
-        "hachette book group",
-        "little brown",
-        "grand central",
-        "orbit",
-        "yen press",
-      ],
-    ],
-    [
-      "oxford university press",
-      ["oxford", "oup", "oxford univ press", "oxford university"],
-    ],
+    ["hachette", ["hachette book group", "little brown", "grand central", "orbit", "yen press"]],
+    ["oxford university press", ["oxford", "oup", "oxford univ press", "oxford university"]],
     [
       "cambridge university press",
       ["cambridge", "cup", "cambridge univ press", "cambridge university"],
     ],
-    [
-      "harvard university press",
-      ["harvard", "harvard univ press", "harvard university"],
-    ],
+    ["harvard university press", ["harvard", "harvard univ press", "harvard university"]],
     ["yale university press", ["yale", "yale univ press", "yale university"]],
-    [
-      "princeton university press",
-      ["princeton", "princeton univ press", "princeton university"],
-    ],
-    [
-      "university of chicago press",
-      ["chicago", "univ of chicago", "university chicago"],
-    ],
-    [
-      "mit press",
-      ["massachusetts institute of technology", "mit", "mass inst tech"],
-    ],
+    ["princeton university press", ["princeton", "princeton univ press", "princeton university"]],
+    ["university of chicago press", ["chicago", "univ of chicago", "university chicago"]],
+    ["mit press", ["massachusetts institute of technology", "mit", "mass inst tech"]],
     ["norton", ["w. w. norton", "ww norton", "norton & company"]],
     ["wiley", ["john wiley", "wiley & sons", "wiley-blackwell", "jossey-bass"]],
     ["springer", ["springer-verlag", "springer nature", "springer science"]],
     ["elsevier", ["elsevier science", "academic press", "morgan kaufmann"]],
-    [
-      "pearson",
-      [
-        "pearson education",
-        "addison-wesley",
-        "prentice hall",
-        "benjamin cummings",
-      ],
-    ],
-    [
-      "mcgraw-hill",
-      ["mcgraw hill", "mcgraw-hill education", "mcgraw hill education"],
-    ],
+    ["pearson", ["pearson education", "addison-wesley", "prentice hall", "benjamin cummings"]],
+    ["mcgraw-hill", ["mcgraw hill", "mcgraw-hill education", "mcgraw hill education"]],
     ["cengage", ["cengage learning", "thomson", "wadsworth", "brooks/cole"]],
     ["sage", ["sage publications", "sage publishing"]],
     ["routledge", ["taylor & francis", "taylor and francis", "crc press"]],
     ["bloomsbury", ["bloomsbury publishing", "bloomsbury academic"]],
-    [
-      "scholastic",
-      ["scholastic inc", "scholastic press", "scholastic corporation"],
-    ],
+    ["scholastic", ["scholastic inc", "scholastic press", "scholastic corporation"]],
   ]);
 
   /**
@@ -188,18 +123,13 @@ export class PublisherReconciler {
     }
 
     const normalized = this.normalizePublisherName(input);
-    return {
-      name: input,
-      normalized,
-    };
+    return { name: input, normalized };
   }
 
   /**
    * Reconcile multiple publishers using deduplication and conflict resolution
    */
-  reconcilePublishers(
-    inputs: PublicationInfoInput[],
-  ): ReconciledField<Publisher> {
+  reconcilePublishers(inputs: PublicationInfoInput[]): ReconciledField<Publisher> {
     if (inputs.length === 0) {
       throw new Error("No publishers to reconcile");
     }
@@ -209,9 +139,7 @@ export class PublisherReconciler {
       .filter((input) => {
         if (!input.publisher) return false;
         const publisherStr =
-          typeof input.publisher === "string"
-            ? input.publisher
-            : input.publisher.name;
+          typeof input.publisher === "string" ? input.publisher : input.publisher.name;
         return publisherStr && publisherStr.trim() !== "";
       })
       .map((input) => ({
@@ -227,10 +155,7 @@ export class PublisherReconciler {
       const publisher = normalizedPublishers[0];
       return {
         value: publisher.publisher,
-        confidence: this.calculatePublisherConfidence(
-          publisher.publisher,
-          publisher.source,
-        ),
+        confidence: this.calculatePublisherConfidence(publisher.publisher, publisher.source),
         sources: [publisher.source],
         reasoning: "Single valid publisher",
       };
@@ -239,8 +164,7 @@ export class PublisherReconciler {
     // Group by normalized name
     const publisherGroups = new Map<string, typeof normalizedPublishers>();
     for (const item of normalizedPublishers) {
-      const key =
-        item.publisher.normalized || item.publisher.name.toLowerCase();
+      const key = item.publisher.normalized || item.publisher.name.toLowerCase();
       if (!publisherGroups.has(key)) {
         publisherGroups.set(key, []);
       }
@@ -254,10 +178,7 @@ export class PublisherReconciler {
         field: "publisher",
         values: Array.from(publisherGroups.values())
           .flat()
-          .map((item) => ({
-            value: item.publisher,
-            source: item.source,
-          })),
+          .map((item) => ({ value: item.publisher, source: item.source })),
         resolution: "Selected publisher from most reliable source",
       });
     }
@@ -321,8 +242,7 @@ export class PublisherReconciler {
       if (
         variations.some(
           (variation) =>
-            normalized.includes(variation) ||
-            this.calculateSimilarity(normalized, variation) > 0.8,
+            normalized.includes(variation) || this.calculateSimilarity(normalized, variation) > 0.8,
         )
       ) {
         return canonical;
@@ -367,10 +287,7 @@ export class PublisherReconciler {
   /**
    * Calculate confidence score for a publisher
    */
-  private calculatePublisherConfidence(
-    publisher: Publisher,
-    source: MetadataSource,
-  ): number {
+  private calculatePublisherConfidence(publisher: Publisher, source: MetadataSource): number {
     let confidence = source.reliability;
 
     // Adjust based on publisher name quality
@@ -378,19 +295,13 @@ export class PublisherReconciler {
       confidence *= 0.1;
     } else if (publisher.name.trim().length < 3) {
       confidence *= 0.5;
-    } else if (
-      publisher.normalized &&
-      publisher.normalized !== publisher.name.toLowerCase()
-    ) {
+    } else if (publisher.normalized && publisher.normalized !== publisher.name.toLowerCase()) {
       // Publisher was successfully normalized to a known publisher
       confidence *= 1.1;
     }
 
     // Boost confidence for well-known publishers
-    if (
-      publisher.normalized &&
-      this.publisherVariations.has(publisher.normalized)
-    ) {
+    if (publisher.normalized && this.publisherVariations.has(publisher.normalized)) {
       confidence *= 1.2;
     }
 

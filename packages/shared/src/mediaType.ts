@@ -5,16 +5,16 @@
  * @see https://github.com/hapijs/accept/blob/master/lib/media.js
  */
 export function resolveAcceptedMediaTypes(request: Request): MediaType[] {
-  const raw = request.headers.get('accept');
+  const raw = request.headers.get("accept");
 
   if (!raw) {
-    return ['*/*'];
+    return ["*/*"];
   }
 
   const { header, quoted } = normalize(raw);
 
   // Parse selections
-  const parts = header.split(',');
+  const parts = header.split(",");
   const selections = [];
 
   for (let i = 0; i < parts.length; ++i) {
@@ -26,7 +26,7 @@ export function resolveAcceptedMediaTypes(request: Request): MediaType[] {
     }
 
     // Parse parameters
-    const pairs = part.split(';');
+    const pairs = part.split(";");
     const token = pairs.shift()!.toLowerCase();
 
     // Ignore invalid types
@@ -50,20 +50,16 @@ export function resolveAcceptedMediaTypes(request: Request): MediaType[] {
       let value: string | number | undefined;
 
       // eslint-disable-next-line prefer-const
-      [key, value] = pair.split('=', 2);
+      [key, value] = pair.split("=", 2);
 
-      if (typeof value === 'undefined') {
+      if (typeof value === "undefined") {
         continue;
       }
 
-      if (key.toLowerCase() === 'q') {
+      if (key.toLowerCase() === "q") {
         value = Number(value);
 
-        if (
-          !Number.isFinite(value) ||
-          value > 1 ||
-          (value < 0.001 && value !== 0)
-        ) {
+        if (!Number.isFinite(value) || value > 1 || (value < 0.001 && value !== 0)) {
           value = 1;
         }
 
@@ -85,7 +81,7 @@ export function resolveAcceptedMediaTypes(request: Request): MediaType[] {
       selection.weight = 1;
     }
 
-    const [type, subType] = selection.token.split('/', 2);
+    const [type, subType] = selection.token.split("/", 2);
     selection.type = type;
     selection.subType = subType;
 
@@ -109,12 +105,12 @@ function sort(a: Selection, b: Selection) {
 
   // Sort by type
   if (a.type !== b.type) {
-    return innerSort(a, b, 'type');
+    return innerSort(a, b, "type");
   }
 
   // Sort by subtype
   if (a.subType !== b.subType) {
-    return innerSort(a, b, 'subType');
+    return innerSort(a, b, "subType");
   }
 
   // Sort by specificity
@@ -125,29 +121,25 @@ function sort(a: Selection, b: Selection) {
   return a.position - b.position;
 }
 
-function innerSort(
-  a: Selection,
-  b: Selection,
-  key: keyof Selection & ('type' | 'subType'),
-) {
+function innerSort(a: Selection, b: Selection, key: keyof Selection & ("type" | "subType")) {
   const aValue = a[key];
   const bValue = b[key];
 
-  if (a[key] === '*') {
+  if (a[key] === "*") {
     return 1;
   }
 
-  if (b[key] === '*') {
+  if (b[key] === "*") {
     return -1;
   }
 
   // Group alphabetically
-  return aValue?.localeCompare(bValue ?? '') ?? 0;
+  return aValue?.localeCompare(bValue ?? "") ?? 0;
 }
 
 function normalize(header: string) {
   const quoted: Record<string, string> = {};
-  header = header || '*/*';
+  header = header || "*/*";
 
   if (header.includes('"')) {
     let i = 0;
@@ -156,11 +148,11 @@ function normalize(header: string) {
       const key = '"' + ++i;
       quoted[key] = $1;
 
-      return '=' + key;
+      return "=" + key;
     });
   }
 
-  header = header.replace(/[ \t]/g, '');
+  header = header.replace(/[ \t]/g, "");
 
   return { header, quoted };
 }

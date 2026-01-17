@@ -1,3 +1,6 @@
+import type { Database } from "../../database.js";
+import { getSettingValue } from "../../settings/index.js";
+import { cleanIsbn } from "../utils/normalization.js";
 import {
   type CreatorQuery,
   type MetadataRecord,
@@ -8,9 +11,6 @@ import {
   type TitleQuery,
 } from "./provider.js";
 import { RetryableMetadataProvider } from "./retryable-provider.js";
-import type { Database } from "../../database.js";
-import { getSettingValue } from "../../settings/index.js";
-import { cleanIsbn } from "../utils/normalization.js";
 
 /**
  * ISBNdb API response interfaces
@@ -207,9 +207,7 @@ export class ISBNdbMetadataProvider extends RetryableMetadataProvider {
     // Filter results to only include books where the author name matches
     const filteredBooks = response.books.filter((book) => {
       if (!book.authors || book.authors.length === 0) return false;
-      return book.authors.some((author) =>
-        author.toLowerCase().includes(query.name.toLowerCase()),
-      );
+      return book.authors.some((author) => author.toLowerCase().includes(query.name.toLowerCase()));
     });
 
     return filteredBooks
@@ -226,9 +224,7 @@ export class ISBNdbMetadataProvider extends RetryableMetadataProvider {
   /**
    * Search using multiple criteria
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     // Strategy 1: ISBN search (most reliable)
     if (query.isbn) {
       return await this.searchByISBN(query.isbn);
@@ -259,18 +255,12 @@ export class ISBNdbMetadataProvider extends RetryableMetadataProvider {
 
     // Strategy 3: Title search
     if (query.title) {
-      return await this.searchByTitle({
-        title: query.title,
-        exactMatch: false,
-      });
+      return await this.searchByTitle({ title: query.title, exactMatch: false });
     }
 
     // Strategy 4: Author search
     if (query.authors && query.authors.length > 0) {
-      return await this.searchByCreator({
-        name: query.authors[0],
-        fuzzy: query.fuzzy || true,
-      });
+      return await this.searchByCreator({ name: query.authors[0], fuzzy: query.fuzzy || true });
     }
 
     return [];
@@ -298,16 +288,11 @@ export class ISBNdbMetadataProvider extends RetryableMetadataProvider {
   /**
    * Make an authenticated request to ISBNdb API
    */
-  private async apiRequest<T>(
-    endpoint: string,
-    operationName: string,
-  ): Promise<T | null> {
+  private async apiRequest<T>(endpoint: string, operationName: string): Promise<T | null> {
     const apiKey = await this.getApiKey();
 
     if (!apiKey) {
-      console.warn(
-        "ISBNdb API key not configured - skipping ISBNdb metadata lookup",
-      );
+      console.warn("ISBNdb API key not configured - skipping ISBNdb metadata lookup");
       return null;
     }
 
@@ -337,22 +322,17 @@ export class ISBNdbMetadataProvider extends RetryableMetadataProvider {
       // Handle 429 - rate limited
       if (response.status === 429) {
         const retryAfter = response.headers.get("Retry-After") || "60";
-        throw new Error(
-          `ISBNdb rate limit exceeded. Retry after ${retryAfter} seconds`,
-          { cause: { status: 429, retryAfter, response } },
-        );
+        throw new Error(`ISBNdb rate limit exceeded. Retry after ${retryAfter} seconds`, {
+          cause: { status: 429, retryAfter, response },
+        });
       }
 
       if (!response.ok) {
-        const errorBody = (await response
-          .json()
-          .catch(() => ({}))) as ISBNdbErrorResponse;
-        const errorMessage =
-          errorBody.errorMessage || errorBody.message || response.statusText;
-        throw new Error(
-          `ISBNdb API error: ${response.status} - ${errorMessage}`,
-          { cause: { status: response.status, response, errorBody } },
-        );
+        const errorBody = (await response.json().catch(() => ({}))) as ISBNdbErrorResponse;
+        const errorMessage = errorBody.errorMessage || errorBody.message || response.statusText;
+        throw new Error(`ISBNdb API error: ${response.status} - ${errorMessage}`, {
+          cause: { status: response.status, response, errorBody },
+        });
       }
 
       return (await response.json()) as T;
@@ -364,12 +344,9 @@ export class ISBNdbMetadataProvider extends RetryableMetadataProvider {
    */
   private mapISBNdbBookToMetadata(
     book: ISBNdbBook,
-  ): Partial<
-    Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">
-  > {
-    const metadata: Partial<
-      Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">
-    > = {};
+  ): Partial<Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">> {
+    const metadata: Partial<Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">> =
+      {};
 
     // Title - prefer long title if available
     if (book.title_long) {
@@ -432,9 +409,7 @@ export class ISBNdbMetadataProvider extends RetryableMetadataProvider {
     }
 
     // Physical dimensions
-    const dimensions = book.dimensions
-      ? this.parseDimensions(book.dimensions)
-      : undefined;
+    const dimensions = book.dimensions ? this.parseDimensions(book.dimensions) : undefined;
 
     if (dimensions) {
       metadata.physicalDimensions = dimensions;
@@ -442,17 +417,11 @@ export class ISBNdbMetadataProvider extends RetryableMetadataProvider {
 
     // Cover image
     if (book.image) {
-      metadata.coverImage = {
-        url: book.image,
-      };
+      metadata.coverImage = { url: book.image };
     }
 
     // Store provider-specific data
-    metadata.providerData = {
-      msrp: book.msrp,
-      binding: book.binding,
-      edition: book.edition,
-    };
+    metadata.providerData = { msrp: book.msrp, binding: book.binding, edition: book.edition };
 
     return metadata;
   }
@@ -487,13 +456,9 @@ export class ISBNdbMetadataProvider extends RetryableMetadataProvider {
    * Parse dimensions string to structured format
    * Format: "Height x Width x Depth" (e.g., "9.0 x 6.0 x 1.0")
    */
-  private parseDimensions(
-    dimensions: string,
-  ): MetadataRecord["physicalDimensions"] | undefined {
+  private parseDimensions(dimensions: string): MetadataRecord["physicalDimensions"] | undefined {
     try {
-      const parts = dimensions
-        .split("x")
-        .map((part) => parseFloat(part.trim()));
+      const parts = dimensions.split("x").map((part) => parseFloat(part.trim()));
 
       if (parts.length >= 2 && parts.every((part) => !isNaN(part))) {
         return {
@@ -542,11 +507,7 @@ export class ISBNdbMetadataProvider extends RetryableMetadataProvider {
 
     const checkField = (field: any) => {
       fieldCount++;
-      if (
-        field &&
-        (typeof field !== "object" ||
-          (Array.isArray(field) && field.length > 0))
-      ) {
+      if (field && (typeof field !== "object" || (Array.isArray(field) && field.length > 0))) {
         filledFields++;
       }
     };

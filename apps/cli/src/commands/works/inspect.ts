@@ -19,9 +19,7 @@ export default class Inspect extends BaseCommand<typeof Inspect> {
     }),
   };
   static override description = "Inspect an ebook file";
-  static override examples = [
-    "<%= config.bin %> <%= command.id %> some-file.epub",
-  ];
+  static override examples = ["<%= config.bin %> <%= command.id %> some-file.epub"];
 
   public async run() {
     const { file: path } = this.args;
@@ -40,9 +38,7 @@ export default class Inspect extends BaseCommand<typeof Inspect> {
               value:
                 metadata.contributors
                   ?.map(({ name, roles }) => {
-                    const roleLabels = roles
-                      ?.map((role) => relatorLabels[role] ?? role)
-                      .join(", ");
+                    const roleLabels = roles?.map((role) => relatorLabels[role] ?? role).join(", ");
 
                     return `${name} (${roleLabels})`;
                   })
@@ -52,50 +48,30 @@ export default class Inspect extends BaseCommand<typeof Inspect> {
             divider,
             {
               key: "Tags",
-              value:
-                metadata.tags
-                  ?.map((tag) => bgBlueBright(` ${tag} `))
-                  ?.join(" ") || undefined,
+              value: metadata.tags?.map((tag) => bgBlueBright(` ${tag} `))?.join(" ") || undefined,
             },
             { key: "Language", value: metadata.language },
-            {
-              key: "Number of Pages",
-              value: metadata.numberOfPages?.toString(),
-            },
-            {
-              key: "Legal Information",
-              value: metadata.legalInformation,
-            },
+            { key: "Number of Pages", value: metadata.numberOfPages?.toString() },
+            { key: "Legal Information", value: metadata.legalInformation },
             {
               key: "Date Created",
-              value: metadata.dateCreated?.toLocaleString(
-                this.flags.displayLocale,
-              ),
+              value: metadata.dateCreated?.toLocaleString(this.flags.displayLocale),
             },
             {
               key: "Date Modified",
-              value: metadata.dateModified?.toLocaleString(
-                this.flags.displayLocale,
-              ),
+              value: metadata.dateModified?.toLocaleString(this.flags.displayLocale),
             },
             {
               key: "Date Published",
-              value: metadata.datePublished?.toLocaleString(
-                this.flags.displayLocale,
-              ),
+              value: metadata.datePublished?.toLocaleString(this.flags.displayLocale),
             },
             {
               key: "Identifiers",
-              value: metadata.identifiers
-                ?.map(({ type, value }) => `${type}:${value}`)
-                .join(", "),
+              value: metadata.identifiers?.map(({ type, value }) => `${type}:${value}`).join(", "),
             },
             { key: "Page Progression", value: metadata.pageProgression },
             divider,
-            {
-              key: "File Name",
-              value: hyperlink(new URL(`file://${path}`), file.name),
-            },
+            { key: "File Name", value: hyperlink(new URL(`file://${path}`), file.name) },
             { key: "File Size", value: humanReadableFileSize(file.size) },
             {
               key: "Checksum",
@@ -108,31 +84,18 @@ export default class Inspect extends BaseCommand<typeof Inspect> {
             ...(this.flags.verbose
               ? ([
                   divider,
-                  ...Object.entries(metadata.properties ?? {}).map(
-                    ([key, value]) => ({
-                      key: `Extra Property: ${key}`,
-                      value:
-                        typeof value === "string"
-                          ? value
-                          : JSON.stringify(value),
-                    }),
-                  ),
+                  ...Object.entries(metadata.properties ?? {}).map(([key, value]) => ({
+                    key: `Extra Property: ${key}`,
+                    value: typeof value === "string" ? value : JSON.stringify(value),
+                  })),
                 ] as const)
               : []),
           ],
           [
-            {
-              format: (value?: string) => dim(value),
-              justify: "end",
-              name: "key",
-              wrap: false,
-            },
+            { format: (value?: string) => dim(value), justify: "end", name: "key", wrap: false },
             { justify: "start", name: "value" },
           ],
-          {
-            displayHeader: false,
-            theme: invisibleTheme,
-          },
+          { displayHeader: false, theme: invisibleTheme },
         ),
       );
     }

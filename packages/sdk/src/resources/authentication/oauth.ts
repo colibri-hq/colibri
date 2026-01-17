@@ -1,8 +1,8 @@
-import type { Database, Schema } from "../../database.js";
+import type { PkceCodeChallengeMethod } from "@colibri-hq/oauth";
+import { generateRandomBytes, generateRandomString } from "@colibri-hq/shared";
 import { isoBase64URL } from "@simplewebauthn/server/helpers";
 import { type Insertable } from "kysely";
-import { generateRandomBytes, generateRandomString } from "@colibri-hq/shared";
-import type { PkceCodeChallengeMethod } from "@colibri-hq/oauth";
+import type { Database, Schema } from "../../database.js";
 
 // region Authorization Codes
 export function storeAuthorizationCode(
@@ -70,10 +70,7 @@ export function storeAuthorizationRequest(
     .executeTakeFirstOrThrow();
 }
 
-export function loadAuthorizationRequest(
-  database: Database,
-  identifier: string,
-) {
+export function loadAuthorizationRequest(database: Database, identifier: string) {
   return database
     .updateTable("authentication.authorization_request")
     .set({ used_at: new Date() })
@@ -102,12 +99,7 @@ export async function createClient(
     if (scopes && scopes.length > 0) {
       await trx
         .insertInto("authentication.client_scope")
-        .values(
-          scopes.map((scope) => ({
-            scope_id: scope,
-            client_id: client.id,
-          })),
-        )
+        .values(scopes.map((scope) => ({ scope_id: scope, client_id: client.id })))
         .execute();
     }
 
@@ -164,11 +156,7 @@ export function loadClientWithScopes(database: Database, id: string) {
     .executeTakeFirstOrThrow();
 }
 
-export function loadUserConsent(
-  database: Database,
-  clientId: string,
-  userId: string,
-) {
+export function loadUserConsent(database: Database, clientId: string, userId: string) {
   return database
     .selectFrom("authentication.user_consent")
     .where("authentication.user_consent.client_id", "=", clientId)
@@ -231,9 +219,7 @@ export function createAccessToken(
   scopes: string[],
   ttl: number,
 ) {
-  const token = isoBase64URL.fromBuffer(
-    crypto.getRandomValues(new Uint8Array(24)),
-  );
+  const token = isoBase64URL.fromBuffer(crypto.getRandomValues(new Uint8Array(24)));
   const expiration = new Date();
   expiration.setSeconds(expiration.getSeconds() + ttl);
 
@@ -275,9 +261,7 @@ export function createRefreshToken(
   scopes: string[],
   ttl: number,
 ) {
-  const token = isoBase64URL.fromBuffer(
-    crypto.getRandomValues(new Uint8Array(24)),
-  );
+  const token = isoBase64URL.fromBuffer(crypto.getRandomValues(new Uint8Array(24)));
   const expiration = new Date();
   expiration.setSeconds(expiration.getSeconds() + ttl);
 
@@ -306,22 +290,14 @@ export async function revokeAccessTokenOrRefreshToken(
   clientId: string,
   token: string,
 ) {
-  const { numUpdatedRows } = await revokeRefreshToken(
-    database,
-    clientId,
-    token,
-  );
+  const { numUpdatedRows } = await revokeRefreshToken(database, clientId, token);
 
   if (Number(numUpdatedRows) === 0) {
     return revokeAccessToken(database, clientId, token);
   }
 }
 
-export function revokeAccessToken(
-  database: Database,
-  clientId: string,
-  token: string,
-) {
+export function revokeAccessToken(database: Database, clientId: string, token: string) {
   return database
     .updateTable("authentication.access_token")
     .set("revoked_at", new Date())
@@ -332,11 +308,7 @@ export function revokeAccessToken(
     .executeTakeFirst();
 }
 
-export function revokeRefreshToken(
-  database: Database,
-  clientId: string,
-  token: string,
-) {
+export function revokeRefreshToken(database: Database, clientId: string, token: string) {
   return database
     .updateTable("authentication.refresh_token")
     .set("revoked_at", new Date())
@@ -384,9 +356,7 @@ export function createDeviceChallenge(
   ttl = 1800,
 ) {
   const expiresAt = new Date(new Date().getTime() + Number(ttl) * 1000);
-  const deviceCode = isoBase64URL.fromBuffer(
-    crypto.getRandomValues(new Uint8Array(24)),
-  );
+  const deviceCode = isoBase64URL.fromBuffer(crypto.getRandomValues(new Uint8Array(24)));
 
   // Generate a random string without using vowels, to avoid casual cussing
   const userCode = generateRandomString(6, "bcdfghjklmnpqrstvwxz");
@@ -400,11 +370,7 @@ export function createDeviceChallenge(
   });
 }
 
-export function loadDeviceChallenge(
-  database: Database,
-  clientId: string,
-  deviceCode: string,
-) {
+export function loadDeviceChallenge(database: Database, clientId: string, deviceCode: string) {
   return database
     .selectFrom("authentication.device_challenge")
     .selectAll()
@@ -413,10 +379,7 @@ export function loadDeviceChallenge(
     .executeTakeFirstOrThrow();
 }
 
-export function loadDeviceChallengeByUserCode(
-  database: Database,
-  userCode: string,
-) {
+export function loadDeviceChallengeByUserCode(database: Database, userCode: string) {
   return database
     .selectFrom("authentication.device_challenge")
     .selectAll()
@@ -427,11 +390,7 @@ export function loadDeviceChallengeByUserCode(
     .executeTakeFirstOrThrow();
 }
 
-export function pollDeviceChallenge(
-  database: Database,
-  clientId: string,
-  deviceCode: string,
-) {
+export function pollDeviceChallenge(database: Database, clientId: string, deviceCode: string) {
   return database
     .updateTable("authentication.device_challenge")
     .set("last_poll_at", new Date())
@@ -455,11 +414,7 @@ export function pollDeviceChallenge(
     .executeTakeFirstOrThrow();
 }
 
-export function invalidateDeviceChallenge(
-  database: Database,
-  id: string,
-  approved: boolean,
-) {
+export function invalidateDeviceChallenge(database: Database, id: string, approved: boolean) {
   return database
     .updateTable("authentication.device_challenge")
     .set({ approved })

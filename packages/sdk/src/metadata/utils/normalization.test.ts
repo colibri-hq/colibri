@@ -201,47 +201,31 @@ describe("Author Name Normalization", () => {
     });
 
     it("should remove diacritics", () => {
-      expect(normalizeAuthorName("Gabriel García Márquez")).toBe(
-        "gabriel garcia marquez",
-      );
+      expect(normalizeAuthorName("Gabriel García Márquez")).toBe("gabriel garcia marquez");
       expect(normalizeAuthorName("François Müller")).toBe("francois muller");
     });
 
     it("should remove titles", () => {
-      expect(normalizeAuthorName("Dr. Martin Luther King")).toBe(
-        "martin luther king",
-      );
-      expect(normalizeAuthorName("Prof. Stephen Hawking")).toBe(
-        "stephen hawking",
-      );
-      expect(normalizeAuthorName("Sir Arthur Conan Doyle")).toBe(
-        "arthur conan doyle",
-      );
+      expect(normalizeAuthorName("Dr. Martin Luther King")).toBe("martin luther king");
+      expect(normalizeAuthorName("Prof. Stephen Hawking")).toBe("stephen hawking");
+      expect(normalizeAuthorName("Sir Arthur Conan Doyle")).toBe("arthur conan doyle");
     });
 
     it("should remove suffixes", () => {
-      expect(normalizeAuthorName("Martin Luther King Jr.")).toBe(
-        "martin luther king",
-      );
+      expect(normalizeAuthorName("Martin Luther King Jr.")).toBe("martin luther king");
       expect(normalizeAuthorName("Robert Downey, Jr")).toBe("robert downey");
       expect(normalizeAuthorName("John Smith III")).toBe("john smith");
     });
 
     it("should remove life dates", () => {
-      expect(normalizeAuthorName("Tolkien, J.R.R., 1892-1973")).toBe(
-        "jrr tolkien",
-      );
-      expect(normalizeAuthorName("Shakespeare, William (1564-1616)")).toBe(
-        "william shakespeare",
-      );
+      expect(normalizeAuthorName("Tolkien, J.R.R., 1892-1973")).toBe("jrr tolkien");
+      expect(normalizeAuthorName("Shakespeare, William (1564-1616)")).toBe("william shakespeare");
     });
 
     it("should convert 'Last, First' to 'First Last'", () => {
       expect(normalizeAuthorName("Tolkien, J.R.R.")).toBe("jrr tolkien");
       expect(normalizeAuthorName("King, Stephen")).toBe("stephen king");
-      expect(normalizeAuthorName("García Márquez, Gabriel")).toBe(
-        "gabriel garcia marquez",
-      );
+      expect(normalizeAuthorName("García Márquez, Gabriel")).toBe("gabriel garcia marquez");
     });
 
     it("should handle empty input", () => {
@@ -294,18 +278,12 @@ describe("Author Name Normalization", () => {
 
   describe("formatAuthorName", () => {
     it("should format as 'First Last'", () => {
-      const result = formatAuthorName(
-        { firstName: "Stephen", lastName: "King" },
-        "first-last",
-      );
+      const result = formatAuthorName({ firstName: "Stephen", lastName: "King" }, "first-last");
       expect(result).toBe("Stephen King");
     });
 
     it("should format as 'Last, First'", () => {
-      const result = formatAuthorName(
-        { firstName: "Stephen", lastName: "King" },
-        "last-first",
-      );
+      const result = formatAuthorName({ firstName: "Stephen", lastName: "King" }, "last-first");
       expect(result).toBe("King, Stephen");
     });
 
@@ -379,12 +357,8 @@ describe("Publisher Normalization", () => {
 
     it("should remove corporate suffixes", () => {
       expect(normalizePublisher("Random House, Inc.")).toBe("random house");
-      expect(normalizePublisher("HarperCollins Publishers")).toBe(
-        "harpercollins",
-      );
-      expect(normalizePublisher("Simon & Schuster Ltd")).toBe(
-        "simon and schuster",
-      );
+      expect(normalizePublisher("HarperCollins Publishers")).toBe("harpercollins");
+      expect(normalizePublisher("Simon & Schuster Ltd")).toBe("simon and schuster");
     });
 
     it("should normalize ampersand to 'and'", () => {
@@ -405,12 +379,8 @@ describe("Publisher Normalization", () => {
 describe("DOI Normalization", () => {
   describe("normalizeDoi", () => {
     it("should remove doi.org URL prefix", () => {
-      expect(normalizeDoi("https://doi.org/10.1000/xyz123")).toBe(
-        "10.1000/xyz123",
-      );
-      expect(normalizeDoi("http://doi.org/10.1000/xyz123")).toBe(
-        "10.1000/xyz123",
-      );
+      expect(normalizeDoi("https://doi.org/10.1000/xyz123")).toBe("10.1000/xyz123");
+      expect(normalizeDoi("http://doi.org/10.1000/xyz123")).toBe("10.1000/xyz123");
     });
 
     it("should return clean DOI as-is", () => {

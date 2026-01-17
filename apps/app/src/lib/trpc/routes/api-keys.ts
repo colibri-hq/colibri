@@ -43,15 +43,10 @@ export const apiKeys = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { apiKey, plainTextKey } = await createApiKey(
-        ctx.database,
-        ctx.userId,
-        input.name,
-        {
-          scopes: input.scopes as ApiKeyScope[] | undefined,
-          expiresAt: input.expiresAt,
-        },
-      );
+      const { apiKey, plainTextKey } = await createApiKey(ctx.database, ctx.userId, input.name, {
+        scopes: input.scopes as ApiKeyScope[] | undefined,
+        expiresAt: input.expiresAt,
+      });
 
       return {
         id: apiKey.id.toString(),
@@ -82,11 +77,7 @@ export const apiKeys = t.router({
   rotate: procedure()
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
-      const { apiKey, plainTextKey } = await rotateApiKey(
-        ctx.database,
-        input,
-        ctx.userId,
-      );
+      const { apiKey, plainTextKey } = await rotateApiKey(ctx.database, input, ctx.userId);
 
       return {
         id: apiKey.id.toString(),

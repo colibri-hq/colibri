@@ -10,9 +10,7 @@ describe("Special Endpoints", () => {
       expect(response.status).toBe(200);
       // Content type should be text/plain (but may vary by environment)
       const contentType = response.headers.get("content-type") ?? "";
-      expect(
-        contentType.includes("text/plain") || contentType.includes("text/html"),
-      ).toBe(true);
+      expect(contentType.includes("text/plain") || contentType.includes("text/html")).toBe(true);
 
       const body = await response.text();
       expect(body).toContain("User-agent:");
@@ -63,8 +61,7 @@ describe("Special Endpoints", () => {
       expect(response.status).toBe(200);
       const contentType = response.headers.get("content-type");
       expect(
-        contentType?.includes("application/xml") ||
-          contentType?.includes("application/rss+xml"),
+        contentType?.includes("application/xml") || contentType?.includes("application/rss+xml"),
       ).toBe(true);
 
       const body = await response.text();

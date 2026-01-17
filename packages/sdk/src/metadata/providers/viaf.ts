@@ -43,51 +43,29 @@ type Fetch = typeof globalThis.fetch;
 interface VIAFSearchResponse {
   searchRetrieveResponse?: {
     numberOfRecords?: string;
-    records?: Array<{
-      record: {
-        recordData: VIAFRecord;
-      };
-    }>;
+    records?: Array<{ record: { recordData: VIAFRecord } }>;
   };
 }
 
 interface VIAFRecord {
   viafID?: string;
   nameType?: string;
-  mainHeadings?: {
-    data?: VIAFHeading[];
-  };
+  mainHeadings?: { data?: VIAFHeading[] };
   birthDate?: string;
   deathDate?: string;
-  titles?: {
-    work?: VIAFWork[];
-  };
-  sources?: {
-    source?: Array<{
-      "@nsid"?: string;
-      "#text"?: string;
-    }>;
-  };
-  xLinks?: {
-    xLink?: Array<{
-      "@type"?: string;
-      "#text"?: string;
-    }>;
-  };
+  titles?: { work?: VIAFWork[] };
+  sources?: { source?: Array<{ "@nsid"?: string; "#text"?: string }> };
+  xLinks?: { xLink?: Array<{ "@type"?: string; "#text"?: string }> };
 }
 
 interface VIAFHeading {
   text?: string;
-  sources?: {
-    s?: string | string[];
-  };
+  sources?: { s?: string | string[] };
 }
 
 interface VIAFWork {
   title?: string;
-  sources?: {
-    s?: string | string[];
-  };
+  sources?: { s?: string | string[] };
 }
 
 /**
@@ -221,9 +199,7 @@ export class VIAFMetadataProvider extends RetryableMetadataProvider {
   /**
    * Search using multiple criteria
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     return this.executeWithRetry(async () => {
       const cqlParts: string[] = [];
 
@@ -276,16 +252,11 @@ export class VIAFMetadataProvider extends RetryableMetadataProvider {
     const url = `${this.sruEndpoint}?${params.toString()}`;
 
     const response = await this.#fetch(url, {
-      headers: {
-        Accept: "application/json",
-        "User-Agent": this.userAgent,
-      },
+      headers: { Accept: "application/json", "User-Agent": this.userAgent },
     });
 
     if (!response.ok) {
-      throw new Error(
-        `VIAF API error: ${response.status} ${response.statusText}`,
-      );
+      throw new Error(`VIAF API error: ${response.status} ${response.statusText}`);
     }
 
     const data = (await response.json()) as VIAFSearchResponse;
@@ -311,12 +282,9 @@ export class VIAFMetadataProvider extends RetryableMetadataProvider {
    */
   #mapVIAFRecordToMetadata(
     result: VIAFRecord,
-  ): Partial<
-    Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">
-  > {
-    const metadata: Partial<
-      Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">
-    > = {};
+  ): Partial<Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">> {
+    const metadata: Partial<Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">> =
+      {};
 
     // Extract main name heading
     const mainHeading = result.mainHeadings?.data?.[0];

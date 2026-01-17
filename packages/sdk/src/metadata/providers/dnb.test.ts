@@ -69,14 +69,9 @@ describe("DNBMetadataProvider", () => {
 
   describe("searchByTitle", () => {
     it("should search by title and parse MARC21 response", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => sampleMarcResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => sampleMarcResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Die Vermessung der Welt",
-      });
+      const results = await provider.searchByTitle({ title: "Die Vermessung der Welt" });
 
       expect(mockFetch).toHaveBeenCalled();
       expect(results.length).toBeGreaterThan(0);
@@ -91,28 +86,17 @@ describe("DNBMetadataProvider", () => {
     });
 
     it("should return empty array when no results", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => emptyResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => emptyResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Nonexistent Book",
-      });
+      const results = await provider.searchByTitle({ title: "Nonexistent Book" });
 
       expect(results).toEqual([]);
     });
 
     it("should handle exact match searches", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => sampleMarcResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => sampleMarcResponse });
 
-      await provider.searchByTitle({
-        title: "Die Vermessung der Welt",
-        exactMatch: true,
-      });
+      await provider.searchByTitle({ title: "Die Vermessung der Welt", exactMatch: true });
 
       const call = mockFetch.mock.calls[0];
       // URL-encoded: tit="..." becomes tit%3D%22...%22
@@ -122,10 +106,7 @@ describe("DNBMetadataProvider", () => {
 
   describe("searchByISBN", () => {
     it("should search by ISBN", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => sampleMarcResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => sampleMarcResponse });
 
       const results = await provider.searchByISBN("978-3-446-27486-0");
 
@@ -139,10 +120,7 @@ describe("DNBMetadataProvider", () => {
     });
 
     it("should clean ISBN before searching", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => sampleMarcResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => sampleMarcResponse });
 
       await provider.searchByISBN("978-3-446-27486-0");
 
@@ -155,14 +133,9 @@ describe("DNBMetadataProvider", () => {
 
   describe("searchByCreator", () => {
     it("should search by author name", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => sampleMarcResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => sampleMarcResponse });
 
-      const results = await provider.searchByCreator({
-        name: "Kehlmann, Daniel",
-      });
+      const results = await provider.searchByCreator({ name: "Kehlmann, Daniel" });
 
       expect(mockFetch).toHaveBeenCalled();
       expect(results.length).toBeGreaterThan(0);
@@ -170,15 +143,9 @@ describe("DNBMetadataProvider", () => {
     });
 
     it("should handle fuzzy author searches", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => sampleMarcResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => sampleMarcResponse });
 
-      await provider.searchByCreator({
-        name: "Kehlmann",
-        fuzzy: true,
-      });
+      await provider.searchByCreator({ name: "Kehlmann", fuzzy: true });
 
       const call = mockFetch.mock.calls[0];
       // URL-encoded: spaces become +
@@ -188,10 +155,7 @@ describe("DNBMetadataProvider", () => {
 
   describe("searchMultiCriteria", () => {
     it("should prioritize ISBN when available", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => sampleMarcResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => sampleMarcResponse });
 
       await provider.searchMultiCriteria({
         title: "Die Vermessung der Welt",
@@ -205,10 +169,7 @@ describe("DNBMetadataProvider", () => {
     });
 
     it("should combine title and author", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => sampleMarcResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => sampleMarcResponse });
 
       await provider.searchMultiCriteria({
         title: "Die Vermessung der Welt",
@@ -229,14 +190,9 @@ describe("DNBMetadataProvider", () => {
 
   describe("MARC21 Parsing", () => {
     it("should extract GND IDs from author fields when present", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => sampleMarcResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => sampleMarcResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       const record = results[0];
       // GND IDs should be stored in providerData if extracted
@@ -249,28 +205,18 @@ describe("DNBMetadataProvider", () => {
     });
 
     it("should extract DDC classification", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => sampleMarcResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => sampleMarcResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       const record = results[0];
       expect(record.providerData?.ddcClassification).toBe("833.914");
     });
 
     it("should extract subjects", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => sampleMarcResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => sampleMarcResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       const record = results[0];
       expect(record.subjects).toContain("Humboldt, Alexander von");
@@ -280,14 +226,9 @@ describe("DNBMetadataProvider", () => {
 
   describe("Language Code Normalization", () => {
     it("should normalize ISO 639-2/B codes to ISO 639-1", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => sampleMarcResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => sampleMarcResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results[0].language).toBe("de");
     });
@@ -295,20 +236,12 @@ describe("DNBMetadataProvider", () => {
     it("should handle English language code", async () => {
       // Replace both the 041 subfield AND the language in 008 control field
       const englishResponse = sampleMarcResponse
-        .replace(
-          '<subfield code="a">ger</subfield>',
-          '<subfield code="a">eng</subfield>',
-        )
+        .replace('<subfield code="a">ger</subfield>', '<subfield code="a">eng</subfield>')
         .replace("ger d</controlfield>", "eng d</controlfield>");
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => englishResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => englishResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results[0].language).toBe("en");
     });
@@ -316,15 +249,9 @@ describe("DNBMetadataProvider", () => {
 
   describe("Error Handling", () => {
     it("should handle HTTP errors gracefully", async () => {
-      mockFetch.mockResolvedValue({
-        ok: false,
-        status: 500,
-        statusText: "Internal Server Error",
-      });
+      mockFetch.mockResolvedValue({ ok: false, status: 500, statusText: "Internal Server Error" });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results).toEqual([]);
     }, 30000);
@@ -333,28 +260,18 @@ describe("DNBMetadataProvider", () => {
       mockFetch
         .mockRejectedValueOnce(new Error("Network error"))
         .mockRejectedValueOnce(new Error("Network error"))
-        .mockResolvedValue({
-          ok: true,
-          text: async () => sampleMarcResponse,
-        });
+        .mockResolvedValue({ ok: true, text: async () => sampleMarcResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results.length).toBeGreaterThan(0);
       expect(mockFetch).toHaveBeenCalledTimes(3);
     }, 30000);
 
     it("should handle malformed XML gracefully", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => "not valid xml",
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => "not valid xml" });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results).toEqual([]);
     });
@@ -362,24 +279,16 @@ describe("DNBMetadataProvider", () => {
 
   describe("Confidence Scoring", () => {
     it("should assign higher confidence for ISBN searches", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => sampleMarcResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => sampleMarcResponse });
 
       const results = await provider.searchByISBN("9783446274860");
       expect(results[0].confidence).toBeGreaterThanOrEqual(0.9);
     });
 
     it("should boost confidence for complete metadata", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        text: async () => sampleMarcResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, text: async () => sampleMarcResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       // Complete record should have higher confidence
       expect(results[0].confidence).toBeGreaterThanOrEqual(0.85);
@@ -409,9 +318,7 @@ describe("DNBMetadataProvider", () => {
       expect(provider.supportsDataType(MetadataType.TITLE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.AUTHORS)).toBe(true);
       expect(provider.supportsDataType(MetadataType.ISBN)).toBe(true);
-      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(
-        true,
-      );
+      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(true);
     });
 
     it("should not support cover images", () => {

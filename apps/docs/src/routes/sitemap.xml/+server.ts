@@ -30,9 +30,5 @@ export const GET: RequestHandler = ({ url }) => {
 ${urls}
 </urlset>`;
 
-  return new Response(sitemap, {
-    headers: {
-      "Content-Type": "application/xml",
-    },
-  });
-}
+  return new Response(sitemap, { headers: { "Content-Type": "application/xml" } });
+};

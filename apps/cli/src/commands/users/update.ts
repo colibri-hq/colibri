@@ -1,13 +1,5 @@
-import type {
-  AuthenticationColorScheme,
-  AuthenticationUserRole,
-} from "@colibri-hq/sdk/schema";
-import {
-  findUserByEmail,
-  findUserByIdentifier,
-  NoResultError,
-  updateUser,
-} from "@colibri-hq/sdk";
+import type { AuthenticationColorScheme, AuthenticationUserRole } from "@colibri-hq/sdk/schema";
+import { findUserByEmail, findUserByIdentifier, NoResultError, updateUser } from "@colibri-hq/sdk";
 import { Flags } from "@oclif/core";
 import { colorize } from "@oclif/core/ux";
 import { userIdentifier } from "../../args/user.ts";
@@ -15,12 +7,7 @@ import { BaseCommand } from "../../command.ts";
 import { date } from "../../flags/date.ts";
 
 const roleFlag = Flags.option({
-  options: [
-    "admin",
-    "adult",
-    "child",
-    "guest",
-  ] satisfies AuthenticationUserRole[],
+  options: ["admin", "adult", "child", "guest"] satisfies AuthenticationUserRole[],
 });
 
 const colorSchemeFlag = Flags.option({
@@ -37,8 +24,7 @@ export default class Update extends BaseCommand<typeof Update> {
   static description = "Update a user's information.";
   static examples = [
     {
-      command:
-        '<%= config.bin %> <%= command.id %> jane@doe.com --name "Jane Doe"',
+      command: '<%= config.bin %> <%= command.id %> jane@doe.com --name "Jane Doe"',
       description: "Update a user's name by email address:",
     },
     {
@@ -48,41 +34,29 @@ export default class Update extends BaseCommand<typeof Update> {
     {
       command:
         "<%= config.bin %> <%= command.id %> 42 --instance https://colibri.example.com --color-scheme dark",
-      description:
-        "Update a user's color scheme by ID from a specific Colibri instance:",
+      description: "Update a user's color scheme by ID from a specific Colibri instance:",
     },
   ];
   static flags = {
-    birthdate: date({
-      description: "Birthdate of the user.",
-      multiple: false,
-      required: false,
-    }),
+    birthdate: date({ description: "Birthdate of the user.", multiple: false, required: false }),
     colorScheme: colorSchemeFlag({
       description: "Color scheme preference of the user.",
       multiple: false,
       required: false,
     }),
-    name: Flags.string({
-      description: "Name of the user.",
-      required: false,
-    }),
+    name: Flags.string({ description: "Name of the user.", required: false }),
     role: roleFlag({
       char: "r",
       description: "Role of the user.",
       multiple: false,
       required: false,
     }),
-    verified: Flags.boolean({
-      description: "Whether the user is verified.",
-      required: false,
-    }),
+    verified: Flags.boolean({ description: "Whether the user is verified.", required: false }),
   };
 
   async run() {
     const { user } = this.args;
-    const { birthdate, colorScheme, name, role, verbose, verified } =
-      this.flags;
+    const { birthdate, colorScheme, name, role, verbose, verified } = this.flags;
     let account;
 
     try {
@@ -96,15 +70,10 @@ export default class Update extends BaseCommand<typeof Update> {
           this.logToStderr(`${error.name}: ${error.message}`);
         }
 
-        this.error(
-          `User not found: ${"email" in user ? user.email : user.id}`,
-          {
-            exit: 1,
-            suggestions: [
-              "Make sure you've entered the correct email address or ID.",
-            ],
-          },
-        );
+        this.error(`User not found: ${"email" in user ? user.email : user.id}`, {
+          exit: 1,
+          suggestions: ["Make sure you've entered the correct email address or ID."],
+        });
       }
 
       if (!(error instanceof Error)) {
@@ -114,10 +83,7 @@ export default class Update extends BaseCommand<typeof Update> {
       this.error("An error occurred while fetching the user.", {
         exit: 1,
         message: error.message,
-        suggestions: [
-          "Make sure the user exists.",
-          "Check your network connection.",
-        ],
+        suggestions: ["Make sure the user exists.", "Check your network connection."],
       });
     }
 
@@ -144,28 +110,22 @@ export default class Update extends BaseCommand<typeof Update> {
     }
 
     if (Object.keys(updateData).length === 0) {
-      this.error(
-        "No update data provided. Please specify at least one field to update.",
-        {
-          exit: 1,
-          suggestions: [
-            "Use --name to update the user's name",
-            "Use --role to update the user's role",
-            "Use --birthdate to update the user's birthdate",
-            "Use --color-scheme to update the user's color scheme preference",
-            "Use --verified to update the user's verification status",
-          ],
-        },
-      );
+      this.error("No update data provided. Please specify at least one field to update.", {
+        exit: 1,
+        suggestions: [
+          "Use --name to update the user's name",
+          "Use --role to update the user's role",
+          "Use --birthdate to update the user's birthdate",
+          "Use --color-scheme to update the user's color scheme preference",
+          "Use --verified to update the user's verification status",
+        ],
+      });
     }
 
     try {
       await updateUser(this.instance.database, account.id, updateData);
       this.logToStderr(
-        `User ${colorize(
-          "cyan",
-          account.name ?? account.email,
-        )} updated successfully.`,
+        `User ${colorize("cyan", account.name ?? account.email)} updated successfully.`,
       );
     } catch (error) {
       if (!(error instanceof Error)) {

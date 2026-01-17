@@ -5,6 +5,9 @@
  * and error cause chain preservation.
  */
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import { AuthorizationCodeClient } from "../../src/client/authorization-code.js";
+import { ClientCredentialsClient } from "../../src/client/client-credentials.js";
+import { DeviceAuthorizationClient } from "../../src/client/device-authorization.js";
 import {
   AbortError,
   AccessDeniedError,
@@ -20,9 +23,6 @@ import {
   StateMismatchError,
   TokenExpiredError,
 } from "../../src/client/errors.js";
-import { AuthorizationCodeClient } from "../../src/client/authorization-code.js";
-import { ClientCredentialsClient } from "../../src/client/client-credentials.js";
-import { DeviceAuthorizationClient } from "../../src/client/device-authorization.js";
 import {
   createMockTokenStore,
   mockMetadata,
@@ -62,9 +62,7 @@ describe("Extended Error Handling", () => {
 
     it("should handle connection timeout", async () => {
       const timeoutFetch = vi.fn().mockImplementation(async () => {
-        await new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Timeout")), 100),
-        );
+        await new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 100));
       });
 
       const client = new ClientCredentialsClient({
@@ -102,10 +100,7 @@ describe("Extended Error Handling", () => {
           return createJsonResponse(mockMetadata, 200);
         }
         return createJsonResponse(
-          {
-            error: "server_error",
-            error_description: "Internal server error",
-          },
+          { error: "server_error", error_description: "Internal server error" },
           500,
         );
       });
@@ -127,10 +122,7 @@ describe("Extended Error Handling", () => {
         if (urlString.includes("/.well-known/")) {
           return createJsonResponse(mockMetadata, 200);
         }
-        return new Response("Bad Gateway", {
-          status: 502,
-          statusText: "Bad Gateway",
-        });
+        return new Response("Bad Gateway", { status: 502, statusText: "Bad Gateway" });
       });
 
       const client = new ClientCredentialsClient({
@@ -175,10 +167,7 @@ describe("Extended Error Handling", () => {
           return createJsonResponse(mockMetadata, 200);
         }
         return createJsonResponse(
-          {
-            error: "slow_down",
-            error_description: "Rate limit exceeded",
-          },
+          { error: "slow_down", error_description: "Rate limit exceeded" },
           429,
           { "Retry-After": "30" },
         );
@@ -270,13 +259,7 @@ describe("Extended Error Handling", () => {
           return createJsonResponse(mockMetadata, 200);
         }
         // Missing access_token returns undefined which causes issues downstream
-        return createJsonResponse(
-          {
-            token_type: "Bearer",
-            expires_in: 3600,
-          },
-          200,
-        );
+        return createJsonResponse({ token_type: "Bearer", expires_in: 3600 }, 200);
       });
 
       const client = new ClientCredentialsClient({
@@ -460,19 +443,22 @@ describe("Extended Error Handling", () => {
           return createJsonResponse(mockMetadata, 200);
         }
         if (urlString.includes("/device")) {
-          return createJsonResponse({
-            device_code: "device_code",
-            user_code: "ABCD-EFGH",
-            verification_uri: "https://auth.example.com/device",
-            expires_in: 1800,
-            interval: 5,
-          }, 200);
+          return createJsonResponse(
+            {
+              device_code: "device_code",
+              user_code: "ABCD-EFGH",
+              verification_uri: "https://auth.example.com/device",
+              expires_in: 1800,
+              interval: 5,
+            },
+            200,
+          );
         }
         if (urlString.includes("/token")) {
-          return createJsonResponse({
-            error: "access_denied",
-            error_description: "The user denied the request",
-          }, 403);
+          return createJsonResponse(
+            { error: "access_denied", error_description: "The user denied the request" },
+            403,
+          );
         }
         return new Response("Not Found", { status: 404 });
       });
@@ -505,20 +491,26 @@ describe("Extended Error Handling", () => {
           return createJsonResponse(mockMetadata, 200);
         }
         if (urlString.includes("/device")) {
-          return createJsonResponse({
-            device_code: "device_code",
-            user_code: "ABCD-EFGH",
-            verification_uri: "https://auth.example.com/device",
-            expires_in: 1800,
-            interval: 5,
-          }, 200);
+          return createJsonResponse(
+            {
+              device_code: "device_code",
+              user_code: "ABCD-EFGH",
+              verification_uri: "https://auth.example.com/device",
+              expires_in: 1800,
+              interval: 5,
+            },
+            200,
+          );
         }
         if (urlString.includes("/token")) {
           pollCount++;
-          return createJsonResponse({
-            error: "authorization_pending",
-            error_description: "The user has not yet completed authorization",
-          }, 400);
+          return createJsonResponse(
+            {
+              error: "authorization_pending",
+              error_description: "The user has not yet completed authorization",
+            },
+            400,
+          );
         }
         return new Response("Not Found", { status: 404 });
       });
@@ -549,26 +541,26 @@ describe("Extended Error Handling", () => {
           return createJsonResponse(mockMetadata, 200);
         }
         if (urlString.includes("/device")) {
-          return createJsonResponse({
-            device_code: "device_code",
-            user_code: "ABCD-EFGH",
-            verification_uri: "https://auth.example.com/device",
-            expires_in: 1800,
-            interval: 5,
-          }, 200);
+          return createJsonResponse(
+            {
+              device_code: "device_code",
+              user_code: "ABCD-EFGH",
+              verification_uri: "https://auth.example.com/device",
+              expires_in: 1800,
+              interval: 5,
+            },
+            200,
+          );
         }
         if (urlString.includes("/token")) {
           callCount++;
           if (callCount <= 2) {
-            return createJsonResponse({
-              error: "slow_down",
-            }, 400);
+            return createJsonResponse({ error: "slow_down" }, 400);
           }
-          return createJsonResponse({
-            access_token: "token",
-            token_type: "Bearer",
-            expires_in: 3600,
-          }, 200);
+          return createJsonResponse(
+            { access_token: "token", token_type: "Bearer", expires_in: 3600 },
+            200,
+          );
         }
         return new Response("Not Found", { status: 404 });
       });
@@ -596,18 +588,19 @@ describe("Extended Error Handling", () => {
           return createJsonResponse(mockMetadata, 200);
         }
         if (urlString.includes("/device")) {
-          return createJsonResponse({
-            device_code: "device_code",
-            user_code: "ABCD-EFGH",
-            verification_uri: "https://auth.example.com/device",
-            expires_in: 1800,
-            interval: 5,
-          }, 200);
+          return createJsonResponse(
+            {
+              device_code: "device_code",
+              user_code: "ABCD-EFGH",
+              verification_uri: "https://auth.example.com/device",
+              expires_in: 1800,
+              interval: 5,
+            },
+            200,
+          );
         }
         if (urlString.includes("/token")) {
-          return createJsonResponse({
-            error: "authorization_pending",
-          }, 400);
+          return createJsonResponse({ error: "authorization_pending" }, 400);
         }
         return new Response("Not Found", { status: 404 });
       });
@@ -626,7 +619,8 @@ describe("Extended Error Handling", () => {
       setTimeout(() => abortController.abort(), 50);
 
       await expect(
-        client.pollForToken(device.device_code, 0.02, { // 20ms interval
+        client.pollForToken(device.device_code, 0.02, {
+          // 20ms interval
           signal: abortController.signal,
         }),
       ).rejects.toThrow(AbortError);
@@ -642,13 +636,16 @@ describe("Extended Error Handling", () => {
           return createJsonResponse(mockMetadata, 200);
         }
         if (urlString.includes("/device")) {
-          return createJsonResponse({
-            device_code: "device_code",
-            user_code: "ABCD-EFGH",
-            verification_uri: "https://auth.example.com/device",
-            expires_in: 1800,
-            interval: 5,
-          }, 200);
+          return createJsonResponse(
+            {
+              device_code: "device_code",
+              user_code: "ABCD-EFGH",
+              verification_uri: "https://auth.example.com/device",
+              expires_in: 1800,
+              interval: 5,
+            },
+            200,
+          );
         }
         return new Response("Not Found", { status: 404 });
       });
@@ -664,7 +661,8 @@ describe("Extended Error Handling", () => {
       const device = await client.requestDeviceAuthorization();
 
       await expect(
-        client.pollForToken(device.device_code, 0.01, { // 10ms interval
+        client.pollForToken(device.device_code, 0.01, {
+          // 10ms interval
           signal: abortController.signal,
         }),
       ).rejects.toThrow(AbortError);

@@ -21,11 +21,7 @@ export {
   type RetryConfig,
   DEFAULT_RETRY_CONFIG,
 } from "./retryable-provider.js";
-export {
-  CacheableMetadataProvider,
-  memoizeAsync,
-  BatchProcessor,
-} from "./cacheable-provider.js";
+export { CacheableMetadataProvider, memoizeAsync, BatchProcessor } from "./cacheable-provider.js";
 export { ConfigurableMetadataProvider } from "./configurable-provider.js";
 
 // External metadata providers
@@ -64,12 +60,7 @@ export {
 } from "./embedded-metadata-converter.js";
 
 // Cover image fetching
-export type {
-  CoverResult,
-  CoverSource,
-  CoverFetchOptions,
-  QualityAssessment,
-} from "./covers.js";
+export type { CoverResult, CoverSource, CoverFetchOptions, QualityAssessment } from "./covers.js";
 export {
   fetchCover,
   fetchCoverSizes,

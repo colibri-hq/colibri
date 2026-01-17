@@ -2,8 +2,8 @@
 
 @theme {
   --font-sans:
-    "Titillium Web", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    "Titillium Web", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 @source "../../../packages/ui/src/**/*.{js,ts,svelte}";

@@ -1,13 +1,10 @@
-import type { User } from "./user.js";
-import type { Database, Schema } from "../../database.js";
 import { type Insertable, type Selectable, type Updateable } from "kysely";
+import type { Database, Schema } from "../../database.js";
+import type { User } from "./user.js";
 
 const table = "authentication.authenticator" as const;
 
-export async function findAuthenticatorByIdentifier(
-  client: Database,
-  identifier: string,
-) {
+export async function findAuthenticatorByIdentifier(client: Database, identifier: string) {
   return await client
     .selectFrom(table)
     .selectAll()
@@ -15,10 +12,7 @@ export async function findAuthenticatorByIdentifier(
     .executeTakeFirstOrThrow();
 }
 
-export async function listAuthenticatorsForUser(
-  client: Database,
-  user: User | string,
-) {
+export async function listAuthenticatorsForUser(client: Database, user: User | string) {
   const userId = typeof user === "string" ? user : user.id;
 
   return await client
@@ -30,10 +24,7 @@ export async function listAuthenticatorsForUser(
     .execute();
 }
 
-export async function hasRegisteredAuthenticator(
-  client: Database,
-  user: User | string,
-) {
+export async function hasRegisteredAuthenticator(client: Database, user: User | string) {
   const userId = typeof user === "string" ? user : user.id;
   const { count } = await client
     .selectFrom(table)
@@ -56,22 +47,13 @@ export async function updateAuthenticator(
     .execute();
 }
 
-export async function removeAuthenticator(
-  client: Database,
-  identifier: string,
-) {
-  await client
-    .deleteFrom(table)
-    .where("identifier", "=", identifier)
-    .executeTakeFirstOrThrow();
+export async function removeAuthenticator(client: Database, identifier: string) {
+  await client.deleteFrom(table).where("identifier", "=", identifier).executeTakeFirstOrThrow();
 }
 
 export async function createAuthenticator(
   client: Database,
-  data: Omit<
-    Insertable<Schema["authentication.authenticator"]>,
-    "created_at" | "id"
-  >,
+  data: Omit<Insertable<Schema["authentication.authenticator"]>, "created_at" | "id">,
 ) {
   return await client.insertInto(table).values(data).executeTakeFirstOrThrow();
 }

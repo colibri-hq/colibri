@@ -11,31 +11,19 @@ import type { PDFDocumentProxy } from "@colibri-hq/pdf";
  * Source pointer for EPUB files.
  * Uses spine index for navigation and optional CFI for precise positioning.
  */
-export type EpubPointer = {
-  type: "epub";
-  spineIndex: number;
-  itemId: string;
-};
+export type EpubPointer = { type: "epub"; spineIndex: number; itemId: string };
 
 /**
  * Source pointer for MOBI files.
  * Uses record index and offset within the decompressed text.
  */
-export type MobiPointer = {
-  type: "mobi";
-  recordIndex: number;
-  offset: number;
-};
+export type MobiPointer = { type: "mobi"; recordIndex: number; offset: number };
 
 /**
  * Source pointer for PDF files.
  * Uses page number (1-indexed) and character offset.
  */
-export type PdfPointer = {
-  type: "pdf";
-  page: number;
-  offset: number;
-};
+export type PdfPointer = { type: "pdf"; page: number; offset: number };
 
 /**
  * Union type for all source pointer formats.
@@ -64,10 +52,7 @@ export interface ExtractOptions {
   minChunkWords?: number;
 }
 
-const DEFAULT_OPTIONS: Required<ExtractOptions> = {
-  maxChunkWords: 500,
-  minChunkWords: 3,
-};
+const DEFAULT_OPTIONS: Required<ExtractOptions> = { maxChunkWords: 500, minChunkWords: 3 };
 
 /**
  * Extract searchable text chunks from an ebook file.
@@ -120,11 +105,7 @@ function countWords(text: string): number {
 /**
  * Merge small paragraphs and split large ones to meet chunk size constraints.
  */
-function normalizeChunks(
-  paragraphs: string[],
-  maxWords: number,
-  minWords: number,
-): string[] {
+function normalizeChunks(paragraphs: string[], maxWords: number, minWords: number): string[] {
   const chunks: string[] = [];
   let buffer = "";
 
@@ -149,9 +130,7 @@ function normalizeChunks(
           }
           sentenceBuffer = sentence;
         } else {
-          sentenceBuffer = sentenceBuffer
-            ? sentenceBuffer + " " + sentence
-            : sentence;
+          sentenceBuffer = sentenceBuffer ? sentenceBuffer + " " + sentence : sentence;
         }
       }
       if (sentenceBuffer) {
@@ -201,11 +180,7 @@ async function extractEpubChunks(
       const item = spineItems[spineIndex];
 
       // Skip non-XHTML items
-      if (
-        item.mediaType &&
-        !item.mediaType.includes("xhtml") &&
-        !item.mediaType.includes("html")
-      ) {
+      if (item.mediaType && !item.mediaType.includes("xhtml") && !item.mediaType.includes("html")) {
         continue;
       }
 
@@ -221,11 +196,7 @@ async function extractEpubChunks(
         for (const content of normalizedChunks) {
           chunks.push({
             content,
-            sourcePointer: {
-              type: "epub",
-              spineIndex,
-              itemId: item.id,
-            },
+            sourcePointer: { type: "epub", spineIndex, itemId: item.id },
             chunkIndex: chunks.length,
           });
         }

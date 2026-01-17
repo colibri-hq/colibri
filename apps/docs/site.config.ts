@@ -11,9 +11,7 @@ export const siteConfig = {
   },
 
   // Social media links
-  social: {
-    github: "https://github.com/colibri-hq/colibri",
-  },
+  social: { github: "https://github.com/colibri-hq/colibri" },
 
   // Search configuration
   search: {
@@ -53,6 +51,5 @@ export const siteConfig = {
 
 export const blogConfig = {
   title: "Colibri Development Blog",
-  description:
-    "Development updates, tutorials, and insights from the Colibri team",
+  description: "Development updates, tutorials, and insights from the Colibri team",
 };

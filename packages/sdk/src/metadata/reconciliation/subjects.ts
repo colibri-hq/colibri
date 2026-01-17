@@ -1,10 +1,4 @@
-import type {
-  Conflict,
-  MetadataSource,
-  ReconciledField,
-  Subject,
-  SubjectInput,
-} from "./types.js";
+import type { Conflict, MetadataSource, ReconciledField, Subject, SubjectInput } from "./types.js";
 
 /**
  * Normalizes and reconciles subjects, genres, and classifications from multiple sources
@@ -13,10 +7,7 @@ export class SubjectReconciler {
   // Dewey Decimal Classification mappings (simplified)
   private readonly deweyMappings = new Map([
     // Computer science, information, and general works
-    [
-      "000",
-      ["computer science", "information", "general knowledge", "encyclopedias"],
-    ],
+    ["000", ["computer science", "information", "general knowledge", "encyclopedias"]],
     ["004", ["computer science", "computing", "data processing"]],
     ["020", ["library science", "information science"]],
 
@@ -144,19 +135,10 @@ export class SubjectReconciler {
     ["fiction", ["novel", "novels", "fiction", "literary fiction"]],
     ["mystery", ["mystery", "detective", "crime", "thriller", "suspense"]],
     ["romance", ["romance", "love story", "romantic fiction"]],
-    [
-      "science fiction",
-      ["science fiction", "sci-fi", "sf", "speculative fiction"],
-    ],
-    [
-      "fantasy",
-      ["fantasy", "epic fantasy", "urban fantasy", "magical realism"],
-    ],
+    ["science fiction", ["science fiction", "sci-fi", "sf", "speculative fiction"]],
+    ["fantasy", ["fantasy", "epic fantasy", "urban fantasy", "magical realism"]],
     ["horror", ["horror", "supernatural", "gothic", "dark fantasy"]],
-    [
-      "historical fiction",
-      ["historical fiction", "historical novel", "period fiction"],
-    ],
+    ["historical fiction", ["historical fiction", "historical novel", "period fiction"]],
     ["young adult", ["young adult", "ya", "teen fiction", "juvenile fiction"]],
     ["children", ["children", "juvenile", "kids", "picture book"]],
     ["biography", ["biography", "autobiography", "memoir", "life story"]],
@@ -258,10 +240,7 @@ export class SubjectReconciler {
         const normalized = this.normalizeSubject(subjectInput);
         // Only include subjects with meaningful names
         if (normalized.name && normalized.name.trim().length > 0) {
-          allSubjects.push({
-            subject: normalized,
-            source: input.source,
-          });
+          allSubjects.push({ subject: normalized, source: input.source });
         }
       }
     }
@@ -331,21 +310,15 @@ export class SubjectReconciler {
 
       if (sourceSubjects.size > 1) {
         const allSourceSubjects = Array.from(sourceSubjects.values()).flat();
-        const uniqueSubjects = new Set(
-          allSourceSubjects.map((s) => s.normalized || s.name),
-        );
+        const uniqueSubjects = new Set(allSourceSubjects.map((s) => s.normalized || s.name));
 
         if (uniqueSubjects.size !== allSourceSubjects.length) {
           conflicts.push({
             field: "subjects",
-            values: Array.from(sourceSubjects.entries()).map(
-              ([sourceName, subjects]) => ({
-                value: subjects,
-                source: inputs.find(
-                  (input) => input.source.name === sourceName,
-                )!.source,
-              }),
-            ),
+            values: Array.from(sourceSubjects.entries()).map(([sourceName, subjects]) => ({
+              value: subjects,
+              source: inputs.find((input) => input.source.name === sourceName)!.source,
+            })),
             resolution:
               "Merged and deduplicated subjects from all sources, prioritizing by source reliability",
           });
@@ -399,11 +372,7 @@ export class SubjectReconciler {
 
     // Check for high similarity matches
     for (const [canonical, variations] of this.genreMappings.entries()) {
-      if (
-        variations.some(
-          (variation) => this.calculateSimilarity(normalized, variation) > 0.9,
-        )
-      ) {
+      if (variations.some((variation) => this.calculateSimilarity(normalized, variation) > 0.9)) {
         return canonical;
       }
     }
@@ -506,30 +475,19 @@ export class SubjectReconciler {
     if (subject.code && subject.scheme) {
       return this.buildHierarchyFromCode(subject.code, subject.scheme);
     }
-    return this.buildHierarchyFromString(
-      subject.normalized || subject.name,
-      subject.scheme,
-    );
+    return this.buildHierarchyFromString(subject.normalized || subject.name, subject.scheme);
   }
 
   /**
    * Build hierarchy from a string and scheme
    */
-  private buildHierarchyFromString(
-    input: string,
-    scheme?: Subject["scheme"],
-  ): string[] {
+  private buildHierarchyFromString(input: string, scheme?: Subject["scheme"]): string[] {
     const hierarchy: string[] = [];
 
-    if (
-      scheme === "lcsh" &&
-      (input.includes(" -- ") || input.includes(" - "))
-    ) {
+    if (scheme === "lcsh" && (input.includes(" -- ") || input.includes(" - "))) {
       // LCSH uses " -- " or " - " to separate hierarchy levels
       // Keep original case for hierarchy parts
-      const originalParts = input
-        .split(/\s*-+\s*/)
-        .filter((part) => part.length > 0);
+      const originalParts = input.split(/\s*-+\s*/).filter((part) => part.length > 0);
       return originalParts;
     }
 
@@ -551,10 +509,7 @@ export class SubjectReconciler {
   /**
    * Build hierarchy from a classification code
    */
-  private buildHierarchyFromCode(
-    code: string,
-    scheme: Subject["scheme"],
-  ): string[] {
+  private buildHierarchyFromCode(code: string, scheme: Subject["scheme"]): string[] {
     const hierarchy: string[] = [];
 
     if (scheme === "dewey") {
@@ -633,8 +588,7 @@ export class SubjectReconciler {
       // Check for similar subjects
       let isDuplicate = false;
       for (const existing of deduplicated) {
-        const existingKey =
-          existing.subject.normalized || existing.subject.name.toLowerCase();
+        const existingKey = existing.subject.normalized || existing.subject.name.toLowerCase();
         if (this.calculateSimilarity(key, existingKey) > 0.9) {
           // If current source is more reliable, replace the existing one
           if (item.source.reliability > existing.source.reliability) {
@@ -669,10 +623,7 @@ export class SubjectReconciler {
     }
 
     // Bonus for normalization
-    if (
-      subject.normalized &&
-      subject.normalized !== subject.name.toLowerCase()
-    ) {
+    if (subject.normalized && subject.normalized !== subject.name.toLowerCase()) {
       score += 0.5;
     }
 
@@ -713,16 +664,12 @@ export class SubjectReconciler {
   /**
    * Calculate confidence score for reconciled subjects
    */
-  private calculateSubjectsConfidence(
-    subjects: Subject[],
-    sources: MetadataSource[],
-  ): number {
+  private calculateSubjectsConfidence(subjects: Subject[], sources: MetadataSource[]): number {
     if (subjects.length === 0) return 0.1;
 
     // Base confidence from source reliability
     const avgSourceReliability =
-      sources.reduce((sum, source) => sum + source.reliability, 0) /
-      sources.length;
+      sources.reduce((sum, source) => sum + source.reliability, 0) / sources.length;
     let confidence = avgSourceReliability;
 
     // Adjust based on number of subjects (more subjects generally means better coverage)
@@ -736,16 +683,12 @@ export class SubjectReconciler {
 
     // Adjust based on subject quality
     const avgQuality =
-      subjects.reduce(
-        (sum, subject) => sum + this.calculateSubjectQuality(subject),
-        0,
-      ) / subjects.length;
+      subjects.reduce((sum, subject) => sum + this.calculateSubjectQuality(subject), 0) /
+      subjects.length;
     confidence *= 0.7 + avgQuality / 10; // Scale quality to 0.7-1.0 multiplier
 
     // Bonus for having subjects with classification schemes
-    const classifiedSubjects = subjects.filter(
-      (s) => s.scheme && s.scheme !== "unknown",
-    ).length;
+    const classifiedSubjects = subjects.filter((s) => s.scheme && s.scheme !== "unknown").length;
     if (classifiedSubjects > 0) {
       confidence *= 1 + (classifiedSubjects / subjects.length) * 0.2;
     }

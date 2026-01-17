@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { IdentifierReconciler } from "./identifiers.js";
 import type { Identifier, IdentifierInput, MetadataSource } from "./types.js";
+import { IdentifierReconciler } from "./identifiers.js";
 
 describe("IdentifierReconciler", () => {
   const reconciler = new IdentifierReconciler();
@@ -63,9 +63,7 @@ describe("IdentifierReconciler", () => {
       });
 
       it("should normalize DOI URL", () => {
-        const result = reconciler.normalizeIdentifier(
-          "https://doi.org/10.1000/182",
-        );
+        const result = reconciler.normalizeIdentifier("https://doi.org/10.1000/182");
         expect(result.type).toBe("doi");
         expect(result.normalized).toBe("10.1000/182");
         expect(result.valid).toBe(true);
@@ -131,9 +129,7 @@ describe("IdentifierReconciler", () => {
 
     describe("Amazon normalization", () => {
       it("should normalize Amazon URL", () => {
-        const result = reconciler.normalizeIdentifier(
-          "https://amazon.com/dp/B01234567X",
-        );
+        const result = reconciler.normalizeIdentifier("https://amazon.com/dp/B01234567X");
         expect(result.type).toBe("amazon");
         expect(result.normalized).toBe("B01234567X");
         expect(result.valid).toBe(true);
@@ -187,10 +183,7 @@ describe("IdentifierReconciler", () => {
 
     it("should deduplicate identical identifiers from different sources", () => {
       const inputs: IdentifierInput[] = [
-        {
-          isbn: "9780123456786",
-          source: mockSource1,
-        },
+        { isbn: "9780123456786", source: mockSource1 },
         {
           isbn: "978-0-12-345678-6", // Same ISBN with formatting
           source: mockSource2,
@@ -246,12 +239,7 @@ describe("IdentifierReconciler", () => {
 
     it("should sort identifiers by priority and validity", () => {
       const inputs: IdentifierInput[] = [
-        {
-          goodreads: "12345678",
-          isbn: "9780123456786",
-          amazon: "B01234567X",
-          source: mockSource1,
-        },
+        { goodreads: "12345678", isbn: "9780123456786", amazon: "B01234567X", source: mockSource1 },
       ];
 
       const result = reconciler.reconcileIdentifiers(inputs);
@@ -271,10 +259,7 @@ describe("IdentifierReconciler", () => {
         { type: "doi", value: "10.1000/182", valid: true },
       ];
 
-      const input: IdentifierInput = {
-        identifiers,
-        source: mockSource1,
-      };
+      const input: IdentifierInput = { identifiers, source: mockSource1 };
 
       const result = reconciler.reconcileIdentifiers([input]);
 
@@ -284,15 +269,11 @@ describe("IdentifierReconciler", () => {
     });
 
     it("should handle empty input gracefully", () => {
-      expect(() => reconciler.reconcileIdentifiers([])).toThrow(
-        "No identifiers to reconcile",
-      );
+      expect(() => reconciler.reconcileIdentifiers([])).toThrow("No identifiers to reconcile");
     });
 
     it("should handle input with no valid identifiers", () => {
-      const input: IdentifierInput = {
-        source: mockSource1,
-      };
+      const input: IdentifierInput = { source: mockSource1 };
 
       const result = reconciler.reconcileIdentifiers([input]);
 

@@ -25,9 +25,7 @@ import type { ExtractedMetadata } from "./types.js";
  * @param record - The MetadataRecord from a provider
  * @returns Partial ExtractedMetadata ready for ingestion
  */
-export function convertToExtractedMetadata(
-  record: MetadataRecord,
-): Partial<ExtractedMetadata> {
+export function convertToExtractedMetadata(record: MetadataRecord): Partial<ExtractedMetadata> {
   const metadata: Partial<ExtractedMetadata> = {};
 
   // Title
@@ -47,10 +45,7 @@ export function convertToExtractedMetadata(
 
   // ISBN → Identifiers
   if (record.isbn && record.isbn.length > 0) {
-    metadata.identifiers = record.isbn.map((isbn) => ({
-      type: "isbn",
-      value: isbn,
-    }));
+    metadata.identifiers = record.isbn.map((isbn) => ({ type: "isbn", value: isbn }));
   }
 
   // Description → Synopsis
@@ -75,10 +70,7 @@ export function convertToExtractedMetadata(
 
   // Series
   if (record.series) {
-    metadata.series = {
-      name: record.series.name,
-      position: record.series.volume,
-    };
+    metadata.series = { name: record.series.name, position: record.series.volume };
   }
 
   // Language
@@ -198,9 +190,7 @@ function generateSortingKey(name: string): string {
  * @param records - Array of MetadataRecords to merge
  * @returns Merged ExtractedMetadata
  */
-export function mergeMetadataRecords(
-  records: MetadataRecord[],
-): Partial<ExtractedMetadata> {
+export function mergeMetadataRecords(records: MetadataRecord[]): Partial<ExtractedMetadata> {
   if (records.length === 0) {
     return {};
   }
@@ -214,21 +204,13 @@ export function mergeMetadataRecords(
     const additional = convertToExtractedMetadata(sorted[i]);
 
     // Only fill in missing fields, don't override
-    for (const key of Object.keys(additional) as Array<
-      keyof ExtractedMetadata
-    >) {
+    for (const key of Object.keys(additional) as Array<keyof ExtractedMetadata>) {
       if (!base[key] && additional[key]) {
         // @ts-expect-error - Complex type merging
         base[key] = additional[key];
-      } else if (
-        key === "contributors" &&
-        base.contributors &&
-        additional.contributors
-      ) {
+      } else if (key === "contributors" && base.contributors && additional.contributors) {
         // Merge contributors, avoiding duplicates
-        const existing = new Set(
-          base.contributors.map((c) => normalizeNameForComparison(c.name)),
-        );
+        const existing = new Set(base.contributors.map((c) => normalizeNameForComparison(c.name)));
         for (const contrib of additional.contributors) {
           const normalizedName = normalizeNameForComparison(contrib.name);
           if (!existing.has(normalizedName)) {
@@ -236,11 +218,7 @@ export function mergeMetadataRecords(
             existing.add(normalizedName);
           }
         }
-      } else if (
-        key === "identifiers" &&
-        base.identifiers &&
-        additional.identifiers
-      ) {
+      } else if (key === "identifiers" && base.identifiers && additional.identifiers) {
         // Merge identifiers, avoiding duplicates
         const existing = new Set(
           base.identifiers.map((i) => `${i.type}:${normalizeISBN(i.value)}`),
@@ -254,9 +232,7 @@ export function mergeMetadataRecords(
         }
       } else if (key === "subjects" && base.subjects && additional.subjects) {
         // Merge subjects, avoiding duplicates
-        const existing = new Set(
-          base.subjects.map((s) => s.toLowerCase().trim()),
-        );
+        const existing = new Set(base.subjects.map((s) => s.toLowerCase().trim()));
         for (const subject of additional.subjects) {
           const normalized = subject.toLowerCase().trim();
           if (!existing.has(normalized)) {
@@ -318,12 +294,7 @@ export function selectBestValue<T>(
   minConfidence: number = 0.6,
 ): T | undefined {
   const candidates = records
-    .filter(
-      (r) =>
-        r[field] !== undefined &&
-        r[field] !== null &&
-        r.confidence >= minConfidence,
-    )
+    .filter((r) => r[field] !== undefined && r[field] !== null && r.confidence >= minConfidence)
     .sort((a, b) => b.confidence - a.confidence);
 
   if (candidates.length === 0) {
@@ -385,9 +356,7 @@ export function calculateAggregatedConfidence(
   records: MetadataRecord[],
   field: keyof MetadataRecord,
 ): number {
-  const validRecords = records.filter(
-    (r) => r[field] !== undefined && r[field] !== null,
-  );
+  const validRecords = records.filter((r) => r[field] !== undefined && r[field] !== null);
 
   if (validRecords.length === 0) {
     return 0;
@@ -427,27 +396,18 @@ export function resolveConflict<T>(
   hasConflict: boolean;
   alternatives: Array<{ value: T; source: string; confidence: number }>;
 } {
-  const validRecords = records.filter(
-    (r) => r[field] !== undefined && r[field] !== null,
-  );
+  const validRecords = records.filter((r) => r[field] !== undefined && r[field] !== null);
 
   if (validRecords.length === 0) {
     return { value: undefined, hasConflict: false, alternatives: [] };
   }
 
   if (validRecords.length === 1) {
-    return {
-      value: validRecords[0][field] as T,
-      hasConflict: false,
-      alternatives: [],
-    };
+    return { value: validRecords[0][field] as T, hasConflict: false, alternatives: [] };
   }
 
   // Group by normalized value to detect conflicts
-  const valueGroups = new Map<
-    string,
-    Array<{ record: MetadataRecord; value: T }>
-  >();
+  const valueGroups = new Map<string, Array<{ record: MetadataRecord; value: T }>>();
 
   for (const record of validRecords) {
     const value = record[field] as T;
@@ -478,16 +438,8 @@ export function resolveConflict<T>(
   // Build alternatives list
   const alternatives = Array.from(valueGroups.values())
     .flat()
-    .map((g) => ({
-      value: g.value,
-      source: g.record.source,
-      confidence: g.record.confidence,
-    }))
+    .map((g) => ({ value: g.value, source: g.record.source, confidence: g.record.confidence }))
     .sort((a, b) => b.confidence - a.confidence);
 
-  return {
-    value: selectedValue,
-    hasConflict,
-    alternatives,
-  };
+  return { value: selectedValue, hasConflict, alternatives };
 }

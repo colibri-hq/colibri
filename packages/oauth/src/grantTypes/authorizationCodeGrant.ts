@@ -1,5 +1,5 @@
+import type { MaybePromise } from "@colibri-hq/shared";
 import { z } from "zod";
-import { defineGrantType, type GrantTypeOptions } from "./grantType.js";
 import { OAuthAuthorizationError, OAuthError } from "../errors.js";
 import {
   type AuthorizationServerOptions,
@@ -16,7 +16,7 @@ import {
   resolveScopes,
   timeOffset,
 } from "../utilities.js";
-import type { MaybePromise } from "@colibri-hq/shared";
+import { defineGrantType, type GrantTypeOptions } from "./grantType.js";
 
 export interface AuthorizationCodeGrantOptions<
   T extends Entities.AuthorizationCode = Entities.AuthorizationCode,
@@ -214,26 +214,17 @@ export const AuthorizationCodeGrant = defineGrantType({
     const authorizationCode = await this.options.loadAuthorizationCode(code);
 
     if (!authorizationCode) {
-      throw new OAuthError(
-        "invalid_grant",
-        "The authorization code is invalid",
-      );
+      throw new OAuthError("invalid_grant", "The authorization code is invalid");
     }
 
     // Check if the code has expired
     if (authorizationCode.expires_at <= new Date()) {
-      throw new OAuthError(
-        "invalid_grant",
-        "The authorization code has expired",
-      );
+      throw new OAuthError("invalid_grant", "The authorization code has expired");
     }
 
     // Check if the code has been used
     if (authorizationCode.used_at) {
-      throw new OAuthError(
-        "invalid_grant",
-        "The authorization code has already been used",
-      );
+      throw new OAuthError("invalid_grant", "The authorization code has already been used");
     }
 
     // Check if the code was issued to the same client
@@ -252,10 +243,7 @@ export const AuthorizationCodeGrant = defineGrantType({
     // If PKCE is required, validate the code verifier
     if (authorizationCode.challenge) {
       if (!code_verifier) {
-        throw new OAuthError(
-          "invalid_request",
-          "The code verifier is required",
-        );
+        throw new OAuthError("invalid_request", "The code verifier is required");
       }
 
       const isValid = await validateCodeVerifier(
@@ -294,12 +282,8 @@ export const AuthorizationCodeGrant = defineGrantType({
     });
 
     return {
-      accessToken: {
-        ttl: this.options.accessTokenTtl,
-      },
-      refreshToken: {
-        ttl: this.options.refreshTokenTtl,
-      },
+      accessToken: { ttl: this.options.accessTokenTtl },
+      refreshToken: { ttl: this.options.refreshTokenTtl },
       scopes: scopes,
       userIdentifier,
     };
@@ -497,19 +481,13 @@ export const AuthorizationCodeGrant = defineGrantType({
  *
  * @see https://datatracker.ietf.org/doc/html/rfc6749#section-3.1 RFC 6749, Section 3.1
  */
-export async function handleAuthorizationRequest<
-  T extends AuthorizationServerOptions,
->(
+export async function handleAuthorizationRequest<T extends AuthorizationServerOptions>(
   request: Request,
   {
     grantOptions: { ttl = 300, storeAuthorizationCode },
     options,
     userIdentifier,
-  }: {
-    grantOptions: AuthorizationCodeGrantOptions;
-    options: T;
-    userIdentifier: string;
-  },
+  }: { grantOptions: AuthorizationCodeGrantOptions; options: T; userIdentifier: string },
 ): Promise<Response> {
   const url = new URL(request.url);
   const queryParams = Object.fromEntries(url.searchParams.entries());
@@ -528,8 +506,7 @@ export async function handleAuthorizationRequest<
   }
 
   // region Issue the authorization code
-  const { clientId, challenge, challengeMethod, scopes, redirectUri, state } =
-    params;
+  const { clientId, challenge, challengeMethod, scopes, redirectUri, state } = params;
   const { code } = await storeAuthorizationCode({
     clientId,
     challenge,
@@ -776,21 +753,11 @@ export async function handlePushedAuthorizationRequest<
   // "Reject the request if the request_uri authorization request parameter is provided."
   // See https://datatracker.ietf.org/doc/html/rfc9126#section-2.1-7.2
   if ("request_uri" in params) {
-    throw new OAuthError(
-      "invalid_request",
-      "The request_uri parameter is not allowed",
-    );
+    throw new OAuthError("invalid_request", "The request_uri parameter is not allowed");
   }
 
-  const {
-    responseType,
-    clientId,
-    challenge,
-    challengeMethod,
-    scopes,
-    redirectUri,
-    state,
-  } = await authorize(params, options, true);
+  const { responseType, clientId, challenge, challengeMethod, scopes, redirectUri, state } =
+    await authorize(params, options, true);
   // endregion
 
   // region Store the authorization request
@@ -814,14 +781,8 @@ export async function handlePushedAuthorizationRequest<
   // endregion
 
   return jsonResponse(
-    {
-      request_uri: requestUri,
-      expires_in: timeOffset(expires_at),
-    },
-    {
-      status: 201,
-      headers: { "Cache-Control": "no-cache, no-store" },
-    },
+    { request_uri: requestUri, expires_in: timeOffset(expires_at) },
+    { status: 201, headers: { "Cache-Control": "no-cache, no-store" } },
   );
 }
 
@@ -874,17 +835,10 @@ async function authorize<T extends AuthorizationServerOptions>(
         .string({ message: "The request URI is invalid" })
         .url({ message: "The request URI is not a valid URI" })
         .optional()
-        .refine(
-          (uri) =>
-            !(uri && !uri.startsWith("urn:ietf:params:oauth:request_uri:")),
-          {
-            message:
-              'The request URI must use the "urn:ietf:params:oauth:request_uri" URN scheme',
-          },
-        )
-        .transform((uri) =>
-          uri?.replace("urn:ietf:params:oauth:request_uri:", ""),
-        ),
+        .refine((uri) => !(uri && !uri.startsWith("urn:ietf:params:oauth:request_uri:")), {
+          message: 'The request URI must use the "urn:ietf:params:oauth:request_uri" URN scheme',
+        })
+        .transform((uri) => uri?.replace("urn:ietf:params:oauth:request_uri:", "")),
     })
     .safeParse(data);
 
@@ -914,14 +868,8 @@ async function authorize<T extends AuthorizationServerOptions>(
           initialPayload.data.request_uri,
         );
 
-      if (
-        !authorizationRequest ||
-        authorizationRequest.expires_at <= new Date()
-      ) {
-        throw new OAuthError(
-          "invalid_request",
-          "The request URI is unknown or expired",
-        );
+      if (!authorizationRequest || authorizationRequest.expires_at <= new Date()) {
+        throw new OAuthError("invalid_request", "The request URI is unknown or expired");
       }
 
       const {
@@ -950,11 +898,7 @@ async function authorize<T extends AuthorizationServerOptions>(
   // endregion
 
   // region Validate Client
-  const {
-    client_id: clientId,
-    redirect_uri: redirectUri,
-    state,
-  } = initialPayload.data;
+  const { client_id: clientId, redirect_uri: redirectUri, state } = initialPayload.data;
   const client = await resolveClient(clientId, options);
 
   if (!client.redirect_uris) {
@@ -965,18 +909,16 @@ async function authorize<T extends AuthorizationServerOptions>(
   }
 
   if (!client.redirect_uris.includes(redirectUri)) {
-    throw new OAuthError(
-      "invalid_request",
-      "The redirect URI is missing or invalid",
-    );
+    throw new OAuthError("invalid_request", "The redirect URI is missing or invalid");
   }
   // endregion
 
   // region Validate Authorization Request Parameters
-  const responseTypesSupported = options.authorizationCode
-    .responseTypesSupported as [ResponseType, ...ResponseType[]];
-  const codeChallengeMethodsSupported = options.authorizationCode
-    .codeChallengeMethodsSupported as [
+  const responseTypesSupported = options.authorizationCode.responseTypesSupported as [
+    ResponseType,
+    ...ResponseType[],
+  ];
+  const codeChallengeMethodsSupported = options.authorizationCode.codeChallengeMethodsSupported as [
     PkceCodeChallengeMethod,
     ...PkceCodeChallengeMethod[],
   ];
@@ -986,21 +928,15 @@ async function authorize<T extends AuthorizationServerOptions>(
         invalid_type_error: "The response type is unknown or unsupported",
         required_error: "The response type is missing",
       }),
-      code_challenge: z.string({
-        message: "A PKCE code challenge is required",
-      }),
+      code_challenge: z.string({ message: "A PKCE code challenge is required" }),
       code_challenge_method: z.enum(codeChallengeMethodsSupported, {
-        invalid_type_error:
-          "The code challenge method is unknown or unsupported",
+        invalid_type_error: "The code challenge method is unknown or unsupported",
         required_error: "The code challenge method is missing",
       }),
       scope: z
         .string({ message: "The scope is missing" })
         .transform((scope) => scope.split(" "))
-        .pipe(
-          options.scopeSchema ??
-            z.string({ message: "The scope is invalid" }).array(),
-        ),
+        .pipe(options.scopeSchema ?? z.string({ message: "The scope is invalid" }).array()),
     })
     .safeParseAsync(data);
 
@@ -1008,10 +944,7 @@ async function authorize<T extends AuthorizationServerOptions>(
     const issue = payload.error.issues.shift()!;
     const field = issue.path[0]!.toString();
 
-    if (
-      field === "response_type" &&
-      issue.code === z.ZodIssueCode.invalid_enum_value
-    ) {
+    if (field === "response_type" && issue.code === z.ZodIssueCode.invalid_enum_value) {
       throw new OAuthAuthorizationError(
         "unsupported_response_type",
         redirectUri,
@@ -1086,20 +1019,13 @@ async function authorize<T extends AuthorizationServerOptions>(
   };
 }
 
-async function validateCodeVerifier(
-  verifier: string,
-  challenge: string,
-  method: string,
-) {
+async function validateCodeVerifier(verifier: string, challenge: string, method: string) {
   switch (method) {
     case "plain":
       return verifier === challenge;
 
     case "S256":
-      const hash = await crypto.subtle.digest(
-        "SHA-256",
-        new TextEncoder().encode(verifier),
-      );
+      const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
       const base64 = btoa(String.fromCharCode(...new Uint8Array(hash)))
         .replace(/\+/g, "-")
         .replace(/\//g, "_")
@@ -1107,9 +1033,6 @@ async function validateCodeVerifier(
       return base64 === challenge;
 
     default:
-      throw new OAuthError(
-        "invalid_request",
-        `Unsupported code challenge method: ${method}`,
-      );
+      throw new OAuthError("invalid_request", `Unsupported code challenge method: ${method}`);
   }
 }

@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
+import type { ExtractedMetadata, DuplicateCheckResult } from "../ingestion/types.js";
 import { initialize } from "../database.js";
 import {
   createPendingIngestion,
@@ -7,31 +8,16 @@ import {
   deleteExpiredIngestions,
   getPendingIngestionsForUser,
 } from "./pending-ingestion.js";
-import type {
-  ExtractedMetadata,
-  DuplicateCheckResult,
-} from "../ingestion/types.js";
 
 describe("Pending Ingestion Resource", () => {
   const database = initialize(
-    process.env.DATABASE_URL ??
-      "postgresql://postgres:postgres@localhost:54322/postgres",
+    process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:54322/postgres",
   );
 
   const mockMetadata: ExtractedMetadata = {
     title: "Test Book",
-    contributors: [
-      {
-        name: "Test Author",
-        roles: ["aut"],
-      },
-    ],
-    identifiers: [
-      {
-        type: "isbn",
-        value: "978-0-123456-78-9",
-      },
-    ],
+    contributors: [{ name: "Test Author", roles: ["aut"] }],
+    identifiers: [{ type: "isbn", value: "978-0-123456-78-9" }],
   };
 
   const mockDuplicateInfo: DuplicateCheckResult = {
@@ -48,10 +34,7 @@ describe("Pending Ingestion Resource", () => {
 
   beforeEach(async () => {
     // Clean up any existing test data
-    await database
-      .deleteFrom("pending_ingestion")
-      .where("upload_id", "like", "test-%")
-      .execute();
+    await database.deleteFrom("pending_ingestion").where("upload_id", "like", "test-%").execute();
 
     // Create or reuse a test user for foreign key constraint
     let user = await database
@@ -63,11 +46,7 @@ describe("Pending Ingestion Resource", () => {
     if (!user) {
       user = await database
         .insertInto("authentication.user")
-        .values({
-          email: "test-pending-ingestion@example.com",
-          name: "Test User",
-          role: "adult",
-        })
+        .values({ email: "test-pending-ingestion@example.com", name: "Test User", role: "adult" })
         .returningAll()
         .executeTakeFirst();
     }
@@ -100,12 +79,8 @@ describe("Pending Ingestion Resource", () => {
     it("should properly serialize complex metadata", async () => {
       const complexMetadata: ExtractedMetadata = {
         ...mockMetadata,
-        synopsis:
-          "A detailed synopsis with\nline breaks and special chars: <>&",
-        properties: {
-          custom: "value",
-          nested: { deep: true },
-        },
+        synopsis: "A detailed synopsis with\nline breaks and special chars: <>&",
+        properties: { custom: "value", nested: { deep: true } },
       };
 
       const result = await createPendingIngestion(database, {
@@ -118,9 +93,7 @@ describe("Pending Ingestion Resource", () => {
       });
 
       expect(result.extractedMetadata.synopsis).toBe(complexMetadata.synopsis);
-      expect(result.extractedMetadata.properties).toEqual(
-        complexMetadata.properties,
-      );
+      expect(result.extractedMetadata.properties).toEqual(complexMetadata.properties);
     });
   });
 
@@ -144,10 +117,7 @@ describe("Pending Ingestion Resource", () => {
     });
 
     it("should return undefined for non-existent ID", async () => {
-      const result = await getPendingIngestion(
-        database,
-        "00000000-0000-0000-0000-000000000000",
-      );
+      const result = await getPendingIngestion(database, "00000000-0000-0000-0000-000000000000");
       expect(result).toBeUndefined();
     });
   });
@@ -203,9 +173,7 @@ describe("Pending Ingestion Resource", () => {
 
       expect(results).toHaveLength(2);
       expect(results.every((r) => r.userId === testUserId)).toBe(true);
-      expect(results[0].createdAt.getTime()).toBeGreaterThanOrEqual(
-        results[1].createdAt.getTime(),
-      );
+      expect(results[0].createdAt.getTime()).toBeGreaterThanOrEqual(results[1].createdAt.getTime());
     });
 
     it("should return empty array for user with no pending ingestions", async () => {

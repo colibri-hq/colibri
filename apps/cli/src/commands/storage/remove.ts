@@ -17,9 +17,7 @@ export class Remove extends BaseCommand<typeof Remove> {
   static description = "Remove an object from a storage bucket.";
   static examples = [];
   static flags = {
-    force: force({
-      description: "Force remove the object(s) without confirmation",
-    }),
+    force: force({ description: "Force remove the object(s) without confirmation" }),
   };
   /**
    * Disable strict argument parsing to allow for multiple objects to be passed
@@ -48,9 +46,7 @@ export class Remove extends BaseCommand<typeof Remove> {
         await Promise.all(
           keysByBucket
             .entries()
-            .map(async ([bucket, keys]) =>
-              removeObjects(storage, [...keys], undefined, bucket),
-            ),
+            .map(async ([bucket, keys]) => removeObjects(storage, [...keys], undefined, bucket)),
         );
       },
       `Are you sure you want to remove the object(s) "${objects.join('", "')}"? This action cannot be undone!`,
@@ -60,9 +56,7 @@ export class Remove extends BaseCommand<typeof Remove> {
     await operation();
 
     if (this.flags.verbose) {
-      this.logToStderr(
-        dim(`Removed ${objects.length} object(s) successfully.`),
-      );
+      this.logToStderr(dim(`Removed ${objects.length} object(s) successfully.`));
     }
   }
 }

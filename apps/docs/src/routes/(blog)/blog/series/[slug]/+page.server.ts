@@ -1,6 +1,6 @@
+import { getAllSeriesSlugs, getSeriesBySlug } from "$lib/content/blog";
 import { error } from "@sveltejs/kit";
 import type { EntryGenerator, PageServerLoad } from "./$types.js";
-import { getAllSeriesSlugs, getSeriesBySlug } from "$lib/content/blog";
 
 export const prerender = true;
 

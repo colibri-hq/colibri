@@ -22,12 +22,12 @@ import type {
   SeriesInput,
   SubjectInput,
 } from "./types.js";
-import { PublicationReconciler } from "./publication.js";
-import { SubjectReconciler } from "./subjects.js";
+import { ContentReconciler } from "./content.js";
 import { IdentifierReconciler } from "./identifiers.js";
 import { PhysicalReconciler } from "./physical.js";
-import { ContentReconciler } from "./content.js";
+import { PublicationReconciler } from "./publication.js";
 import { SeriesReconciler } from "./series.js";
+import { SubjectReconciler } from "./subjects.js";
 
 /**
  * Configuration for the reconciliation coordinator
@@ -177,10 +177,7 @@ export class ReconciliationCoordinator {
     const startTime = Date.now();
 
     // Merge configuration with options
-    const config = {
-      ...this.config,
-      ...(options?.config || {}),
-    };
+    const config = { ...this.config, ...(options?.config || {}) };
 
     // Convert MetadataRecord[] to reconciliation inputs
     const sources = this.convertToMetadataSources(records);
@@ -192,32 +189,31 @@ export class ReconciliationCoordinator {
     const seriesInputs = this.convertToSeriesInputs(records, sources);
 
     // Run reconcilers in parallel (they are independent)
-    const [publication, subjects, identifiers, physical, content, series] =
-      await Promise.all([
-        config.reconcilePublishers && publicationInputs.length > 0
-          ? this.reconcilePublication(publicationInputs)
-          : this.getEmptyPublicationInfo(),
+    const [publication, subjects, identifiers, physical, content, series] = await Promise.all([
+      config.reconcilePublishers && publicationInputs.length > 0
+        ? this.reconcilePublication(publicationInputs)
+        : this.getEmptyPublicationInfo(),
 
-        config.reconcileSubjects && subjectInputs.length > 0
-          ? this.reconcileSubjects(subjectInputs)
-          : this.getEmptySubjects(),
+      config.reconcileSubjects && subjectInputs.length > 0
+        ? this.reconcileSubjects(subjectInputs)
+        : this.getEmptySubjects(),
 
-        config.reconcileIdentifiers && identifierInputs.length > 0
-          ? this.reconcileIdentifiers(identifierInputs)
-          : this.getEmptyIdentifiers(),
+      config.reconcileIdentifiers && identifierInputs.length > 0
+        ? this.reconcileIdentifiers(identifierInputs)
+        : this.getEmptyIdentifiers(),
 
-        config.reconcilePhysical && physicalInputs.length > 0
-          ? this.reconcilePhysical(physicalInputs)
-          : this.getEmptyPhysical(),
+      config.reconcilePhysical && physicalInputs.length > 0
+        ? this.reconcilePhysical(physicalInputs)
+        : this.getEmptyPhysical(),
 
-        config.reconcileContent && contentInputs.length > 0
-          ? this.reconcileContent(contentInputs)
-          : this.getEmptyContent(),
+      config.reconcileContent && contentInputs.length > 0
+        ? this.reconcileContent(contentInputs)
+        : this.getEmptyContent(),
 
-        config.reconcileSeries && seriesInputs.length > 0
-          ? this.reconcileSeries(seriesInputs)
-          : this.getEmptySeries(),
-      ]);
+      config.reconcileSeries && seriesInputs.length > 0
+        ? this.reconcileSeries(seriesInputs)
+        : this.getEmptySeries(),
+    ]);
 
     // Calculate overall confidence and statistics
     const overallConfidence = this.calculateOverallConfidence([
@@ -287,9 +283,7 @@ export class ReconciliationCoordinator {
   /**
    * Convert SDK MetadataRecord[] to MetadataSource[]
    */
-  private convertToMetadataSources(
-    records: MetadataRecord[],
-  ): MetadataSource[] {
+  private convertToMetadataSources(records: MetadataRecord[]): MetadataSource[] {
     return records.map((record) => ({
       name: record.source,
       reliability: record.confidence,
@@ -322,10 +316,7 @@ export class ReconciliationCoordinator {
     sources: MetadataSource[],
   ): SubjectInput[] {
     return records
-      .map((record, index) => ({
-        subjects: record.subjects,
-        source: sources[index],
-      }))
+      .map((record, index) => ({ subjects: record.subjects, source: sources[index] }))
       .filter((input) => input.subjects && input.subjects.length > 0);
   }
 
@@ -336,10 +327,7 @@ export class ReconciliationCoordinator {
     records: MetadataRecord[],
     sources: MetadataSource[],
   ): IdentifierInput[] {
-    return records.map((record, index) => ({
-      isbn: record.isbn,
-      source: sources[index],
-    }));
+    return records.map((record, index) => ({ isbn: record.isbn, source: sources[index] }));
   }
 
   /**
@@ -400,21 +388,15 @@ export class ReconciliationCoordinator {
   /**
    * Reconcile subjects and genres
    */
-  private async reconcileSubjects(
-    inputs: SubjectInput[],
-  ): Promise<ReconciledSubjects> {
+  private async reconcileSubjects(inputs: SubjectInput[]): Promise<ReconciledSubjects> {
     return { subjects: this.subjectReconciler.reconcileSubjects(inputs) };
   }
 
   /**
    * Reconcile identifiers (ISBN, OCLC, etc.)
    */
-  private async reconcileIdentifiers(
-    inputs: IdentifierInput[],
-  ): Promise<ReconciledIdentifiers> {
-    return {
-      identifiers: this.identifierReconciler.reconcileIdentifiers(inputs),
-    };
+  private async reconcileIdentifiers(inputs: IdentifierInput[]): Promise<ReconciledIdentifiers> {
+    return { identifiers: this.identifierReconciler.reconcileIdentifiers(inputs) };
   }
 
   /**
@@ -438,9 +420,7 @@ export class ReconciliationCoordinator {
   /**
    * Reconcile series information
    */
-  private async reconcileSeries(
-    inputs: SeriesInput[],
-  ): Promise<ReconciledSeries> {
+  private async reconcileSeries(inputs: SeriesInput[]): Promise<ReconciledSeries> {
     return this.seriesReconciler.reconcileSeries(inputs);
   }
 
@@ -562,8 +542,7 @@ export class ReconciliationCoordinator {
       ReconciledSeries,
     ],
   ): number {
-    const [publication, subjects, identifiers, physical, content, series] =
-      results;
+    const [publication, subjects, identifiers, physical, content, series] = results;
 
     const fields: ReconciledField<unknown>[] = [
       // Publication fields
@@ -608,8 +587,7 @@ export class ReconciliationCoordinator {
       ReconciledSeries,
     ],
   ): number {
-    const [publication, subjects, identifiers, physical, content, series] =
-      results;
+    const [publication, subjects, identifiers, physical, content, series] = results;
 
     const fields: ReconciledField<unknown>[] = [
       publication.date,
@@ -631,10 +609,7 @@ export class ReconciliationCoordinator {
       series.series,
     ];
 
-    return fields.reduce(
-      (total, field) => total + (field.conflicts?.length ?? 0),
-      0,
-    );
+    return fields.reduce((total, field) => total + (field.conflicts?.length ?? 0), 0);
   }
 
   /**
@@ -651,8 +626,7 @@ export class ReconciliationCoordinator {
       ReconciledSeries,
     ],
   ): number {
-    const [publication, subjects, identifiers, physical, content, series] =
-      results;
+    const [publication, subjects, identifiers, physical, content, series] = results;
 
     const fields: ReconciledField<unknown>[] = [
       publication.date,

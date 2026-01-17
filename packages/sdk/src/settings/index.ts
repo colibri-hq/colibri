@@ -1,6 +1,7 @@
 import type { Database } from "../database.js";
-import { loadSettings, updateSettings } from "../resources/settings.js";
 import type { JsonObject } from "../schema.js";
+import type { SettingCategory, SettingKey, SettingValueMap, SettingWithValue } from "./types.js";
+import { loadSettings, updateSettings } from "../resources/settings.js";
 import {
   getAllSettingDefinitions,
   getSettingDefinition,
@@ -8,12 +9,6 @@ import {
   isValidSettingKey,
   SETTINGS_REGISTRY,
 } from "./registry.js";
-import type {
-  SettingCategory,
-  SettingKey,
-  SettingValueMap,
-  SettingWithValue,
-} from "./types.js";
 
 // Re-export types and registry functions
 export * from "./types.js";
@@ -53,8 +48,7 @@ function parseEnvValue<K extends SettingKey>(
   try {
     switch (definition.type) {
       case "boolean":
-        return (envValue.toLowerCase() === "true" ||
-          envValue === "1") as SettingValueMap[K];
+        return (envValue.toLowerCase() === "true" || envValue === "1") as SettingValueMap[K];
       case "number":
         return Number(envValue) as unknown as SettingValueMap[K];
       case "string[]":
@@ -78,10 +72,7 @@ function parseEnvValue<K extends SettingKey>(
 export async function getSetting<K extends SettingKey>(
   database: Database,
   key: K,
-): Promise<{
-  value: SettingValueMap[K];
-  source: "environment" | "database" | "default";
-}> {
+): Promise<{ value: SettingValueMap[K]; source: "environment" | "database" | "default" }> {
   const definition = getSettingDefinition(key);
 
   // 1. Check environment variable
@@ -149,9 +140,7 @@ export async function setSetting<K extends SettingKey>(
   // Validate the value
   const result = definition.validation.safeParse(value);
   if (!result.success) {
-    throw new Error(
-      `Invalid value for setting ${key}: ${result.error.message}`,
-    );
+    throw new Error(`Invalid value for setting ${key}: ${result.error.message}`);
   }
 
   // Load existing settings
@@ -164,16 +153,10 @@ export async function setSetting<K extends SettingKey>(
   }
 
   // Merge with new value
-  const newData: JsonObject = {
-    ...existingData,
-    [key]: result.data,
-  };
+  const newData: JsonObject = { ...existingData, [key]: result.data };
 
   // Save new revision
-  await updateSettings(database, {
-    data: newData,
-    updated_by: userId ? BigInt(userId) : null,
-  });
+  await updateSettings(database, { data: newData, updated_by: userId ? BigInt(userId) : null });
 }
 
 /**
@@ -203,10 +186,7 @@ export async function resetSetting<K extends SettingKey>(
   const newData: JsonObject = rest as JsonObject;
 
   // Save new revision
-  await updateSettings(database, {
-    data: newData,
-    updated_by: userId ? BigInt(userId) : null,
-  });
+  await updateSettings(database, { data: newData, updated_by: userId ? BigInt(userId) : null });
 }
 
 /**
@@ -225,10 +205,7 @@ export async function getAllSettings(
   };
 
   for (const definition of definitions) {
-    const { value, source } = await getSetting(
-      database,
-      definition.key as SettingKey,
-    );
+    const { value, source } = await getSetting(database, definition.key as SettingKey);
     // Exclude validation schema - it can't be serialized to JSON
     const { validation: _, ...serializableDefinition } = definition;
     result[definition.category].push({
@@ -245,24 +222,15 @@ export async function getAllSettings(
  * Get all settings as a flat list with their current values.
  * Excludes the validation schema since it can't be serialized to JSON.
  */
-export async function getAllSettingsFlat(
-  database: Database,
-): Promise<SettingWithValue[]> {
+export async function getAllSettingsFlat(database: Database): Promise<SettingWithValue[]> {
   const definitions = getAllSettingDefinitions();
   const settings: SettingWithValue[] = [];
 
   for (const definition of definitions) {
-    const { value, source } = await getSetting(
-      database,
-      definition.key as SettingKey,
-    );
+    const { value, source } = await getSetting(database, definition.key as SettingKey);
     // Exclude validation schema - it can't be serialized to JSON
     const { validation: _, ...serializableDefinition } = definition;
-    settings.push({
-      ...serializableDefinition,
-      value,
-      source,
-    } as SettingWithValue);
+    settings.push({ ...serializableDefinition, value, source } as SettingWithValue);
   }
 
   return settings;
@@ -271,9 +239,7 @@ export async function getAllSettingsFlat(
 /**
  * Export all settings as a JSON object (for backup/export).
  */
-export async function exportSettings(
-  database: Database,
-): Promise<Record<SettingKey, unknown>> {
+export async function exportSettings(database: Database): Promise<Record<SettingKey, unknown>> {
   try {
     const settings = await loadSettings(database);
     return (settings.data as Record<SettingKey, unknown>) ?? {};
@@ -295,10 +261,7 @@ export async function importSettings(
   database: Database,
   data: Record<string, unknown>,
   userId?: string,
-): Promise<{
-  imported: SettingKey[];
-  errors: Array<{ key: string; error: string }>;
-}> {
+): Promise<{ imported: SettingKey[]; errors: Array<{ key: string; error: string }> }> {
   const imported: SettingKey[] = [];
   const errors: Array<{ key: string; error: string }> = [];
 
@@ -332,10 +295,7 @@ export async function importSettings(
   }
 
   if (imported.length > 0) {
-    await updateSettings(database, {
-      data: newData,
-      updated_by: userId ? BigInt(userId) : null,
-    });
+    await updateSettings(database, { data: newData, updated_by: userId ? BigInt(userId) : null });
   }
 
   return { imported, errors };

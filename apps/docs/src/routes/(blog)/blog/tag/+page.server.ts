@@ -5,10 +5,7 @@ export const prerender = true;
 
 export const load = function load() {
   const tagsMap = getBlogTags();
-  const tags = Array.from(tagsMap.entries()).map(([name, count]) => ({
-    name,
-    count,
-  }));
+  const tags = Array.from(tagsMap.entries()).map(([name, count]) => ({ name, count }));
 
   return { tags };
 } satisfies PageServerLoad;

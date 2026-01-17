@@ -1,10 +1,7 @@
-import type {
-  PublicationInfoInput,
-  ReconciledPublicationInfo,
-} from "./types.js";
+import type { PublicationInfoInput, ReconciledPublicationInfo } from "./types.js";
 import { DateReconciler } from "./dates.js";
-import { PublisherReconciler } from "./publishers.js";
 import { PlaceReconciler } from "./places.js";
+import { PublisherReconciler } from "./publishers.js";
 
 /**
  * Main publication information reconciler that coordinates all publication-related reconciliation
@@ -17,17 +14,13 @@ export class PublicationReconciler {
   /**
    * Reconcile all publication information from multiple sources
    */
-  reconcilePublicationInfo(
-    inputs: PublicationInfoInput[],
-  ): ReconciledPublicationInfo {
+  reconcilePublicationInfo(inputs: PublicationInfoInput[]): ReconciledPublicationInfo {
     if (inputs.length === 0) {
       throw new Error("No publication information to reconcile");
     }
 
     // Filter inputs that have at least one piece of publication information
-    const validInputs = inputs.filter(
-      (input) => input.date || input.publisher || input.place,
-    );
+    const validInputs = inputs.filter((input) => input.date || input.publisher || input.place);
 
     if (validInputs.length === 0) {
       throw new Error("No valid publication information found in inputs");
@@ -75,11 +68,7 @@ export class PublicationReconciler {
    * Get overall confidence score for the reconciled publication information
    */
   getOverallConfidence(reconciledInfo: ReconciledPublicationInfo): number {
-    const weights = {
-      date: 0.4,
-      publisher: 0.4,
-      place: 0.2,
-    };
+    const weights = { date: 0.4, publisher: 0.4, place: 0.2 };
 
     const weightedSum =
       reconciledInfo.date.confidence * weights.date +

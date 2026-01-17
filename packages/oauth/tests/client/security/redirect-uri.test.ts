@@ -157,11 +157,7 @@ describe("Redirect URI Security (RFC 9700 Section 4.1)", () => {
         if (urlString.includes("/token")) {
           capturedBody = new URLSearchParams(init?.body as string);
           return createJsonResponse(
-            {
-              access_token: "access_token",
-              token_type: "Bearer",
-              expires_in: 3600,
-            },
+            { access_token: "access_token", token_type: "Bearer", expires_in: 3600 },
             200,
           );
         }
@@ -180,10 +176,7 @@ describe("Redirect URI Security (RFC 9700 Section 4.1)", () => {
       });
 
       await client.createAuthorizationUrl({ state: "test-state" });
-      await client.handleCallback(
-        `${redirectUri}?code=auth_code&state=test-state`,
-        "test-state",
-      );
+      await client.handleCallback(`${redirectUri}?code=auth_code&state=test-state`, "test-state");
 
       expect(capturedBody).not.toBeNull();
       expect(capturedBody!.get("redirect_uri")).toBe(redirectUri);

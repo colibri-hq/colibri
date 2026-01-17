@@ -6,11 +6,7 @@ export type AuthData =
   | { isAuthenticated?: false; user?: never }
   | { isAuthenticated: true; user: User };
 
-export const load = async function load({
-  cookies,
-  depends,
-  locals: { database },
-}) {
+export const load = async function load({ cookies, depends, locals: { database } }) {
   depends("auth:user");
 
   try {

@@ -65,10 +65,7 @@ export async function detectDuplicates(
   }
 
   // No duplicates found
-  return {
-    hasDuplicate: false,
-    confidence: 0,
-  };
+  return { hasDuplicate: false, confidence: 0 };
 }
 
 /**
@@ -185,9 +182,7 @@ async function checkISBN(
   metadata: ExtractedMetadata,
 ): Promise<DuplicateCheckResult> {
   const isbns =
-    metadata.identifiers
-      ?.filter((id) => id.type === "isbn")
-      .map((id) => id.value) ?? [];
+    metadata.identifiers?.filter((id) => id.type === "isbn").map((id) => id.value) ?? [];
 
   if (isbns.length === 0) {
     return { hasDuplicate: false, confidence: 0 };
@@ -205,8 +200,7 @@ async function checkISBN(
 
       // Determine if this is the same edition or a different format
       const isSameTitle =
-        existing.title?.toLowerCase().trim() ===
-        metadata.title?.toLowerCase().trim();
+        existing.title?.toLowerCase().trim() === metadata.title?.toLowerCase().trim();
 
       return {
         hasDuplicate: true,
@@ -232,9 +226,7 @@ async function checkASIN(
   metadata: ExtractedMetadata,
 ): Promise<DuplicateCheckResult> {
   const asins =
-    metadata.identifiers
-      ?.filter((id) => id.type === "asin")
-      .map((id) => id.value) ?? [];
+    metadata.identifiers?.filter((id) => id.type === "asin").map((id) => id.value) ?? [];
 
   if (asins.length === 0) {
     return { hasDuplicate: false, confidence: 0 };
@@ -276,9 +268,7 @@ async function checkExactTitle(
   }
 
   // Get the primary creator name (first author)
-  const primaryCreator = metadata.contributors?.find((c) =>
-    c.roles.includes("aut"),
-  )?.name;
+  const primaryCreator = metadata.contributors?.find((c) => c.roles.includes("aut"))?.name;
 
   const matches = await findWorksByTitle(
     database,
@@ -319,9 +309,7 @@ async function checkSimilarTitles(
   }
 
   // Get the primary creator name
-  const primaryCreator = metadata.contributors?.find((c) =>
-    c.roles.includes("aut"),
-  )?.name;
+  const primaryCreator = metadata.contributors?.find((c) => c.roles.includes("aut"))?.name;
 
   try {
     const matches = await findSimilarWorks(
@@ -385,15 +373,10 @@ export function isPossibleFormatVariant(
       ?.filter((id) => id.type === "isbn")
       .map((id) => id.value.replace(/[-\s]/g, ""));
 
-    const existingIsbns = [
-      existingEdition.isbn_10,
-      existingEdition.isbn_13,
-    ].filter(Boolean);
+    const existingIsbns = [existingEdition.isbn_10, existingEdition.isbn_13].filter(Boolean);
 
     // If ISBNs are different, it's likely a format variant
-    const hasMatch = newIsbns?.some((isbn) =>
-      existingIsbns.some((existing) => existing === isbn),
-    );
+    const hasMatch = newIsbns?.some((isbn) => existingIsbns.some((existing) => existing === isbn));
 
     return !hasMatch;
   }

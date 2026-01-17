@@ -21,9 +21,7 @@ const visibilitySchema = z.enum(["private", "shared", "public"]);
 export const collections = t.router({
   list: procedure()
     .input(z.object({ book: z.string().optional() }).optional())
-    .query(({ ctx: { database, userId } }) =>
-      loadCollectionsForUser(database, userId),
-    ),
+    .query(({ ctx: { database, userId } }) => loadCollectionsForUser(database, userId)),
 
   load: procedure()
     .input(z.string())
@@ -33,50 +31,27 @@ export const collections = t.router({
 
   loadBooks: procedure()
     .input(z.string())
-    .query(({ input, ctx: { database } }) =>
-      loadCollectionWorks(database, input),
-    ),
+    .query(({ input, ctx: { database } }) => loadCollectionWorks(database, input)),
 
   loadCommentsWithReactions: procedure()
     .input(z.string())
-    .query(({ input, ctx: { database } }) =>
-      loadCollectionCommentsLegacy(database, input),
-    ),
+    .query(({ input, ctx: { database } }) => loadCollectionCommentsLegacy(database, input)),
 
   loadComments: procedure()
     .input(z.string())
-    .query(({ input, ctx: { database } }) =>
-      loadCollectionComments(database, input),
-    ),
+    .query(({ input, ctx: { database } }) => loadCollectionComments(database, input)),
 
   addComment: procedure()
-    .input(
-      z.object({
-        collection: z.string(),
-        content: z.string(),
-      }),
-    )
-    .mutation(
-      async ({ input: { collection, content }, ctx: { database, userId } }) => {
-        await addCollectionComment(database, collection, {
-          content: content,
-          created_by: userId,
-        });
-      },
-    ),
+    .input(z.object({ collection: z.string(), content: z.string() }))
+    .mutation(async ({ input: { collection, content }, ctx: { database, userId } }) => {
+      await addCollectionComment(database, collection, { content: content, created_by: userId });
+    }),
 
   toggleBook: procedure()
-    .input(
-      z.object({
-        collection: z.string(),
-        book: z.string(),
-      }),
-    )
-    .mutation(
-      async ({ input: { book, collection }, ctx: { database, userId } }) => {
-        return toggleWorkInCollection(database, collection, book, userId);
-      },
-    ),
+    .input(z.object({ collection: z.string(), book: z.string() }))
+    .mutation(async ({ input: { book, collection }, ctx: { database, userId } }) => {
+      return toggleWorkInCollection(database, collection, book, userId);
+    }),
 
   save: procedure()
     .input(
@@ -91,22 +66,14 @@ export const collections = t.router({
       }),
     )
     .mutation(async ({ input, ctx: { database, userId } }) => {
-      const { id, name, description, icon, color, visibility, ageRequirement } =
-        input;
+      const { id, name, description, icon, color, visibility, ageRequirement } = input;
 
       // Convert visibility string to shared boolean
       // private = false, shared = null, public = true
-      const shared =
-        visibility === "private"
-          ? false
-          : visibility === "public"
-            ? true
-            : null;
+      const shared = visibility === "private" ? false : visibility === "public" ? true : null;
 
       // Convert hex color string to Buffer if provided
-      const colorBuffer = color
-        ? Buffer.from(color.replace("#", ""), "hex")
-        : undefined;
+      const colorBuffer = color ? Buffer.from(color.replace("#", ""), "hex") : undefined;
 
       if (id) {
         return updateCollection(database, id, userId, {
@@ -159,29 +126,15 @@ export const collections = t.router({
     .input(
       z.object({
         collectionId: z.string(),
-        entries: z.array(
-          z.object({
-            workId: z.string(),
-            position: z.number(),
-          }),
-        ),
+        entries: z.array(z.object({ workId: z.string(), position: z.number() })),
       }),
     )
     .mutation(async ({ input, ctx: { database, userId } }) => {
       // Verify the user can edit this collection
-      const collection = await loadCollectionForUser(
-        database,
-        input.collectionId,
-        userId,
-      );
+      const collection = await loadCollectionForUser(database, input.collectionId, userId);
       if (collection.created_by?.toString() !== userId) {
         throw new Error("Not authorized to reorder this collection");
       }
-      await reorderCollectionEntries(
-        database,
-        input.collectionId,
-        input.entries,
-        userId,
-      );
+      await reorderCollectionEntries(database, input.collectionId, input.entries, userId);
     }),
 });

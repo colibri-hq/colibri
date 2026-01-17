@@ -37,9 +37,7 @@ export function loadLanguage(database: Database, code: string) {
   code = code.toLowerCase().split(/[-_]/, 1)?.shift() ?? code;
 
   return (
-    code.length === 2
-      ? query.where("iso_639_1", "=", code)
-      : query.where("iso_639_3", "=", code)
+    code.length === 2 ? query.where("iso_639_1", "=", code) : query.where("iso_639_3", "=", code)
   ).executeTakeFirst();
 }
 

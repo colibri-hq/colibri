@@ -22,9 +22,7 @@ describe("Cache Key Normalization", () => {
     it("should remove leading articles", () => {
       expect(normalizeTitle("The Hobbit")).toBe("hobbit");
       expect(normalizeTitle("A Tale of Two Cities")).toBe("tale of two cities");
-      expect(normalizeTitle("An Introduction to Algorithms")).toBe(
-        "introduction to algorithms",
-      );
+      expect(normalizeTitle("An Introduction to Algorithms")).toBe("introduction to algorithms");
     });
 
     it("should remove leading articles in other languages", () => {
@@ -62,13 +60,7 @@ describe("Cache Key Normalization", () => {
     });
 
     it("should produce same key for equivalent titles", () => {
-      const titles = [
-        "The Hobbit",
-        "THE HOBBIT",
-        "the hobbit",
-        " The  Hobbit ",
-        "The Hobbit.",
-      ];
+      const titles = ["The Hobbit", "THE HOBBIT", "the hobbit", " The  Hobbit ", "The Hobbit."];
       // Use arrow function to avoid map passing index as second arg to normalizeTitle
       const normalized = titles.map((t) => normalizeTitle(t));
       expect(new Set(normalized).size).toBe(1);
@@ -140,34 +132,24 @@ describe("Cache Key Normalization", () => {
     });
 
     it("should remove titles", () => {
-      expect(normalizeAuthor("Dr. Martin Luther King")).toBe(
-        "martin luther king",
-      );
+      expect(normalizeAuthor("Dr. Martin Luther King")).toBe("martin luther king");
       expect(normalizeAuthor("Prof. Stephen Hawking")).toBe("stephen hawking");
-      expect(normalizeAuthor("Sir Arthur Conan Doyle")).toBe(
-        "arthur conan doyle",
-      );
+      expect(normalizeAuthor("Sir Arthur Conan Doyle")).toBe("arthur conan doyle");
     });
 
     it("should remove suffixes", () => {
-      expect(normalizeAuthor("Martin Luther King Jr.")).toBe(
-        "martin luther king",
-      );
+      expect(normalizeAuthor("Martin Luther King Jr.")).toBe("martin luther king");
       expect(normalizeAuthor("Robert Downey, Jr")).toBe("robert downey");
       expect(normalizeAuthor("John Smith III")).toBe("john smith");
     });
 
     it("should remove date ranges", () => {
       expect(normalizeAuthor("Tolkien, J.R.R., 1892-1973")).toBe("jrr tolkien");
-      expect(normalizeAuthor("Shakespeare, William (1564-1616)")).toBe(
-        "william shakespeare",
-      );
+      expect(normalizeAuthor("Shakespeare, William (1564-1616)")).toBe("william shakespeare");
     });
 
     it("should remove diacritics", () => {
-      expect(normalizeAuthor("Gabriel García Márquez")).toBe(
-        "gabriel garcia marquez",
-      );
+      expect(normalizeAuthor("Gabriel García Márquez")).toBe("gabriel garcia marquez");
       expect(normalizeAuthor("François Müller")).toBe("francois muller");
     });
 
@@ -177,11 +159,7 @@ describe("Cache Key Normalization", () => {
 
     it("should produce same key for equivalent names", () => {
       // Names with same formatting patterns
-      const names = [
-        "Tolkien, J.R.R.",
-        "J.R.R. Tolkien",
-        "Tolkien, J.R.R., 1892-1973",
-      ];
+      const names = ["Tolkien, J.R.R.", "J.R.R. Tolkien", "Tolkien, J.R.R., 1892-1973"];
       const normalized = names.map(normalizeAuthor);
       expect(new Set(normalized).size).toBe(1);
       expect(normalized[0]).toBe("jrr tolkien");
@@ -198,12 +176,8 @@ describe("Cache Key Normalization", () => {
 
     it("should remove corporate suffixes", () => {
       expect(normalizePublisher("Random House, Inc.")).toBe("random house");
-      expect(normalizePublisher("HarperCollins Publishers")).toBe(
-        "harpercollins",
-      );
-      expect(normalizePublisher("Simon & Schuster Ltd")).toBe(
-        "simon and schuster",
-      );
+      expect(normalizePublisher("HarperCollins Publishers")).toBe("harpercollins");
+      expect(normalizePublisher("Simon & Schuster Ltd")).toBe("simon and schuster");
     });
 
     it("should normalize ampersand", () => {
@@ -220,12 +194,7 @@ describe("Cache Key Normalization", () => {
     });
 
     it("should produce same key for equivalent publishers", () => {
-      const publishers = [
-        "Penguin Books",
-        "PENGUIN BOOKS",
-        "Penguin",
-        "Penguin Publishing",
-      ];
+      const publishers = ["Penguin Books", "PENGUIN BOOKS", "Penguin", "Penguin Publishing"];
       const normalized = publishers.map(normalizePublisher);
       expect(new Set(normalized).size).toBe(1);
     });
@@ -290,19 +259,13 @@ describe("Cache Key Normalization", () => {
     });
 
     it("should skip null/undefined parameters", () => {
-      const key = generateCacheKey("search", {
-        title: "Test",
-        author: undefined,
-        isbn: null,
-      });
+      const key = generateCacheKey("search", { title: "Test", author: undefined, isbn: null });
       expect(key).not.toContain("author");
       expect(key).not.toContain("isbn");
     });
 
     it("should normalize ISBN parameters", () => {
-      const key1 = generateCacheKey("searchByISBN", {
-        isbn: "978-0-571-08989-6",
-      });
+      const key1 = generateCacheKey("searchByISBN", { isbn: "978-0-571-08989-6" });
       const key2 = generateCacheKey("searchByISBN", { isbn: "9780571089896" });
       expect(key1).toBe(key2);
     });
@@ -314,19 +277,13 @@ describe("Cache Key Normalization", () => {
     });
 
     it("should normalize author parameters", () => {
-      const key1 = generateCacheKey("searchByCreator", {
-        author: "Tolkien, J.R.R.",
-      });
-      const key2 = generateCacheKey("searchByCreator", {
-        author: "J.R.R. Tolkien",
-      });
+      const key1 = generateCacheKey("searchByCreator", { author: "Tolkien, J.R.R." });
+      const key2 = generateCacheKey("searchByCreator", { author: "J.R.R. Tolkien" });
       expect(key1).toBe(key2);
     });
 
     it("should handle array parameters", () => {
-      const key = generateCacheKey("search", {
-        authors: ["Tolkien, J.R.R.", "C.S. Lewis"],
-      });
+      const key = generateCacheKey("search", { authors: ["Tolkien, J.R.R.", "C.S. Lewis"] });
       expect(key).toContain("authors:");
       expect(key).toContain("jrr tolkien");
       expect(key).toContain("cs lewis");
@@ -354,9 +311,7 @@ describe("Cache Key Normalization", () => {
 
     it("should handle ISBN-10 to ISBN-13 conversion", () => {
       const key10 = generateCacheKey("searchByISBN", { isbn: "0-571-08989-5" });
-      const key13 = generateCacheKey("searchByISBN", {
-        isbn: "978-0-571-08989-5",
-      });
+      const key13 = generateCacheKey("searchByISBN", { isbn: "978-0-571-08989-5" });
       expect(key10).toBe(key13);
     });
   });
@@ -376,13 +331,7 @@ describe("Cache Key Normalization", () => {
 
     it("should pass through options", () => {
       const generator = createProviderCacheKeyGenerator("TestProvider");
-      const key = generator(
-        "searchByISBN",
-        { isbn: "0-571-08989-5" },
-        {
-          normalizeIsbn13: false,
-        },
-      );
+      const key = generator("searchByISBN", { isbn: "0-571-08989-5" }, { normalizeIsbn13: false });
       // With normalizeIsbn13: false, should not convert
       expect(key).toContain("isbn:0571089895");
     });
@@ -391,62 +340,38 @@ describe("Cache Key Normalization", () => {
   describe("Integration scenarios", () => {
     it("should cache hit for same book searched different ways", () => {
       // Someone searches by ISBN-10, then later by ISBN-13
-      const searchByISBN10 = generateCacheKey("searchByISBN", {
-        isbn: "0-571-08989-5",
-      });
-      const searchByISBN13 = generateCacheKey("searchByISBN", {
-        isbn: "978-0-571-08989-5",
-      });
+      const searchByISBN10 = generateCacheKey("searchByISBN", { isbn: "0-571-08989-5" });
+      const searchByISBN13 = generateCacheKey("searchByISBN", { isbn: "978-0-571-08989-5" });
       expect(searchByISBN10).toBe(searchByISBN13);
     });
 
     it("should cache hit for same title with different formatting", () => {
       // All these titles should normalize to the same key
-      const search1 = generateCacheKey("searchByTitle", {
-        title: "The Lord of the Rings",
-      });
-      const search2 = generateCacheKey("searchByTitle", {
-        title: "THE LORD OF THE RINGS",
-      });
-      const search3 = generateCacheKey("searchByTitle", {
-        title: " The  Lord  Of  The  Rings ",
-      });
+      const search1 = generateCacheKey("searchByTitle", { title: "The Lord of the Rings" });
+      const search2 = generateCacheKey("searchByTitle", { title: "THE LORD OF THE RINGS" });
+      const search3 = generateCacheKey("searchByTitle", { title: " The  Lord  Of  The  Rings " });
       // All have leading "The/THE" which gets removed, resulting in "lord of the rings"
       expect(search1).toBe(search2);
       expect(search2).toBe(search3);
     });
 
     it("should cache hit for same author with different name formats", () => {
-      const search1 = generateCacheKey("searchByCreator", {
-        name: "Gabriel García Márquez",
-      });
-      const search2 = generateCacheKey("searchByCreator", {
-        name: "García Márquez, Gabriel",
-      });
-      const search3 = generateCacheKey("searchByCreator", {
-        name: "GABRIEL GARCIA MARQUEZ",
-      });
+      const search1 = generateCacheKey("searchByCreator", { name: "Gabriel García Márquez" });
+      const search2 = generateCacheKey("searchByCreator", { name: "García Márquez, Gabriel" });
+      const search3 = generateCacheKey("searchByCreator", { name: "GABRIEL GARCIA MARQUEZ" });
       expect(search1).toBe(search2);
       expect(search2).toBe(search3);
     });
 
     it("should distinguish different books", () => {
-      const book1 = generateCacheKey("searchByISBN", {
-        isbn: "978-0-571-08989-6",
-      });
-      const book2 = generateCacheKey("searchByISBN", {
-        isbn: "978-0-13-468599-1",
-      });
+      const book1 = generateCacheKey("searchByISBN", { isbn: "978-0-571-08989-6" });
+      const book2 = generateCacheKey("searchByISBN", { isbn: "978-0-13-468599-1" });
       expect(book1).not.toBe(book2);
     });
 
     it("should distinguish different authors", () => {
-      const author1 = generateCacheKey("searchByCreator", {
-        name: "Stephen King",
-      });
-      const author2 = generateCacheKey("searchByCreator", {
-        name: "Martin Luther King",
-      });
+      const author1 = generateCacheKey("searchByCreator", { name: "Stephen King" });
+      const author2 = generateCacheKey("searchByCreator", { name: "Martin Luther King" });
       expect(author1).not.toBe(author2);
     });
   });

@@ -1,6 +1,6 @@
-import { OAuthError } from "../errors.js";
-import type { Entities } from "../types.js";
 import { z } from "zod";
+import type { Entities } from "../types.js";
+import { OAuthError } from "../errors.js";
 import { defineGrantType, type GrantTypeOptions } from "./grantType.js";
 
 export interface RefreshTokenGrantOptions<
@@ -76,9 +76,7 @@ export const RefreshTokenGrant = defineGrantType({
 
   get schema() {
     return z.object({
-      grant_type: z.literal("refresh_token", {
-        message: "The grant type is missing or invalid",
-      }),
+      grant_type: z.literal("refresh_token", { message: "The grant type is missing or invalid" }),
       client_id: z.string({
         required_error: "The client ID is missing",
         invalid_type_error: "The client ID is invalid",
@@ -113,10 +111,7 @@ export const RefreshTokenGrant = defineGrantType({
     try {
       refreshToken = await this.options.loadRefreshToken(token);
     } catch {
-      throw new OAuthError(
-        "invalid_grant",
-        "The refresh token is invalid or expired",
-      );
+      throw new OAuthError("invalid_grant", "The refresh token is invalid or expired");
     }
 
     if (
@@ -124,10 +119,7 @@ export const RefreshTokenGrant = defineGrantType({
       refreshToken.revoked_at !== null ||
       refreshToken.expires_at <= new Date()
     ) {
-      throw new OAuthError(
-        "invalid_grant",
-        "The refresh token is invalid or expired",
-      );
+      throw new OAuthError("invalid_grant", "The refresh token is invalid or expired");
     }
 
     if (refreshToken.client_id !== client.id) {
@@ -136,25 +128,16 @@ export const RefreshTokenGrant = defineGrantType({
     // endregion
 
     // region Verify scopes
-    if (
-      scope &&
-      !scope.every((scope: string) => refreshToken.scopes.includes(scope))
-    ) {
+    if (scope && !scope.every((scope: string) => refreshToken.scopes.includes(scope))) {
       throw new OAuthError("invalid_scope", "One or more scopes are invalid");
     }
 
-    const effectiveScopes =
-      scope && scope.length > 0 ? scope : refreshToken.scopes;
+    const effectiveScopes = scope && scope.length > 0 ? scope : refreshToken.scopes;
     // endregion
 
     return {
-      accessToken: {
-        ttl: this.options.accessTokenTtl,
-      },
-      refreshToken: {
-        ttl: this.options.refreshTokenTtl,
-        exchange: refreshToken.token,
-      },
+      accessToken: { ttl: this.options.accessTokenTtl },
+      refreshToken: { ttl: this.options.refreshTokenTtl, exchange: refreshToken.token },
       userIdentifier: refreshToken.user_id ?? undefined,
       scopes: effectiveScopes,
     };

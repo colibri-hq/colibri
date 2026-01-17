@@ -104,10 +104,7 @@ console.log("Confidence:", result.confidence);
 ### Manual Conversion
 
 ```typescript
-import {
-  convertToExtractedMetadata,
-  mergeMetadataRecords,
-} from "./metadata-converter.js";
+import { convertToExtractedMetadata, mergeMetadataRecords } from "./metadata-converter.js";
 import { WikiDataMetadataProvider } from "../metadata/wikidata.js";
 import { OpenLibraryMetadataProvider } from "../metadata/open-library.js";
 
@@ -139,10 +136,8 @@ const allRecords: MetadataRecord[] = [
 ];
 
 // Resolve conflict
-const resolution = resolveConflict<Date>(
-  allRecords,
-  "publicationDate",
-  (date) => date.getFullYear().toString(),
+const resolution = resolveConflict<Date>(allRecords, "publicationDate", (date) =>
+  date.getFullYear().toString(),
 );
 
 if (resolution.hasConflict) {

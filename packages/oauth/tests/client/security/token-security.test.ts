@@ -5,9 +5,9 @@
  * @see https://datatracker.ietf.org/doc/rfc9700/
  */
 import { describe, expect, it, beforeEach } from "vitest";
+import type { StoredTokens } from "../../../src/client/types.js";
 import { AuthorizationCodeClient } from "../../../src/client/authorization-code.js";
 import { ClientCredentialsClient } from "../../../src/client/client-credentials.js";
-import type { StoredTokens } from "../../../src/client/types.js";
 import {
   createFullMockFetch,
   createMockTokenStore,

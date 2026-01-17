@@ -5,10 +5,8 @@ export default class Login extends BaseCommand<typeof Login> {
   static examples = [
     "<%= config.bin %> <%= command.id %>",
     {
-      command:
-        "<%= config.bin %> <%= command.id %> --instance https://colibri.example.com",
-      description:
-        "To connect to a specific Colibri instance, use the --instance option:",
+      command: "<%= config.bin %> <%= command.id %> --instance https://colibri.example.com",
+      description: "To connect to a specific Colibri instance, use the --instance option:",
     },
   ];
 

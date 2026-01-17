@@ -123,11 +123,7 @@ describe("glossary-data", () => {
       const entries = getAllGlossaryEntries();
       const originalLength = GLOSSARY.length;
 
-      entries.push({
-        id: "test",
-        displayTerm: "Test",
-        definition: "Test entry",
-      });
+      entries.push({ id: "test", displayTerm: "Test", definition: "Test entry" });
 
       expect(GLOSSARY.length).toBe(originalLength);
     });
@@ -188,14 +184,7 @@ describe("glossary-data", () => {
     });
 
     it("should have entries for core Colibri concepts", () => {
-      const coreTerms = [
-        "work",
-        "edition",
-        "asset",
-        "collection",
-        "metadata",
-        "enrichment",
-      ];
+      const coreTerms = ["work", "edition", "asset", "collection", "metadata", "enrichment"];
       coreTerms.forEach((term) => {
         expect(hasGlossaryEntry(term)).toBe(true);
       });

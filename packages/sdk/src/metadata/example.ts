@@ -80,9 +80,7 @@ export class ExampleMetadataProvider extends BaseMetadataProvider {
     ];
   }
 
-  async searchMultiCriteria(
-    criteria: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(criteria: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     const results: MetadataRecord[] = [];
 
     // If title is provided, add a title-based result
@@ -201,9 +199,7 @@ async function demonstrateEnhancedProvider() {
   dataTypes.forEach((type) => {
     const score = provider.getReliabilityScore(type);
     const supported = provider.supportsDataType(type);
-    console.log(
-      `  ${type}: ${score} (${supported ? "supported" : "not supported"})`,
-    );
+    console.log(`  ${type}: ${score} (${supported ? "supported" : "not supported"})`);
   });
 
   console.log("\n=== Search Examples ===\n");
@@ -211,10 +207,7 @@ async function demonstrateEnhancedProvider() {
   try {
     // Example 1: Title search
     console.log("1. Title Search (exact match):");
-    const titleResults = await provider.searchByTitle({
-      title: "The Hobbit",
-      exactMatch: true,
-    });
+    const titleResults = await provider.searchByTitle({ title: "The Hobbit", exactMatch: true });
     console.log(`Found ${titleResults.length} results`);
     if (titleResults.length > 0) {
       const result = titleResults[0];
@@ -239,10 +232,7 @@ async function demonstrateEnhancedProvider() {
 
     // Example 3: Creator search
     console.log("3. Creator Search:");
-    const creatorResults = await provider.searchByCreator({
-      name: "J.R.R. Tolkien",
-      fuzzy: false,
-    });
+    const creatorResults = await provider.searchByCreator({ name: "J.R.R. Tolkien", fuzzy: false });
     console.log(`Found ${creatorResults.length} results`);
     if (creatorResults.length > 0) {
       const result = creatorResults[0];
@@ -269,13 +259,9 @@ async function demonstrateEnhancedProvider() {
       console.log(`  Authors: ${result.authors?.join(", ")}`);
       console.log(`  Language: ${result.language}`);
       console.log(`  Subjects: ${result.subjects?.slice(0, 3).join(", ")}...`);
-      console.log(
-        `  Publication Date: ${result.publicationDate?.getFullYear()}`,
-      );
+      console.log(`  Publication Date: ${result.publicationDate?.getFullYear()}`);
       console.log(`  Confidence: ${result.confidence}`);
-      console.log(
-        `  Provider Data Keys: ${Object.keys(result.providerData || {}).join(", ")}`,
-      );
+      console.log(`  Provider Data Keys: ${Object.keys(result.providerData || {}).join(", ")}`);
     }
   } catch (error) {
     console.error("Error during demonstration:", error);
@@ -310,9 +296,7 @@ export async function demonstrateInfrastructure() {
   dataTypes.forEach((type) => {
     const supported = provider.supportsDataType(type);
     const score = provider.getReliabilityScore(type);
-    console.log(
-      `  ${type}: ${supported ? "supported" : "not supported"} (reliability: ${score})`,
-    );
+    console.log(`  ${type}: ${supported ? "supported" : "not supported"} (reliability: ${score})`);
   });
 
   // Test searches
@@ -324,9 +308,7 @@ export async function demonstrateInfrastructure() {
   const isbnResults = await provider.searchByISBN("978-1234567890");
   console.log(`ISBN search results: ${isbnResults.length}`);
 
-  const creatorResults = await provider.searchByCreator({
-    name: "Test Author",
-  });
+  const creatorResults = await provider.searchByCreator({ name: "Test Author" });
   console.log(`Creator search results: ${creatorResults.length}`);
 
   const multiResults = await provider.searchMultiCriteria({

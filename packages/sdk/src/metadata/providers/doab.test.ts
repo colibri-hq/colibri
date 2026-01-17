@@ -20,17 +20,13 @@ const sampleBookResponse: Record<string, unknown> = {
         { key: "dc.date.issued", value: "2023-06-15" },
         {
           key: "dc.description.abstract",
-          value:
-            "This book provides a comprehensive introduction to open science practices...",
+          value: "This book provides a comprehensive introduction to open science practices...",
         },
         { key: "dc.subject", value: "Open Access" },
         { key: "dc.subject", value: "Academic Publishing" },
         { key: "dc.subject.classification", value: "Science" },
         { key: "dc.language.iso", value: "eng" },
-        {
-          key: "dc.rights.uri",
-          value: "https://creativecommons.org/licenses/by/4.0/",
-        },
+        { key: "dc.rights.uri", value: "https://creativecommons.org/licenses/by/4.0/" },
       ],
       bitstreams: [
         {
@@ -44,8 +40,7 @@ const sampleBookResponse: Record<string, unknown> = {
           name: "cover.jpg",
           format: "image/jpeg",
           sizeBytes: 102400,
-          retrieveLink:
-            "https://directory.doabooks.org/bitstream/20.500.12657/12345/2/cover.jpg",
+          retrieveLink: "https://directory.doabooks.org/bitstream/20.500.12657/12345/2/cover.jpg",
         },
       ],
     },
@@ -76,12 +71,7 @@ const sampleMultipleAuthorsResponse: Record<string, unknown> = {
   total: 1,
 };
 
-const emptyResponse: Record<string, unknown> = {
-  items: [],
-  total: 0,
-  offset: 0,
-  limit: 10,
-};
+const emptyResponse: Record<string, unknown> = { items: [], total: 0, offset: 0, limit: 10 };
 
 describe("DOABMetadataProvider", () => {
   let provider: DOABMetadataProvider;
@@ -99,14 +89,9 @@ describe("DOABMetadataProvider", () => {
 
   describe("searchByTitle", () => {
     it("should search by title and return metadata records", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Open Science",
-      });
+      const results = await provider.searchByTitle({ title: "Open Science" });
 
       expect(mockFetch).toHaveBeenCalled();
       expect(results.length).toBeGreaterThan(0);
@@ -121,38 +106,24 @@ describe("DOABMetadataProvider", () => {
     });
 
     it("should return empty array when no results", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => emptyResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => emptyResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Nonexistent Book",
-      });
+      const results = await provider.searchByTitle({ title: "Nonexistent Book" });
 
       expect(results).toEqual([]);
     });
 
     it("should handle exact match searches", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
-      await provider.searchByTitle({
-        title: "Open Science",
-        exactMatch: true,
-      });
+      await provider.searchByTitle({ title: "Open Science", exactMatch: true });
 
       const call = mockFetch.mock.calls[0];
       expect(call[0]).toContain("dc.title%3A%22Open+Science%22");
     });
 
     it("should extract subjects from both dc.subject and dc.subject.classification", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -164,10 +135,7 @@ describe("DOABMetadataProvider", () => {
 
   describe("searchByISBN", () => {
     it("should search by ISBN", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByISBN("978-3-030-55555-5");
 
@@ -177,10 +145,7 @@ describe("DOABMetadataProvider", () => {
     });
 
     it("should clean ISBN before searching", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       await provider.searchByISBN("978-3-030-55555-5");
 
@@ -191,10 +156,7 @@ describe("DOABMetadataProvider", () => {
 
   describe("searchByDOI", () => {
     it("should search by DOI", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByDOI("10.1007/978-3-030-55555-5");
 
@@ -204,30 +166,20 @@ describe("DOABMetadataProvider", () => {
     });
 
     it("should handle doi.org URL format", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       await provider.searchByDOI("https://doi.org/10.1007/978-3-030-55555-5");
 
       const call = mockFetch.mock.calls[0];
-      expect(call[0]).toContain(
-        "dc.identifier.doi%3A10.1007%2F978-3-030-55555-5",
-      );
+      expect(call[0]).toContain("dc.identifier.doi%3A10.1007%2F978-3-030-55555-5");
     });
   });
 
   describe("searchByCreator", () => {
     it("should search by author name", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
-      const results = await provider.searchByCreator({
-        name: "Smith",
-      });
+      const results = await provider.searchByCreator({ name: "Smith" });
 
       expect(mockFetch).toHaveBeenCalled();
       expect(results.length).toBeGreaterThan(0);
@@ -235,30 +187,18 @@ describe("DOABMetadataProvider", () => {
     });
 
     it("should handle fuzzy author searches", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
-      await provider.searchByCreator({
-        name: "Smith",
-        fuzzy: true,
-      });
+      await provider.searchByCreator({ name: "Smith", fuzzy: true });
 
       const call = mockFetch.mock.calls[0];
       expect(call[0]).toContain("dc.contributor.author%3ASmith");
     });
 
     it("should handle exact author searches", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
-      await provider.searchByCreator({
-        name: "Smith, John",
-        fuzzy: false,
-      });
+      await provider.searchByCreator({ name: "Smith, John", fuzzy: false });
 
       const call = mockFetch.mock.calls[0];
       expect(call[0]).toContain("dc.contributor.author%3A%22Smith%2C+John%22");
@@ -267,30 +207,18 @@ describe("DOABMetadataProvider", () => {
 
   describe("searchMultiCriteria", () => {
     it("should prioritize ISBN when available", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
-      await provider.searchMultiCriteria({
-        title: "Open Science",
-        isbn: "9783030555555",
-      });
+      await provider.searchMultiCriteria({ title: "Open Science", isbn: "9783030555555" });
 
       const call = mockFetch.mock.calls[0];
       expect(call[0]).toContain("dc.identifier.isbn%3A9783030555555");
     });
 
     it("should combine title and author with AND", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
-      await provider.searchMultiCriteria({
-        title: "Open Science",
-        authors: ["Smith"],
-      });
+      await provider.searchMultiCriteria({ title: "Open Science", authors: ["Smith"] });
 
       const call = mockFetch.mock.calls[0];
       expect(call[0]).toContain("dc.title%3AOpen");
@@ -299,15 +227,9 @@ describe("DOABMetadataProvider", () => {
     });
 
     it("should include publisher in search", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
-      await provider.searchMultiCriteria({
-        title: "Open Science",
-        publisher: "Academic Press",
-      });
+      await provider.searchMultiCriteria({ title: "Open Science", publisher: "Academic Press" });
 
       const call = mockFetch.mock.calls[0];
       expect(call[0]).toContain("dc.publisher%3AAcademic");
@@ -321,10 +243,7 @@ describe("DOABMetadataProvider", () => {
 
   describe("Provider Data", () => {
     it("should include DOI in provider data", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -332,10 +251,7 @@ describe("DOABMetadataProvider", () => {
     });
 
     it("should include open access URL", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -343,10 +259,7 @@ describe("DOABMetadataProvider", () => {
     });
 
     it("should include license information", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -354,10 +267,7 @@ describe("DOABMetadataProvider", () => {
     });
 
     it("should include bitstream information", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -366,10 +276,7 @@ describe("DOABMetadataProvider", () => {
     });
 
     it("should include UUID and handle", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -380,10 +287,7 @@ describe("DOABMetadataProvider", () => {
 
   describe("Author Extraction", () => {
     it("should extract authors from dc.contributor.author", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -392,10 +296,7 @@ describe("DOABMetadataProvider", () => {
     });
 
     it("should extract authors from dc.creator", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleMultipleAuthorsResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleMultipleAuthorsResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -407,10 +308,7 @@ describe("DOABMetadataProvider", () => {
 
   describe("Language Normalization", () => {
     it("should normalize 3-letter language codes", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -418,10 +316,7 @@ describe("DOABMetadataProvider", () => {
     });
 
     it("should keep 2-letter language codes as-is", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleMultipleAuthorsResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleMultipleAuthorsResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -431,15 +326,9 @@ describe("DOABMetadataProvider", () => {
 
   describe("Error Handling", () => {
     it("should handle HTTP errors gracefully", async () => {
-      mockFetch.mockResolvedValue({
-        ok: false,
-        status: 500,
-        statusText: "Internal Server Error",
-      });
+      mockFetch.mockResolvedValue({ ok: false, status: 500, statusText: "Internal Server Error" });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results).toEqual([]);
     }, 30000);
@@ -448,28 +337,18 @@ describe("DOABMetadataProvider", () => {
       mockFetch
         .mockRejectedValueOnce(new Error("Network error"))
         .mockRejectedValueOnce(new Error("Network error"))
-        .mockResolvedValue({
-          ok: true,
-          json: async () => sampleBookResponse,
-        });
+        .mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results.length).toBeGreaterThan(0);
       expect(mockFetch).toHaveBeenCalledTimes(3);
     }, 30000);
 
     it("should handle missing items gracefully", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => ({}),
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results).toEqual([]);
     }, 30000);
@@ -477,30 +356,21 @@ describe("DOABMetadataProvider", () => {
 
   describe("Confidence Scoring", () => {
     it("should assign high confidence for ISBN searches", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByISBN("9783030555555");
       expect(results[0].confidence).toBeGreaterThanOrEqual(0.9);
     }, 30000);
 
     it("should assign high confidence for DOI searches", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByDOI("10.1007/test");
       expect(results[0].confidence).toBeGreaterThanOrEqual(0.9);
     }, 30000);
 
     it("should boost confidence for complete metadata", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 

@@ -21,9 +21,7 @@ import {
 /**
  * Helper to create a mock MetadataRecord
  */
-function createMockRecord(
-  overrides: Partial<MetadataRecord> = {},
-): MetadataRecord {
+function createMockRecord(overrides: Partial<MetadataRecord> = {}): MetadataRecord {
   return {
     title: "The Hobbit",
     authors: ["J.R.R. Tolkien"],
@@ -98,9 +96,7 @@ describe("OpenLibrary Confidence Utilities", () => {
     });
 
     it("should allow custom configuration", () => {
-      const factors = calculateConfidenceFactors([], {
-        minConfidence: 0.5,
-      });
+      const factors = calculateConfidenceFactors([], { minConfidence: 0.5 });
 
       expect(factors.finalConfidence).toBe(0.5);
     });
@@ -118,16 +114,8 @@ describe("OpenLibrary Confidence Utilities", () => {
 
     it("should calculate correctly for multiple sources", () => {
       const results = [
-        createMockRecord({
-          confidence: 0.9,
-          title: "The Hobbit",
-          isbn: ["978-0-618-00222-4"],
-        }),
-        createMockRecord({
-          confidence: 0.85,
-          title: "The Hobbit",
-          isbn: ["978-0-618-00222-4"],
-        }),
+        createMockRecord({ confidence: 0.9, title: "The Hobbit", isbn: ["978-0-618-00222-4"] }),
+        createMockRecord({ confidence: 0.85, title: "The Hobbit", isbn: ["978-0-618-00222-4"] }),
       ];
       const aggregated = calculateAggregatedConfidence(results);
 
@@ -280,11 +268,7 @@ describe("OpenLibrary Confidence Utilities", () => {
 
     it("should respect maxPenalty parameter", () => {
       const results = [
-        createMockRecord({
-          title: "A",
-          authors: ["X"],
-          publicationDate: new Date("1900-01-01"),
-        }),
+        createMockRecord({ title: "A", authors: ["X"], publicationDate: new Date("1900-01-01") }),
         createMockRecord({
           title: "B",
           authors: ["X", "Y", "Z"],
@@ -323,12 +307,7 @@ describe("OpenLibrary Confidence Utilities", () => {
     });
 
     it("should return low boost for low reliability scores", () => {
-      const lowReliability = [
-        createMockRecord({
-          confidence: 0.5,
-          title: "Test",
-        }),
-      ];
+      const lowReliability = [createMockRecord({ confidence: 0.5, title: "Test" })];
       const boost = calculateReliabilityBoost(lowReliability);
 
       expect(boost).toBeLessThanOrEqual(0.01);
@@ -356,12 +335,7 @@ describe("OpenLibrary Confidence Utilities", () => {
           subjects: ["Fiction"],
         }),
       ];
-      const lowQuality = [
-        createMockRecord({
-          confidence: 0.5,
-          title: "Test",
-        }),
-      ];
+      const lowQuality = [createMockRecord({ confidence: 0.5, title: "Test" })];
 
       const highScore = calculateSourceReliabilityScore(highQuality);
       const lowScore = calculateSourceReliabilityScore(lowQuality);
@@ -372,10 +346,7 @@ describe("OpenLibrary Confidence Utilities", () => {
 
   describe("calculateDataCompleteness", () => {
     it("should return 0 for empty record", () => {
-      const completeness = calculateDataCompleteness({
-        confidence: 0.5,
-        source: "test",
-      });
+      const completeness = calculateDataCompleteness({ confidence: 0.5, source: "test" });
       expect(completeness).toBeCloseTo(0, 5);
     });
 
@@ -475,14 +446,8 @@ describe("OpenLibrary Confidence Utilities", () => {
 
     it("should return lower score for mismatched results", () => {
       const results = [
-        createMockRecord({
-          title: "The Hobbit",
-          authors: ["J.R.R. Tolkien"],
-        }),
-        createMockRecord({
-          title: "The Lord of the Rings",
-          authors: ["Different Author"],
-        }),
+        createMockRecord({ title: "The Hobbit", authors: ["J.R.R. Tolkien"] }),
+        createMockRecord({ title: "The Lord of the Rings", authors: ["Different Author"] }),
       ];
       const score = calculateOverallAgreementScore(results);
 
@@ -491,12 +456,8 @@ describe("OpenLibrary Confidence Utilities", () => {
 
     it("should give high score for common ISBNs", () => {
       const results = [
-        createMockRecord({
-          isbn: ["978-0-618-00222-4", "0-618-00222-1"],
-        }),
-        createMockRecord({
-          isbn: ["978-0-618-00222-4"],
-        }),
+        createMockRecord({ isbn: ["978-0-618-00222-4", "0-618-00222-1"] }),
+        createMockRecord({ isbn: ["978-0-618-00222-4"] }),
       ];
       const score = calculateOverallAgreementScore(results);
 
@@ -610,14 +571,8 @@ describe("OpenLibrary Confidence Utilities", () => {
 
     it("should handle low quality sources scenario", () => {
       const results = [
-        createMockRecord({
-          title: "Unknown Book",
-          confidence: 0.4,
-        }),
-        createMockRecord({
-          title: "Unknown Book",
-          confidence: 0.35,
-        }),
+        createMockRecord({ title: "Unknown Book", confidence: 0.4 }),
+        createMockRecord({ title: "Unknown Book", confidence: 0.35 }),
       ];
 
       const aggregated = calculateAggregatedConfidence(results);

@@ -10,6 +10,7 @@
  * @module metadata/aggregator
  */
 
+import type { ConfidenceFactors } from "./providers/open-library/types.js";
 import type {
   MetadataProvider,
   MetadataRecord,
@@ -18,7 +19,6 @@ import type {
 } from "./providers/provider.js";
 import { normalizeISBN, normalizeTitle } from "./cache-keys.js";
 import { calculateAggregatedConfidence } from "./providers/open-library/confidence.js";
-import type { ConfidenceFactors } from "./providers/open-library/types.js";
 
 /**
  * Configuration options for the MetadataAggregator
@@ -138,12 +138,8 @@ export class MetadataAggregator {
 
     if (this.options.enableLogging) {
       const totalTime = performance.now() - startTime;
-      console.log(
-        `[Aggregator] ISBN search completed in ${totalTime.toFixed(2)}ms`,
-      );
-      console.log(
-        `[Aggregator] Found ${aggregated.results.length} unique results`,
-      );
+      console.log(`[Aggregator] ISBN search completed in ${totalTime.toFixed(2)}ms`);
+      console.log(`[Aggregator] Found ${aggregated.results.length} unique results`);
     }
 
     return aggregated;
@@ -175,12 +171,8 @@ export class MetadataAggregator {
 
     if (this.options.enableLogging) {
       const totalTime = performance.now() - startTime;
-      console.log(
-        `[Aggregator] Title search completed in ${totalTime.toFixed(2)}ms`,
-      );
-      console.log(
-        `[Aggregator] Found ${aggregated.results.length} unique results`,
-      );
+      console.log(`[Aggregator] Title search completed in ${totalTime.toFixed(2)}ms`);
+      console.log(`[Aggregator] Found ${aggregated.results.length} unique results`);
     }
 
     return aggregated;
@@ -192,9 +184,7 @@ export class MetadataAggregator {
    * @param query - The multi-criteria query
    * @returns Aggregated results from all providers
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<AggregatedResult> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<AggregatedResult> {
     const startTime = performance.now();
 
     if (this.options.enableLogging) {
@@ -214,12 +204,8 @@ export class MetadataAggregator {
 
     if (this.options.enableLogging) {
       const totalTime = performance.now() - startTime;
-      console.log(
-        `[Aggregator] Multi-criteria search completed in ${totalTime.toFixed(2)}ms`,
-      );
-      console.log(
-        `[Aggregator] Found ${aggregated.results.length} unique results`,
-      );
+      console.log(`[Aggregator] Multi-criteria search completed in ${totalTime.toFixed(2)}ms`);
+      console.log(`[Aggregator] Found ${aggregated.results.length} unique results`);
     }
 
     return aggregated;
@@ -264,19 +250,12 @@ export class MetadataAggregator {
         );
       }
 
-      return {
-        provider: providerName,
-        records,
-        timing,
-      };
+      return { provider: providerName, records, timing };
     } catch (error) {
       const timing = performance.now() - startTime;
 
       if (this.options.enableLogging) {
-        console.error(
-          `[${providerName}] Failed after ${timing.toFixed(2)}ms:`,
-          error,
-        );
+        console.error(`[${providerName}] Failed after ${timing.toFixed(2)}ms:`, error);
       }
 
       return {
@@ -307,10 +286,7 @@ export class MetadataAggregator {
           provider: provider.name,
           records: [],
           timing: 0,
-          error:
-            result.reason instanceof Error
-              ? result.reason
-              : new Error(String(result.reason)),
+          error: result.reason instanceof Error ? result.reason : new Error(String(result.reason)),
         };
       }
     });
@@ -333,9 +309,7 @@ export class MetadataAggregator {
   /**
    * Aggregate and merge results from multiple providers
    */
-  private aggregateResults(
-    providerResults: ProviderResult[],
-  ): AggregatedResult {
+  private aggregateResults(providerResults: ProviderResult[]): AggregatedResult {
     // Build maps for result structure
     const providerResultsMap = new Map<string, MetadataRecord[]>();
     const timingMap = new Map<string, number>();
@@ -354,10 +328,7 @@ export class MetadataAggregator {
     for (const result of providerResults) {
       if (!result.error && result.records.length > 0) {
         for (const record of result.records) {
-          allRecords.push({
-            ...record,
-            provider: result.provider,
-          });
+          allRecords.push({ ...record, provider: result.provider });
         }
       }
     }
@@ -392,10 +363,7 @@ export class MetadataAggregator {
     records: Array<MetadataRecord & { provider: string }>,
   ): Array<MetadataRecord & { provider: string }> {
     // Group records by normalized ISBN
-    const isbnGroups = new Map<
-      string,
-      Array<MetadataRecord & { provider: string }>
-    >();
+    const isbnGroups = new Map<string, Array<MetadataRecord & { provider: string }>>();
     const nonIsbnRecords: Array<MetadataRecord & { provider: string }> = [];
 
     for (const record of records) {
@@ -417,10 +385,7 @@ export class MetadataAggregator {
         // Check if we already have a record with this title
         let foundMatch = false;
         for (const existing of nonIsbnRecords) {
-          if (
-            existing.title &&
-            normalizeTitle(existing.title) === normalizedTitle
-          ) {
+          if (existing.title && normalizeTitle(existing.title) === normalizedTitle) {
             foundMatch = true;
             break;
           }
@@ -501,27 +466,21 @@ export class MetadataAggregator {
       // Override with merged array fields
       isbn: allIsbns.size > 0 ? Array.from(allIsbns) : primary.isbn,
       authors: allAuthors.size > 0 ? Array.from(allAuthors) : primary.authors,
-      subjects:
-        allSubjects.size > 0 ? Array.from(allSubjects) : primary.subjects,
+      subjects: allSubjects.size > 0 ? Array.from(allSubjects) : primary.subjects,
     };
 
     // For scalar fields, prefer the first non-empty value from highest-confidence records
     for (const record of sorted) {
       if (!merged.title && record.title) merged.title = record.title;
-      if (!merged.description && record.description)
-        merged.description = record.description;
-      if (!merged.publisher && record.publisher)
-        merged.publisher = record.publisher;
+      if (!merged.description && record.description) merged.description = record.description;
+      if (!merged.publisher && record.publisher) merged.publisher = record.publisher;
       if (!merged.publicationDate && record.publicationDate)
         merged.publicationDate = record.publicationDate;
-      if (!merged.language && record.language)
-        merged.language = record.language;
+      if (!merged.language && record.language) merged.language = record.language;
       if (!merged.edition && record.edition) merged.edition = record.edition;
-      if (!merged.pageCount && record.pageCount)
-        merged.pageCount = record.pageCount;
+      if (!merged.pageCount && record.pageCount) merged.pageCount = record.pageCount;
       if (!merged.series && record.series) merged.series = record.series;
-      if (!merged.coverImage && record.coverImage)
-        merged.coverImage = record.coverImage;
+      if (!merged.coverImage && record.coverImage) merged.coverImage = record.coverImage;
       if (!merged.physicalDimensions && record.physicalDimensions)
         merged.physicalDimensions = record.physicalDimensions;
     }
@@ -536,17 +495,12 @@ export class MetadataAggregator {
     records: Array<MetadataRecord & { provider: string }>,
   ): AggregatedResult["consensus"] {
     // Remove provider attribution for confidence calculation
-    const recordsWithoutProvider = records.map(
-      ({ provider, ...record }) => record,
-    );
+    const recordsWithoutProvider = records.map(({ provider, ...record }) => record);
 
     // Use the OpenLibrary confidence calculation utilities
-    const confidenceResult = calculateAggregatedConfidence(
-      recordsWithoutProvider,
-      {
-        enableLogging: this.options.enableLogging,
-      },
-    );
+    const confidenceResult = calculateAggregatedConfidence(recordsWithoutProvider, {
+      enableLogging: this.options.enableLogging,
+    });
 
     return {
       confidence: confidenceResult.confidence,

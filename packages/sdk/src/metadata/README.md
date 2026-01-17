@@ -28,8 +28,7 @@ const aggregator = new MetadataAggregator([
   new WikiDataMetadataProvider(),
 ]);
 
-const { results, consensus } =
-  await aggregator.searchByISBN("978-0-14-028329-7");
+const { results, consensus } = await aggregator.searchByISBN("978-0-14-028329-7");
 
 console.log(results[0].title); // "The Great Gatsby"
 console.log(results[0].authors); // ["F. Scott Fitzgerald"]
@@ -113,10 +112,7 @@ Title searches are useful when you don't have an ISBN. Use `exactMatch` for prec
 search.
 
 ```typescript
-const results = await aggregator.searchByTitle({
-  title: "The Great Gatsby",
-  exactMatch: false,
-});
+const results = await aggregator.searchByTitle({ title: "The Great Gatsby", exactMatch: false });
 ```
 
 ### Search by author
@@ -152,7 +148,7 @@ const results = await aggregator.searchMultiCriteria({
 These providers require no authentication:
 
 | Provider                            | Best for                         |
-|-------------------------------------|----------------------------------|
+| ----------------------------------- | -------------------------------- |
 | `OpenLibraryMetadataProvider`       | General book metadata, covers    |
 | `WikiDataMetadataProvider`          | Authority data, linked entities  |
 | `LibraryOfCongressMetadataProvider` | Authoritative bibliographic data |
@@ -183,7 +179,7 @@ const aggregator = new MetadataAggregator([
 These providers require API keys:
 
 | Provider                         | Registration                                                  |
-|----------------------------------|---------------------------------------------------------------|
+| -------------------------------- | ------------------------------------------------------------- |
 | `GoogleBooksMetadataProvider`    | [Google Cloud Console](https://console.cloud.google.com/)     |
 | `SpringerNatureMetadataProvider` | [Springer Nature API Portal](https://dev.springernature.com/) |
 | `ISBNdbMetadataProvider`         | [ISBNdb](https://isbndb.com/apidocs)                          |
@@ -192,9 +188,7 @@ These providers require API keys:
 ```typescript
 import { GoogleBooksMetadataProvider } from "@colibri-hq/sdk/metadata";
 
-const googleBooks = new GoogleBooksMetadataProvider({
-  apiKey: process.env.GOOGLE_BOOKS_API_KEY,
-});
+const googleBooks = new GoogleBooksMetadataProvider({ apiKey: process.env.GOOGLE_BOOKS_API_KEY });
 ```
 
 ### Extracting metadata from files
@@ -224,11 +218,7 @@ The SDK provides utilities to normalize metadata into consistent formats.
 Convert any ISBN format to a canonical form:
 
 ```typescript
-import {
-  cleanIsbn,
-  isValidIsbn,
-  normalizeIsbn,
-} from "@colibri-hq/sdk/metadata";
+import { cleanIsbn, isValidIsbn, normalizeIsbn } from "@colibri-hq/sdk/metadata";
 
 // Remove formatting
 cleanIsbn("978-0-14-028329-7"); // "9780140283297"
@@ -246,11 +236,7 @@ isValidIsbn("1234567890"); // false
 Standardize author name formats:
 
 ```typescript
-import {
-  normalizeAuthorName,
-  parseAuthorName,
-  formatAuthorName,
-} from "@colibri-hq/sdk/metadata";
+import { normalizeAuthorName, parseAuthorName, formatAuthorName } from "@colibri-hq/sdk/metadata";
 
 // Convert "Last, First" to "First Last"
 normalizeAuthorName("Fitzgerald, F. Scott"); // "F. Scott Fitzgerald"
@@ -381,7 +367,7 @@ console.log(consensus?.agreementScore); // 0.88
 The SDK calculates confidence based on multiple factors:
 
 | Factor            | Description                                     |
-|-------------------|-------------------------------------------------|
+| ----------------- | ----------------------------------------------- |
 | Source count      | More sources agreeing increases confidence      |
 | Source quality    | Higher-priority providers carry more weight     |
 | Field agreement   | Fields matching across sources boost confidence |
@@ -390,7 +376,7 @@ The SDK calculates confidence based on multiple factors:
 Confidence tiers:
 
 | Tier        | Score     | Interpretation                             |
-|-------------|-----------|--------------------------------------------|
+| ----------- | --------- | ------------------------------------------ |
 | Exceptional | 0.95+     | Very high agreement, authoritative sources |
 | Strong      | 0.90–0.95 | Good consensus across multiple sources     |
 | Good        | 0.80–0.90 | Moderate agreement                         |
@@ -479,9 +465,7 @@ Detect potential duplicates in your library:
 ```typescript
 import { DuplicateDetector, detectDuplicates } from "@colibri-hq/sdk/metadata";
 
-const detector = new DuplicateDetector({
-  minSimilarityThreshold: 0.7,
-});
+const detector = new DuplicateDetector({ minSimilarityThreshold: 0.7 });
 
 const duplicates = detector.detectDuplicates(proposedEntry, existingLibrary);
 
@@ -500,10 +484,7 @@ Choose the best edition from available metadata:
 ```typescript
 import { EditionSelector } from "@colibri-hq/sdk/metadata";
 
-const selector = new EditionSelector({
-  recentEditionYears: 5,
-  maxAlternatives: 3,
-});
+const selector = new EditionSelector({ recentEditionYears: 5, maxAlternatives: 3 });
 
 const selection = selector.selectBestEdition(preview, rawMetadata);
 
@@ -526,14 +507,9 @@ Detect series relationships in your library:
 ```typescript
 import { SeriesAnalyzer } from "@colibri-hq/sdk/metadata";
 
-const analyzer = new SeriesAnalyzer({
-  minSeriesNameSimilarity: 0.8,
-});
+const analyzer = new SeriesAnalyzer({ minSeriesNameSimilarity: 0.8 });
 
-const relationships = analyzer.detectSeriesRelationships(
-  preview,
-  existingLibrary,
-);
+const relationships = analyzer.detectSeriesRelationships(preview, existingLibrary);
 
 for (const rel of relationships) {
   console.log(`Series: ${rel.series.name}`);
@@ -556,10 +532,7 @@ for (const rel of relationships) {
 Detect and analyze conflicts between metadata sources:
 
 ```typescript
-import {
-  ConflictDetector,
-  ConflictDisplayFormatter,
-} from "@colibri-hq/sdk/metadata";
+import { ConflictDetector, ConflictDisplayFormatter } from "@colibri-hq/sdk/metadata";
 
 const detector = new ConflictDetector();
 const conflicts = detector.detectConflicts(preview);
@@ -641,9 +614,7 @@ const selected = selectProviders(allProviders, query, "fastest", {
 Select diverse providers for cross-validation:
 
 ```typescript
-const selected = selectProviders(allProviders, query, "consensus", {
-  maxProviders: 4,
-});
+const selected = selectProviders(allProviders, query, "consensus", { maxProviders: 4 });
 ```
 
 ### Filter by capability
@@ -651,14 +622,9 @@ const selected = selectProviders(allProviders, query, "consensus", {
 Select providers that support specific data types:
 
 ```typescript
-import {
-  MetadataType,
-  filterByDataTypeSupport,
-} from "@colibri-hq/sdk/metadata";
+import { MetadataType, filterByDataTypeSupport } from "@colibri-hq/sdk/metadata";
 
-const withCovers = filterByDataTypeSupport(providers, [
-  MetadataType.COVER_IMAGE,
-]);
+const withCovers = filterByDataTypeSupport(providers, [MetadataType.COVER_IMAGE]);
 ```
 
 ---
@@ -800,9 +766,7 @@ async function enrichEbook(file: File) {
     const { results } = await aggregator.searchByISBN(fileRecord.isbn[0]);
     externalRecords = results;
   } else if (fileRecord.title) {
-    const { results } = await aggregator.searchByTitle({
-      title: fileRecord.title,
-    });
+    const { results } = await aggregator.searchByTitle({ title: fileRecord.title });
     externalRecords = results;
   }
 
@@ -939,14 +903,16 @@ Tags (subjects/genres) are normalized and deduplicated automatically.
 import { findOrCreateTags, addTagsToWork } from "@colibri-hq/sdk";
 
 // Batch create or find tags (optimized for multiple tags)
-const tags = await findOrCreateTags(
-  database,
-  ["epic fantasy", "magic", "adventure"],
-  { userId: "user-123" },
-);
+const tags = await findOrCreateTags(database, ["epic fantasy", "magic", "adventure"], {
+  userId: "user-123",
+});
 
 // Batch link tags to a work
-await addTagsToWork(database, workId, tags.map(({ id }) => id));
+await addTagsToWork(
+  database,
+  workId,
+  tags.map(({ id }) => id),
+);
 ```
 
 ### Tag normalization
@@ -1010,9 +976,7 @@ const amazon = new AmazonPaapiMetadataProvider({
 const isbndb = new ISBNdbMetadataProvider(database);
 
 // Google Books
-const googleBooks = new GoogleBooksMetadataProvider({
-  apiKey: process.env.GOOGLE_BOOKS_API_KEY,
-});
+const googleBooks = new GoogleBooksMetadataProvider({ apiKey: process.env.GOOGLE_BOOKS_API_KEY });
 ```
 
 ### Provider settings
@@ -1020,7 +984,7 @@ const googleBooks = new GoogleBooksMetadataProvider({
 Credentials are stored as instance settings:
 
 | Setting URN                                        | Provider | Description    |
-|----------------------------------------------------|----------|----------------|
+| -------------------------------------------------- | -------- | -------------- |
 | `urn:colibri:settings:metadata:amazon-access-key`  | Amazon   | AWS access key |
 | `urn:colibri:settings:metadata:amazon-secret-key`  | Amazon   | AWS secret key |
 | `urn:colibri:settings:metadata:amazon-partner-tag` | Amazon   | Associate tag  |

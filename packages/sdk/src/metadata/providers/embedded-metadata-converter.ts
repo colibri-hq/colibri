@@ -33,9 +33,7 @@ export const DEFAULT_EMBEDDED_CONFIG: EmbeddedMetadataConfig = {
  * Converts embedded ebook metadata to MetadataRecord format
  */
 export class EmbeddedMetadataConverter {
-  constructor(
-    private config: EmbeddedMetadataConfig = DEFAULT_EMBEDDED_CONFIG,
-  ) {}
+  constructor(private config: EmbeddedMetadataConfig = DEFAULT_EMBEDDED_CONFIG) {}
 
   /**
    * Convert embedded metadata to MetadataRecord with high confidence scores
@@ -45,11 +43,7 @@ export class EmbeddedMetadataConverter {
     fileFormat: "epub" | "mobi" | "pdf",
     filePath?: string,
   ): MetadataRecord {
-    const recordId = this.generateRecordId(
-      embeddedMetadata,
-      fileFormat,
-      filePath,
-    );
+    const recordId = this.generateRecordId(embeddedMetadata, fileFormat, filePath);
     const timestamp = new Date();
 
     // Extract and convert metadata fields
@@ -142,8 +136,7 @@ export class EmbeddedMetadataConverter {
     subjects?: string[];
     yearRange?: [number, number];
   } {
-    const query: ReturnType<EmbeddedMetadataConverter["createSearchQuery"]> =
-      {};
+    const query: ReturnType<EmbeddedMetadataConverter["createSearchQuery"]> = {};
 
     // Extract title
     if (embeddedMetadata.title) {
@@ -228,9 +221,7 @@ export class EmbeddedMetadataConverter {
   /**
    * Determine which metadata types are available in the embedded metadata
    */
-  private getAvailableMetadataTypes(
-    embeddedMetadata: EbookMetadata,
-  ): MetadataType[] {
+  private getAvailableMetadataTypes(embeddedMetadata: EbookMetadata): MetadataType[] {
     const types: MetadataType[] = [];
 
     if (embeddedMetadata.title) {
@@ -281,9 +272,7 @@ export class EmbeddedMetadataConverter {
     filePath?: string,
   ): string {
     // Use ISBN if available for consistent ID
-    const isbn = embeddedMetadata.identifiers?.find(
-      (id) => id.type === "isbn",
-    )?.value;
+    const isbn = embeddedMetadata.identifiers?.find((id) => id.type === "isbn")?.value;
     if (isbn) {
       return `embedded-${isbn}-${fileFormat}`;
     }
@@ -336,11 +325,7 @@ export function convertEmbeddedMetadata(
     ? new EmbeddedMetadataConverter({ ...DEFAULT_EMBEDDED_CONFIG, ...config })
     : globalEmbeddedMetadataConverter;
 
-  return converter.convertToMetadataRecord(
-    embeddedMetadata,
-    fileFormat,
-    filePath,
-  );
+  return converter.convertToMetadataRecord(embeddedMetadata, fileFormat, filePath);
 }
 
 /**

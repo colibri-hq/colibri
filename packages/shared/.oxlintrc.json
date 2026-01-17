@@ -1,14 +1,8 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["typescript", "unicorn"],
-  "categories": {
-    "correctness": "off"
-  },
-  "env": {
-    "builtin": true,
-    "shared-node-browser": true,
-    "worker": true
-  },
+  "categories": { "correctness": "off" },
+  "env": { "builtin": true, "shared-node-browser": true, "worker": true },
   "ignorePatterns": [
     ".svelte-kit/**/*",
     "node_modules/**/*",
@@ -947,30 +941,16 @@
   "overrides": [
     {
       "files": ["*.svelte", "**/*.svelte"],
-      "rules": {
-        "no-inner-declarations": "off",
-        "no-self-assign": "off"
-      }
+      "rules": { "no-inner-declarations": "off", "no-self-assign": "off" }
     },
     {
       "files": ["*.svelte", "**/*.svelte"],
-      "rules": {
-        "no-inner-declarations": "off",
-        "no-self-assign": "off"
-      }
+      "rules": { "no-inner-declarations": "off", "no-self-assign": "off" }
     },
-    {
-      "files": ["**/*.cjs"],
-      "rules": {
-        "@typescript-eslint/no-require-imports": "off"
-      }
-    },
+    { "files": ["**/*.cjs"], "rules": { "@typescript-eslint/no-require-imports": "off" } },
     {
       "files": ["tests/**/*.ts", "src/**/*.test.ts", "src/**/*.spec.ts"],
-      "env": {
-        "commonjs": true,
-        "node": true
-      }
+      "env": { "commonjs": true, "node": true }
     },
     {
       "files": ["src/**/*.ts", "tests/**/*.ts", "src/**/*.svelte"],
@@ -987,28 +967,12 @@
         ]
       }
     },
-    {
-      "files": ["src/**/*.ts"],
-      "rules": {
-        "no-console": "warn"
-      }
-    },
+    { "files": ["src/**/*.ts"], "rules": { "no-console": "warn" } },
     {
       "files": ["src/lib/server/**/*.ts", "**/*.server.ts"],
-      "rules": {
-        "no-console": "off"
-      },
-      "env": {
-        "browser": true,
-        "commonjs": true,
-        "node": true
-      }
+      "rules": { "no-console": "off" },
+      "env": { "browser": true, "commonjs": true, "node": true }
     },
-    {
-      "files": ["src/**/*.svelte"],
-      "env": {
-        "browser": true
-      }
-    }
+    { "files": ["src/**/*.svelte"], "env": { "browser": true } }
   ]
 }

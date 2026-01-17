@@ -6,43 +6,42 @@
  *
  * @returns {import('unified').Transformer}
  */
-export const remarkRemoveDuplicateTitle =
-  function remarkRemoveDuplicateTitle() {
-    return function remarkRemoveDuplicateTitle(tree, file) {
-      // Get the frontmatter title from the VFile data. mdsvex stores frontmatter in file.data.fm
-      // @ts-expect-error -- mdsvex adds 'fm' to file.data
-      const frontmatterTitle = file.data?.fm?.title;
+export const remarkRemoveDuplicateTitle = function remarkRemoveDuplicateTitle() {
+  return function remarkRemoveDuplicateTitle(tree, file) {
+    // Get the frontmatter title from the VFile data. mdsvex stores frontmatter in file.data.fm
+    // @ts-expect-error -- mdsvex adds 'fm' to file.data
+    const frontmatterTitle = file.data?.fm?.title;
 
-      if (!frontmatterTitle) {
-        return;
-      }
+    if (!frontmatterTitle) {
+      return;
+    }
 
-      // Normalize the frontmatter title for comparison
-      const normalizedFmTitle = normalizeText(frontmatterTitle);
+    // Normalize the frontmatter title for comparison
+    const normalizedFmTitle = normalizeText(frontmatterTitle);
 
-      // Find the first h1 heading in the document
-      // @ts-expect-error -- tree is of type 'import('mdast').Root'
-      const { children } = tree;
+    // Find the first h1 heading in the document
+    // @ts-expect-error -- tree is of type 'import('mdast').Root'
+    const { children } = tree;
 
-      for (let i = 0; i < children.length; i++) {
-        const node = children[i];
+    for (let i = 0; i < children.length; i++) {
+      const node = children[i];
 
-        if (node.type === "heading" && node.depth === 1) {
-          // Extract the text content from the heading
-          const headingText = extractText(node);
-          const normalizedHeading = normalizeText(headingText);
+      if (node.type === "heading" && node.depth === 1) {
+        // Extract the text content from the heading
+        const headingText = extractText(node);
+        const normalizedHeading = normalizeText(headingText);
 
-          // If the h1 matches the frontmatter title, remove it
-          if (normalizedHeading === normalizedFmTitle) {
-            children.splice(i, 1);
-          }
-
-          // Only check the first h1
-          break;
+        // If the h1 matches the frontmatter title, remove it
+        if (normalizedHeading === normalizedFmTitle) {
+          children.splice(i, 1);
         }
+
+        // Only check the first h1
+        break;
       }
-    };
+    }
   };
+};
 
 export default remarkRemoveDuplicateTitle;
 

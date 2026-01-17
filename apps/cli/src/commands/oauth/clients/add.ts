@@ -5,10 +5,7 @@ import { BaseCommand } from "../../../command.ts";
 
 export default class Add extends BaseCommand<typeof Add> {
   static args = {
-    id: Args.string({
-      description: "Client ID (must be alphanumeric)",
-      required: true,
-    }),
+    id: Args.string({ description: "Client ID (must be alphanumeric)", required: true }),
   };
   static description = "Add a new OAuth client.";
   static examples = [
@@ -29,18 +26,11 @@ export default class Add extends BaseCommand<typeof Add> {
     },
   ];
   static flags = {
-    description: Flags.string({
-      description: "Description of the OAuth client.",
-      required: false,
-    }),
-    name: Flags.string({
-      description: "Name of the OAuth client.",
-      required: false,
-    }),
+    description: Flags.string({ description: "Description of the OAuth client.", required: false }),
+    name: Flags.string({ description: "Name of the OAuth client.", required: false }),
     personal: Flags.boolean({
       default: false,
-      description:
-        "Whether this client is personal (only available to its owner).",
+      description: "Whether this client is personal (only available to its owner).",
       required: false,
     }),
     "redirect-uris": Flags.string({
@@ -60,10 +50,7 @@ export default class Add extends BaseCommand<typeof Add> {
   };
 
   async run() {
-    const spinner = ora({
-      stream: process.stderr,
-      text: "Creating OAuth client…",
-    }).start();
+    const spinner = ora({ stream: process.stderr, text: "Creating OAuth client…" }).start();
     const { id } = this.args;
     const {
       description,
@@ -88,9 +75,7 @@ export default class Add extends BaseCommand<typeof Add> {
       : null;
 
     // Parse scopes
-    const parsedScopes = scopes
-      ? scopes.split(",").map((scope) => scope.trim())
-      : undefined;
+    const parsedScopes = scopes ? scopes.split(",").map((scope) => scope.trim()) : undefined;
 
     try {
       const client = await createClient(

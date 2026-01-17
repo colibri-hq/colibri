@@ -1,6 +1,6 @@
+import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import { loadEpubMetadata } from "./epub.js";
-import { readFile } from "node:fs/promises";
 
 describe("EPUB Metadata Extraction", () => {
   describe("Series Detection", () => {
@@ -150,9 +150,7 @@ describe("EPUB Metadata Extraction", () => {
     });
 
     it("should prefer term over name if both exist", async () => {
-      const mockSubjects = [
-        { name: "Generic Fiction", term: "Fiction / Literary" },
-      ];
+      const mockSubjects = [{ name: "Generic Fiction", term: "Fiction / Literary" }];
 
       const allSubjects: string[] = [];
       for (const subject of mockSubjects) {
@@ -181,12 +179,8 @@ describe("EPUB Metadata Extraction", () => {
     it("should extract metadata from real EPUB", async () => {
       // Test with the actual EPUB file in the repo
       try {
-        const buffer = await readFile(
-          "/Users/moritz/Projects/colibri/Mogi, Ken - Ikigai.epub",
-        );
-        const file = new File([buffer], "Ikigai.epub", {
-          type: "application/epub+zip",
-        });
+        const buffer = await readFile("/Users/moritz/Projects/colibri/Mogi, Ken - Ikigai.epub");
+        const file = new File([buffer], "Ikigai.epub", { type: "application/epub+zip" });
 
         const metadata = await loadEpubMetadata(file);
 

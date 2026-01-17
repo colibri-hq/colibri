@@ -1,7 +1,7 @@
-import { parseRequestBody } from "../utilities.js";
 import { z } from "zod";
 import { OAuthError } from "../errors.js";
 import { type AuthorizationServerOptions } from "../types.js";
+import { parseRequestBody } from "../utilities.js";
 import { assertAuthorization } from "./assert.js";
 
 /**
@@ -132,9 +132,10 @@ import { assertAuthorization } from "./assert.js";
  *
  * @see https://datatracker.ietf.org/doc/html/rfc7009#section-2 RFC 7009, Section 2
  */
-export async function handleTokenRevocation<
-  T extends AuthorizationServerOptions,
->(request: Request, { tokenRevocation, loadAccessToken }: T) {
+export async function handleTokenRevocation<T extends AuthorizationServerOptions>(
+  request: Request,
+  { tokenRevocation, loadAccessToken }: T,
+) {
   if (!tokenRevocation) {
     throw new OAuthError(
       "invalid_request",
@@ -164,9 +165,7 @@ export async function handleTokenRevocation<
   }
 
   try {
-    const { client_id } = await assertAuthorization(request, {
-      loadAccessToken,
-    });
+    const { client_id } = await assertAuthorization(request, { loadAccessToken });
 
     switch (tokenTypeHint.data) {
       case "access_token":

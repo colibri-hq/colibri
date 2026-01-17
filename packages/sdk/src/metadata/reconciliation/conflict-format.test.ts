@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { ConflictDisplayFormatter } from "./conflict-format.js";
 import type { ConflictSummary, DetailedConflict } from "./conflicts.js";
 import type { MetadataSource } from "./types.js";
+import { ConflictDisplayFormatter } from "./conflict-format.js";
 
 describe("ConflictDisplayFormatter", () => {
   let formatter: ConflictDisplayFormatter;
@@ -13,16 +13,8 @@ describe("ConflictDisplayFormatter", () => {
     formatter = new ConflictDisplayFormatter();
 
     mockSources = [
-      {
-        name: "OpenLibrary",
-        reliability: 0.8,
-        timestamp: new Date("2024-01-01"),
-      },
-      {
-        name: "WikiData",
-        reliability: 0.9,
-        timestamp: new Date("2024-01-02"),
-      },
+      { name: "OpenLibrary", reliability: 0.8, timestamp: new Date("2024-01-01") },
+      { name: "WikiData", reliability: 0.9, timestamp: new Date("2024-01-02") },
     ];
 
     mockConflict = {
@@ -36,10 +28,7 @@ describe("ConflictDisplayFormatter", () => {
       severity: "major",
       confidence: 0.8,
       explanation: "Different title formats found across sources",
-      resolutionSuggestions: [
-        "Review source reliability",
-        "Consider manual verification",
-      ],
+      resolutionSuggestions: ["Review source reliability", "Consider manual verification"],
       impact: {
         score: 0.6,
         affectedAreas: ["identification", "display"],
@@ -57,12 +46,7 @@ describe("ConflictDisplayFormatter", () => {
 
     mockSummary = {
       totalConflicts: 3,
-      bySeverity: {
-        critical: [mockConflict],
-        major: [],
-        minor: [],
-        informational: [],
-      },
+      bySeverity: { critical: [mockConflict], major: [], minor: [], informational: [] },
       byType: {
         value_mismatch: [mockConflict],
         format_difference: [],
@@ -73,15 +57,10 @@ describe("ConflictDisplayFormatter", () => {
         source_disagreement: [],
         normalization_conflict: [],
       },
-      byField: {
-        title: [mockConflict],
-      },
+      byField: { title: [mockConflict] },
       overallScore: 0.3,
       problematicFields: ["title"],
-      recommendations: [
-        "Address 1 critical conflict immediately",
-        "Review source reliability",
-      ],
+      recommendations: ["Address 1 critical conflict immediately", "Review source reliability"],
       autoResolvableConflicts: [],
       manualConflicts: [mockConflict],
     };
@@ -125,12 +104,8 @@ describe("ConflictDisplayFormatter", () => {
     it("should format resolution explanation", () => {
       const formatted = formatter.formatConflict(mockConflict);
 
-      expect(formatted.resolutionExplanation).toContain(
-        "Used most reliable source",
-      );
-      expect(formatted.resolutionExplanation).toContain(
-        "Manual review required",
-      );
+      expect(formatted.resolutionExplanation).toContain("Used most reliable source");
+      expect(formatted.resolutionExplanation).toContain("Manual review required");
     });
 
     it("should format suggestions when enabled", () => {
@@ -230,27 +205,18 @@ describe("ConflictDisplayFormatter", () => {
 
       const summaryWithBoth: ConflictSummary = {
         ...mockSummary,
-        autoResolvableConflicts: [
-          {
-            ...mockConflict,
-            autoResolvable: true,
-            severity: "minor",
-          },
-        ],
+        autoResolvableConflicts: [{ ...mockConflict, autoResolvable: true, severity: "minor" }],
         manualConflicts: [mockConflict],
       };
 
-      const report =
-        formatterWithSeparation.generateConflictReport(summaryWithBoth);
+      const report = formatterWithSeparation.generateConflictReport(summaryWithBoth);
 
       expect(report).toContain("✅ Auto-Resolvable Conflicts");
       expect(report).toContain("⚠️  Manual Review Required");
     });
 
     it("should handle empty conflict summary", () => {
-      const noColorFormatter = new ConflictDisplayFormatter({
-        useColors: false,
-      });
+      const noColorFormatter = new ConflictDisplayFormatter({ useColors: false });
       const emptySummary: ConflictSummary = {
         totalConflicts: 0,
         bySeverity: { critical: [], major: [], minor: [], informational: [] },
@@ -287,11 +253,7 @@ describe("ConflictDisplayFormatter", () => {
           field: "string_field",
           values: [{ value: "test string", source: mockSources[0] }],
         },
-        {
-          ...mockConflict,
-          field: "number_field",
-          values: [{ value: 42, source: mockSources[0] }],
-        },
+        { ...mockConflict, field: "number_field", values: [{ value: 42, source: mockSources[0] }] },
         {
           ...mockConflict,
           field: "boolean_field",
@@ -302,11 +264,7 @@ describe("ConflictDisplayFormatter", () => {
           field: "array_field",
           values: [{ value: ["item1", "item2"], source: mockSources[0] }],
         },
-        {
-          ...mockConflict,
-          field: "null_field",
-          values: [{ value: null, source: mockSources[0] }],
-        },
+        { ...mockConflict, field: "null_field", values: [{ value: null, source: mockSources[0] }] },
       ];
 
       testConflicts.forEach((conflict) => {
@@ -320,10 +278,7 @@ describe("ConflictDisplayFormatter", () => {
         ...mockConflict,
         field: "publisher",
         values: [
-          {
-            value: { name: "Scribner", location: "New York" },
-            source: mockSources[0],
-          },
+          { value: { name: "Scribner", location: "New York" }, source: mockSources[0] },
           { value: { year: 1925, month: 4 }, source: mockSources[1] },
         ],
       };
@@ -338,12 +293,7 @@ describe("ConflictDisplayFormatter", () => {
       const largeArrayConflict: DetailedConflict = {
         ...mockConflict,
         field: "subjects",
-        values: [
-          {
-            value: ["item1", "item2", "item3", "item4", "item5"],
-            source: mockSources[0],
-          },
-        ],
+        values: [{ value: ["item1", "item2", "item3", "item4", "item5"], source: mockSources[0] }],
       };
 
       const formatted = formatter.formatConflict(largeArrayConflict);
@@ -368,8 +318,7 @@ describe("ConflictDisplayFormatter", () => {
         };
 
         const formatted = formatter.formatConflict(testConflict);
-        const reliabilityIndicator =
-          formatted.formattedValues[0].source.reliabilityIndicator;
+        const reliabilityIndicator = formatted.formattedValues[0].source.reliabilityIndicator;
 
         if (source.reliability >= 0.9) {
           expect(reliabilityIndicator).toContain("⭐⭐⭐");
@@ -386,9 +335,7 @@ describe("ConflictDisplayFormatter", () => {
 
   describe("configuration", () => {
     it("should respect color configuration", () => {
-      const noColorFormatter = new ConflictDisplayFormatter({
-        useColors: false,
-      });
+      const noColorFormatter = new ConflictDisplayFormatter({ useColors: false });
       const formatted = noColorFormatter.formatConflict(mockConflict);
 
       // Should not contain ANSI color codes
@@ -396,15 +343,11 @@ describe("ConflictDisplayFormatter", () => {
     });
 
     it("should respect detailed explanations configuration", () => {
-      const minimalFormatter = new ConflictDisplayFormatter({
-        showDetailedExplanations: false,
-      });
+      const minimalFormatter = new ConflictDisplayFormatter({ showDetailedExplanations: false });
       const formatted = minimalFormatter.formatConflict(mockConflict);
 
       expect(formatted.description).not.toBe(mockConflict.explanation);
-      expect(formatted.description).toContain(
-        "value mismatch detected in title",
-      );
+      expect(formatted.description).toContain("value mismatch detected in title");
     });
 
     it("should respect resolution suggestions configuration", () => {
@@ -417,9 +360,7 @@ describe("ConflictDisplayFormatter", () => {
     });
 
     it("should respect source info configuration", () => {
-      const noSourceFormatter = new ConflictDisplayFormatter({
-        showSourceInfo: false,
-      });
+      const noSourceFormatter = new ConflictDisplayFormatter({ showSourceInfo: false });
 
       const report = noSourceFormatter.generateConflictReport(mockSummary);
 
@@ -452,10 +393,7 @@ describe("ConflictDisplayFormatter", () => {
       const longExplanation =
         "This is a very long explanation that should be wrapped to multiple lines when the maximum width is exceeded by the text content.";
 
-      const longConflict: DetailedConflict = {
-        ...mockConflict,
-        explanation: longExplanation,
-      };
+      const longConflict: DetailedConflict = { ...mockConflict, explanation: longExplanation };
 
       const formatted = longTextFormatter.formatConflict(longConflict);
       expect(formatted.description).toBe(longExplanation);
@@ -464,10 +402,7 @@ describe("ConflictDisplayFormatter", () => {
 
   describe("edge cases", () => {
     it("should handle conflicts with no values", () => {
-      const emptyConflict: DetailedConflict = {
-        ...mockConflict,
-        values: [],
-      };
+      const emptyConflict: DetailedConflict = { ...mockConflict, values: [] };
 
       const formatted = formatter.formatConflict(emptyConflict);
       expect(formatted.formattedValues).toHaveLength(0);
@@ -476,12 +411,7 @@ describe("ConflictDisplayFormatter", () => {
     it("should handle conflicts with undefined/null impact", () => {
       const noImpactConflict: DetailedConflict = {
         ...mockConflict,
-        impact: {
-          score: 0,
-          affectedAreas: [],
-          description: "",
-          affectsCoreMetadata: false,
-        },
+        impact: { score: 0, affectedAreas: [], description: "", affectsCoreMetadata: false },
       };
 
       const formatted = formatter.formatConflict(noImpactConflict);

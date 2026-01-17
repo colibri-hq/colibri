@@ -226,9 +226,7 @@ export function hasGlossaryEntry(term: string): boolean {
  * Get all glossary entries, sorted alphabetically
  */
 export function getAllGlossaryEntries(): GlossaryEntry[] {
-  return [...GLOSSARY].sort((a, b) =>
-    a.displayTerm.localeCompare(b.displayTerm),
-  );
+  return [...GLOSSARY].sort((a, b) => a.displayTerm.localeCompare(b.displayTerm));
 }
 
 /**

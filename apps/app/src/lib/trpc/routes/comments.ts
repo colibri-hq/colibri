@@ -1,6 +1,6 @@
-import { procedure, t } from "$lib/trpc/t";
-import { adminProcedure } from "$lib/trpc/middleware/admin";
 import { emitCommentEvent } from "$lib/server/comment-events";
+import { adminProcedure } from "$lib/trpc/middleware/admin";
+import { procedure, t } from "$lib/trpc/t";
 import {
   addCollectionComment,
   addCreatorComment,
@@ -37,13 +37,7 @@ import {
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-const entityTypeSchema = z.enum([
-  "work",
-  "creator",
-  "publisher",
-  "series",
-  "collection",
-]);
+const entityTypeSchema = z.enum(["work", "creator", "publisher", "series", "collection"]);
 type EntityType = z.infer<typeof entityTypeSchema>;
 
 /**
@@ -74,12 +68,7 @@ export const comments = t.router({
    * Load root-level comments for an entity
    */
   load: procedure()
-    .input(
-      z.object({
-        entityType: entityTypeSchema,
-        entityId: z.string(),
-      }),
-    )
+    .input(z.object({ entityType: entityTypeSchema, entityId: z.string() }))
     .query(async ({ input: { entityType, entityId }, ctx: { database } }) => {
       switch (entityType) {
         case "work":
@@ -99,11 +88,7 @@ export const comments = t.router({
    * Get replies to a comment
    */
   getReplies: procedure()
-    .input(
-      z.object({
-        parentId: z.string(),
-      }),
-    )
+    .input(z.object({ parentId: z.string() }))
     .query(async ({ input: { parentId }, ctx: { database } }) => {
       return loadCommentReplies(database, parentId);
     }),
@@ -121,15 +106,8 @@ export const comments = t.router({
       }),
     )
     .mutation(
-      async ({
-        input: { entityType, entityId, content, parentId },
-        ctx: { database, userId },
-      }) => {
-        const comment = {
-          content,
-          created_by: userId,
-          parent_comment_id: parentId ?? null,
-        };
+      async ({ input: { entityType, entityId, content, parentId }, ctx: { database, userId } }) => {
+        const comment = { content, created_by: userId, parent_comment_id: parentId ?? null };
 
         let newComment;
         switch (entityType) {
@@ -146,11 +124,7 @@ export const comments = t.router({
             newComment = await addSeriesComment(database, entityId, comment);
             break;
           case "collection":
-            newComment = await addCollectionComment(
-              database,
-              entityId,
-              comment,
-            );
+            newComment = await addCollectionComment(database, entityId, comment);
             break;
         }
 
@@ -166,14 +140,9 @@ export const comments = t.router({
             // Only notify if the parent author is different from the replier
             if (parentAuthorId && parentAuthorId !== userId) {
               // Check user preferences
-              if (
-                await shouldNotify(database, parentAuthorId, "comment_reply")
-              ) {
+              if (await shouldNotify(database, parentAuthorId, "comment_reply")) {
                 // Get the current user's name for the notification
-                const currentUser = await findUserByIdentifier(
-                  database,
-                  userId,
-                );
+                const currentUser = await findUserByIdentifier(database, userId);
                 const authorName = currentUser.name ?? "Someone";
                 const preview = content.slice(0, 100);
 
@@ -226,13 +195,7 @@ export const comments = t.router({
 
               if (mentionedUser && mentionedUser.id !== userId) {
                 // Check user preferences
-                if (
-                  await shouldNotify(
-                    database,
-                    mentionedUser.id,
-                    "comment_mention",
-                  )
-                ) {
+                if (await shouldNotify(database, mentionedUser.id, "comment_mention")) {
                   // Emit SSE event for real-time delivery
                   emitCommentEvent(mentionedUser.id, {
                     type: "mention",
@@ -270,48 +233,31 @@ export const comments = t.router({
    * Update a comment's content (only by author)
    */
   update: procedure()
-    .input(
-      z.object({
-        commentId: z.string(),
-        content: z.string().min(1).max(10000),
-      }),
-    )
-    .mutation(
-      async ({ input: { commentId, content }, ctx: { database, userId } }) => {
-        // Verify ownership
-        const comment = await database
-          .selectFrom("comment")
-          .where("id", "=", commentId)
-          .select("created_by")
-          .executeTakeFirst();
+    .input(z.object({ commentId: z.string(), content: z.string().min(1).max(10000) }))
+    .mutation(async ({ input: { commentId, content }, ctx: { database, userId } }) => {
+      // Verify ownership
+      const comment = await database
+        .selectFrom("comment")
+        .where("id", "=", commentId)
+        .select("created_by")
+        .executeTakeFirst();
 
-        if (!comment) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Comment not found",
-          });
-        }
+      if (!comment) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Comment not found" });
+      }
 
-        if (comment.created_by?.toString() !== userId) {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "You can only edit your own comments",
-          });
-        }
+      if (comment.created_by?.toString() !== userId) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "You can only edit your own comments" });
+      }
 
-        await updateComment(database, commentId, content);
-      },
-    ),
+      await updateComment(database, commentId, content);
+    }),
 
   /**
    * Delete a comment (and cascade to replies, only by author)
    */
   delete: procedure()
-    .input(
-      z.object({
-        commentId: z.string(),
-      }),
-    )
+    .input(z.object({ commentId: z.string() }))
     .mutation(async ({ input: { commentId }, ctx: { database, userId } }) => {
       // Verify ownership
       const comment = await database
@@ -321,10 +267,7 @@ export const comments = t.router({
         .executeTakeFirst();
 
       if (!comment) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Comment not found",
-        });
+        throw new TRPCError({ code: "NOT_FOUND", message: "Comment not found" });
       }
 
       if (comment.created_by?.toString() !== userId) {
@@ -350,21 +293,12 @@ export const comments = t.router({
       }),
     )
     .mutation(
-      async ({
-        input: { commentId, emoji, entityType, entityId },
-        ctx: { database, userId },
-      }) => {
+      async ({ input: { commentId, emoji, entityType, entityId }, ctx: { database, userId } }) => {
         // Insert or update the reaction
         await database
           .insertInto("comment_reaction")
-          .values({
-            comment_id: commentId,
-            user_id: userId,
-            emoji,
-          })
-          .onConflict((eb) =>
-            eb.constraint("comment_reaction_pkey").doUpdateSet({ emoji }),
-          )
+          .values({ comment_id: commentId, user_id: userId, emoji })
+          .onConflict((eb) => eb.constraint("comment_reaction_pkey").doUpdateSet({ emoji }))
           .execute();
 
         // Send notification
@@ -375,9 +309,7 @@ export const comments = t.router({
           // Only notify if the comment author is different from the reactor
           if (commentAuthorId && commentAuthorId !== userId) {
             // Check user preferences
-            if (
-              await shouldNotify(database, commentAuthorId, "comment_reaction")
-            ) {
+            if (await shouldNotify(database, commentAuthorId, "comment_reaction")) {
               // Get the current user's name for the notification
               const currentUser = await findUserByIdentifier(database, userId);
               const authorName = currentUser.name ?? "Someone";
@@ -417,22 +349,15 @@ export const comments = t.router({
    * Remove a reaction from a comment
    */
   removeReaction: procedure()
-    .input(
-      z.object({
-        commentId: z.string(),
-        emoji: z.string(),
-      }),
-    )
-    .mutation(
-      async ({ input: { commentId, emoji }, ctx: { database, userId } }) => {
-        await database
-          .deleteFrom("comment_reaction")
-          .where("comment_id", "=", commentId)
-          .where("user_id", "=", userId)
-          .where("emoji", "=", emoji)
-          .execute();
-      },
-    ),
+    .input(z.object({ commentId: z.string(), emoji: z.string() }))
+    .mutation(async ({ input: { commentId, emoji }, ctx: { database, userId } }) => {
+      await database
+        .deleteFrom("comment_reaction")
+        .where("comment_id", "=", commentId)
+        .where("user_id", "=", userId)
+        .where("emoji", "=", emoji)
+        .execute();
+    }),
 
   // region Moderation
 
@@ -440,50 +365,34 @@ export const comments = t.router({
    * Report a comment for moderation (any authenticated user)
    */
   report: procedure()
-    .input(
-      z.object({
-        commentId: z.string(),
-        reason: z.string().min(10).max(1000),
-      }),
-    )
-    .mutation(
-      async ({ input: { commentId, reason }, ctx: { database, userId } }) => {
-        // Check if moderation is enabled
-        const moderationEnabled = await getSettingValue(
-          database,
-          "urn:colibri:settings:content:moderation-enabled",
-        );
-        if (!moderationEnabled) {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "Comment moderation is disabled",
-          });
-        }
+    .input(z.object({ commentId: z.string(), reason: z.string().min(10).max(1000) }))
+    .mutation(async ({ input: { commentId, reason }, ctx: { database, userId } }) => {
+      // Check if moderation is enabled
+      const moderationEnabled = await getSettingValue(
+        database,
+        "urn:colibri:settings:content:moderation-enabled",
+      );
+      if (!moderationEnabled) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Comment moderation is disabled" });
+      }
 
-        // Can't report your own comment
-        const comment = await database
-          .selectFrom("comment")
-          .where("id", "=", commentId)
-          .select("created_by")
-          .executeTakeFirst();
+      // Can't report your own comment
+      const comment = await database
+        .selectFrom("comment")
+        .where("id", "=", commentId)
+        .select("created_by")
+        .executeTakeFirst();
 
-        if (!comment) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Comment not found",
-          });
-        }
+      if (!comment) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Comment not found" });
+      }
 
-        if (comment.created_by?.toString() === userId) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "You cannot report your own comment",
-          });
-        }
+      if (comment.created_by?.toString() === userId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "You cannot report your own comment" });
+      }
 
-        await reportComment(database, commentId, userId, reason);
-      },
-    ),
+      await reportComment(database, commentId, userId, reason);
+    }),
 
   /**
    * Get comment reports (admin only)
@@ -519,55 +428,42 @@ export const comments = t.router({
    */
   resolveReport: adminProcedure()
     .input(
-      z.object({
-        reportId: z.string(),
-        resolution: z.enum(["dismissed", "hidden", "deleted"]),
-      }),
+      z.object({ reportId: z.string(), resolution: z.enum(["dismissed", "hidden", "deleted"]) }),
     )
-    .mutation(
-      async ({
-        input: { reportId, resolution },
-        ctx: { database, userId },
-      }) => {
-        // Get report info for logging
-        const report = await database
-          .selectFrom("comment_report")
-          .leftJoin("comment", "comment.id", "comment_report.comment_id")
-          .where("comment_report.id", "=", reportId)
-          .select(["comment_report.comment_id", "comment.content"])
-          .executeTakeFirst();
+    .mutation(async ({ input: { reportId, resolution }, ctx: { database, userId } }) => {
+      // Get report info for logging
+      const report = await database
+        .selectFrom("comment_report")
+        .leftJoin("comment", "comment.id", "comment_report.comment_id")
+        .where("comment_report.id", "=", reportId)
+        .select(["comment_report.comment_id", "comment.content"])
+        .executeTakeFirst();
 
-        // If resolution is "hidden", also hide the comment
-        if (resolution === "hidden" && report) {
-          await hideComment(
-            database,
-            report.comment_id,
-            userId,
-            "Hidden due to report",
-          );
-        }
+      // If resolution is "hidden", also hide the comment
+      if (resolution === "hidden" && report) {
+        await hideComment(database, report.comment_id, userId, "Hidden due to report");
+      }
 
-        // If resolution is "deleted", also delete the comment
-        if (resolution === "deleted" && report) {
-          await deleteComment(database, report.comment_id);
-        }
+      // If resolution is "deleted", also delete the comment
+      if (resolution === "deleted" && report) {
+        await deleteComment(database, report.comment_id);
+      }
 
-        await resolveReport(database, reportId, userId, resolution);
+      await resolveReport(database, reportId, userId, resolution);
 
-        // Log the action
-        await logModerationAction(database, {
-          actionType: "resolve_report",
-          targetType: "report",
-          targetId: reportId,
-          performedBy: userId,
-          details: {
-            resolution,
-            commentId: report?.comment_id?.toString(),
-            commentPreview: report?.content?.slice(0, 100),
-          },
-        });
-      },
-    ),
+      // Log the action
+      await logModerationAction(database, {
+        actionType: "resolve_report",
+        targetType: "report",
+        targetId: reportId,
+        performedBy: userId,
+        details: {
+          resolution,
+          commentId: report?.comment_id?.toString(),
+          commentPreview: report?.content?.slice(0, 100),
+        },
+      });
+    }),
 
   /**
    * Bulk resolve multiple reports at once (admin only)
@@ -579,69 +475,55 @@ export const comments = t.router({
         resolution: z.enum(["dismissed", "hidden", "deleted"]),
       }),
     )
-    .mutation(
-      async ({
-        input: { reportIds, resolution },
-        ctx: { database, userId },
-      }) => {
-        // For hidden/deleted resolutions, we need to handle the comments first
-        if (resolution === "hidden" || resolution === "deleted") {
-          // Get all report info to process comments
-          const reports = await database
-            .selectFrom("comment_report")
-            .leftJoin("comment", "comment.id", "comment_report.comment_id")
-            .where("comment_report.id", "in", reportIds)
-            .select([
-              "comment_report.id",
-              "comment_report.comment_id",
-              "comment.content",
-            ])
-            .execute();
+    .mutation(async ({ input: { reportIds, resolution }, ctx: { database, userId } }) => {
+      // For hidden/deleted resolutions, we need to handle the comments first
+      if (resolution === "hidden" || resolution === "deleted") {
+        // Get all report info to process comments
+        const reports = await database
+          .selectFrom("comment_report")
+          .leftJoin("comment", "comment.id", "comment_report.comment_id")
+          .where("comment_report.id", "in", reportIds)
+          .select(["comment_report.id", "comment_report.comment_id", "comment.content"])
+          .execute();
 
-          // Process each comment
-          for (const report of reports) {
-            if (report.comment_id) {
-              if (resolution === "hidden") {
-                await hideComment(
-                  database,
-                  report.comment_id,
-                  userId,
-                  "Hidden due to report (bulk action)",
-                );
-              } else if (resolution === "deleted") {
-                await deleteComment(database, report.comment_id);
-              }
+        // Process each comment
+        for (const report of reports) {
+          if (report.comment_id) {
+            if (resolution === "hidden") {
+              await hideComment(
+                database,
+                report.comment_id,
+                userId,
+                "Hidden due to report (bulk action)",
+              );
+            } else if (resolution === "deleted") {
+              await deleteComment(database, report.comment_id);
             }
           }
         }
+      }
 
-        // Bulk resolve all reports
-        const result = await bulkResolveReports(
-          database,
-          reportIds,
-          userId,
+      // Bulk resolve all reports
+      const result = await bulkResolveReports(database, reportIds, userId, resolution);
+
+      // Log the bulk action
+      await logModerationAction(database, {
+        actionType: "resolve_report",
+        targetType: "report",
+        targetId: reportIds[0]!, // Log first report ID as target
+        performedBy: userId,
+        details: {
+          bulkAction: true,
+          totalReports: reportIds.length,
           resolution,
-        );
+          resolvedCount: result.resolved,
+          failedCount: result.failed,
+          reportIds,
+        },
+      });
 
-        // Log the bulk action
-        await logModerationAction(database, {
-          actionType: "resolve_report",
-          targetType: "report",
-          targetId: reportIds[0]!, // Log first report ID as target
-          performedBy: userId,
-          details: {
-            bulkAction: true,
-            totalReports: reportIds.length,
-            resolution,
-            resolvedCount: result.resolved,
-            failedCount: result.failed,
-            reportIds,
-          },
-        });
-
-        return result;
-      },
-    ),
+      return result;
+    }),
 
   /**
    * Reopen a resolved report (admin only)
@@ -654,27 +536,17 @@ export const comments = t.router({
       }),
     )
     .mutation(
-      async ({
-        input: { reportId, unhideComment: shouldUnhide },
-        ctx: { database, userId },
-      }) => {
+      async ({ input: { reportId, unhideComment: shouldUnhide }, ctx: { database, userId } }) => {
         // Get the report to check if the comment was hidden
         const report = await getReport(database, reportId);
         if (!report) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Report not found",
-          });
+          throw new TRPCError({ code: "NOT_FOUND", message: "Report not found" });
         }
 
         const previousResolution = report.resolution;
 
         // If the comment was hidden by this report and user wants to unhide, do so
-        if (
-          shouldUnhide &&
-          report.resolution === "hidden" &&
-          report.comment_id
-        ) {
+        if (shouldUnhide && report.resolution === "hidden" && report.comment_id) {
           await unhideComment(database, report.comment_id);
         }
 
@@ -701,117 +573,87 @@ export const comments = t.router({
    */
   changeResolution: adminProcedure()
     .input(
-      z.object({
-        reportId: z.string(),
-        newResolution: z.enum(["dismissed", "hidden", "deleted"]),
-      }),
+      z.object({ reportId: z.string(), newResolution: z.enum(["dismissed", "hidden", "deleted"]) }),
     )
-    .mutation(
-      async ({
-        input: { reportId, newResolution },
-        ctx: { database, userId },
-      }) => {
-        // Get the current report
-        const report = await getReport(database, reportId);
-        if (!report) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Report not found",
-          });
+    .mutation(async ({ input: { reportId, newResolution }, ctx: { database, userId } }) => {
+      // Get the current report
+      const report = await getReport(database, reportId);
+      if (!report) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Report not found" });
+      }
+
+      const oldResolution = report.resolution;
+      const commentId = report.comment_id;
+
+      // Handle reverting old resolution effects
+      if (oldResolution === "hidden" && commentId) {
+        // If old resolution was hidden, unhide the comment first
+        await unhideComment(database, commentId);
+      }
+      // Note: If old resolution was "deleted", the comment is gone and can't be restored
+
+      // Apply new resolution effects
+      if (newResolution === "hidden" && commentId) {
+        await hideComment(database, commentId, userId, "Hidden due to report");
+      } else if (newResolution === "deleted" && commentId) {
+        // Check if comment still exists before trying to delete
+        const comment = await database
+          .selectFrom("comment")
+          .where("id", "=", commentId.toString())
+          .select("id")
+          .executeTakeFirst();
+        if (comment) {
+          await deleteComment(database, commentId);
         }
+      }
 
-        const oldResolution = report.resolution;
-        const commentId = report.comment_id;
+      // Update the resolution
+      await resolveReport(database, reportId, userId, newResolution);
 
-        // Handle reverting old resolution effects
-        if (oldResolution === "hidden" && commentId) {
-          // If old resolution was hidden, unhide the comment first
-          await unhideComment(database, commentId);
-        }
-        // Note: If old resolution was "deleted", the comment is gone and can't be restored
-
-        // Apply new resolution effects
-        if (newResolution === "hidden" && commentId) {
-          await hideComment(
-            database,
-            commentId,
-            userId,
-            "Hidden due to report",
-          );
-        } else if (newResolution === "deleted" && commentId) {
-          // Check if comment still exists before trying to delete
-          const comment = await database
-            .selectFrom("comment")
-            .where("id", "=", commentId.toString())
-            .select("id")
-            .executeTakeFirst();
-          if (comment) {
-            await deleteComment(database, commentId);
-          }
-        }
-
-        // Update the resolution
-        await resolveReport(database, reportId, userId, newResolution);
-
-        // Log the action
-        await logModerationAction(database, {
-          actionType: "change_resolution",
-          targetType: "report",
-          targetId: reportId,
-          performedBy: userId,
-          details: {
-            previousResolution: oldResolution,
-            newResolution,
-            commentId: commentId?.toString(),
-          },
-        });
-      },
-    ),
+      // Log the action
+      await logModerationAction(database, {
+        actionType: "change_resolution",
+        targetType: "report",
+        targetId: reportId,
+        performedBy: userId,
+        details: {
+          previousResolution: oldResolution,
+          newResolution,
+          commentId: commentId?.toString(),
+        },
+      });
+    }),
 
   /**
    * Hide a comment (admin only)
    */
   hide: adminProcedure()
-    .input(
-      z.object({
-        commentId: z.string(),
-        reason: z.string().min(1).max(500),
-      }),
-    )
-    .mutation(
-      async ({ input: { commentId, reason }, ctx: { database, userId } }) => {
-        // Get comment content for logging
-        const comment = await database
-          .selectFrom("comment")
-          .where("id", "=", commentId)
-          .select("content")
-          .executeTakeFirst();
+    .input(z.object({ commentId: z.string(), reason: z.string().min(1).max(500) }))
+    .mutation(async ({ input: { commentId, reason }, ctx: { database, userId } }) => {
+      // Get comment content for logging
+      const comment = await database
+        .selectFrom("comment")
+        .where("id", "=", commentId)
+        .select("content")
+        .executeTakeFirst();
 
-        await hideComment(database, commentId, userId, reason);
+      await hideComment(database, commentId, userId, reason);
 
-        // Log the action
-        await logModerationAction(database, {
-          actionType: "hide_comment",
-          targetType: "comment",
-          targetId: commentId,
-          performedBy: userId,
-          details: {
-            reason,
-            commentPreview: comment?.content?.slice(0, 100),
-          },
-        });
-      },
-    ),
+      // Log the action
+      await logModerationAction(database, {
+        actionType: "hide_comment",
+        targetType: "comment",
+        targetId: commentId,
+        performedBy: userId,
+        details: { reason, commentPreview: comment?.content?.slice(0, 100) },
+      });
+    }),
 
   /**
    * Unhide a comment (admin only)
    */
   unhide: adminProcedure()
-    .input(
-      z.object({
-        commentId: z.string(),
-      }),
-    )
+    .input(z.object({ commentId: z.string() }))
     .mutation(async ({ input: { commentId }, ctx: { database, userId } }) => {
       await unhideComment(database, commentId);
 

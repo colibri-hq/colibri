@@ -5,13 +5,10 @@
 
 import type { ColumnType } from "kysely";
 
-export type ArrayType<T> =
-  ArrayTypeImpl<T> extends (infer U)[] ? U[] : ArrayTypeImpl<T>;
+export type ArrayType<T> = ArrayTypeImpl<T> extends (infer U)[] ? U[] : ArrayTypeImpl<T>;
 
 export type ArrayTypeImpl<T> =
-  T extends ColumnType<infer S, infer I, infer U>
-    ? ColumnType<S[], I[], U[]>
-    : T[];
+  T extends ColumnType<infer S, infer I, infer U> ? ColumnType<S[], I[], U[]> : T[];
 
 export type AuthenticationColorScheme = "dark" | "light" | "system";
 
@@ -334,30 +331,19 @@ export type Generated<T> =
     ? ColumnType<S, I | undefined, U>
     : ColumnType<T, T | undefined, T>;
 
-export type Int8 = ColumnType<
-  string,
-  bigint | number | string,
-  bigint | number | string
->;
+export type Int8 = ColumnType<string, bigint | number | string, bigint | number | string>;
 
 export type Json = JsonValue;
 
 export type JsonArray = JsonValue[];
 
-export type JsonObject = {
-  [x: string]: JsonValue | undefined;
-};
+export type JsonObject = { [x: string]: JsonValue | undefined };
 
 export type JsonPrimitive = boolean | number | string | null;
 
 export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 
-export type LanguageType =
-  | "constructed"
-  | "extinct"
-  | "historical"
-  | "living"
-  | "special";
+export type LanguageType = "constructed" | "extinct" | "historical" | "living" | "special";
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 

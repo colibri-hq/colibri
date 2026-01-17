@@ -6,16 +6,12 @@ import type { RequestHandler } from "./$types";
 
 export const prerender = false;
 
-export const POST: RequestHandler = async function handler({
-  request,
-  locals: { database },
-}) {
+export const POST: RequestHandler = async function handler({ request, locals: { database } }) {
   if (!dev) {
     return json(
       {
         error: "access_denied",
-        error_description:
-          "The Token introspection endpoint is disabled in production",
+        error_description: "The Token introspection endpoint is disabled in production",
       },
       { status: 403 },
     );

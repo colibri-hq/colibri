@@ -56,10 +56,7 @@ export function loadWork(database: Database, id: string | number) {
     .executeTakeFirstOrThrow();
 }
 
-export async function loadWorkWithAssets(
-  database: Database,
-  id: string | number,
-) {
+export async function loadWorkWithAssets(database: Database, id: string | number) {
   const work = await loadWork(database, id);
   const assets = await database
     .selectFrom("asset")
@@ -119,11 +116,7 @@ export function loadRatings(database: Database, workId: string | number) {
   return database
     .selectFrom(table)
     .innerJoin("work_rating", "work_rating.work_id", "work.id")
-    .innerJoin(
-      "authentication.user",
-      "authentication.user.id",
-      "work_rating.user_id",
-    )
+    .innerJoin("authentication.user", "authentication.user.id", "work_rating.user_id")
     .select([
       "work_rating.user_id",
       "work_rating.rating",
@@ -163,20 +156,14 @@ export async function updateRating(
 ) {
   await database
     .insertInto("work_rating")
-    .values({
-      work_id: workId.toString(),
-      user_id: userId.toString(),
-      rating,
-    })
-    .onConflict((oc) =>
-      oc.columns(["work_id", "user_id"]).doUpdateSet({ rating }),
-    )
+    .values({ work_id: workId.toString(), user_id: userId.toString(), rating })
+    .onConflict((oc) => oc.columns(["work_id", "user_id"]).doUpdateSet({ rating }))
     .execute();
 }
 
-export function withCover<
-  T extends SelectQueryBuilder<Schema, "work" | "edition", unknown>,
->(builder: T) {
+export function withCover<T extends SelectQueryBuilder<Schema, "work" | "edition", unknown>>(
+  builder: T,
+) {
   return builder
     .leftJoin("image", "image.id", "edition.cover_image_id")
     .select("image.blurhash as cover_blurhash")
@@ -184,11 +171,7 @@ export function withCover<
     .select("image.height as cover_height");
 }
 
-export function createWork(
-  database: Database,
-  mainEditionId?: string | number,
-  userId?: string,
-) {
+export function createWork(database: Database, mainEditionId?: string | number, userId?: string) {
   return database
     .insertInto(table)
     .values({
@@ -279,10 +262,7 @@ export function createEdition(
     .executeTakeFirstOrThrow();
 }
 
-export function findAssetByChecksum(
-  database: Database,
-  checksum: Uint8Array<ArrayBufferLike>,
-) {
+export function findAssetByChecksum(database: Database, checksum: Uint8Array<ArrayBufferLike>) {
   return database
     .selectFrom("asset")
     .where("checksum", "=", checksum as unknown as Buffer)
@@ -328,11 +308,7 @@ export function findEditionByASIN(database: Database, asin: string) {
 /**
  * Find editions by any identifier type (ISBN or ASIN)
  */
-export function findEditionByIdentifier(
-  database: Database,
-  type: "isbn" | "asin",
-  value: string,
-) {
+export function findEditionByIdentifier(database: Database, type: "isbn" | "asin", value: string) {
   if (type === "isbn") {
     return findEditionByISBN(database, value);
   }
@@ -353,9 +329,7 @@ export function findEditionsByIdentifiers(
   const isbns = identifiers
     .filter((id) => id.type === "isbn")
     .map((id) => id.value.replace(/[-\s]/g, ""));
-  const asins = identifiers
-    .filter((id) => id.type === "asin")
-    .map((id) => id.value);
+  const asins = identifiers.filter((id) => id.type === "asin").map((id) => id.value);
 
   let query = database
     .selectFrom("edition")
@@ -373,10 +347,7 @@ export function findEditionsByIdentifiers(
     );
   } else if (isbns.length > 0) {
     query = query.where((eb) =>
-      eb.or([
-        eb("edition.isbn_10", "in", isbns),
-        eb("edition.isbn_13", "in", isbns),
-      ]),
+      eb.or([eb("edition.isbn_10", "in", isbns), eb("edition.isbn_13", "in", isbns)]),
     );
   } else if (asins.length > 0) {
     query = query.where("edition.asin", "in", asins);
@@ -415,18 +386,14 @@ export function findWorksByTitle(
     .limit(limit);
 
   // Case-insensitive title matching
-  query = query.where((eb) =>
-    eb(eb.fn("lower", [eb.ref("edition.title")]), "=", normalizedTitle),
-  );
+  query = query.where((eb) => eb(eb.fn("lower", [eb.ref("edition.title")]), "=", normalizedTitle));
 
   // Optional creator name filter
   if (options?.creatorName) {
     const normalizedCreator = options.creatorName.toLowerCase().trim();
     query = query.having((eb) =>
       eb(
-        eb.fn("lower", [
-          eb.fn("string_agg", [eb.ref("creator.name"), eb.val(", ")]),
-        ]),
+        eb.fn("lower", [eb.fn("string_agg", [eb.ref("creator.name"), eb.val(", ")])]),
         "like",
         `%${normalizedCreator}%`,
       ),
@@ -483,9 +450,7 @@ export function findSimilarWorks(
     const normalizedCreator = options.creatorName.toLowerCase().trim();
     query = query.having((eb) =>
       eb(
-        eb.fn("lower", [
-          eb.fn("string_agg", [eb.ref("creator.name"), eb.val(", ")]),
-        ]),
+        eb.fn("lower", [eb.fn("string_agg", [eb.ref("creator.name"), eb.val(", ")])]),
         "like",
         `%${normalizedCreator}%`,
       ),
@@ -498,12 +463,6 @@ export function findSimilarWorks(
 // endregion
 
 type Table = Schema[typeof table];
-export type Work = Selectable<Table> & {
-  language_name?: string;
-  cover_blurhash?: string | null;
-};
-export type WorkWithMainEdition<T extends Work = Work> = T &
-  Selectable<Edition>;
-export type WorkWithCreators<T extends Work = Work> = T & {
-  creators: Creator[];
-};
+export type Work = Selectable<Table> & { language_name?: string; cover_blurhash?: string | null };
+export type WorkWithMainEdition<T extends Work = Work> = T & Selectable<Edition>;
+export type WorkWithCreators<T extends Work = Work> = T & { creators: Creator[] };

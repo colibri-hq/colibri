@@ -17,41 +17,26 @@ type Operator =
   | "not in"
   | "~";
 
-type FilterObject<
-  K extends string = string,
-  O extends Operator = Operator,
-  V = unknown,
-> = {
+type FilterObject<K extends string = string, O extends Operator = Operator, V = unknown> = {
   key: K;
   operator: O;
   value: V;
 };
 
-type ListFilter<
-  K extends string,
-  T extends FilterValue = FilterValue,
-> = FilterObject<K, "in" | "not in", T[]>;
+type ListFilter<K extends string, T extends FilterValue = FilterValue> = FilterObject<
+  K,
+  "in" | "not in",
+  T[]
+>;
 type StringFilter<K extends string> = FilterObject<
   K,
   "!=" | "!~" | "$~" | "=" | "^~" | "~",
   string
 >;
-type NumberFilter<K extends string> = FilterObject<
-  K,
-  "!=" | "<" | "<=" | "=" | ">" | ">=",
-  number
->;
-type DateFilter<K extends string> = FilterObject<
-  K,
-  "!=" | "<" | "<=" | "=" | ">" | ">=",
-  Date
->;
+type NumberFilter<K extends string> = FilterObject<K, "!=" | "<" | "<=" | "=" | ">" | ">=", number>;
+type DateFilter<K extends string> = FilterObject<K, "!=" | "<" | "<=" | "=" | ">" | ">=", Date>;
 type NullFilter<K extends string> = FilterObject<K, "is" | "is not", null>;
-type BooleanFilter<K extends string> = FilterObject<
-  K,
-  "is" | "is not",
-  boolean
->;
+type BooleanFilter<K extends string> = FilterObject<K, "is" | "is not", boolean>;
 export type Filter<K extends string = string> =
   | BooleanFilter<K>
   | DateFilter<K>
@@ -69,9 +54,7 @@ export const filterFactory = <T extends string = string>() =>
     name: "filter",
     async parse(input) {
       const [key, operator, value] = input
-        .split(
-          /([=<>!~^$]+|is(?: not)?|(?:not )?in|n?eq|ne|gte?|lte?|(?:not )?like)/,
-        )
+        .split(/([=<>!~^$]+|is(?: not)?|(?:not )?in|n?eq|ne|gte?|lte?|(?:not )?like)/)
         .map((v) => v.trim());
 
       return parseFilter(key as T, operator, value);
@@ -87,11 +70,7 @@ function parseFilter<K extends string>(
   const parsedValue = parseValue(value);
   const parsedOperator = resolveOperator(operator);
 
-  if (
-    parsedOperator === "is" ||
-    parsedOperator === "is not" ||
-    parsedValue === null
-  ) {
+  if (parsedOperator === "is" || parsedOperator === "is not" || parsedValue === null) {
     return buildNullFilter(key, parsedOperator ?? "is not");
   }
 
@@ -114,10 +93,7 @@ function parseFilter<K extends string>(
   return buildStringFilter(key, parsedOperator, parsedValue);
 }
 
-function buildNullFilter<T extends string>(
-  key: T,
-  operator: string | undefined,
-): NullFilter<T> {
+function buildNullFilter<T extends string>(key: T, operator: string | undefined): NullFilter<T> {
   if (operator !== "is" && operator !== "is not") {
     throw new Error(
       `Invalid filter value "null" for operator "${operator}". ` +
@@ -125,11 +101,7 @@ function buildNullFilter<T extends string>(
     );
   }
 
-  return {
-    key,
-    operator,
-    value: null,
-  };
+  return { key, operator, value: null };
 }
 
 function buildDateFilter<T extends string>(
@@ -151,11 +123,7 @@ function buildDateFilter<T extends string>(
     );
   }
 
-  return {
-    key,
-    operator,
-    value,
-  };
+  return { key, operator, value };
 }
 
 function buildBooleanFilter<T extends string>(
@@ -176,11 +144,7 @@ function buildBooleanFilter<T extends string>(
     );
   }
 
-  return {
-    key,
-    operator,
-    value,
-  };
+  return { key, operator, value };
 }
 
 function buildNumberFilter<T extends string>(
@@ -202,11 +166,7 @@ function buildNumberFilter<T extends string>(
     );
   }
 
-  return {
-    key,
-    operator,
-    value: Number(value),
-  };
+  return { key, operator, value: Number(value) };
 }
 
 function buildListFilter<T extends string>(
@@ -221,11 +181,7 @@ function buildListFilter<T extends string>(
     );
   }
 
-  return {
-    key,
-    operator,
-    value: value.split(",").map((v) => v.trim()),
-  };
+  return { key, operator, value: value.split(",").map((v) => v.trim()) };
 }
 
 function buildStringFilter<T extends string>(
@@ -247,11 +203,7 @@ function buildStringFilter<T extends string>(
     );
   }
 
-  return {
-    key,
-    operator,
-    value,
-  };
+  return { key, operator, value };
 }
 
 function parseValue(value: string | undefined): FilterValue {

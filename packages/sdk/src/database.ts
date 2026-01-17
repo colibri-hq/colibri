@@ -12,12 +12,7 @@ export type Database = Kysely<DB>;
 type ClientOptions = {
   certificate?: string;
   debug?: boolean;
-  log?: (
-    channel: string,
-    level: string,
-    message: string | Error,
-    ...args: unknown[]
-  ) => unknown;
+  log?: (channel: string, level: string, message: string | Error, ...args: unknown[]) => unknown;
 };
 
 /**
@@ -38,10 +33,7 @@ export function initialize(
       // Include 'extensions' schema in search_path for pg_trgm functions (similarity, etc.)
       options: "-c search_path=public,extensions",
       ssl: certificate
-        ? {
-            rejectUnauthorized: false,
-            ca: Buffer.from(certificate, "base64"),
-          }
+        ? { rejectUnauthorized: false, ca: Buffer.from(certificate, "base64") }
         : undefined,
       connectionString: connectionString.toString(),
       log:
@@ -78,11 +70,7 @@ export function initialize(
           maximumFractionDigits: 2,
         });
 
-        log?.(
-          "kysely:query",
-          "debug",
-          `${query} \x1b[2m(${duration}ms)\x1b[0m`,
-        );
+        log?.("kysely:query", "debug", `${query} \x1b[2m(${duration}ms)\x1b[0m`);
 
         return;
       }
@@ -90,15 +78,10 @@ export function initialize(
       if (level === "error") {
         const { error, queryDurationMillis, query } = event;
 
-        log?.(
-          "kysely",
-          "error",
-          `${error}${error instanceof Error ? "\n" + error.stack : ""}`,
-          {
-            query,
-            duration: queryDurationMillis,
-          },
-        );
+        log?.("kysely", "error", `${error}${error instanceof Error ? "\n" + error.stack : ""}`, {
+          query,
+          duration: queryDurationMillis,
+        });
       }
     },
     dialect,

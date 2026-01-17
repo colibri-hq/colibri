@@ -8,9 +8,7 @@ if (!connectionString) {
 
 /** @type {import('kanel').Config} */
 module.exports = {
-  connection: {
-    connectionString,
-  },
+  connection: { connectionString },
   schemas: ["public", "authentication", "auth", "vault"],
 
   preDeleteOutputFolder: true,

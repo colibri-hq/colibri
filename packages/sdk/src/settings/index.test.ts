@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { Database } from "../database.js";
 import {
   exportSettings,
   getSetting,
@@ -8,13 +9,9 @@ import {
   setSetting,
   settingKeyToEnvVar,
 } from "./index.js";
-import type { Database } from "../database.js";
 
 // Mock the settings resource
-vi.mock("../resources/settings.js", () => ({
-  loadSettings: vi.fn(),
-  updateSettings: vi.fn(),
-}));
+vi.mock("../resources/settings.js", () => ({ loadSettings: vi.fn(), updateSettings: vi.fn() }));
 
 import { loadSettings, updateSettings } from "../resources/settings.js";
 
@@ -41,20 +38,18 @@ describe("settings index", () => {
 
   describe("settingKeyToEnvVar", () => {
     it("should convert URN keys to environment variable names", () => {
-      expect(
-        settingKeyToEnvVar("urn:colibri:settings:general:instance-name"),
-      ).toBe("COLIBRI_INSTANCE_NAME");
-      expect(
-        settingKeyToEnvVar(
-          "urn:colibri:settings:security:registration-enabled",
-        ),
-      ).toBe("COLIBRI_REGISTRATION_ENABLED");
-      expect(
-        settingKeyToEnvVar("urn:colibri:settings:metadata:auto-fetch-enabled"),
-      ).toBe("COLIBRI_AUTO_FETCH_ENABLED");
-      expect(
-        settingKeyToEnvVar("urn:colibri:settings:metadata:provider-priority"),
-      ).toBe("COLIBRI_PROVIDER_PRIORITY");
+      expect(settingKeyToEnvVar("urn:colibri:settings:general:instance-name")).toBe(
+        "COLIBRI_INSTANCE_NAME",
+      );
+      expect(settingKeyToEnvVar("urn:colibri:settings:security:registration-enabled")).toBe(
+        "COLIBRI_REGISTRATION_ENABLED",
+      );
+      expect(settingKeyToEnvVar("urn:colibri:settings:metadata:auto-fetch-enabled")).toBe(
+        "COLIBRI_AUTO_FETCH_ENABLED",
+      );
+      expect(settingKeyToEnvVar("urn:colibri:settings:metadata:provider-priority")).toBe(
+        "COLIBRI_PROVIDER_PRIORITY",
+      );
     });
   });
 
@@ -62,10 +57,7 @@ describe("settings index", () => {
     it("should return environment variable value when set", async () => {
       process.env.COLIBRI_INSTANCE_NAME = "My Test Library";
 
-      const result = await getSetting(
-        mockDatabase,
-        "urn:colibri:settings:general:instance-name",
-      );
+      const result = await getSetting(mockDatabase, "urn:colibri:settings:general:instance-name");
 
       expect(result.value).toBe("My Test Library");
       expect(result.source).toBe("environment");
@@ -107,37 +99,27 @@ describe("settings index", () => {
     });
 
     it("should parse string array environment variables correctly", async () => {
-      process.env.COLIBRI_PROVIDER_PRIORITY =
-        "wikidata, open-library, google-books";
+      process.env.COLIBRI_PROVIDER_PRIORITY = "wikidata, open-library, google-books";
 
       const result = await getSetting(
         mockDatabase,
         "urn:colibri:settings:metadata:provider-priority",
       );
 
-      expect(result.value).toEqual([
-        "wikidata",
-        "open-library",
-        "google-books",
-      ]);
+      expect(result.value).toEqual(["wikidata", "open-library", "google-books"]);
       expect(result.source).toBe("environment");
     });
 
     it("should return database value when no environment variable is set", async () => {
       mockLoadSettings.mockResolvedValueOnce({
-        data: {
-          "urn:colibri:settings:general:instance-name": "Database Library",
-        },
+        data: { "urn:colibri:settings:general:instance-name": "Database Library" },
         version: 1,
         created_at: new Date(),
         updated_at: new Date(),
         updated_by: null,
       });
 
-      const result = await getSetting(
-        mockDatabase,
-        "urn:colibri:settings:general:instance-name",
-      );
+      const result = await getSetting(mockDatabase, "urn:colibri:settings:general:instance-name");
 
       expect(result.value).toBe("Database Library");
       expect(result.source).toBe("database");
@@ -153,10 +135,7 @@ describe("settings index", () => {
         updated_by: null,
       });
 
-      const result = await getSetting(
-        mockDatabase,
-        "urn:colibri:settings:general:instance-name",
-      );
+      const result = await getSetting(mockDatabase, "urn:colibri:settings:general:instance-name");
 
       expect(result.value).toBe("Colibri");
       expect(result.source).toBe("default");
@@ -165,10 +144,7 @@ describe("settings index", () => {
     it("should return default value when database throws", async () => {
       mockLoadSettings.mockRejectedValueOnce(new Error("No settings found"));
 
-      const result = await getSetting(
-        mockDatabase,
-        "urn:colibri:settings:general:instance-name",
-      );
+      const result = await getSetting(mockDatabase, "urn:colibri:settings:general:instance-name");
 
       expect(result.value).toBe("Colibri");
       expect(result.source).toBe("default");
@@ -179,19 +155,14 @@ describe("settings index", () => {
       process.env.COLIBRI_INSTANCE_NAME = "";
 
       mockLoadSettings.mockResolvedValueOnce({
-        data: {
-          "urn:colibri:settings:general:instance-name": "Database Name",
-        },
+        data: { "urn:colibri:settings:general:instance-name": "Database Name" },
         version: 1,
         created_at: new Date(),
         updated_at: new Date(),
         updated_by: null,
       });
 
-      const result = await getSetting(
-        mockDatabase,
-        "urn:colibri:settings:general:instance-name",
-      );
+      const result = await getSetting(mockDatabase, "urn:colibri:settings:general:instance-name");
 
       // Should fall back to database since empty string fails validation
       expect(result.value).toBe("Database Name");
@@ -202,9 +173,7 @@ describe("settings index", () => {
   describe("getSettingValue", () => {
     it("should return just the value without source", async () => {
       mockLoadSettings.mockResolvedValueOnce({
-        data: {
-          "urn:colibri:settings:general:instance-name": "Test Library",
-        },
+        data: { "urn:colibri:settings:general:instance-name": "Test Library" },
         version: 1,
         created_at: new Date(),
         updated_at: new Date(),
@@ -234,11 +203,7 @@ describe("settings index", () => {
       });
       mockUpdateSettings.mockResolvedValueOnce({} as never);
 
-      await setSetting(
-        mockDatabase,
-        "urn:colibri:settings:general:instance-name",
-        "New Name",
-      );
+      await setSetting(mockDatabase, "urn:colibri:settings:general:instance-name", "New Name");
 
       expect(mockUpdateSettings).toHaveBeenCalledWith(mockDatabase, {
         data: {
@@ -267,9 +232,7 @@ describe("settings index", () => {
       );
 
       expect(mockUpdateSettings).toHaveBeenCalledWith(mockDatabase, {
-        data: {
-          "urn:colibri:settings:general:instance-name": "New Name",
-        },
+        data: { "urn:colibri:settings:general:instance-name": "New Name" },
         updated_by: BigInt(123),
       });
     });
@@ -288,16 +251,10 @@ describe("settings index", () => {
       mockLoadSettings.mockRejectedValueOnce(new Error("No settings"));
       mockUpdateSettings.mockResolvedValueOnce({} as never);
 
-      await setSetting(
-        mockDatabase,
-        "urn:colibri:settings:general:instance-name",
-        "First Name",
-      );
+      await setSetting(mockDatabase, "urn:colibri:settings:general:instance-name", "First Name");
 
       expect(mockUpdateSettings).toHaveBeenCalledWith(mockDatabase, {
-        data: {
-          "urn:colibri:settings:general:instance-name": "First Name",
-        },
+        data: { "urn:colibri:settings:general:instance-name": "First Name" },
         updated_by: null,
       });
     });
@@ -317,15 +274,10 @@ describe("settings index", () => {
       });
       mockUpdateSettings.mockResolvedValueOnce({} as never);
 
-      await resetSetting(
-        mockDatabase,
-        "urn:colibri:settings:general:instance-name",
-      );
+      await resetSetting(mockDatabase, "urn:colibri:settings:general:instance-name");
 
       expect(mockUpdateSettings).toHaveBeenCalledWith(mockDatabase, {
-        data: {
-          "urn:colibri:settings:security:registration-enabled": false,
-        },
+        data: { "urn:colibri:settings:security:registration-enabled": false },
         updated_by: null,
       });
     });
@@ -333,10 +285,7 @@ describe("settings index", () => {
     it("should do nothing when no settings exist", async () => {
       mockLoadSettings.mockRejectedValueOnce(new Error("No settings"));
 
-      await resetSetting(
-        mockDatabase,
-        "urn:colibri:settings:general:instance-name",
-      );
+      await resetSetting(mockDatabase, "urn:colibri:settings:general:instance-name");
 
       expect(mockUpdateSettings).not.toHaveBeenCalled();
     });
@@ -387,12 +336,8 @@ describe("settings index", () => {
         "urn:colibri:settings:security:registration-enabled": false,
       });
 
-      expect(result.imported).toContain(
-        "urn:colibri:settings:general:instance-name",
-      );
-      expect(result.imported).toContain(
-        "urn:colibri:settings:security:registration-enabled",
-      );
+      expect(result.imported).toContain("urn:colibri:settings:general:instance-name");
+      expect(result.imported).toContain("urn:colibri:settings:security:registration-enabled");
       expect(result.errors).toHaveLength(0);
     });
 
@@ -411,9 +356,7 @@ describe("settings index", () => {
         "urn:colibri:settings:general:instance-name": "Valid Name",
       });
 
-      expect(result.imported).toContain(
-        "urn:colibri:settings:general:instance-name",
-      );
+      expect(result.imported).toContain("urn:colibri:settings:general:instance-name");
       expect(result.errors).toHaveLength(1);
       expect(result.errors[0].key).toBe("invalid-key");
       expect(result.errors[0].error).toBe("Unknown setting key");
@@ -440,9 +383,7 @@ describe("settings index", () => {
 
     it("should merge with existing settings", async () => {
       mockLoadSettings.mockResolvedValueOnce({
-        data: {
-          "urn:colibri:settings:security:registration-enabled": true,
-        },
+        data: { "urn:colibri:settings:security:registration-enabled": true },
         version: 1,
         created_at: new Date(),
         updated_at: new Date(),
@@ -475,16 +416,12 @@ describe("settings index", () => {
 
       await importSettings(
         mockDatabase,
-        {
-          "urn:colibri:settings:general:instance-name": "Test",
-        },
+        { "urn:colibri:settings:general:instance-name": "Test" },
         "456",
       );
 
       expect(mockUpdateSettings).toHaveBeenCalledWith(mockDatabase, {
-        data: {
-          "urn:colibri:settings:general:instance-name": "Test",
-        },
+        data: { "urn:colibri:settings:general:instance-name": "Test" },
         updated_by: BigInt(456),
       });
     });

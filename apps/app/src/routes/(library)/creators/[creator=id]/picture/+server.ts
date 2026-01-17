@@ -1,9 +1,6 @@
 import { error, redirect, type RequestHandler } from "@sveltejs/kit";
 
-const handler: RequestHandler = async function ({
-  params,
-  locals: { database },
-}) {
+const handler: RequestHandler = async function ({ params, locals: { database } }) {
   const id = params.creator;
 
   if (typeof id !== "string") {

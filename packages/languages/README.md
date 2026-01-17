@@ -26,14 +26,14 @@ yarn add @colibri-hq/languages
 import { resolveLanguage, getLanguageByIso3 } from "@colibri-hq/languages";
 
 // Resolve from any input format
-resolveLanguage("en");       // { iso3: "eng", iso1: "en", name: "English", ... }
-resolveLanguage("eng");      // { iso3: "eng", iso1: "en", name: "English", ... }
-resolveLanguage("en-US");    // { iso3: "eng", iso1: "en", matchType: "regional", ... }
-resolveLanguage("English");  // { iso3: "eng", iso1: "en", matchType: "name", ... }
+resolveLanguage("en"); // { iso3: "eng", iso1: "en", name: "English", ... }
+resolveLanguage("eng"); // { iso3: "eng", iso1: "en", name: "English", ... }
+resolveLanguage("en-US"); // { iso3: "eng", iso1: "en", matchType: "regional", ... }
+resolveLanguage("English"); // { iso3: "eng", iso1: "en", matchType: "name", ... }
 
 // Direct lookups when you know the format
-getLanguageByIso3("deu");    // { iso3: "deu", iso1: "de", name: "German", ... }
-getLanguageByIso1("de");     // { iso3: "deu", iso1: "de", name: "German", ... }
+getLanguageByIso3("deu"); // { iso3: "deu", iso1: "de", name: "German", ... }
+getLanguageByIso1("de"); // { iso3: "deu", iso1: "de", name: "German", ... }
 getLanguageByName("German"); // { iso3: "deu", iso1: "de", name: "German", ... }
 ```
 
@@ -72,7 +72,7 @@ Resolve multiple language inputs in bulk. Efficient for batch processing.
 
 ```typescript
 const results = resolveLanguages(["en", "de", "invalid"]);
-results.get("en");      // { iso3: "eng", ... }
+results.get("en"); // { iso3: "eng", ... }
 results.get("invalid"); // null
 ```
 
@@ -81,10 +81,10 @@ results.get("invalid"); // null
 Check if a string is a valid ISO 639-1 or ISO 639-3 code. Regional variants are also accepted.
 
 ```typescript
-isValidLanguageCode("en");    // true
-isValidLanguageCode("eng");   // true
+isValidLanguageCode("en"); // true
+isValidLanguageCode("eng"); // true
 isValidLanguageCode("en-US"); // true
-isValidLanguageCode("xyz");   // false
+isValidLanguageCode("xyz"); // false
 ```
 
 ### Direct Lookup Functions
@@ -184,10 +184,10 @@ function normalizeBookLanguage(rawLanguage: string): string | null {
 }
 
 // Works with various input formats from different sources
-normalizeBookLanguage("en");       // "eng"
-normalizeBookLanguage("English");  // "eng"
-normalizeBookLanguage("en-US");    // "eng"
-normalizeBookLanguage("eng");      // "eng"
+normalizeBookLanguage("en"); // "eng"
+normalizeBookLanguage("English"); // "eng"
+normalizeBookLanguage("en-US"); // "eng"
+normalizeBookLanguage("eng"); // "eng"
 ```
 
 ### Bulk processing

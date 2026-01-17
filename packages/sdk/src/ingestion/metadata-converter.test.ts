@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect } from "vitest";
+import type { MetadataRecord } from "../metadata/provider.js";
 import {
   convertToExtractedMetadata,
   mergeMetadataRecords,
@@ -11,7 +12,6 @@ import {
   calculateAggregatedConfidence,
   resolveConflict,
 } from "./metadata-converter.js";
-import type { MetadataRecord } from "../metadata/provider.js";
 
 describe("convertToExtractedMetadata", () => {
   it("should convert basic metadata fields", () => {
@@ -29,10 +29,7 @@ describe("convertToExtractedMetadata", () => {
       language: "en",
       publisher: "Scribner",
       subjects: ["Fiction", "Classic Literature"],
-      series: {
-        name: "Great American Novels",
-        volume: 1,
-      },
+      series: { name: "Great American Novels", volume: 1 },
     };
 
     const result = convertToExtractedMetadata(record);
@@ -43,10 +40,7 @@ describe("convertToExtractedMetadata", () => {
     expect(result.numberOfPages).toBe(180);
     expect(result.language).toBe("en");
     expect(result.subjects).toEqual(["Fiction", "Classic Literature"]);
-    expect(result.series).toEqual({
-      name: "Great American Novels",
-      position: 1,
-    });
+    expect(result.series).toEqual({ name: "Great American Novels", position: 1 });
   });
 
   it("should convert authors to contributors with aut role", () => {
@@ -82,14 +76,8 @@ describe("convertToExtractedMetadata", () => {
     const result = convertToExtractedMetadata(record);
 
     expect(result.identifiers).toHaveLength(2);
-    expect(result.identifiers?.[0]).toEqual({
-      type: "isbn",
-      value: "9780743273565",
-    });
-    expect(result.identifiers?.[1]).toEqual({
-      type: "isbn",
-      value: "0743273567",
-    });
+    expect(result.identifiers?.[0]).toEqual({ type: "isbn", value: "9780743273565" });
+    expect(result.identifiers?.[1]).toEqual({ type: "isbn", value: "0743273567" });
   });
 
   it("should add publisher as contributor with pbl role", () => {
@@ -144,10 +132,7 @@ describe("convertToExtractedMetadata", () => {
       confidence: 0.92,
       timestamp: new Date("2024-01-01"),
       title: "Test Book",
-      providerData: {
-        wikidataId: "Q12345",
-        wikidataUri: "http://www.wikidata.org/entity/Q12345",
-      },
+      providerData: { wikidataId: "Q12345", wikidataUri: "http://www.wikidata.org/entity/Q12345" },
     };
 
     const result = convertToExtractedMetadata(record);
@@ -156,10 +141,7 @@ describe("convertToExtractedMetadata", () => {
       source: "WikiData",
       confidence: 0.92,
       timestamp: new Date("2024-01-01"),
-      data: {
-        wikidataId: "Q12345",
-        wikidataUri: "http://www.wikidata.org/entity/Q12345",
-      },
+      data: { wikidataId: "Q12345", wikidataUri: "http://www.wikidata.org/entity/Q12345" },
     });
   });
 });
@@ -433,13 +415,7 @@ describe("mergeArrayField", () => {
 describe("calculateAggregatedConfidence", () => {
   it("should return base confidence for single record", () => {
     const records: MetadataRecord[] = [
-      {
-        id: "1",
-        source: "WikiData",
-        confidence: 0.85,
-        timestamp: new Date(),
-        title: "Test Book",
-      },
+      { id: "1", source: "WikiData", confidence: 0.85, timestamp: new Date(), title: "Test Book" },
     ];
 
     const result = calculateAggregatedConfidence(records, "title");
@@ -449,20 +425,8 @@ describe("calculateAggregatedConfidence", () => {
 
   it("should add consensus boost for multiple sources", () => {
     const records: MetadataRecord[] = [
-      {
-        id: "1",
-        source: "WikiData",
-        confidence: 0.85,
-        timestamp: new Date(),
-        title: "Test Book",
-      },
-      {
-        id: "2",
-        source: "LoC",
-        confidence: 0.8,
-        timestamp: new Date(),
-        title: "Test Book",
-      },
+      { id: "1", source: "WikiData", confidence: 0.85, timestamp: new Date(), title: "Test Book" },
+      { id: "2", source: "LoC", confidence: 0.8, timestamp: new Date(), title: "Test Book" },
       {
         id: "3",
         source: "OpenLibrary",
@@ -481,20 +445,8 @@ describe("calculateAggregatedConfidence", () => {
 
   it("should cap confidence at 0.98", () => {
     const records: MetadataRecord[] = [
-      {
-        id: "1",
-        source: "WikiData",
-        confidence: 0.95,
-        timestamp: new Date(),
-        title: "Test Book",
-      },
-      {
-        id: "2",
-        source: "LoC",
-        confidence: 0.95,
-        timestamp: new Date(),
-        title: "Test Book",
-      },
+      { id: "1", source: "WikiData", confidence: 0.95, timestamp: new Date(), title: "Test Book" },
+      { id: "2", source: "LoC", confidence: 0.95, timestamp: new Date(), title: "Test Book" },
       {
         id: "3",
         source: "OpenLibrary",
@@ -502,13 +454,7 @@ describe("calculateAggregatedConfidence", () => {
         timestamp: new Date(),
         title: "Test Book",
       },
-      {
-        id: "4",
-        source: "ISNI",
-        confidence: 0.95,
-        timestamp: new Date(),
-        title: "Test Book",
-      },
+      { id: "4", source: "ISNI", confidence: 0.95, timestamp: new Date(), title: "Test Book" },
     ];
 
     const result = calculateAggregatedConfidence(records, "title");
@@ -524,13 +470,7 @@ describe("calculateAggregatedConfidence", () => {
 
   it("should ignore records without the field", () => {
     const records: MetadataRecord[] = [
-      {
-        id: "1",
-        source: "WikiData",
-        confidence: 0.85,
-        timestamp: new Date(),
-        title: "Test Book",
-      },
+      { id: "1", source: "WikiData", confidence: 0.85, timestamp: new Date(), title: "Test Book" },
       {
         id: "2",
         source: "LoC",
@@ -550,27 +490,9 @@ describe("calculateAggregatedConfidence", () => {
 describe("resolveConflict", () => {
   it("should detect no conflict when all values are identical", () => {
     const records: MetadataRecord[] = [
-      {
-        id: "1",
-        source: "WikiData",
-        confidence: 0.9,
-        timestamp: new Date(),
-        language: "en",
-      },
-      {
-        id: "2",
-        source: "LoC",
-        confidence: 0.85,
-        timestamp: new Date(),
-        language: "en",
-      },
-      {
-        id: "3",
-        source: "OpenLibrary",
-        confidence: 0.8,
-        timestamp: new Date(),
-        language: "en",
-      },
+      { id: "1", source: "WikiData", confidence: 0.9, timestamp: new Date(), language: "en" },
+      { id: "2", source: "LoC", confidence: 0.85, timestamp: new Date(), language: "en" },
+      { id: "3", source: "OpenLibrary", confidence: 0.8, timestamp: new Date(), language: "en" },
     ];
 
     const result = resolveConflict<string>(records, "language");
@@ -632,9 +554,7 @@ describe("resolveConflict", () => {
       },
     ];
 
-    const result = resolveConflict<string>(records, "title", (title) =>
-      title.toLowerCase(),
-    );
+    const result = resolveConflict<string>(records, "title", (title) => title.toLowerCase());
 
     expect(result.hasConflict).toBe(false); // Same after normalization
     expect(result.value).toBe("The Great Gatsby"); // Highest confidence
@@ -650,13 +570,7 @@ describe("resolveConflict", () => {
 
   it("should handle single record", () => {
     const records: MetadataRecord[] = [
-      {
-        id: "1",
-        source: "WikiData",
-        confidence: 0.9,
-        timestamp: new Date(),
-        title: "Solo Book",
-      },
+      { id: "1", source: "WikiData", confidence: 0.9, timestamp: new Date(), title: "Solo Book" },
     ];
 
     const result = resolveConflict<string>(records, "title");
@@ -675,20 +589,8 @@ describe("resolveConflict", () => {
         timestamp: new Date(),
         title: "Version A",
       },
-      {
-        id: "2",
-        source: "WikiData",
-        confidence: 0.92,
-        timestamp: new Date(),
-        title: "Version B",
-      },
-      {
-        id: "3",
-        source: "LoC",
-        confidence: 0.85,
-        timestamp: new Date(),
-        title: "Version C",
-      },
+      { id: "2", source: "WikiData", confidence: 0.92, timestamp: new Date(), title: "Version B" },
+      { id: "3", source: "LoC", confidence: 0.85, timestamp: new Date(), title: "Version C" },
     ];
 
     const result = resolveConflict<string>(records, "title");

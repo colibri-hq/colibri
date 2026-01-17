@@ -1,14 +1,12 @@
-import { error } from "@sveltejs/kit";
 import { getAvailableYears, getPostsByYear } from "$lib/content/blog";
+import { error } from "@sveltejs/kit";
 import type { EntryGenerator, PageServerLoad } from "./$types.js";
 
 export const prerender = true;
 
 export const entries: EntryGenerator = () => {
   const years = getAvailableYears();
-  return years.map((year) => ({
-    year: String(year),
-  }));
+  return years.map((year) => ({ year: String(year) }));
 };
 
 export const load: PageServerLoad = async ({ params }) => {

@@ -8,9 +8,5 @@
     "types": ["vitest/globals"]
   },
   "include": ["src/**/*.test.ts", "src/**/*.spec.ts", "test/**/*.ts"],
-  "references": [
-    {
-      "path": "./tsconfig.lib.json"
-    }
-  ]
+  "references": [{ "path": "./tsconfig.lib.json" }]
 }

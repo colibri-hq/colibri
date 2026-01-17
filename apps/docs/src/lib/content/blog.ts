@@ -1,7 +1,7 @@
 import type { Component } from "svelte";
 import type { Page, PageMetadata } from "./content";
-import { getAllPages } from "./content";
 import { type AuthorWithGravatar, getAuthorWithGravatar, parseAuthor } from "./author";
+import { getAllPages } from "./content";
 
 /**
  * Extended metadata for blog posts
@@ -43,28 +43,19 @@ export type BlogPost = {
  */
 export function isBlogPost(item: unknown): item is BlogPost {
   return (
-    typeof item === "object" &&
-    item !== null &&
-    "__type" in item &&
-    item.__type === "BlogPost"
+    typeof item === "object" && item !== null && "__type" in item && item.__type === "BlogPost"
   );
 }
 
 /**
  * Adjacent posts for navigation
  */
-export type AdjacentPosts = {
-  previous?: BlogPost;
-  next?: BlogPost;
-};
+export type AdjacentPosts = { previous?: BlogPost; next?: BlogPost };
 
 /**
  * Author info with post count
  */
-export type AuthorInfo = {
-  author: AuthorWithGravatar;
-  count: number;
-};
+export type AuthorInfo = { author: AuthorWithGravatar; count: number };
 
 /**
  * Series info with posts
@@ -224,9 +215,7 @@ export async function getBlogAuthors(): Promise<Map<string, AuthorInfo>> {
   }
 
   // Sort by count descending
-  return new Map(
-    [...authors.entries()].sort((a, b) => b[1].count - a[1].count),
-  );
+  return new Map([...authors.entries()].sort((a, b) => b[1].count - a[1].count));
 }
 
 /**
@@ -258,16 +247,11 @@ export function getPostsByYearMonth(): Map<number, Map<number, BlogPost[]>> {
   }
 
   // Sort years descending
-  const sortedGroups = new Map(
-    [...groups.entries()].sort((a, b) => b[0] - a[0]),
-  );
+  const sortedGroups = new Map([...groups.entries()].sort((a, b) => b[0] - a[0]));
 
   // Sort months descending within each year
   for (const [year, months] of sortedGroups) {
-    sortedGroups.set(
-      year,
-      new Map([...months.entries()].sort((a, b) => b[0] - a[0])),
-    );
+    sortedGroups.set(year, new Map([...months.entries()].sort((a, b) => b[0] - a[0])));
   }
 
   yearMonthCache = sortedGroups;
@@ -280,9 +264,7 @@ export function getPostsByYearMonth(): Map<number, Map<number, BlogPost[]>> {
 export function getSeriesPosts(seriesName: string): BlogPost[] {
   return getBlogPosts()
     .filter((p) => p.metadata.series === seriesName)
-    .sort(
-      (a, b) => (a.metadata.seriesOrder ?? 0) - (b.metadata.seriesOrder ?? 0),
-    );
+    .sort((a, b) => (a.metadata.seriesOrder ?? 0) - (b.metadata.seriesOrder ?? 0));
 }
 
 /**
@@ -375,10 +357,7 @@ export function getAdjacentPosts(urlSlug: string): AdjacentPosts {
  * @param content - Raw markdown content
  * @param maxLength - Maximum excerpt length (default 160)
  */
-export function generateExcerpt(
-  content: string,
-  maxLength: number = 160,
-): string {
+export function generateExcerpt(content: string, maxLength: number = 160): string {
   // Strip markdown formatting
   const plainText = content
     // Remove frontmatter
@@ -449,11 +428,7 @@ export function getMonthName(month: number): string {
  */
 export function formatBlogDate(dateString: string): string {
   const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 }
 
 /**
@@ -472,10 +447,7 @@ export function getPostsByYear(year: number): BlogPost[] {
  * @param year - Full year (e.g., 2024)
  * @param month - Month number (1-12)
  */
-export function getPostsByYearAndMonth(
-  year: number,
-  month: number,
-): BlogPost[] {
+export function getPostsByYearAndMonth(year: number, month: number): BlogPost[] {
   return getBlogPosts().filter((p) => {
     const date = new Date(p.metadata.date);
     return date.getFullYear() === year && date.getMonth() + 1 === month;
@@ -562,9 +534,7 @@ export function clearBlogCache(): void {
  * @param limit - Maximum number of related posts to return (default 3)
  */
 export function getRelatedPosts(post: BlogPost, limit: number = 3): BlogPost[] {
-  const postTags = new Set(
-    post.metadata.tags?.map((t) => t.toLowerCase()) ?? [],
-  );
+  const postTags = new Set(post.metadata.tags?.map((t) => t.toLowerCase()) ?? []);
 
   if (postTags.size === 0) return [];
 

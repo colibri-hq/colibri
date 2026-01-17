@@ -1,8 +1,4 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { MetadataCoordinator } from "./fetch.js";
-import { PreviewGenerator } from "./preview.js";
-import { ConflictDetector } from "./conflicts.js";
-import { ConflictDisplayFormatter } from "./conflict-format.js";
 import type {
   CreatorQuery,
   MetadataProvider,
@@ -11,6 +7,10 @@ import type {
   TitleQuery,
 } from "../providers/provider.js";
 import { MetadataType } from "../providers/provider.js";
+import { ConflictDisplayFormatter } from "./conflict-format.js";
+import { ConflictDetector } from "./conflicts.js";
+import { MetadataCoordinator } from "./fetch.js";
+import { PreviewGenerator } from "./preview.js";
 
 describe("End-to-End Metadata Discovery Workflow", () => {
   let coordinator: MetadataCoordinator;
@@ -37,9 +37,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       return this.searchMultiCriteria({ authors: [query.name] });
     }
 
-    async searchMultiCriteria(
-      query: MultiCriteriaQuery,
-    ): Promise<MetadataRecord[]> {
+    async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
       // Simulate OpenLibrary responses
       if (query.title?.toLowerCase().includes("gatsby")) {
         return [
@@ -109,11 +107,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
   class MockWikiDataProvider implements MetadataProvider {
     readonly name = "WikiData";
     readonly priority = 3;
-    readonly rateLimit = {
-      maxRequests: 50,
-      windowMs: 60000,
-      requestDelay: 100,
-    };
+    readonly rateLimit = { maxRequests: 50, windowMs: 60000, requestDelay: 100 };
     readonly timeout = { requestTimeout: 8000, operationTimeout: 15000 };
 
     async searchByTitle(query: TitleQuery): Promise<MetadataRecord[]> {
@@ -128,9 +122,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       return this.searchMultiCriteria({ authors: [query.name] });
     }
 
-    async searchMultiCriteria(
-      query: MultiCriteriaQuery,
-    ): Promise<MetadataRecord[]> {
+    async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
       // Simulate WikiData responses with more detailed metadata
       if (query.title?.toLowerCase().includes("gatsby")) {
         return [
@@ -143,19 +135,11 @@ describe("End-to-End Metadata Discovery Workflow", () => {
             authors: ["Francis Scott Key Fitzgerald"],
             isbn: ["9780743273565", "9780141182636"],
             publicationDate: new Date("1925-04-10"),
-            subjects: [
-              "American literature",
-              "Modernist literature",
-              "Jazz Age fiction",
-            ],
-            description:
-              "A 1925 novel by American writer F. Scott Fitzgerald set in the Jazz Age",
+            subjects: ["American literature", "Modernist literature", "Jazz Age fiction"],
+            description: "A 1925 novel by American writer F. Scott Fitzgerald set in the Jazz Age",
             language: "en",
             publisher: "Charles Scribner's Sons",
-            series: {
-              name: "Modern American Classics",
-              volume: 1,
-            },
+            series: { name: "Modern American Classics", volume: 1 },
             pageCount: 180,
             awards: ["Modern Library 100 Best Novels"],
             adaptations: ["1974 film", "2013 film"],
@@ -174,13 +158,8 @@ describe("End-to-End Metadata Discovery Workflow", () => {
             authors: ["Nelle Harper Lee"],
             isbn: ["9780061120084", "9780446310789"],
             publicationDate: new Date("1960-07-11"),
-            subjects: [
-              "American literature",
-              "Legal fiction",
-              "Coming-of-age story",
-            ],
-            description:
-              "A novel by Harper Lee published in 1960, dealing with racial inequality",
+            subjects: ["American literature", "Legal fiction", "Coming-of-age story"],
+            description: "A novel by Harper Lee published in 1960, dealing with racial inequality",
             language: "en",
             publisher: "J.B. Lippincott & Co.",
             pageCount: 281,
@@ -213,11 +192,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
   class MockLibraryOfCongressProvider implements MetadataProvider {
     readonly name = "Library of Congress";
     readonly priority = 4;
-    readonly rateLimit = {
-      maxRequests: 30,
-      windowMs: 60000,
-      requestDelay: 200,
-    };
+    readonly rateLimit = { maxRequests: 30, windowMs: 60000, requestDelay: 200 };
     readonly timeout = { requestTimeout: 10000, operationTimeout: 20000 };
 
     async searchByTitle(query: TitleQuery): Promise<MetadataRecord[]> {
@@ -232,9 +207,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       return this.searchMultiCriteria({ authors: [query.name] });
     }
 
-    async searchMultiCriteria(
-      query: MultiCriteriaQuery,
-    ): Promise<MetadataRecord[]> {
+    async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
       // Simulate Library of Congress responses with authoritative data
       if (query.title?.toLowerCase().includes("gatsby")) {
         return [
@@ -252,8 +225,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
               { name: "Jazz Age", scheme: "lcsh" },
               { name: "Long Island (N.Y.)", scheme: "lcsh" },
             ],
-            description:
-              "First edition published by Charles Scribner's Sons, New York, 1925",
+            description: "First edition published by Charles Scribner's Sons, New York, 1925",
             language: "eng",
             publisher: { name: "Scribner", location: "New York" },
             lccn: "25005799",
@@ -314,18 +286,14 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       expect(coordinatorResult.failedProviders).toBe(0);
 
       // Step 2: Generate preview from raw metadata
-      const preview = previewGenerator.generatePreview(
-        coordinatorResult.aggregatedRecords,
-      );
+      const preview = previewGenerator.generatePreview(coordinatorResult.aggregatedRecords);
 
       // Verify preview generation
       expect(preview.title.value).toBe("The Great Gatsby");
       // Authors may be in different formats, check if any author name contains Fitzgerald
       const hasAuthor =
         preview.authors.value &&
-        preview.authors.value.some((author: string) =>
-          author.toLowerCase().includes("fitzgerald"),
-        );
+        preview.authors.value.some((author: string) => author.toLowerCase().includes("fitzgerald"));
       expect(hasAuthor).toBe(true);
       expect(preview.overallConfidence).toBeGreaterThan(0.8);
       expect(preview.sourceCount).toBe(3);
@@ -338,9 +306,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       // Verify enhanced preview
       expect(enhancedPreview.conflictAnalysis).toBeDefined();
       expect(enhancedPreview.conflictDisplay).toBeDefined();
-      expect(
-        enhancedPreview.conflictDetectionMetadata.detectedAt,
-      ).toBeInstanceOf(Date);
+      expect(enhancedPreview.conflictDetectionMetadata.detectedAt).toBeInstanceOf(Date);
 
       // Step 4: Generate library preview
       const libraryPreview = previewGenerator.generateLibraryPreview(
@@ -352,9 +318,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       // Verify library preview
       expect(libraryPreview.entry.title).toBe("The Great Gatsby");
       expect(libraryPreview.duplicates).toHaveLength(0);
-      expect(libraryPreview.quality.level).toMatch(
-        /^(excellent|good|fair|poor)$/,
-      );
+      expect(libraryPreview.quality.level).toMatch(/^(excellent|good|fair|poor)$/);
       expect(libraryPreview.recommendations.length).toBeGreaterThanOrEqual(0);
     });
 
@@ -363,11 +327,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       class FailingProvider implements MetadataProvider {
         readonly name = "FailingProvider";
         readonly priority = 1;
-        readonly rateLimit = {
-          maxRequests: 100,
-          windowMs: 60000,
-          requestDelay: 0,
-        };
+        readonly rateLimit = { maxRequests: 100, windowMs: 60000, requestDelay: 0 };
         readonly timeout = { requestTimeout: 5000, operationTimeout: 10000 };
 
         async searchByTitle(): Promise<MetadataRecord[]> {
@@ -411,9 +371,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       expect(result.totalRecords).toBeGreaterThan(0);
 
       // Preview generation should still work
-      const preview = previewGenerator.generatePreview(
-        result.aggregatedRecords,
-      );
+      const preview = previewGenerator.generatePreview(result.aggregatedRecords);
       expect(preview.title.value).toBe("The Great Gatsby");
     });
 
@@ -422,11 +380,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       class ConflictingProvider implements MetadataProvider {
         readonly name = "ConflictingProvider";
         readonly priority = 1;
-        readonly rateLimit = {
-          maxRequests: 100,
-          windowMs: 60000,
-          requestDelay: 0,
-        };
+        readonly rateLimit = { maxRequests: 100, windowMs: 60000, requestDelay: 0 };
         readonly timeout = { requestTimeout: 5000, operationTimeout: 10000 };
 
         async searchByTitle(): Promise<MetadataRecord[]> {
@@ -482,21 +436,14 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       expect(result.totalRecords).toBeGreaterThan(1);
 
       // Generate enhanced preview to detect conflicts
-      const enhancedPreview = previewGenerator.generateEnhancedPreview(
-        result.aggregatedRecords,
-      );
+      const enhancedPreview = previewGenerator.generateEnhancedPreview(result.aggregatedRecords);
 
       // Should detect conflicts
-      expect(enhancedPreview.conflictAnalysis.totalConflicts).toBeGreaterThan(
-        0,
-      );
-      expect(
-        enhancedPreview.conflictDetectionMetadata.totalConflictsDetected,
-      ).toBeGreaterThan(0);
+      expect(enhancedPreview.conflictAnalysis.totalConflicts).toBeGreaterThan(0);
+      expect(enhancedPreview.conflictDetectionMetadata.totalConflictsDetected).toBeGreaterThan(0);
 
       // Generate conflict report
-      const conflictReport =
-        previewGenerator.generateConflictReport(enhancedPreview);
+      const conflictReport = previewGenerator.generateConflictReport(enhancedPreview);
       expect(conflictReport).toContain("METADATA CONFLICT ANALYSIS REPORT");
       expect(conflictReport.length).toBeGreaterThan(100);
     });
@@ -519,9 +466,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       expect(result.failedProviders).toBe(0);
 
       // Preview should handle empty results
-      const preview = previewGenerator.generatePreview(
-        result.aggregatedRecords,
-      );
+      const preview = previewGenerator.generatePreview(result.aggregatedRecords);
       expect(preview.sourceCount).toBe(0);
       expect(preview.overallConfidence).toBe(0.1); // Minimum confidence
     });
@@ -556,9 +501,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       // - Jaccard similarity for authors treats these as different strings
       // - Date format conversion may affect date similarity
       expect(libraryPreview.duplicates).toHaveLength(1);
-      expect(["exact", "likely", "possible"]).toContain(
-        libraryPreview.duplicates[0].matchType,
-      );
+      expect(["exact", "likely", "possible"]).toContain(libraryPreview.duplicates[0].matchType);
       expect(libraryPreview.duplicates[0].similarity).toBeGreaterThan(0.5);
       expect(["skip", "merge", "review_manually", "add_as_new"]).toContain(
         libraryPreview.duplicates[0].recommendation,
@@ -586,11 +529,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       class SlowProvider implements MetadataProvider {
         readonly name = "SlowProvider";
         readonly priority = 1;
-        readonly rateLimit = {
-          maxRequests: 100,
-          windowMs: 60000,
-          requestDelay: 0,
-        };
+        readonly rateLimit = { maxRequests: 100, windowMs: 60000, requestDelay: 0 };
         readonly timeout = { requestTimeout: 5000, operationTimeout: 10000 };
 
         async searchByTitle(): Promise<MetadataRecord[]> {
@@ -658,9 +597,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       // Verify quality assessment
       expect(libraryPreview.quality.score).toBeGreaterThan(0);
       expect(libraryPreview.quality.score).toBeLessThanOrEqual(1);
-      expect(libraryPreview.quality.level).toMatch(
-        /^(excellent|good|fair|poor)$/,
-      );
+      expect(libraryPreview.quality.level).toMatch(/^(excellent|good|fair|poor)$/);
       expect(libraryPreview.quality.completeness).toBeGreaterThan(0);
       expect(libraryPreview.quality.accuracy).toBeGreaterThan(0);
       expect(libraryPreview.quality.consistency).toBeGreaterThan(0);
@@ -669,8 +606,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
 
       // Should have meaningful quality factors
       expect(
-        libraryPreview.quality.strengths.length +
-          libraryPreview.quality.improvements.length,
+        libraryPreview.quality.strengths.length + libraryPreview.quality.improvements.length,
       ).toBeGreaterThan(0);
     });
 
@@ -696,11 +632,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       expect(emptyPreview.overallConfidence).toBe(0.1);
 
       // Test library preview with empty data
-      const emptyLibraryPreview = previewGenerator.generateLibraryPreview(
-        [],
-        undefined,
-        [],
-      );
+      const emptyLibraryPreview = previewGenerator.generateLibraryPreview([], undefined, []);
       // The implementation may provide a default title for empty data
       expect(emptyLibraryPreview.entry.title).toBeDefined();
       expect(emptyLibraryPreview.duplicates).toHaveLength(0);
@@ -719,9 +651,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       ];
 
       const startTime = Date.now();
-      const results = await Promise.all(
-        queries.map((query) => coordinator.query(query)),
-      );
+      const results = await Promise.all(queries.map((query) => coordinator.query(query)));
       const duration = Date.now() - startTime;
 
       // Should complete all queries
@@ -729,10 +659,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       expect(duration).toBeLessThan(10000); // Should complete within 10 seconds
 
       // Should have some successful results
-      const totalRecords = results.reduce(
-        (sum, result) => sum + result.totalRecords,
-        0,
-      );
+      const totalRecords = results.reduce((sum, result) => sum + result.totalRecords, 0);
       expect(totalRecords).toBeGreaterThan(0);
     });
 
@@ -741,11 +668,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       class LargeResultProvider implements MetadataProvider {
         readonly name = "LargeResultProvider";
         readonly priority = 1;
-        readonly rateLimit = {
-          maxRequests: 100,
-          windowMs: 60000,
-          requestDelay: 0,
-        };
+        readonly rateLimit = { maxRequests: 100, windowMs: 60000, requestDelay: 0 };
         readonly timeout = { requestTimeout: 5000, operationTimeout: 10000 };
 
         async searchByTitle(): Promise<MetadataRecord[]> {
@@ -781,9 +704,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
         }
       }
 
-      const largeResultCoordinator = new MetadataCoordinator([
-        new LargeResultProvider(),
-      ]);
+      const largeResultCoordinator = new MetadataCoordinator([new LargeResultProvider()]);
 
       const startTime = Date.now();
       const result = await largeResultCoordinator.query({ title: "test" });
@@ -794,9 +715,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
 
       // Test preview generation with large dataset
       const previewStartTime = Date.now();
-      const preview = previewGenerator.generatePreview(
-        result.aggregatedRecords,
-      );
+      const preview = previewGenerator.generatePreview(result.aggregatedRecords);
       const previewDuration = Date.now() - previewStartTime;
 
       expect(preview.sourceCount).toBe(1);
@@ -808,11 +727,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       class RateLimitedProvider implements MetadataProvider {
         readonly name = "RateLimitedProvider";
         readonly priority = 1;
-        readonly rateLimit = {
-          maxRequests: 2,
-          windowMs: 1000,
-          requestDelay: 500,
-        };
+        readonly rateLimit = { maxRequests: 2, windowMs: 1000, requestDelay: 500 };
         readonly timeout = { requestTimeout: 1000, operationTimeout: 2000 };
 
         private requestCount = 0;
@@ -858,14 +773,10 @@ describe("End-to-End Metadata Discovery Workflow", () => {
         }
       }
 
-      const rateLimitedCoordinator = new MetadataCoordinator([
-        new RateLimitedProvider(),
-      ]);
+      const rateLimitedCoordinator = new MetadataCoordinator([new RateLimitedProvider()]);
 
       // Make multiple rapid requests
-      const queries = Array.from({ length: 5 }, (_, i) => ({
-        title: `Book ${i}`,
-      }));
+      const queries = Array.from({ length: 5 }, (_, i) => ({ title: `Book ${i}` }));
       const results = await Promise.all(
         queries.map((query) => rateLimitedCoordinator.query(query)),
       );
@@ -884,11 +795,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       class NetworkErrorProvider implements MetadataProvider {
         readonly name = "NetworkErrorProvider";
         readonly priority = 1;
-        readonly rateLimit = {
-          maxRequests: 100,
-          windowMs: 60000,
-          requestDelay: 0,
-        };
+        readonly rateLimit = { maxRequests: 100, windowMs: 60000, requestDelay: 0 };
         readonly timeout = { requestTimeout: 5000, operationTimeout: 10000 };
 
         private attemptCount = 0;
@@ -957,11 +864,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       class CorruptedDataProvider implements MetadataProvider {
         readonly name = "CorruptedDataProvider";
         readonly priority = 1;
-        readonly rateLimit = {
-          maxRequests: 100,
-          windowMs: 60000,
-          requestDelay: 0,
-        };
+        readonly rateLimit = { maxRequests: 100, windowMs: 60000, requestDelay: 0 };
         readonly timeout = { requestTimeout: 5000, operationTimeout: 10000 };
 
         async searchByTitle(): Promise<MetadataRecord[]> {
@@ -1008,9 +911,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
         }
       }
 
-      const corruptedCoordinator = new MetadataCoordinator([
-        new CorruptedDataProvider(),
-      ]);
+      const corruptedCoordinator = new MetadataCoordinator([new CorruptedDataProvider()]);
 
       const result = await corruptedCoordinator.query({ title: "test" });
 
@@ -1019,9 +920,7 @@ describe("End-to-End Metadata Discovery Workflow", () => {
       expect(result.totalRecords).toBeGreaterThanOrEqual(1);
 
       // Preview generation should handle corrupted data
-      const preview = previewGenerator.generatePreview(
-        result.aggregatedRecords,
-      );
+      const preview = previewGenerator.generatePreview(result.aggregatedRecords);
       expect(preview.sourceCount).toBe(1);
     });
   });

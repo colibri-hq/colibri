@@ -1,8 +1,4 @@
-import {
-  expect,
-  type APIRequestContext,
-  type APIResponse,
-} from "@playwright/test";
+import { expect, type APIRequestContext, type APIResponse } from "@playwright/test";
 import { test } from "../base";
 
 /**
@@ -41,15 +37,11 @@ test.describe("Search API - Basic Functionality", () => {
     expect(response.ok()).toBe(true);
 
     const results = await getResults(response);
-    const editionResults = results.filter(
-      (r: { type: string }) => r.type === "edition",
-    );
+    const editionResults = results.filter((r: { type: string }) => r.type === "edition");
     expect(editionResults.length).toBeGreaterThan(0);
-    expect(
-      editionResults.some((r: { title: string }) =>
-        r.title.includes("Fantasy Quest"),
-      ),
-    ).toBe(true);
+    expect(editionResults.some((r: { title: string }) => r.title.includes("Fantasy Quest"))).toBe(
+      true,
+    );
   });
 
   test("returns matching editions by synopsis", async ({ request }) => {
@@ -57,9 +49,7 @@ test.describe("Search API - Basic Functionality", () => {
     expect(response.ok()).toBe(true);
 
     const results = await getResults(response);
-    const editionResults = results.filter(
-      (r: { type: string }) => r.type === "edition",
-    );
+    const editionResults = results.filter((r: { type: string }) => r.type === "edition");
     expect(editionResults.length).toBeGreaterThan(0);
   });
 
@@ -68,15 +58,11 @@ test.describe("Search API - Basic Functionality", () => {
     expect(response.ok()).toBe(true);
 
     const results = await getResults(response);
-    const creatorResults = results.filter(
-      (r: { type: string }) => r.type === "creator",
-    );
+    const creatorResults = results.filter((r: { type: string }) => r.type === "creator");
     expect(creatorResults.length).toBeGreaterThan(0);
-    expect(
-      creatorResults.some((r: { name: string }) =>
-        r.name.includes("Brandon Sanderson"),
-      ),
-    ).toBe(true);
+    expect(creatorResults.some((r: { name: string }) => r.name.includes("Brandon Sanderson"))).toBe(
+      true,
+    );
   });
 
   test("returns matching publishers by name", async ({ request }) => {
@@ -84,13 +70,9 @@ test.describe("Search API - Basic Functionality", () => {
     expect(response.ok()).toBe(true);
 
     const results = await getResults(response);
-    const publisherResults = results.filter(
-      (r: { type: string }) => r.type === "publisher",
-    );
+    const publisherResults = results.filter((r: { type: string }) => r.type === "publisher");
     expect(publisherResults.length).toBeGreaterThan(0);
-    expect(
-      publisherResults.some((r: { name: string }) => r.name.includes("Tor")),
-    ).toBe(true);
+    expect(publisherResults.some((r: { name: string }) => r.name.includes("Tor"))).toBe(true);
   });
 
   test("returns matching collections by name", async ({ request }) => {
@@ -98,43 +80,27 @@ test.describe("Search API - Basic Functionality", () => {
     expect(response.ok()).toBe(true);
 
     const results = await getResults(response);
-    const collectionResults = results.filter(
-      (r: { type: string }) => r.type === "collection",
-    );
+    const collectionResults = results.filter((r: { type: string }) => r.type === "collection");
     expect(collectionResults.length).toBeGreaterThan(0);
-    expect(
-      collectionResults.some((r: { name: string }) =>
-        r.name.includes("Fantasy"),
-      ),
-    ).toBe(true);
+    expect(collectionResults.some((r: { name: string }) => r.name.includes("Fantasy"))).toBe(true);
   });
 });
 
 test.describe("Search API - Filtering", () => {
   test("filters by single entity type - editions only", async ({ request }) => {
-    const response = await searchQuery(request, {
-      query: "fantasy",
-      types: ["edition"],
-    });
+    const response = await searchQuery(request, { query: "fantasy", types: ["edition"] });
     expect(response.ok()).toBe(true);
 
     const results = await getResults(response);
-    expect(results.every((r: { type: string }) => r.type === "edition")).toBe(
-      true,
-    );
+    expect(results.every((r: { type: string }) => r.type === "edition")).toBe(true);
   });
 
   test("filters by single entity type - creators only", async ({ request }) => {
-    const response = await searchQuery(request, {
-      query: "fantasy",
-      types: ["creator"],
-    });
+    const response = await searchQuery(request, { query: "fantasy", types: ["creator"] });
     expect(response.ok()).toBe(true);
 
     const results = await getResults(response);
-    expect(results.every((r: { type: string }) => r.type === "creator")).toBe(
-      true,
-    );
+    expect(results.every((r: { type: string }) => r.type === "creator")).toBe(true);
   });
 
   test("filters by multiple entity types", async ({ request }) => {
@@ -146,18 +112,12 @@ test.describe("Search API - Filtering", () => {
 
     const results = await getResults(response);
     expect(
-      results.every(
-        (r: { type: string }) =>
-          r.type === "edition" || r.type === "collection",
-      ),
+      results.every((r: { type: string }) => r.type === "edition" || r.type === "collection"),
     ).toBe(true);
   });
 
   test("respects limit parameter", async ({ request }) => {
-    const response = await searchQuery(request, {
-      query: "fantasy",
-      limit: 2,
-    });
+    const response = await searchQuery(request, { query: "fantasy", limit: 2 });
     expect(response.ok()).toBe(true);
 
     const results = await getResults(response);
@@ -166,14 +126,9 @@ test.describe("Search API - Filtering", () => {
 });
 
 test.describe("Search API - Ranking", () => {
-  test("ranks title matches higher than synopsis matches", async ({
-    request,
-  }) => {
+  test("ranks title matches higher than synopsis matches", async ({ request }) => {
     // "Fantasy" appears in both title and synopsis of different entries
-    const response = await searchQuery(request, {
-      query: "Fantasy",
-      types: ["edition"],
-    });
+    const response = await searchQuery(request, { query: "Fantasy", types: ["edition"] });
     expect(response.ok()).toBe(true);
 
     const results = await getResults(response);
@@ -196,9 +151,7 @@ test.describe("Search API - Ranking", () => {
 
 test.describe("Search API - Edge Cases", () => {
   test("returns empty array for non-matching query", async ({ request }) => {
-    const response = await searchQuery(request, {
-      query: "xyznonexistent123",
-    });
+    const response = await searchQuery(request, { query: "xyznonexistent123" });
     expect(response.ok()).toBe(true);
 
     const results = await getResults(response);
@@ -227,9 +180,7 @@ test.describe("Search API - Edge Cases", () => {
   });
 
   test("handles SQL injection attempts safely", async ({ request }) => {
-    const response = await searchQuery(request, {
-      query: "'; DROP TABLE edition;--",
-    });
+    const response = await searchQuery(request, { query: "'; DROP TABLE edition;--" });
     expect(response.ok()).toBe(true);
 
     // Should not error and should sanitize the input
@@ -246,9 +197,7 @@ test.describe("Search API - Edge Cases", () => {
   });
 
   test("handles multiple spaces between words", async ({ request }) => {
-    const response = await searchQuery(request, {
-      query: "fantasy    quest",
-    });
+    const response = await searchQuery(request, { query: "fantasy    quest" });
     expect(response.ok()).toBe(true);
 
     const results = await getResults(response);
@@ -301,37 +250,25 @@ test.describe("Search API - Error Handling", () => {
 });
 
 test.describe("Search API - Performance", () => {
-  test("responds within acceptable time for simple query", async ({
-    request,
-  }) => {
+  test("responds within acceptable time for simple query", async ({ request }) => {
     const start = Date.now();
-    const response = await searchQuery(request, {
-      query: "fantasy",
-      limit: 20,
-    });
+    const response = await searchQuery(request, { query: "fantasy", limit: 20 });
     const duration = Date.now() - start;
 
     expect(response.ok()).toBe(true);
     expect(duration).toBeLessThan(500); // 500ms threshold
   });
 
-  test("responds within acceptable time for multi-word query", async ({
-    request,
-  }) => {
+  test("responds within acceptable time for multi-word query", async ({ request }) => {
     const start = Date.now();
-    const response = await searchQuery(request, {
-      query: "epic fantasy adventure",
-      limit: 20,
-    });
+    const response = await searchQuery(request, { query: "epic fantasy adventure", limit: 20 });
     const duration = Date.now() - start;
 
     expect(response.ok()).toBe(true);
     expect(duration).toBeLessThan(500);
   });
 
-  test("responds within acceptable time when filtering by type", async ({
-    request,
-  }) => {
+  test("responds within acceptable time when filtering by type", async ({ request }) => {
     const start = Date.now();
     const response = await searchQuery(request, {
       query: "fantasy",

@@ -113,20 +113,10 @@ export class PerformanceMonitor {
   ): PerformanceMetrics {
     if (!this.config.enabled || Math.random() > this.config.sampleRate) {
       // Return a dummy metric that won't be recorded
-      return {
-        operation,
-        provider,
-        startTime: Date.now(),
-        metadata,
-      };
+      return { operation, provider, startTime: Date.now(), metadata };
     }
 
-    const metric: PerformanceMetrics = {
-      operation,
-      provider,
-      startTime: Date.now(),
-      metadata,
-    };
+    const metric: PerformanceMetrics = { operation, provider, startTime: Date.now(), metadata };
 
     return metric;
   }
@@ -218,12 +208,9 @@ export class PerformanceMonitor {
     const statsMap = new Map<string, PerformanceStats>();
 
     for (const metric of this.metrics) {
-      if (metric.duration === undefined || metric.endTime === undefined)
-        continue;
+      if (metric.duration === undefined || metric.endTime === undefined) continue;
 
-      const key = metric.provider
-        ? `${metric.operation}:${metric.provider}`
-        : metric.operation;
+      const key = metric.provider ? `${metric.operation}:${metric.provider}` : metric.operation;
 
       if (!statsMap.has(key)) {
         statsMap.set(key, {
@@ -267,13 +254,9 @@ export class PerformanceMonitor {
     // Calculate derived statistics
     for (const stats of statsMap.values()) {
       stats.successRate =
-        stats.totalOperations > 0
-          ? stats.successfulOperations / stats.totalOperations
-          : 0;
+        stats.totalOperations > 0 ? stats.successfulOperations / stats.totalOperations : 0;
       stats.averageRecords =
-        stats.totalOperations > 0
-          ? stats.totalRecords / stats.totalOperations
-          : 0;
+        stats.totalOperations > 0 ? stats.totalRecords / stats.totalOperations : 0;
 
       // Calculate average duration and percentiles
       const operationMetrics = this.metrics.filter(
@@ -284,11 +267,8 @@ export class PerformanceMonitor {
       );
 
       if (operationMetrics.length > 0) {
-        const durations = operationMetrics
-          .map((m) => m.duration!)
-          .sort((a, b) => a - b);
-        stats.averageDuration =
-          durations.reduce((sum, d) => sum + d, 0) / durations.length;
+        const durations = operationMetrics.map((m) => m.duration!).sort((a, b) => a - b);
+        stats.averageDuration = durations.reduce((sum, d) => sum + d, 0) / durations.length;
         stats.p95Duration = durations[Math.floor(durations.length * 0.95)] || 0;
 
         // Calculate cache hit rate
@@ -303,14 +283,9 @@ export class PerformanceMonitor {
   /**
    * Get statistics for a specific operation
    */
-  getOperationStats(
-    operation: string,
-    provider?: string,
-  ): PerformanceStats | undefined {
+  getOperationStats(operation: string, provider?: string): PerformanceStats | undefined {
     const allStats = this.getStats();
-    return allStats.find(
-      (s) => s.operation === operation && s.provider === provider,
-    );
+    return allStats.find((s) => s.operation === operation && s.provider === provider);
   }
 
   /**
@@ -414,11 +389,7 @@ export class PerformanceMonitor {
  * Decorator for automatically timing method calls
  */
 export function timed(operation?: string) {
-  return function (
-    target: any,
-    propertyName: string,
-    descriptor?: PropertyDescriptor,
-  ) {
+  return function (target: any, propertyName: string, descriptor?: PropertyDescriptor) {
     if (!descriptor) {
       // Handle case where descriptor is not provided (newer TypeScript versions)
       descriptor = Object.getOwnPropertyDescriptor(target, propertyName) || {
@@ -430,8 +401,7 @@ export function timed(operation?: string) {
     }
 
     const method = descriptor.value;
-    const operationName =
-      operation || `${target.constructor.name}.${propertyName}`;
+    const operationName = operation || `${target.constructor.name}.${propertyName}`;
 
     descriptor.value = async function (...args: any[]) {
       const monitor = globalPerformanceMonitor;
@@ -443,11 +413,7 @@ export function timed(operation?: string) {
         monitor.endOperation(metric, true, undefined, recordCount);
         return result;
       } catch (error) {
-        monitor.endOperation(
-          metric,
-          false,
-          error instanceof Error ? error.message : String(error),
-        );
+        monitor.endOperation(metric, false, error instanceof Error ? error.message : String(error));
         throw error;
       }
     };

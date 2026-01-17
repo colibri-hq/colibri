@@ -8,9 +8,7 @@ interface ThemeOptions {
 }
 
 export const preference = writable<AuthenticationColorScheme>("system");
-const internalThemeOptions = writable<ThemeOptions>({
-  colorScheme: undefined,
-});
+const internalThemeOptions = writable<ThemeOptions>({ colorScheme: undefined });
 export const themeOptions = derived(
   internalThemeOptions,
   ($internalThemeOptions) => $internalThemeOptions,
@@ -40,9 +38,7 @@ export const theme: Action = function theme(node) {
 
   preference.subscribe((value) => {
     if (value === "system") {
-      internalThemeOptions.set({
-        colorScheme: query.matches ? "dark" : "light",
-      });
+      internalThemeOptions.set({ colorScheme: query.matches ? "dark" : "light" });
       query.addEventListener("change", mediaQueryListener);
 
       return;

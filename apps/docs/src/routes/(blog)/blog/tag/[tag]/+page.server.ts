@@ -1,5 +1,5 @@
-import { error } from "@sveltejs/kit";
 import { getBlogTags, getPostsByTag } from "$lib/content/blog";
+import { error } from "@sveltejs/kit";
 import type { EntryGenerator, PageServerLoad } from "./$types.js";
 
 export const prerender = true;
@@ -7,9 +7,7 @@ export const prerender = true;
 export const entries = function entries() {
   const tags = getBlogTags();
 
-  return Array.from(tags.keys()).map((tag) => ({
-    tag: encodeURIComponent(tag),
-  }));
+  return Array.from(tags.keys()).map((tag) => ({ tag: encodeURIComponent(tag) }));
 } satisfies EntryGenerator;
 
 export const load = async function load({ params }) {

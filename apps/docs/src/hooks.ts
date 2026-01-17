@@ -1,12 +1,6 @@
 import type { Transport } from "@sveltejs/kit";
-import {
-  Directory,
-  getPage,
-  isDirectory,
-  isPage,
-  type Page,
-} from "$lib/content/content";
 import { getBlogPost, isBlogPost, type BlogPost } from "$lib/content/blog";
+import { Directory, getPage, isDirectory, isPage, type Page } from "$lib/content/content";
 
 export const transport: Transport = {
   Page: {

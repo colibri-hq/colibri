@@ -24,8 +24,7 @@ export async function searchBook(params: BookSearchParams) {
     .filter(
       <K extends keyof BookSearchParams>(
         item: [unknown, unknown],
-      ): item is [K, Exclude<BookSearchParams[K], undefined>] =>
-        typeof item[1] !== "undefined",
+      ): item is [K, Exclude<BookSearchParams[K], undefined>] => typeof item[1] !== "undefined",
     )
     .flatMap(([key, value]) => {
       const parameterName = parameterNames[key];
@@ -43,14 +42,9 @@ export async function searchBook(params: BookSearchParams) {
     }, url.searchParams);
 
   try {
-    const response = await request<OpenLibrarySearchResponse>(
-      new Request(url, {}),
-    );
+    const response = await request<OpenLibrarySearchResponse>(new Request(url, {}));
 
-    return {
-      amount: response.numFound,
-      books: response.docs,
-    };
+    return { amount: response.numFound, books: response.docs };
   } catch (error) {
     if (!(error instanceof Error)) {
       throw error;
@@ -65,11 +59,7 @@ async function request<T>(request: Request) {
   let plainBody: string;
   let body: T;
 
-  log(
-    "open-library",
-    "debug",
-    `Fetching data from Open Library API: ${request.url}`,
-  );
+  log("open-library", "debug", `Fetching data from Open Library API: ${request.url}`);
 
   try {
     response = await fetch(request);
@@ -101,12 +91,7 @@ async function request<T>(request: Request) {
     );
   }
 
-  log(
-    "open-library",
-    "debug",
-    `Fetched data from Open Library API: ${request.url}`,
-    { body },
-  );
+  log("open-library", "debug", `Fetched data from Open Library API: ${request.url}`, { body });
 
   return body;
 }

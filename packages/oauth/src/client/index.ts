@@ -64,15 +64,8 @@ export {
 } from "./discovery.js";
 export type { DiscoveryOptions } from "./discovery.js";
 
-export {
-  MemoryTokenStore,
-  LocalStorageTokenStore,
-  SecureTokenStore,
-} from "./storage/index.js";
-export type {
-  LocalStorageTokenStoreOptions,
-  SecureTokenStoreOptions,
-} from "./storage/index.js";
+export { MemoryTokenStore, LocalStorageTokenStore, SecureTokenStore } from "./storage/index.js";
+export type { LocalStorageTokenStoreOptions, SecureTokenStoreOptions } from "./storage/index.js";
 
 export {
   AuthenticatedFetch,

@@ -1,4 +1,3 @@
-import type { Storage } from "./index.js";
 import {
   type Bucket,
   type BucketCannedACL,
@@ -6,6 +5,7 @@ import {
   DeleteBucketCommand,
   ListBucketsCommand,
 } from "@aws-sdk/client-s3";
+import type { Storage } from "./index.js";
 
 export async function createBucket(
   { client, defaultBucket }: Storage,
@@ -30,15 +30,8 @@ export async function removeBucket(
   await client.send(new DeleteBucketCommand({ Bucket: bucketName }));
 }
 
-export async function listBuckets(
-  { client }: Storage,
-  prefix?: string,
-): Promise<Bucket[]> {
-  const response = await client.send(
-    new ListBucketsCommand({
-      Prefix: prefix,
-    }),
-  );
+export async function listBuckets({ client }: Storage, prefix?: string): Promise<Bucket[]> {
+  const response = await client.send(new ListBucketsCommand({ Prefix: prefix }));
 
   return response.Buckets ?? [];
 }

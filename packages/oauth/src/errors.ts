@@ -1,5 +1,5 @@
-import type { OAuthErrorCode } from "./types.js";
 import { type ZodCustomIssue, ZodError, type ZodIssue } from "zod";
+import type { OAuthErrorCode } from "./types.js";
 import { jsonResponse, redirectResponse } from "./utilities.js";
 
 export const statusMap: Record<OAuthErrorCode, number> = {
@@ -52,11 +52,7 @@ export class OAuthError extends Error {
 
   get response(): Response {
     return jsonResponse(
-      {
-        error: this.code,
-        error_description: this.description,
-        error_uri: this.uri?.toString(),
-      },
+      { error: this.code, error_description: this.description, error_uri: this.uri?.toString() },
       { status: this.status },
     );
   }

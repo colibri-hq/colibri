@@ -10,9 +10,7 @@ import typescript, { configs } from "typescript-eslint";
 
 const config = typescript.config(
   // region Ignored files
-  {
-    ignores: [".turbo/**/*", ".cache/**/*", "node_modules/**/*", "dist/**/*"],
-  },
+  { ignores: [".turbo/**/*", ".cache/**/*", "node_modules/**/*", "dist/**/*"] },
   // endregion
 
   // region Libraries
@@ -27,33 +25,17 @@ const config = typescript.config(
   // endregion
 
   // region Tests
-  {
-    files: ["test/**/*.test.ts"],
-    rules: {
-      "@typescript-eslint/no-unused-expressions": "off",
-    },
-  },
+  { files: ["test/**/*.test.ts"], rules: { "@typescript-eslint/no-unused-expressions": "off" } },
   // endregion
 
   // region Sources
   {
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-    },
-    plugins: {
-      n: node,
-    },
+    languageOptions: { globals: { ...globals.node } },
+    plugins: { n: node },
     rules: {
       "@typescript-eslint/no-dupe-class-members": "error",
       "@typescript-eslint/no-redeclare": "off",
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        {
-          argsIgnorePattern: "^_",
-        },
-      ],
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
       "@typescript-eslint/no-useless-constructor": "error",
       "@typescript-eslint/no-var-requires": "off",
       camelcase: ["error", { properties: "never" }],
@@ -100,38 +82,17 @@ const config = typescript.config(
           type: "alphabetical",
         },
       ],
-      "perfectionist/sort-imports": [
-        "error",
-        {
-          newlinesBetween: "ignore",
-          type: "natural",
-        },
-      ],
+      "perfectionist/sort-imports": ["error", { newlinesBetween: "ignore", type: "natural" }],
       "perfectionist/sort-modules": "off",
-      "unicorn/import-style": [
-        "error",
-        {
-          styles: {
-            "node:path": {
-              named: true,
-            },
-          },
-        },
-      ],
+      "unicorn/import-style": ["error", { styles: { "node:path": { named: true } } }],
       "unicorn/no-await-expression-member": "off",
       "unicorn/no-null": "off",
       "unicorn/prefer-module": "warn",
       "unicorn/prevent-abbreviations": "off",
     },
     settings: {
-      "import/parsers": {
-        "@typescript-eslint/parser": [".ts"],
-      },
-      "import/resolver": {
-        typescript: {
-          alwaysTryTypes: true,
-        },
-      },
+      "import/parsers": { "@typescript-eslint/parser": [".ts"] },
+      "import/resolver": { typescript: { alwaysTryTypes: true } },
     },
   },
   // endregion

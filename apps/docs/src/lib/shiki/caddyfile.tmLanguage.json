@@ -17,14 +17,8 @@
   "repository": {
     "comments": {
       "patterns": [
-        {
-          "name": "comment.line.Caddyfile",
-          "match": "\\s#.*"
-        },
-        {
-          "name": "comment.line.Caddyfile",
-          "match": "^#.*"
-        }
+        { "name": "comment.line.Caddyfile", "match": "\\s#.*" },
+        { "name": "comment.line.Caddyfile", "match": "^#.*" }
       ]
     },
     "strings": {
@@ -34,12 +28,7 @@
           "begin": "\"",
           "end": "\"",
           "name": "string.quoted.double.Caddyfile",
-          "patterns": [
-            {
-              "name": "constant.character.escape.Caddyfile",
-              "match": "\\\\\""
-            }
-          ]
+          "patterns": [{ "name": "constant.character.escape.Caddyfile", "match": "\\\\\"" }]
         },
         {
           "comment": "Backtick Strings",
@@ -50,31 +39,14 @@
       ]
     },
     "status_codes": {
-      "patterns": [
-        {
-          "name": "constant.numeric.decimal",
-          "match": "\\s[0-9]{3}(?!\\.)"
-        }
-      ]
+      "patterns": [{ "name": "constant.numeric.decimal", "match": "\\s[0-9]{3}(?!\\.)" }]
     },
     "path": {
       "patterns": [
-        {
-          "name": "keyword.control.caddyfile",
-          "match": "(unix/)*/[a-zA-Z0-9_\\-./*]+"
-        },
-        {
-          "name": "variable.other.property.caddyfile",
-          "match": "\\*.[a-z]{1,5}"
-        },
-        {
-          "name": "variable.other.property.caddyfile",
-          "match": "\\*/?"
-        },
-        {
-          "name": "variable.other.property.caddyfile",
-          "match": "\\?/"
-        }
+        { "name": "keyword.control.caddyfile", "match": "(unix/)*/[a-zA-Z0-9_\\-./*]+" },
+        { "name": "variable.other.property.caddyfile", "match": "\\*.[a-z]{1,5}" },
+        { "name": "variable.other.property.caddyfile", "match": "\\*/?" },
+        { "name": "variable.other.property.caddyfile", "match": "\\?/" }
       ]
     },
     "domains": {
@@ -99,11 +71,7 @@
           "name": "keyword.control.caddyfile",
           "match": "(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))"
         },
-        {
-          "comment": "Ports",
-          "name": "keyword.control.caddyfile",
-          "match": ":[0-9]+"
-        }
+        { "comment": "Ports", "name": "keyword.control.caddyfile", "match": ":[0-9]+" }
       ]
     },
     "global_options": {
@@ -111,12 +79,8 @@
         {
           "begin": "^(\\{)$",
           "end": "^(\\})$",
-          "beginCaptures": {
-            "0": { "name": "punctuation.definition.dictionary.begin" }
-          },
-          "endCaptures": {
-            "0": { "name": "punctuation.definition.dictionary.end" }
-          },
+          "beginCaptures": { "0": { "name": "punctuation.definition.dictionary.begin" } },
+          "endCaptures": { "0": { "name": "punctuation.definition.dictionary.end" } },
           "patterns": [
             { "include": "#comments" },
             {
@@ -127,32 +91,18 @@
         }
       ]
     },
-    "site_block_common": {
-      "patterns": [{ "include": "#placeholders" }, { "include": "#block" }]
-    },
+    "site_block_common": { "patterns": [{ "include": "#placeholders" }, { "include": "#block" }] },
     "matchers": {
       "patterns": [
-        {
-          "comment": "Matchers",
-          "name": "support.function.Caddyfile",
-          "match": "@[^\\s]+(?=\\s)"
-        }
+        { "comment": "Matchers", "name": "support.function.Caddyfile", "match": "@[^\\s]+(?=\\s)" }
       ]
     },
     "placeholders": {
-      "patterns": [
-        {
-          "name": "keyword.control.Caddyfile",
-          "match": "\\{[\\[\\]\\w.\\$+-]+\\}"
-        }
-      ]
+      "patterns": [{ "name": "keyword.control.Caddyfile", "match": "\\{[\\[\\]\\w.\\$+-]+\\}" }]
     },
     "directive": {
       "patterns": [
-        {
-          "name": "entity.name.function.Caddyfile",
-          "match": "^\\s*[a-zA-Z_\\-+]+"
-        },
+        { "name": "entity.name.function.Caddyfile", "match": "^\\s*[a-zA-Z_\\-+]+" },
         { "include": "#content_types" },
         { "include": "#heredoc" }
       ]
@@ -167,13 +117,7 @@
       ]
     },
     "block": {
-      "patterns": [
-        {
-          "begin": "\\{",
-          "end": "\\}",
-          "patterns": [{ "include": "#block_content" }]
-        }
-      ]
+      "patterns": [{ "begin": "\\{", "end": "\\}", "patterns": [{ "include": "#block_content" }] }]
     },
     "block_content": {
       "patterns": [

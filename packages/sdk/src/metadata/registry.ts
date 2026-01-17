@@ -1,14 +1,6 @@
-import type {
-  MetadataProvider,
-  RateLimitConfig,
-  TimeoutConfig,
-} from "./providers/provider.js";
+import type { MetadataProvider, RateLimitConfig, TimeoutConfig } from "./providers/provider.js";
+import { globalConfigManager, type MetadataConfigManager, type ProviderConfig } from "./config.js";
 import { MetadataType } from "./providers/provider.js";
-import {
-  globalConfigManager,
-  type MetadataConfigManager,
-  type ProviderConfig,
-} from "./config.js";
 
 /**
  * Provider registration information
@@ -42,15 +34,10 @@ export class MetadataProviderRegistry {
    */
   register(provider: MetadataProvider, config?: Record<string, unknown>): void {
     if (this.providers.has(provider.name)) {
-      throw new Error(
-        `Provider with name '${provider.name}' is already registered`,
-      );
+      throw new Error(`Provider with name '${provider.name}' is already registered`);
     }
 
-    this.providers.set(provider.name, {
-      provider,
-      config,
-    });
+    this.providers.set(provider.name, { provider, config });
   }
 
   /**
@@ -81,9 +68,7 @@ export class MetadataProviderRegistry {
     }
 
     // Single source of truth: ConfigManager determines enablement
-    return this.configManager.isProviderEnabled(name)
-      ? registration.provider
-      : undefined;
+    return this.configManager.isProviderEnabled(name) ? registration.provider : undefined;
   }
 
   /**
@@ -98,14 +83,8 @@ export class MetadataProviderRegistry {
       )
       .map((reg) => reg.provider)
       .sort((a, b) => {
-        const priorityA = this.configManager.getEffectivePriority(
-          a.name,
-          a.priority,
-        );
-        const priorityB = this.configManager.getEffectivePriority(
-          b.name,
-          b.priority,
-        );
+        const priorityA = this.configManager.getEffectivePriority(a.name, a.priority);
+        const priorityB = this.configManager.getEffectivePriority(b.name, b.priority);
         return priorityB - priorityA; // Sort by priority (highest first)
       });
   }
@@ -229,10 +208,7 @@ export class MetadataProviderRegistry {
   /**
    * Update provider configuration through the config manager
    */
-  updateProviderConfiguration(
-    name: string,
-    config: Partial<ProviderConfig>,
-  ): void {
+  updateProviderConfiguration(name: string, config: Partial<ProviderConfig>): void {
     this.configManager.updateProviderConfig(name, config);
   }
 
@@ -255,17 +231,13 @@ export class MetadataProviderRegistry {
       .filter(
         (reg) =>
           // Only initialize providers that are enabled in ConfigManager
-          this.configManager.isProviderEnabled(reg.provider.name) &&
-          reg.provider.initialize,
+          this.configManager.isProviderEnabled(reg.provider.name) && reg.provider.initialize,
       )
       .map(async (reg) => {
         try {
           await reg.provider.initialize!();
         } catch (error) {
-          console.warn(
-            `Failed to initialize provider ${reg.provider.name}:`,
-            error,
-          );
+          console.warn(`Failed to initialize provider ${reg.provider.name}:`, error);
           // Disable provider in ConfigManager if initialization fails
           this.configManager.setProviderEnabled(reg.provider.name, false);
         }
@@ -285,10 +257,7 @@ export class MetadataProviderRegistry {
         try {
           await reg.provider.cleanup!();
         } catch (error) {
-          console.warn(
-            `Error cleaning up provider ${reg.provider.name}:`,
-            error,
-          );
+          console.warn(`Error cleaning up provider ${reg.provider.name}:`, error);
         }
       });
 

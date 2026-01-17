@@ -1,5 +1,5 @@
-import { error } from "@sveltejs/kit";
 import { getBlogPost, getBlogPosts } from "$lib/content/blog.js";
+import { error } from "@sveltejs/kit";
 import type { EntryGenerator, RequestHandler } from "./$types.js";
 
 export const prerender = true;

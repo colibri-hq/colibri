@@ -1,8 +1,8 @@
+import TurndownService from "turndown";
+import type { Metadata } from "./metadata.js";
 import { isZipFile, loadEpubMetadata } from "./epub.js";
 import { isMobiFile, loadMobiMetadata } from "./mobi.js";
 import { isPdfFile, loadPdfMetadata } from "./pdf.js";
-import type { Metadata } from "./metadata.js";
-import TurndownService from "turndown";
 
 export async function detectType(file: File) {
   if (await isPdfFile(file)) {
@@ -20,16 +20,9 @@ export async function detectType(file: File) {
   throw new Error("Unsupported file format");
 }
 
-const metadataLoaders = {
-  epub: loadEpubMetadata,
-  mobi: loadMobiMetadata,
-  pdf: loadPdfMetadata,
-};
+const metadataLoaders = { epub: loadEpubMetadata, mobi: loadMobiMetadata, pdf: loadPdfMetadata };
 
-export async function loadMetadata(
-  file: File,
-  signal?: AbortSignal,
-): Promise<Metadata> {
+export async function loadMetadata(file: File, signal?: AbortSignal): Promise<Metadata> {
   const type = await detectType(file);
   const loader = metadataLoaders[type];
 
@@ -72,10 +65,6 @@ function parseHtml(html: string) {
 export { loadEpubMetadata, loadEpub, isZipFile } from "./epub.js";
 export { loadPdfMetadata, loadPdf, isPdfFile } from "./pdf.js";
 export { loadMobiMetadata, loadMobi, isMobiFile } from "./mobi.js";
-export type {
-  Metadata,
-  Contributor,
-  Identifier as IdentifierType,
-} from "./metadata.js";
+export type { Metadata, Contributor, Identifier as IdentifierType } from "./metadata.js";
 export * from "./contributions.js";
 export * from "./extract-text.js";

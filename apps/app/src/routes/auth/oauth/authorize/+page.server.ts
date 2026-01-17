@@ -15,12 +15,7 @@ import type { PageServerLoad } from "./$types";
  *
  * @see https://datatracker.ietf.org/doc/html/rfc6749 RFC 6749
  */
-export const load = async function load({
-  request,
-  url,
-  cookies,
-  locals: { database },
-}) {
+export const load = async function load({ request, url, cookies, locals: { database } }) {
   // region User Authorization
   let user: User | undefined;
   let sub;
@@ -45,10 +40,7 @@ export const load = async function load({
 
   // region Validate the authorization request
   try {
-    return oauth(database).handleAuthorizationRequest(
-      request,
-      user.id.toString(),
-    );
+    return oauth(database).handleAuthorizationRequest(request, user.id.toString());
   } catch (cause) {
     if (cause instanceof OAuthAuthorizationError) {
       const { response } = cause;
@@ -57,9 +49,7 @@ export const load = async function load({
     }
 
     if (cause instanceof OAuthError) {
-      return error(cause.status, {
-        message: cause.description ?? cause.code,
-      });
+      return error(cause.status, { message: cause.description ?? cause.code });
     }
 
     //throw cause;

@@ -42,9 +42,7 @@ export interface CreatorMetadata {
 export interface MetadataProvider {}
 
 export interface BookMetadataProvider extends MetadataProvider {
-  searchBook(
-    properties: LoosePartial<BookMetadata>,
-  ): Promise<LoosePartial<BookMetadata>[]>;
+  searchBook(properties: LoosePartial<BookMetadata>): Promise<LoosePartial<BookMetadata>[]>;
 }
 
 export interface PublisherMetadataProvider extends MetadataProvider {

@@ -1,12 +1,9 @@
-import type { Database, Schema } from "../../database.js";
 import type { Insertable, Selectable } from "kysely";
+import type { Database, Schema } from "../../database.js";
 
 const table = "authentication.challenge" as const;
 
-export async function resolveCurrentChallenge(
-  client: Database,
-  identifier: string,
-) {
+export async function resolveCurrentChallenge(client: Database, identifier: string) {
   const { challenge, expires_at } = await client
     .selectFrom(table)
     .select(["expires_at", "challenge"])
@@ -22,10 +19,7 @@ export async function resolveCurrentChallenge(
   return challenge;
 }
 
-export async function findChallengeByIdentifier(
-  client: Database,
-  identifier: string,
-) {
+export async function findChallengeByIdentifier(client: Database, identifier: string) {
   return await client
     .selectFrom(table)
     .selectAll()
@@ -35,10 +29,7 @@ export async function findChallengeByIdentifier(
     .executeTakeFirstOrThrow();
 }
 
-export async function createChallenge(
-  client: Database,
-  data: Insertable<Table>,
-) {
+export async function createChallenge(client: Database, data: Insertable<Table>) {
   return await client.insertInto(table).values(data).executeTakeFirstOrThrow();
 }
 

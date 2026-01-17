@@ -106,11 +106,10 @@ export type SearchResultsResponsePayload<T> = {
   docs: T[];
 };
 
-export type BookSearchResults =
-  SearchResultsResponsePayload<BookSearchResult> & {
-    offset: number | null;
-    q: string;
-  };
+export type BookSearchResults = SearchResultsResponsePayload<BookSearchResult> & {
+  offset: number | null;
+  q: string;
+};
 
 export type AuthorSearchResult = {
   _version_: number;
@@ -137,8 +136,7 @@ export type AuthorSearchResult = {
   top_subjects?: string[];
 };
 
-export type AuthorSearchResults =
-  SearchResultsResponsePayload<AuthorSearchResult>;
+export type AuthorSearchResults = SearchResultsResponsePayload<AuthorSearchResult>;
 
 // endregion
 
@@ -319,11 +317,7 @@ export type Author = {
   wikipedia: string;
 };
 
-export type AuthorRole = {
-  author: Partial<Author>;
-  role: string;
-  as: string;
-};
+export type AuthorRole = { author: Partial<Author>; role: string; as: string };
 
 export type WorkId = OpenLibraryIdentifier<"W">;
 export type Work = {
@@ -428,16 +422,9 @@ export type Edition = {
   works: Work[];
 };
 
-export type TocItem = {
-  class: string;
-  label: string;
-  title: string;
-  pagenum: string;
-};
+export type TocItem = { class: string; label: string; title: string; pagenum: string };
 
-export type Collection = {
-  name: string;
-};
+export type Collection = { name: string };
 
 export type ScanRecord = {
   edition: Partial<Edition>;
@@ -451,9 +438,7 @@ export type ScanRecord = {
   completion_date: string;
 };
 
-export type ScanLocation = {
-  name: string;
-};
+export type ScanLocation = { name: string };
 
 export type User = {
   displayname: string;
@@ -469,39 +454,19 @@ export type Language = {
   translated_names: Partial<TranslatedString>[];
 };
 
-export type TranslatedString = {
-  text: string;
-  language: Partial<Language>;
-};
+export type TranslatedString = { text: string; language: Partial<Language> };
 
-export type Volume = {
-  ia_id: string;
-  volume_number: number;
-};
+export type Volume = { ia_id: string; volume_number: number };
 
-export type Timestamp = {
-  type: ResourceType<"datetime">;
-  value: string;
-};
+export type Timestamp = { type: ResourceType<"datetime">; value: string };
 
-export type Text = {
-  type: ResourceType<"text">;
-  value: string;
-};
+export type Text = { type: ResourceType<"text">; value: string };
 
-export type Link = {
-  title: string;
-  url: string;
-  type: ResourceTypeIdentifier<"link">;
-};
+export type Link = { title: string; url: string; type: ResourceTypeIdentifier<"link"> };
 
-export type ResourceIdentifier<T extends string, U extends string> = {
-  key: ResourceKey<T, U>;
-};
+export type ResourceIdentifier<T extends string, U extends string> = { key: ResourceKey<T, U> };
 
-export type ResourceTypeIdentifier<T extends string> = {
-  key: ResourceType<T>;
-};
+export type ResourceTypeIdentifier<T extends string> = { key: ResourceType<T> };
 
 export type ResourceKey<T extends string, U extends string> = `/${T}/${U}`;
 

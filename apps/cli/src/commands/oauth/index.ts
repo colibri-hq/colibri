@@ -15,12 +15,8 @@ export class OAuthCommand extends BaseCommand<typeof OAuthCommand> {
     this.log(`Token Endpoint: ${configuration.tokenEndpoint}`);
     this.log(`Revocation Endpoint: ${configuration.revocationEndpoint}`);
     this.log(`Introspection Endpoint: ${configuration.introspectionEndpoint}`);
-    this.log(
-      `Response Types Supported: ${configuration.responseTypesSupported?.join(", ")}`,
-    );
-    this.log(
-      `Grant Types Supported: ${configuration.grantTypesSupported.join(", ")}`,
-    );
+    this.log(`Response Types Supported: ${configuration.responseTypesSupported?.join(", ")}`);
+    this.log(`Grant Types Supported: ${configuration.grantTypesSupported.join(", ")}`);
     this.log(
       `Token Endpoint Authentication Methods Supported: ${configuration.tokenEndpointAuthMethodsSupported.join(
         ", ",

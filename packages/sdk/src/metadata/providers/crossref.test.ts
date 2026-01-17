@@ -32,9 +32,7 @@ const sampleBookResponse = {
         "page-count": 816,
         "references-count": 250,
         "is-referenced-by-count": 156,
-        funder: [
-          { name: "National Science Foundation", DOI: "10.13039/100000001" },
-        ],
+        funder: [{ name: "National Science Foundation", DOI: "10.13039/100000001" }],
         license: [{ URL: "https://creativecommons.org/licenses/by/4.0/" }],
       },
     ],
@@ -61,10 +59,7 @@ const sampleSingleWorkResponse = {
 const emptyResponse = {
   status: "ok",
   "message-type": "work-list",
-  message: {
-    items: [],
-    "total-results": 0,
-  },
+  message: { items: [], "total-results": 0 },
 };
 
 const nonBookResponse = {
@@ -96,22 +91,15 @@ describe("CrossrefMetadataProvider", () => {
 
   describe("searchByTitle", () => {
     it("should search by title and return metadata records", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Oxford Handbook Philosophy Mind",
-      });
+      const results = await provider.searchByTitle({ title: "Oxford Handbook Philosophy Mind" });
 
       expect(mockFetch).toHaveBeenCalled();
       expect(results.length).toBeGreaterThan(0);
 
       const record = results[0];
-      expect(record.title).toBe(
-        "The Oxford Handbook of Philosophy of Mind: A Comprehensive Guide",
-      );
+      expect(record.title).toBe("The Oxford Handbook of Philosophy of Mind: A Comprehensive Guide");
       expect(record.authors).toContain("McLaughlin, Brian");
       expect(record.authors).toContain("Beckermann, Ansgar");
       expect(record.isbn).toContain("9780199588381");
@@ -121,10 +109,7 @@ describe("CrossrefMetadataProvider", () => {
     });
 
     it("should include mailto parameter for polite pool", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       await provider.searchByTitle({ title: "Test" });
 
@@ -133,10 +118,7 @@ describe("CrossrefMetadataProvider", () => {
     });
 
     it("should filter for book types only", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       await provider.searchByTitle({ title: "Test" });
 
@@ -145,27 +127,17 @@ describe("CrossrefMetadataProvider", () => {
     });
 
     it("should return empty array when no results", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => emptyResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => emptyResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Nonexistent Book",
-      });
+      const results = await provider.searchByTitle({ title: "Nonexistent Book" });
 
       expect(results).toEqual([]);
     });
 
     it("should filter out non-book types", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => nonBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => nonBookResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Some Article",
-      });
+      const results = await provider.searchByTitle({ title: "Some Article" });
 
       expect(results).toEqual([]);
     });
@@ -173,10 +145,7 @@ describe("CrossrefMetadataProvider", () => {
 
   describe("searchByISBN", () => {
     it("should search by ISBN", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByISBN("978-0-19-958838-1");
 
@@ -186,10 +155,7 @@ describe("CrossrefMetadataProvider", () => {
     });
 
     it("should clean ISBN before searching", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       await provider.searchByISBN("978-0-19-958838-1");
 
@@ -200,10 +166,7 @@ describe("CrossrefMetadataProvider", () => {
 
   describe("searchByDOI", () => {
     it("should resolve DOI directly", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSingleWorkResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSingleWorkResponse });
 
       const results = await provider.searchByDOI("10.1007/978-3-030-12345-6");
 
@@ -214,10 +177,7 @@ describe("CrossrefMetadataProvider", () => {
     });
 
     it("should handle doi.org URL format", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSingleWorkResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSingleWorkResponse });
 
       await provider.searchByDOI("https://doi.org/10.1007/978-3-030-12345-6");
 
@@ -226,10 +186,7 @@ describe("CrossrefMetadataProvider", () => {
     });
 
     it("should handle organization names as authors", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSingleWorkResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSingleWorkResponse });
 
       const results = await provider.searchByDOI("10.1007/978-3-030-12345-6");
 
@@ -239,14 +196,9 @@ describe("CrossrefMetadataProvider", () => {
 
   describe("searchByCreator", () => {
     it("should search by author name", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
-      const results = await provider.searchByCreator({
-        name: "McLaughlin",
-      });
+      const results = await provider.searchByCreator({ name: "McLaughlin" });
 
       expect(mockFetch).toHaveBeenCalled();
       expect(results.length).toBeGreaterThan(0);
@@ -254,10 +206,7 @@ describe("CrossrefMetadataProvider", () => {
     });
 
     it("should use query.author parameter", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       await provider.searchByCreator({ name: "McLaughlin" });
 
@@ -268,30 +217,18 @@ describe("CrossrefMetadataProvider", () => {
 
   describe("searchMultiCriteria", () => {
     it("should prioritize ISBN when available", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
-      await provider.searchMultiCriteria({
-        title: "Philosophy of Mind",
-        isbn: "9780199588381",
-      });
+      await provider.searchMultiCriteria({ title: "Philosophy of Mind", isbn: "9780199588381" });
 
       const call = mockFetch.mock.calls[0];
       expect(call[0]).toContain("isbn%3A9780199588381");
     });
 
     it("should combine title and author", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
-      await provider.searchMultiCriteria({
-        title: "Philosophy of Mind",
-        authors: ["McLaughlin"],
-      });
+      await provider.searchMultiCriteria({ title: "Philosophy of Mind", authors: ["McLaughlin"] });
 
       const call = mockFetch.mock.calls[0];
       expect(call[0]).toContain("query.title=Philosophy");
@@ -299,15 +236,9 @@ describe("CrossrefMetadataProvider", () => {
     });
 
     it("should include publisher in search", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
-      await provider.searchMultiCriteria({
-        title: "Handbook",
-        publisher: "Oxford",
-      });
+      await provider.searchMultiCriteria({ title: "Handbook", publisher: "Oxford" });
 
       const call = mockFetch.mock.calls[0];
       expect(call[0]).toContain("query.publisher-name=Oxford");
@@ -321,23 +252,15 @@ describe("CrossrefMetadataProvider", () => {
 
   describe("Provider Data", () => {
     it("should include DOI in provider data", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
-      expect(results[0].providerData?.doi).toBe(
-        "10.1093/acprof:oso/9780199588381.001.0001",
-      );
+      expect(results[0].providerData?.doi).toBe("10.1093/acprof:oso/9780199588381.001.0001");
     });
 
     it("should include citation counts in provider data", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -346,38 +269,25 @@ describe("CrossrefMetadataProvider", () => {
     });
 
     it("should include funder information", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
-      expect(results[0].providerData?.funders).toContain(
-        "National Science Foundation",
-      );
+      expect(results[0].providerData?.funders).toContain("National Science Foundation");
     });
 
     it("should include license URL", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
-      expect(results[0].providerData?.license).toBe(
-        "https://creativecommons.org/licenses/by/4.0/",
-      );
+      expect(results[0].providerData?.license).toBe("https://creativecommons.org/licenses/by/4.0/");
     });
   });
 
   describe("Abstract Cleaning", () => {
     it("should remove JATS markup from abstract", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -389,10 +299,7 @@ describe("CrossrefMetadataProvider", () => {
 
   describe("Date Parsing", () => {
     it("should parse full date from published-print", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -403,10 +310,7 @@ describe("CrossrefMetadataProvider", () => {
     });
 
     it("should fall back to published-online", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSingleWorkResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSingleWorkResponse });
 
       const results = await provider.searchByDOI("10.1007/test");
 
@@ -418,15 +322,9 @@ describe("CrossrefMetadataProvider", () => {
 
   describe("Error Handling", () => {
     it("should handle HTTP errors gracefully", async () => {
-      mockFetch.mockResolvedValue({
-        ok: false,
-        status: 500,
-        statusText: "Internal Server Error",
-      });
+      mockFetch.mockResolvedValue({ ok: false, status: 500, statusText: "Internal Server Error" });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results).toEqual([]);
     }, 30000);
@@ -435,14 +333,9 @@ describe("CrossrefMetadataProvider", () => {
       mockFetch
         .mockRejectedValueOnce(new Error("Network error"))
         .mockRejectedValueOnce(new Error("Network error"))
-        .mockResolvedValue({
-          ok: true,
-          json: async () => sampleBookResponse,
-        });
+        .mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results.length).toBeGreaterThan(0);
       expect(mockFetch).toHaveBeenCalledTimes(3);
@@ -456,9 +349,7 @@ describe("CrossrefMetadataProvider", () => {
         },
       });
 
-      const results = await provider.searchByTitle({
-        title: "Test",
-      });
+      const results = await provider.searchByTitle({ title: "Test" });
 
       expect(results).toEqual([]);
     });
@@ -466,30 +357,21 @@ describe("CrossrefMetadataProvider", () => {
 
   describe("Confidence Scoring", () => {
     it("should assign highest confidence for DOI searches", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleSingleWorkResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleSingleWorkResponse });
 
       const results = await provider.searchByDOI("10.1007/test");
       expect(results[0].confidence).toBeGreaterThanOrEqual(0.95);
     });
 
     it("should assign high confidence for ISBN searches", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByISBN("9780199588381");
       expect(results[0].confidence).toBeGreaterThanOrEqual(0.9);
     });
 
     it("should boost confidence for complete metadata", async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => sampleBookResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => sampleBookResponse });
 
       const results = await provider.searchByTitle({ title: "Test" });
 
@@ -525,9 +407,7 @@ describe("CrossrefMetadataProvider", () => {
       expect(provider.supportsDataType(MetadataType.TITLE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.AUTHORS)).toBe(true);
       expect(provider.supportsDataType(MetadataType.ISBN)).toBe(true);
-      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(
-        true,
-      );
+      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.DESCRIPTION)).toBe(true);
     });
 
@@ -536,9 +416,7 @@ describe("CrossrefMetadataProvider", () => {
     });
 
     it("should not support physical dimensions", () => {
-      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(
-        false,
-      );
+      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(false);
     });
   });
 

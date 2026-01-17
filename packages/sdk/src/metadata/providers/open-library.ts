@@ -1,11 +1,22 @@
+import { Client } from "@colibri-hq/open-library-client";
+import { type LoosePartial } from "@colibri-hq/shared";
 import type {
   BookMetadata,
   BookMetadataProvider,
   CreatorMetadata,
   CreatorMetadataProvider,
 } from "../types.js";
-import { type LoosePartial } from "@colibri-hq/shared";
-import { Client } from "@colibri-hq/open-library-client";
+// Import extracted utilities
+import type { ConfidenceFactors, ConfidenceTier, NameComponents } from "./open-library/types.js";
+import { calculateAggregatedConfidence } from "./open-library/confidence.js";
+import {
+  areNamesEquivalent,
+  convertToFirstLastFormat,
+  matchesWithInitials,
+  normalizeAuthorName,
+  normalizeNameForComparison,
+  parseNameComponents,
+} from "./open-library/name-utils.js";
 import {
   type CreatorQuery,
   type MetadataRecord,
@@ -16,22 +27,6 @@ import {
   type TitleQuery,
 } from "./provider.js";
 import { RetryableMetadataProvider } from "./retryable-provider.js";
-
-// Import extracted utilities
-import type {
-  ConfidenceFactors,
-  ConfidenceTier,
-  NameComponents,
-} from "./open-library/types.js";
-import { calculateAggregatedConfidence } from "./open-library/confidence.js";
-import {
-  areNamesEquivalent,
-  convertToFirstLastFormat,
-  matchesWithInitials,
-  normalizeAuthorName,
-  normalizeNameForComparison,
-  parseNameComponents,
-} from "./open-library/name-utils.js";
 
 type Fetch = typeof globalThis.fetch;
 
@@ -55,9 +50,7 @@ export class OpenLibraryMetadataProvider
 
   constructor(fetch: Fetch = globalThis.fetch) {
     super();
-    this.#client = new Client("colibri-metadata-discovery@example.com", {
-      fetch,
-    });
+    this.#client = new Client("colibri-metadata-discovery@example.com", { fetch });
   }
 
   /**
@@ -115,9 +108,7 @@ export class OpenLibraryMetadataProvider
       const titleWords = query.title.split(/\s+/);
       const searchQuery = { title: titleWords };
 
-      const rawResults = await Array.fromAsync(
-        this.#client.searchBook(searchQuery),
-      );
+      const rawResults = await Array.fromAsync(this.#client.searchBook(searchQuery));
 
       if (rawResults.length === 0) return [];
 
@@ -146,9 +137,7 @@ export class OpenLibraryMetadataProvider
       // Clean ISBN (remove hyphens, spaces)
       const cleanIsbn = this.cleanIsbn(isbn);
 
-      const rawResults = await Array.fromAsync(
-        this.#client.searchBook({ isbn: cleanIsbn }),
-      );
+      const rawResults = await Array.fromAsync(this.#client.searchBook({ isbn: cleanIsbn }));
 
       if (rawResults.length === 0) return [];
 
@@ -161,9 +150,7 @@ export class OpenLibraryMetadataProvider
       );
 
       // Return single aggregated result
-      const aggregated = this.#aggregateResults(mappedResults, {
-        isbn: cleanIsbn,
-      });
+      const aggregated = this.#aggregateResults(mappedResults, { isbn: cleanIsbn });
       return aggregated ? [aggregated] : [];
     }, `ISBN search for "${isbn}"`);
   }
@@ -179,9 +166,7 @@ export class OpenLibraryMetadataProvider
       const authorWords = query.name.split(/\s+/);
       const searchQuery = { author: authorWords };
 
-      const rawResults = await Array.fromAsync(
-        this.#client.searchBook(searchQuery),
-      );
+      const rawResults = await Array.fromAsync(this.#client.searchBook(searchQuery));
 
       if (rawResults.length === 0) return [];
 
@@ -205,9 +190,7 @@ export class OpenLibraryMetadataProvider
   /**
    * Search using multiple criteria
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     return this.executeWithRetry(async () => {
       // Use the most appropriate single search method based on available criteria
       // This ensures we get one aggregated result instead of combining multiple search results
@@ -219,18 +202,12 @@ export class OpenLibraryMetadataProvider
 
       // Strategy 2: Author search (often more reliable than title for finding the right work)
       if (query.authors && query.authors.length > 0) {
-        return await this.searchByCreator({
-          name: query.authors[0],
-          fuzzy: query.fuzzy || true,
-        });
+        return await this.searchByCreator({ name: query.authors[0], fuzzy: query.fuzzy || true });
       }
 
       // Strategy 3: Title search
       if (query.title) {
-        return await this.searchByTitle({
-          title: query.title,
-          exactMatch: false,
-        });
+        return await this.searchByTitle({ title: query.title, exactMatch: false });
       }
 
       // No searchable criteria
@@ -238,15 +215,9 @@ export class OpenLibraryMetadataProvider
     }, `multi-criteria search`);
   }
 
-  async searchBook(
-    properties: Partial<BookMetadata>,
-  ): Promise<LoosePartial<BookMetadata>[]> {
-    const results = await Array.fromAsync(
-      this.#client.searchBook(properties.title!),
-    );
-    this.#client.searchBook({
-      publish_year: { from: 1800, to: 2023 },
-    });
+  async searchBook(properties: Partial<BookMetadata>): Promise<LoosePartial<BookMetadata>[]> {
+    const results = await Array.fromAsync(this.#client.searchBook(properties.title!));
+    this.#client.searchBook({ publish_year: { from: 1800, to: 2023 } });
 
     return results.map(
       (result) =>
@@ -259,9 +230,7 @@ export class OpenLibraryMetadataProvider
           openlibraryId: result.key.split("/").pop(),
           description: result.first_sentence?.shift(),
           sortingKey: result.title_sort,
-          datePublished: result.publish_date?.[0]
-            ? new Date(result.publish_date[0])
-            : undefined,
+          datePublished: result.publish_date?.[0] ? new Date(result.publish_date[0]) : undefined,
         }) satisfies LoosePartial<BookMetadata>,
     );
   }
@@ -284,8 +253,7 @@ export class OpenLibraryMetadataProvider
           goodreadsId: result.remote_ids?.goodreads,
           patreonId: result.remote_ids?.patreon,
           openlibraryId: result.key.split("/").pop(),
-          description:
-            typeof result.bio === "string" ? result.bio : result.bio?.value,
+          description: typeof result.bio === "string" ? result.bio : result.bio?.value,
           location: result.location,
           deathDate: new Date(result.death_date),
         }) satisfies LoosePartial<CreatorMetadata>,
@@ -329,24 +297,17 @@ export class OpenLibraryMetadataProvider
     // Identify major penalties
     const majorPenalties: string[] = [];
     if (detailed.disagreementPenalty > 0.1) majorPenalties.push("disagreement");
-    if (detailed.penalties.includes("weak-consensus-cap"))
-      majorPenalties.push("weak-consensus");
-    if (detailed.penalties.includes("few-sources"))
-      majorPenalties.push("insufficient-sources");
-    if (detailed.penalties.includes("low-source-quality"))
-      majorPenalties.push("low-quality");
+    if (detailed.penalties.includes("weak-consensus-cap")) majorPenalties.push("weak-consensus");
+    if (detailed.penalties.includes("few-sources")) majorPenalties.push("insufficient-sources");
+    if (detailed.penalties.includes("low-source-quality")) majorPenalties.push("low-quality");
 
     // Generate recommendations
     const recommendations: string[] = [];
     if (results.length < 3) {
-      recommendations.push(
-        "Consider gathering more metadata sources to improve confidence",
-      );
+      recommendations.push("Consider gathering more metadata sources to improve confidence");
     }
     if (detailed.factors.agreementScore < 0.7) {
-      recommendations.push(
-        "Sources show significant disagreement - verify data accuracy",
-      );
+      recommendations.push("Sources show significant disagreement - verify data accuracy");
     }
     if (detailed.factors.avgQuality < 0.7) {
       recommendations.push(
@@ -354,40 +315,26 @@ export class OpenLibraryMetadataProvider
       );
     }
     if (detailed.disagreementPenalty > 0.15) {
-      recommendations.push(
-        "High disagreement penalty - manual review recommended",
-      );
+      recommendations.push("High disagreement penalty - manual review recommended");
     }
     if (detailed.tier === "exceptional") {
-      recommendations.push(
-        "Excellent confidence - metadata is highly reliable",
-      );
+      recommendations.push("Excellent confidence - metadata is highly reliable");
     } else if (detailed.tier === "poor") {
-      recommendations.push(
-        "Poor confidence - consider alternative sources or manual verification",
-      );
+      recommendations.push("Poor confidence - consider alternative sources or manual verification");
     }
 
     // Always provide at least one recommendation
     if (recommendations.length === 0) {
       if (detailed.tier === "strong") {
-        recommendations.push(
-          "Confidence is strong - consider validating key fields",
-        );
+        recommendations.push("Confidence is strong - consider validating key fields");
       } else if (detailed.tier === "good") {
-        recommendations.push(
-          "Good confidence level - metadata appears reliable",
-        );
+        recommendations.push("Good confidence level - metadata appears reliable");
       } else if (detailed.tier === "moderate") {
-        recommendations.push(
-          "Moderate confidence - consider additional validation",
-        );
+        recommendations.push("Moderate confidence - consider additional validation");
       } else if (detailed.tier === "weak") {
         recommendations.push("Weak confidence - manual review recommended");
       } else {
-        recommendations.push(
-          "Review metadata quality and consider additional sources",
-        );
+        recommendations.push("Review metadata quality and consider additional sources");
       }
     }
 
@@ -407,12 +354,7 @@ export class OpenLibraryMetadataProvider
   /**
    * Compare confidence calculations between different result sets
    */
-  compareConfidenceCalculations(
-    resultSets: Array<{
-      name: string;
-      results: MetadataRecord[];
-    }>,
-  ): {
+  compareConfidenceCalculations(resultSets: Array<{ name: string; results: MetadataRecord[] }>): {
     comparison: Array<{
       name: string;
       confidence: number;
@@ -431,10 +373,7 @@ export class OpenLibraryMetadataProvider
       const weaknesses: string[] = [];
 
       // Analyze strengths
-      if (
-        analysis.detailed.tier === "exceptional" ||
-        analysis.detailed.tier === "strong"
-      ) {
+      if (analysis.detailed.tier === "exceptional" || analysis.detailed.tier === "strong") {
         strengths.push("high-confidence");
       }
       if (results.length >= 3) {
@@ -448,10 +387,7 @@ export class OpenLibraryMetadataProvider
       }
 
       // Analyze weaknesses
-      if (
-        analysis.detailed.tier === "poor" ||
-        analysis.detailed.tier === "weak"
-      ) {
+      if (analysis.detailed.tier === "poor" || analysis.detailed.tier === "weak") {
         weaknesses.push("low-confidence");
       }
       if (results.length < 2) {
@@ -487,22 +423,14 @@ export class OpenLibraryMetadataProvider
       `Key strengths: ${winnerData.strengths.join(", ") || "none"}. ` +
       `Potential issues: ${winnerData.weaknesses.join(", ") || "none"}.`;
 
-    return {
-      comparison,
-      winner: winner.name,
-      analysis,
-    };
+    return { comparison, winner: winner.name, analysis };
   }
 
   /**
    * Get current confidence calculation settings for debugging and transparency
    */
   getConfidenceCalculationSettings(): {
-    caps: {
-      maximum: number;
-      minimum: number;
-      singleSourceCap: number;
-    };
+    caps: { maximum: number; minimum: number; singleSourceCap: number };
     boosts: {
       consensus: { max: number; perSource: number };
       agreement: { max: number };
@@ -526,11 +454,7 @@ export class OpenLibraryMetadataProvider
     };
   } {
     return {
-      caps: {
-        maximum: 0.98,
-        minimum: 0.3,
-        singleSourceCap: 0.98,
-      },
+      caps: { maximum: 0.98, minimum: 0.3, singleSourceCap: 0.98 },
       boosts: {
         consensus: { max: 0.15, perSource: 0.03 },
         agreement: { max: 0.1 },
@@ -558,10 +482,7 @@ export class OpenLibraryMetadataProvider
   /**
    * Aggregate multiple results into a single best match with improved confidence
    */
-  #aggregateResults(
-    results: MetadataRecord[],
-    query: MultiCriteriaQuery,
-  ): MetadataRecord | null {
+  #aggregateResults(results: MetadataRecord[], query: MultiCriteriaQuery): MetadataRecord | null {
     if (results.length === 0) return null;
 
     // Group results by similarity (same work)
@@ -581,11 +502,9 @@ export class OpenLibraryMetadataProvider
   /**
    * Group results by work (same book, different editions/sources)
    */
-  #groupResultsByWork(results: MetadataRecord[]): Array<{
-    results: MetadataRecord[];
-    avgConfidence: number;
-    workKey?: string;
-  }> {
+  #groupResultsByWork(
+    results: MetadataRecord[],
+  ): Array<{ results: MetadataRecord[]; avgConfidence: number; workKey?: string }> {
     const groups = new Map<string, MetadataRecord[]>();
 
     for (const result of results) {
@@ -595,9 +514,7 @@ export class OpenLibraryMetadataProvider
           ?.toLowerCase()
           .replace(/[^\w\s]/g, "")
           .trim() || "";
-      const author = result.authors?.[0]
-        ? this.#normalizeAuthorName(result.authors[0])
-        : "";
+      const author = result.authors?.[0] ? this.#normalizeAuthorName(result.authors[0]) : "";
 
       // Always use title-author combination for grouping to handle different name formats
       // The OpenLibrary key might be different for the same work with different author formats
@@ -611,9 +528,7 @@ export class OpenLibraryMetadataProvider
 
     return Array.from(groups.entries()).map(([workKey, groupResults]) => ({
       results: groupResults,
-      avgConfidence:
-        groupResults.reduce((sum, r) => sum + r.confidence, 0) /
-        groupResults.length,
+      avgConfidence: groupResults.reduce((sum, r) => sum + r.confidence, 0) / groupResults.length,
       workKey,
     }));
   }
@@ -647,31 +562,20 @@ export class OpenLibraryMetadataProvider
 
     // Add optional fields only if they have values
     const title =
-      this.#aggregateField<string>(
-        prioritizedResults,
-        "title",
-        languagePreference,
-      ) || baseResult.title;
+      this.#aggregateField<string>(prioritizedResults, "title", languagePreference) ||
+      baseResult.title;
     if (title) aggregated.title = title;
 
     const authors =
-      this.#aggregateAuthors(prioritizedResults, languagePreference) ||
-      baseResult.authors;
+      this.#aggregateAuthors(prioritizedResults, languagePreference) || baseResult.authors;
     if (authors) aggregated.authors = authors;
 
-    const isbn = this.#aggregateField<string[]>(
-      prioritizedResults,
-      "isbn",
-      languagePreference,
-    );
+    const isbn = this.#aggregateField<string[]>(prioritizedResults, "isbn", languagePreference);
     if (isbn) aggregated.isbn = isbn;
 
     const language =
-      this.#aggregateField<string>(
-        prioritizedResults,
-        "language",
-        languagePreference,
-      ) || languagePreference;
+      this.#aggregateField<string>(prioritizedResults, "language", languagePreference) ||
+      languagePreference;
     if (language) aggregated.language = language;
 
     const subjects = this.#aggregateField<string[]>(
@@ -716,16 +620,15 @@ export class OpenLibraryMetadataProvider
     );
     if (series) aggregated.series = series;
 
-    const coverImage = this.#aggregateField<{
-      url: string;
-      width?: number;
-      height?: number;
-    }>(prioritizedResults, "coverImage", languagePreference);
+    const coverImage = this.#aggregateField<{ url: string; width?: number; height?: number }>(
+      prioritizedResults,
+      "coverImage",
+      languagePreference,
+    );
     if (coverImage) aggregated.coverImage = coverImage;
 
     // Preserve provider data from the best result
-    if (baseResult.providerData)
-      aggregated.providerData = baseResult.providerData;
+    if (baseResult.providerData) aggregated.providerData = baseResult.providerData;
 
     return aggregated;
   }
@@ -746,14 +649,8 @@ export class OpenLibraryMetadataProvider
   /**
    * Log detailed confidence calculation for debugging
    */
-  #logConfidenceCalculation(
-    results: MetadataRecord[],
-    factors: ConfidenceFactors,
-  ): void {
-    if (
-      process.env.NODE_ENV === "development" ||
-      process.env.DEBUG_CONFIDENCE === "true"
-    ) {
+  #logConfidenceCalculation(results: MetadataRecord[], factors: ConfidenceFactors): void {
+    if (process.env.NODE_ENV === "development" || process.env.DEBUG_CONFIDENCE === "true") {
       console.log("🔍 Confidence Calculation Details:", {
         sourceCount: results.length,
         tier: factors.tier,
@@ -796,18 +693,11 @@ export class OpenLibraryMetadataProvider
     if (valuesWithSources.length === 1) return valuesWithSources[0].value as T;
 
     // Group values by normalized representation for consensus analysis
-    const valueGroups = this.#groupValuesByConsensus(
-      valuesWithSources,
-      preferredLanguage,
-    );
+    const valueGroups = this.#groupValuesByConsensus(valuesWithSources, preferredLanguage);
 
     // Handle source disagreement with enhanced logic
     if (valueGroups.length > 1) {
-      return this.#resolveSourceDisagreement(
-        valueGroups,
-        field,
-        preferredLanguage,
-      ) as T;
+      return this.#resolveSourceDisagreement(valueGroups, field, preferredLanguage) as T;
     }
 
     // Single consensus group - return the best value
@@ -869,10 +759,7 @@ export class OpenLibraryMetadataProvider
     return Array.from(valueCounts.values()).map((entry) => ({
       ...entry,
       reliabilityScore: this.#calculateSourceReliabilityBonus(entry.sources),
-      agreementScore: this.#calculateAgreementLevelBonus(
-        entry.sources,
-        entry.count,
-      ),
+      agreementScore: this.#calculateAgreementLevelBonus(entry.sources, entry.count),
     }));
   }
 
@@ -909,13 +796,7 @@ export class OpenLibraryMetadataProvider
       return topGroup.value;
     }
 
-    if (
-      this.#hasLanguagePreferenceTieBreaker(
-        topGroup,
-        secondGroup,
-        preferredLanguage,
-      )
-    ) {
+    if (this.#hasLanguagePreferenceTieBreaker(topGroup, secondGroup, preferredLanguage)) {
       // Language preference can break the tie
       return topGroup.value;
     }
@@ -946,33 +827,22 @@ export class OpenLibraryMetadataProvider
     const consensusRatio = topGroup.count / totalSources;
 
     // Strong consensus if >60% of sources agree or score is significantly higher
-    return (
-      consensusRatio > 0.6 || (topGroup.finalScore > 0.8 && topGroup.count >= 2)
-    );
+    return consensusRatio > 0.6 || (topGroup.finalScore > 0.8 && topGroup.count >= 2);
   }
 
   /**
    * Check if language preference can break a tie between top groups
    */
   #hasLanguagePreferenceTieBreaker(
-    topGroup: {
-      preferredLanguageCount: number;
-      count: number;
-      finalScore: number;
-    },
-    secondGroup: {
-      preferredLanguageCount: number;
-      count: number;
-      finalScore: number;
-    },
+    topGroup: { preferredLanguageCount: number; count: number; finalScore: number },
+    secondGroup: { preferredLanguageCount: number; count: number; finalScore: number },
     preferredLanguage?: string,
   ): boolean {
     if (!preferredLanguage) return false;
 
     // Language preference breaks tie if scores are close but language support differs significantly
     const scoreDiff = Math.abs(topGroup.finalScore - secondGroup.finalScore);
-    const languageDiff =
-      topGroup.preferredLanguageCount - secondGroup.preferredLanguageCount;
+    const languageDiff = topGroup.preferredLanguageCount - secondGroup.preferredLanguageCount;
 
     // More aggressive language preference - larger score difference tolerance
     return scoreDiff < 0.2 && languageDiff > 0;
@@ -986,8 +856,7 @@ export class OpenLibraryMetadataProvider
     secondGroup: { reliabilityScore: number; finalScore: number },
   ): boolean {
     const scoreDiff = Math.abs(topGroup.finalScore - secondGroup.finalScore);
-    const reliabilityDiff =
-      topGroup.reliabilityScore - secondGroup.reliabilityScore;
+    const reliabilityDiff = topGroup.reliabilityScore - secondGroup.reliabilityScore;
 
     // Reliability breaks tie if scores are close but reliability differs significantly
     return scoreDiff < 0.15 && reliabilityDiff > 0.05;
@@ -1012,14 +881,8 @@ export class OpenLibraryMetadataProvider
     preferredLanguage?: string,
   ): boolean {
     // Calculate weighted scores for both candidates
-    const candidateScore = this.#calculateFieldValueScore(
-      candidate,
-      preferredLanguage,
-    );
-    const currentScore = this.#calculateFieldValueScore(
-      current,
-      preferredLanguage,
-    );
+    const candidateScore = this.#calculateFieldValueScore(candidate, preferredLanguage);
+    const currentScore = this.#calculateFieldValueScore(current, preferredLanguage);
 
     return candidateScore > currentScore;
   }
@@ -1103,10 +966,7 @@ export class OpenLibraryMetadataProvider
   /**
    * Calculate bonus score based on agreement level between sources
    */
-  #calculateAgreementLevelBonus(
-    sources: MetadataRecord[],
-    consensusCount: number,
-  ): number {
+  #calculateAgreementLevelBonus(sources: MetadataRecord[], consensusCount: number): number {
     if (sources.length < 2) return 0;
 
     // Higher bonus when more sources agree on the same value
@@ -1127,9 +987,7 @@ export class OpenLibraryMetadataProvider
     const requiredFields = ["title", "authors", "publicationDate"];
     const optionalFields = ["isbn", "language", "publisher"];
 
-    const hasRequired = requiredFields.every(
-      (field) => source[field as keyof MetadataRecord],
-    );
+    const hasRequired = requiredFields.every((field) => source[field as keyof MetadataRecord]);
     const optionalCount = optionalFields.filter(
       (field) => source[field as keyof MetadataRecord],
     ).length;
@@ -1144,8 +1002,7 @@ export class OpenLibraryMetadataProvider
     // Check for consistent author name formats
     if (source.authors) {
       const hasConsistentAuthorFormat = source.authors.every(
-        (author) =>
-          !author.includes(",") || this.#isValidLastFirstFormat(author),
+        (author) => !author.includes(",") || this.#isValidLastFirstFormat(author),
       );
       if (!hasConsistentAuthorFormat) return false;
     }
@@ -1175,10 +1032,7 @@ export class OpenLibraryMetadataProvider
   /**
    * Aggregate author names with special handling for name formats and consensus
    */
-  #aggregateAuthors(
-    results: MetadataRecord[],
-    _preferredLanguage?: string,
-  ): string[] | undefined {
+  #aggregateAuthors(results: MetadataRecord[], _preferredLanguage?: string): string[] | undefined {
     const allAuthors = results
       .map((r) => r.authors)
       .filter((authors) => authors && authors.length > 0)
@@ -1189,27 +1043,16 @@ export class OpenLibraryMetadataProvider
     // Group authors by normalized name (handling "Last, First" vs "First Last")
     const authorGroups = new Map<
       string,
-      {
-        names: string[];
-        count: number;
-        sources: MetadataRecord[];
-        formats: Map<string, number>;
-      }
+      { names: string[]; count: number; sources: MetadataRecord[]; formats: Map<string, number> }
     >();
 
     for (let i = 0; i < allAuthors.length; i++) {
       const author = allAuthors[i];
-      const result =
-        results[Math.floor(i / (results[0]?.authors?.length || 1))];
+      const result = results[Math.floor(i / (results[0]?.authors?.length || 1))];
       const normalized = this.#normalizeAuthorName(author);
 
       if (!authorGroups.has(normalized)) {
-        authorGroups.set(normalized, {
-          names: [],
-          count: 0,
-          sources: [],
-          formats: new Map(),
-        });
+        authorGroups.set(normalized, { names: [], count: 0, sources: [], formats: new Map() });
       }
 
       const group = authorGroups.get(normalized)!;
@@ -1248,8 +1091,7 @@ export class OpenLibraryMetadataProvider
         }
       } else {
         // Only use "Last, First" if it's significantly more common
-        preferredName =
-          group.names.find((name) => name.includes(",")) || group.names[0];
+        preferredName = group.names.find((name) => name.includes(",")) || group.names[0];
       }
 
       finalAuthors.push(preferredName);
@@ -1333,12 +1175,9 @@ export class OpenLibraryMetadataProvider
    */
   #mapOpenLibraryBookToMetadata(
     result: any,
-  ): Partial<
-    Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">
-  > {
-    const metadata: Partial<
-      Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">
-    > = {};
+  ): Partial<Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">> {
+    const metadata: Partial<Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">> =
+      {};
 
     // Basic fields
     if (result.title) {
@@ -1370,11 +1209,7 @@ export class OpenLibraryMetadataProvider
     }
 
     // Publication date handling
-    if (
-      result.publish_date &&
-      Array.isArray(result.publish_date) &&
-      result.publish_date[0]
-    ) {
+    if (result.publish_date && Array.isArray(result.publish_date) && result.publish_date[0]) {
       try {
         metadata.publicationDate = new Date(result.publish_date[0]);
       } catch {
@@ -1394,9 +1229,7 @@ export class OpenLibraryMetadataProvider
 
     // Series information
     if (result.series && Array.isArray(result.series) && result.series[0]) {
-      metadata.series = {
-        name: result.series[0],
-      };
+      metadata.series = { name: result.series[0] };
     }
 
     // Edition information
@@ -1406,9 +1239,7 @@ export class OpenLibraryMetadataProvider
 
     // Cover image
     if (result.cover_i) {
-      metadata.coverImage = {
-        url: `https://covers.openlibrary.org/b/id/${result.cover_i}-L.jpg`,
-      };
+      metadata.coverImage = { url: `https://covers.openlibrary.org/b/id/${result.cover_i}-L.jpg` };
     }
 
     // Store provider-specific data
@@ -1461,11 +1292,7 @@ export class OpenLibraryMetadataProvider
 
     const checkField = (field: any) => {
       fieldCount++;
-      if (
-        field &&
-        (typeof field !== "object" ||
-          (Array.isArray(field) && field.length > 0))
-      ) {
+      if (field && (typeof field !== "object" || (Array.isArray(field) && field.length > 0))) {
         filledFields++;
       }
     };
@@ -1503,10 +1330,7 @@ export class OpenLibraryMetadataProvider
 
       if (query.title) {
         totalCriteria++;
-        if (
-          result.title &&
-          result.title.toLowerCase().includes(query.title.toLowerCase())
-        ) {
+        if (result.title && result.title.toLowerCase().includes(query.title.toLowerCase())) {
           matchedCriteria++;
         }
       }
@@ -1527,10 +1351,7 @@ export class OpenLibraryMetadataProvider
 
       if (query.isbn) {
         totalCriteria++;
-        if (
-          result.isbn &&
-          result.isbn.includes(query.isbn.replace(/[-\s]/g, ""))
-        ) {
+        if (result.isbn && result.isbn.includes(query.isbn.replace(/[-\s]/g, ""))) {
           matchedCriteria++;
         }
       }
@@ -1597,10 +1418,7 @@ export class OpenLibraryMetadataProvider
    * Check if names match when considering initials
    * @deprecated Use matchesWithInitials from open-library/name-utils.js directly
    */
-  #matchesWithInitials(
-    components1: NameComponents,
-    components2: NameComponents,
-  ): boolean {
+  #matchesWithInitials(components1: NameComponents, components2: NameComponents): boolean {
     return matchesWithInitials(components1, components2);
   }
 

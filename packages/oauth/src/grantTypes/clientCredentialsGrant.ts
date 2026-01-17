@@ -1,6 +1,6 @@
-import { OAuthError } from "../errors.js";
 import { encodeToBase64, hash, timingSafeEqual } from "@colibri-hq/shared";
 import { z } from "zod";
+import { OAuthError } from "../errors.js";
 import { defineGrantType, type GrantTypeOptions } from "./grantType.js";
 
 export interface ClientCredentialsGrantOptions extends GrantTypeOptions {
@@ -158,32 +158,21 @@ export const ClientCredentialsGrant = defineGrantType({
     const secretHash = encodeToBase64(await hash(client_secret), true, false);
 
     if (!(await timingSafeEqual(secretHash, client.secret))) {
-      throw new OAuthError(
-        "invalid_request",
-        "The client secret is missing or invalid",
-      );
+      throw new OAuthError("invalid_request", "The client secret is missing or invalid");
     }
 
     if (!scope.every((item) => client.scopes?.includes(item))) {
       throw new OAuthError("invalid_scope", "One or more scopes are invalid");
     }
 
-    return {
-      grant_type,
-      client_id,
-      client_secret,
-      scope,
-    };
+    return { grant_type, client_id, client_secret, scope };
   },
 
   async handle({ scope: scopes = [] }) {
-    const { accessTokenTtl, includeRefreshToken, refreshTokenTtl } =
-      this.options;
+    const { accessTokenTtl, includeRefreshToken, refreshTokenTtl } = this.options;
 
     return {
-      accessToken: {
-        ttl: accessTokenTtl,
-      },
+      accessToken: { ttl: accessTokenTtl },
       refreshToken: includeRefreshToken ? { ttl: refreshTokenTtl } : undefined,
       scopes,
     };

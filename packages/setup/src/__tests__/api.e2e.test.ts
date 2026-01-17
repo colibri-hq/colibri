@@ -116,18 +116,13 @@ describe("API Endpoint Logic E2E Tests", () => {
     });
 
     it("should fail with invalid connection string", async () => {
-      const invalidDsn =
-        "postgres://invalid:invalid@localhost:9999/nonexistent";
+      const invalidDsn = "postgres://invalid:invalid@localhost:9999/nonexistent";
 
       // This should fail to connect
       const testDb = initialize(invalidDsn);
 
       await expect(
-        testDb
-          .selectFrom("authentication.user")
-          .select("id")
-          .limit(1)
-          .execute(),
+        testDb.selectFrom("authentication.user").select("id").limit(1).execute(),
       ).rejects.toThrow();
 
       await testDb.destroy();
@@ -162,16 +157,10 @@ describe("API Endpoint Logic E2E Tests", () => {
       const { applySetup } = await import("../core/state.js");
 
       await applySetup({
-        admin: {
-          email: "api-test@example.com",
-          name: "API Test Admin",
-        },
+        admin: { email: "api-test@example.com", name: "API Test Admin" },
         database,
         databaseDsn: testContext.connectionString,
-        instance: {
-          description: "API Test Description",
-          name: "API Test Instance",
-        },
+        instance: { description: "API Test Description", name: "API Test Instance" },
         storage: {
           accessKeyId: "api-access",
           endpoint: "http://minio:9000",

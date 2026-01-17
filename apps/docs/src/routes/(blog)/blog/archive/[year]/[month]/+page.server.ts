@@ -13,10 +13,7 @@ export const entries = function entries() {
 
   for (const year of getAvailableYears()) {
     for (const month of getAvailableMonthsForYear(year)) {
-      entries.push({
-        year: String(year),
-        month: String(month).padStart(2, "0"),
-      });
+      entries.push({ year: String(year), month: String(month).padStart(2, "0") });
     }
   }
 
@@ -28,10 +25,5 @@ export const load = async function load({ params }) {
   const month = parseInt(params.month, 10);
   const posts = getPostsByYearAndMonth(year, month);
 
-  return {
-    year,
-    month,
-    monthName: getMonthName(month - 1),
-    posts,
-  };
+  return { year, month, monthName: getMonthName(month - 1), posts };
 } satisfies PageServerLoad;

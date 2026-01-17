@@ -74,9 +74,7 @@ export function resolveLanguage(input: string): ResolvedLanguage | null {
  * results.get("en")      // { iso3: "eng", ... }
  * results.get("invalid") // null
  */
-export function resolveLanguages(
-  inputs: readonly string[],
-): Map<string, ResolvedLanguage | null> {
+export function resolveLanguages(inputs: readonly string[]): Map<string, ResolvedLanguage | null> {
   const results = new Map<string, ResolvedLanguage | null>();
 
   for (const input of inputs) {

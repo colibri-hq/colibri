@@ -1,3 +1,4 @@
+import { createHash, createHmac } from "node:crypto";
 import {
   type CreatorQuery,
   type MetadataRecord,
@@ -8,7 +9,6 @@ import {
   type TitleQuery,
 } from "./provider.js";
 import { RetryableMetadataProvider } from "./retryable-provider.js";
-import { createHash, createHmac } from "node:crypto";
 
 /**
  * Regional endpoints for Amazon Product Advertising API
@@ -45,19 +45,13 @@ interface PaapiRequest {
  */
 interface PaapiItemInfo {
   Title?: { DisplayValue?: string };
-  ByLineInfo?: {
-    Contributors?: Array<{ Name?: string; Role?: string }>;
-  };
+  ByLineInfo?: { Contributors?: Array<{ Name?: string; Role?: string }> };
   ContentInfo?: {
     Languages?: { DisplayValues?: Array<{ DisplayValue?: string }> };
     PagesCount?: { DisplayValue?: number };
   };
-  ProductInfo?: {
-    ReleaseDate?: { DisplayValue?: string };
-  };
-  Classifications?: {
-    Binding?: { DisplayValue?: string };
-  };
+  ProductInfo?: { ReleaseDate?: { DisplayValue?: string } };
+  Classifications?: { Binding?: { DisplayValue?: string } };
 }
 
 interface PaapiItem {
@@ -72,12 +66,8 @@ interface PaapiItem {
 }
 
 interface PaapiSearchResponse {
-  SearchResult?: {
-    Items?: PaapiItem[];
-  };
-  ItemsResult?: {
-    Items?: PaapiItem[];
-  };
+  SearchResult?: { Items?: PaapiItem[] };
+  ItemsResult?: { Items?: PaapiItem[] };
   Errors?: Array<{ Code?: string; Message?: string }>;
 }
 
@@ -173,9 +163,7 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
       const items = response.SearchResult?.Items || [];
 
       return items
-        .map((item) =>
-          this.createMetadataRecordFromItem(item, "title", query.title),
-        )
+        .map((item) => this.createMetadataRecordFromItem(item, "title", query.title))
         .filter((record): record is MetadataRecord => record !== null);
     }, `title search for "${query.title}"`);
   }
@@ -238,9 +226,7 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
       const items = response.SearchResult?.Items || [];
 
       return items
-        .map((item) =>
-          this.createMetadataRecordFromItem(item, "creator", query.name),
-        )
+        .map((item) => this.createMetadataRecordFromItem(item, "creator", query.name))
         .filter((record): record is MetadataRecord => record !== null);
     }, `creator search for "${query.name}"`);
   }
@@ -248,9 +234,7 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
   /**
    * Search using multiple criteria
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     // Strategy 1: ISBN search (most reliable)
     if (query.isbn) {
       return await this.searchByISBN(query.isbn);
@@ -280,27 +264,19 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
         const items = response.SearchResult?.Items || [];
 
         return items
-          .map((item) =>
-            this.createMetadataRecordFromItem(item, "multi", keywords),
-          )
+          .map((item) => this.createMetadataRecordFromItem(item, "multi", keywords))
           .filter((record): record is MetadataRecord => record !== null);
       }, `multi-criteria search`);
     }
 
     // Strategy 3: Title search
     if (query.title) {
-      return await this.searchByTitle({
-        title: query.title,
-        exactMatch: !query.fuzzy,
-      });
+      return await this.searchByTitle({ title: query.title, exactMatch: !query.fuzzy });
     }
 
     // Strategy 4: Author search
     if (query.authors && query.authors.length > 0) {
-      return await this.searchByCreator({
-        name: query.authors[0],
-        fuzzy: query.fuzzy ?? false,
-      });
+      return await this.searchByCreator({ name: query.authors[0], fuzzy: query.fuzzy ?? false });
     }
 
     return [];
@@ -376,9 +352,7 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
   /**
    * Execute SearchItems API call
    */
-  private async executeSearchItems(
-    request: PaapiRequest,
-  ): Promise<PaapiSearchResponse> {
+  private async executeSearchItems(request: PaapiRequest): Promise<PaapiSearchResponse> {
     const endpoint = PAAPI_ENDPOINTS[this.region];
     const path = "/paapi5/searchitems";
     const url = `https://${endpoint}${path}`;
@@ -390,9 +364,7 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
   /**
    * Execute GetItems API call
    */
-  private async executeGetItems(
-    request: PaapiRequest,
-  ): Promise<PaapiSearchResponse> {
+  private async executeGetItems(request: PaapiRequest): Promise<PaapiSearchResponse> {
     const endpoint = PAAPI_ENDPOINTS[this.region];
     const path = "/paapi5/getitems";
     const url = `https://${endpoint}${path}`;
@@ -442,23 +414,12 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
     // Create string to sign
     const algorithm = "AWS4-HMAC-SHA256";
     const credentialScope = `${dateStamp}/${this.region}/ProductAdvertisingAPI/aws4_request`;
-    const canonicalRequestHash = createHash("sha256")
-      .update(canonicalRequest)
-      .digest("hex");
+    const canonicalRequestHash = createHash("sha256").update(canonicalRequest).digest("hex");
 
-    const stringToSign = [
-      algorithm,
-      amzDate,
-      credentialScope,
-      canonicalRequestHash,
-    ].join("\n");
+    const stringToSign = [algorithm, amzDate, credentialScope, canonicalRequestHash].join("\n");
 
     // Calculate signature
-    const signature = this.calculateSignature(
-      this.secretKey!,
-      dateStamp,
-      stringToSign,
-    );
+    const signature = this.calculateSignature(this.secretKey!, dateStamp, stringToSign);
 
     // Create authorization header
     const authorization = `${algorithm} Credential=${this.accessKey}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
@@ -515,24 +476,12 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
   /**
    * Calculate AWS Signature V4 signature
    */
-  private calculateSignature(
-    secretKey: string,
-    dateStamp: string,
-    stringToSign: string,
-  ): string {
-    const kDate = createHmac("sha256", `AWS4${secretKey}`)
-      .update(dateStamp)
-      .digest();
+  private calculateSignature(secretKey: string, dateStamp: string, stringToSign: string): string {
+    const kDate = createHmac("sha256", `AWS4${secretKey}`).update(dateStamp).digest();
     const kRegion = createHmac("sha256", kDate).update(this.region).digest();
-    const kService = createHmac("sha256", kRegion)
-      .update("ProductAdvertisingAPI")
-      .digest();
-    const kSigning = createHmac("sha256", kService)
-      .update("aws4_request")
-      .digest();
-    const signature = createHmac("sha256", kSigning)
-      .update(stringToSign)
-      .digest("hex");
+    const kService = createHmac("sha256", kRegion).update("ProductAdvertisingAPI").digest();
+    const kSigning = createHmac("sha256", kService).update("aws4_request").digest();
+    const signature = createHmac("sha256", kSigning).update(stringToSign).digest("hex");
 
     return signature;
   }
@@ -552,9 +501,9 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
     const itemInfo = item.ItemInfo;
 
     // Extract authors
-    const authors = itemInfo.ByLineInfo?.Contributors?.filter(
-      (c) => c.Role === "Author",
-    ).map((c) => c.Name!);
+    const authors = itemInfo.ByLineInfo?.Contributors?.filter((c) => c.Role === "Author").map(
+      (c) => c.Name!,
+    );
 
     // Extract publication date
     let publicationDate: Date | undefined;
@@ -572,13 +521,10 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
     }
 
     // Extract language
-    const language =
-      itemInfo.ContentInfo?.Languages?.DisplayValues?.[0]?.DisplayValue;
+    const language = itemInfo.ContentInfo?.Languages?.DisplayValues?.[0]?.DisplayValue;
 
     // Extract cover image (prefer Large, fallback to Medium)
-    let coverImage:
-      | { url: string; width?: number; height?: number }
-      | undefined;
+    let coverImage: { url: string; width?: number; height?: number } | undefined;
     if (item.Images?.Primary?.Large?.URL) {
       const large = item.Images.Primary.Large;
       const imageUrl = large.URL;
@@ -604,9 +550,7 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
     // Extract binding/format
     const binding = itemInfo.Classifications?.Binding?.DisplayValue;
 
-    const metadata: Partial<
-      Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">
-    > = {
+    const metadata: Partial<Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">> = {
       providerData: {
         asin: item.ASIN,
         region: this.region,
@@ -671,9 +615,7 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
       arabic: "ar",
     };
 
-    return (
-      languageMap[normalizedLanguage] || normalizedLanguage.substring(0, 2)
-    );
+    return languageMap[normalizedLanguage] || normalizedLanguage.substring(0, 2);
   }
 
   /**
@@ -701,19 +643,12 @@ export class AmazonPaapiMetadataProvider extends RetryableMetadataProvider {
     // Boost for data completeness
     let completenessBoost = 0;
     if (item.ItemInfo?.Title?.DisplayValue) completenessBoost += 0.02;
-    if (
-      item.ItemInfo?.ByLineInfo?.Contributors &&
-      item.ItemInfo.ByLineInfo.Contributors.length > 0
-    )
+    if (item.ItemInfo?.ByLineInfo?.Contributors && item.ItemInfo.ByLineInfo.Contributors.length > 0)
       completenessBoost += 0.03;
-    if (item.ItemInfo?.ProductInfo?.ReleaseDate?.DisplayValue)
-      completenessBoost += 0.02;
-    if (item.ItemInfo?.ContentInfo?.PagesCount?.DisplayValue)
-      completenessBoost += 0.02;
-    if (item.ItemInfo?.ContentInfo?.Languages?.DisplayValues)
-      completenessBoost += 0.01;
-    if (item.Images?.Primary?.Large || item.Images?.Primary?.Medium)
-      completenessBoost += 0.03;
+    if (item.ItemInfo?.ProductInfo?.ReleaseDate?.DisplayValue) completenessBoost += 0.02;
+    if (item.ItemInfo?.ContentInfo?.PagesCount?.DisplayValue) completenessBoost += 0.02;
+    if (item.ItemInfo?.ContentInfo?.Languages?.DisplayValues) completenessBoost += 0.01;
+    if (item.Images?.Primary?.Large || item.Images?.Primary?.Medium) completenessBoost += 0.03;
 
     const finalConfidence = Math.min(0.98, baseConfidence + completenessBoost);
     return Math.round(finalConfidence * 100) / 100;

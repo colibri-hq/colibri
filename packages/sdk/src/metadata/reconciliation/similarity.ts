@@ -65,10 +65,7 @@ export function calculateStringSimilarity(str1: string, str2: string): number {
  * @param arr2 - Second array of strings
  * @returns Similarity score from 0 to 1 (1 = identical sets)
  */
-export function calculateArraySimilarity(
-  arr1: string[],
-  arr2: string[],
-): number {
+export function calculateArraySimilarity(arr1: string[], arr2: string[]): number {
   if (!arr1 || !arr2 || arr1.length === 0 || arr2.length === 0) return 0;
 
   const set1 = new Set(arr1.map((s) => s.toLowerCase().trim()));
@@ -87,10 +84,7 @@ export function calculateArraySimilarity(
  * @param isbn2 - Second array of ISBNs
  * @returns 1 if any ISBNs match, 0 otherwise
  */
-export function calculateIsbnSimilarity(
-  isbn1?: string[],
-  isbn2?: string[],
-): number {
+export function calculateIsbnSimilarity(isbn1?: string[], isbn2?: string[]): number {
   if (!isbn1 || !isbn2 || isbn1.length === 0 || isbn2.length === 0) return 0;
 
   // Normalize ISBNs (remove hyphens, spaces)
@@ -109,10 +103,7 @@ export function calculateIsbnSimilarity(
  * @param date2 - Second publication date
  * @returns Similarity score from 0 to 1
  */
-export function calculateDateSimilarity(
-  date1?: PublicationDate,
-  date2?: PublicationDate,
-): number {
+export function calculateDateSimilarity(date1?: PublicationDate, date2?: PublicationDate): number {
   if (!date1 || !date2) return 0;
 
   // Compare years first (most important)
@@ -148,10 +139,7 @@ export function calculateDateSimilarity(
  * @param pub2 - Second publisher
  * @returns Similarity score from 0 to 1
  */
-export function calculatePublisherSimilarity(
-  pub1?: Publisher,
-  pub2?: Publisher,
-): number {
+export function calculatePublisherSimilarity(pub1?: Publisher, pub2?: Publisher): number {
   if (!pub1 || !pub2) return 0;
   return calculateStringSimilarity(pub1.name, pub2.name);
 }
@@ -163,10 +151,7 @@ export function calculatePublisherSimilarity(
  * @param series2 - Second array of series
  * @returns Maximum similarity score between any pair of series
  */
-export function calculateSeriesSimilarity(
-  series1?: Series[],
-  series2?: Series[],
-): number {
+export function calculateSeriesSimilarity(series1?: Series[], series2?: Series[]): number {
   if (
     !series1 ||
     !series2 ||

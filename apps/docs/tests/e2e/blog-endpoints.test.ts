@@ -20,9 +20,7 @@ describe("Blog Endpoints", () => {
       const response = await fetch(`${BASE_URL}/blog.json`);
 
       expect(response.status).toBe(200);
-      expect(response.headers.get("content-type")).toContain(
-        "application/json",
-      );
+      expect(response.headers.get("content-type")).toContain("application/json");
 
       const data = await response.json();
       expect(data).toHaveProperty("posts");
@@ -56,9 +54,7 @@ describe("Blog Endpoints", () => {
       const response = await fetch(`${BASE_URL}/blog/archive.json`);
 
       expect(response.status).toBe(200);
-      expect(response.headers.get("content-type")).toContain(
-        "application/json",
-      );
+      expect(response.headers.get("content-type")).toContain("application/json");
 
       const data = await response.json();
       expect(data).toHaveProperty("years");
@@ -79,9 +75,7 @@ describe("Blog Endpoints", () => {
       const response = await fetch(`${BASE_URL}/blog/tag.json`);
 
       expect(response.status).toBe(200);
-      expect(response.headers.get("content-type")).toContain(
-        "application/json",
-      );
+      expect(response.headers.get("content-type")).toContain("application/json");
 
       const data = await response.json();
       expect(data).toHaveProperty("tags");
@@ -115,9 +109,7 @@ describe("Blog Endpoints", () => {
       const response = await fetch(`${BASE_URL}/blog/author.json`);
 
       expect(response.status).toBe(200);
-      expect(response.headers.get("content-type")).toContain(
-        "application/json",
-      );
+      expect(response.headers.get("content-type")).toContain("application/json");
 
       const data = await response.json();
       expect(data).toHaveProperty("authors");
@@ -139,9 +131,7 @@ describe("Blog Endpoints", () => {
       const response = await fetch(`${BASE_URL}/blog/series.json`);
 
       expect(response.status).toBe(200);
-      expect(response.headers.get("content-type")).toContain(
-        "application/json",
-      );
+      expect(response.headers.get("content-type")).toContain("application/json");
 
       const data = await response.json();
       expect(data).toHaveProperty("series");
@@ -156,8 +146,7 @@ describe("Blog Endpoints", () => {
       expect(response.status).toBe(200);
       const contentType = response.headers.get("content-type");
       expect(
-        contentType?.includes("application/xml") ||
-          contentType?.includes("application/rss+xml"),
+        contentType?.includes("application/xml") || contentType?.includes("application/rss+xml"),
       ).toBe(true);
 
       const body = await response.text();
@@ -181,9 +170,7 @@ describe("Blog Endpoints", () => {
 
   describe("GET /blog/[slug].json", () => {
     it("returns 404 for non-existent post", async () => {
-      const response = await fetch(
-        `${BASE_URL}/blog/this-post-does-not-exist-12345.json`,
-      );
+      const response = await fetch(`${BASE_URL}/blog/this-post-does-not-exist-12345.json`);
 
       expect(response.status).toBe(404);
     });
@@ -191,9 +178,7 @@ describe("Blog Endpoints", () => {
 
   describe("GET /blog/[slug].md", () => {
     it("returns 404 for non-existent post", async () => {
-      const response = await fetch(
-        `${BASE_URL}/blog/this-post-does-not-exist-12345.md`,
-      );
+      const response = await fetch(`${BASE_URL}/blog/this-post-does-not-exist-12345.md`);
 
       expect(response.status).toBe(404);
     });
@@ -210,9 +195,7 @@ describe("Blog Endpoints", () => {
         const response = await fetch(`${BASE_URL}/blog/${urlSlug}.json`);
 
         expect(response.status).toBe(200);
-        expect(response.headers.get("content-type")).toContain(
-          "application/json",
-        );
+        expect(response.headers.get("content-type")).toContain("application/json");
 
         const data = await response.json();
         expect(data).toHaveProperty("type", "blog");

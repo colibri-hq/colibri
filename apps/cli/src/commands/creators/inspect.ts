@@ -1,9 +1,4 @@
-import {
-  type Creator,
-  findCreatorByName,
-  loadCreator,
-  NoResultError,
-} from "@colibri-hq/sdk";
+import { type Creator, findCreatorByName, loadCreator, NoResultError } from "@colibri-hq/sdk";
 import { Args } from "@oclif/core";
 import { dim } from "ansis";
 import { BaseCommand } from "../../command.ts";
@@ -52,10 +47,7 @@ export default class Inspect extends BaseCommand<typeof Inspect> {
           { key: "Image", value: creator.image },
           { key: "URL", value: creator.url },
           { key: "Sorting Key", value: creator.sorting_key },
-          {
-            key: "Created At",
-            value: creator.created_at.toLocaleString(this.flags.displayLocale),
-          },
+          { key: "Created At", value: creator.created_at.toLocaleString(this.flags.displayLocale) },
           {
             key: "Updated At",
             value: creator.updated_at?.toLocaleString(this.flags.displayLocale),
@@ -63,18 +55,10 @@ export default class Inspect extends BaseCommand<typeof Inspect> {
           { key: "Updated By", value: creator.updated_by },
         ],
         [
-          {
-            format: (value) => dim(value),
-            justify: "end",
-            name: "key",
-            wrap: false,
-          },
+          { format: (value) => dim(value), justify: "end", name: "key", wrap: false },
           { justify: "start", name: "value" },
         ],
-        {
-          displayHeader: false,
-          theme: invisibleTheme,
-        },
+        { displayHeader: false, theme: invisibleTheme },
       ),
     );
 

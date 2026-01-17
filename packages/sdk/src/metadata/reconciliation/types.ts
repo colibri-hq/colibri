@@ -18,10 +18,7 @@ export interface ReconciledField<T> {
 
 export interface Conflict {
   field: string;
-  values: Array<{
-    value: unknown;
-    source: MetadataSource;
-  }>;
+  values: Array<{ value: unknown; source: MetadataSource }>;
   resolution: string;
 }
 
@@ -44,12 +41,7 @@ export interface PublicationPlace {
   name: string;
   normalized?: string | undefined;
   country?: string | undefined;
-  coordinates?:
-    | {
-        lat: number;
-        lng: number;
-      }
-    | undefined;
+  coordinates?: { lat: number; lng: number } | undefined;
 }
 
 export interface PublicationInfo {
@@ -75,14 +67,7 @@ export interface ReconciledPublicationInfo {
 export interface Subject {
   name: string;
   normalized?: string | undefined;
-  scheme?:
-    | "dewey"
-    | "lcc"
-    | "lcsh"
-    | "bisac"
-    | "custom"
-    | "unknown"
-    | undefined;
+  scheme?: "dewey" | "lcc" | "lcsh" | "bisac" | "custom" | "unknown" | undefined;
   code?: string | undefined;
   hierarchy?: string[] | undefined;
   type?: "subject" | "genre" | "keyword" | "tag" | undefined;
@@ -99,15 +84,7 @@ export interface ReconciledSubjects {
 
 // Identifier types
 export interface Identifier {
-  type:
-    | "isbn"
-    | "oclc"
-    | "lccn"
-    | "doi"
-    | "goodreads"
-    | "amazon"
-    | "google"
-    | "other";
+  type: "isbn" | "oclc" | "lccn" | "doi" | "goodreads" | "amazon" | "google" | "other";
   value: string;
   normalized?: string | undefined;
   valid?: boolean | undefined;
@@ -160,14 +137,7 @@ export interface FormatInfo {
     | "newspaper"
     | "other"
     | undefined;
-  medium?:
-    | "print"
-    | "digital"
-    | "audio"
-    | "braille"
-    | "large_print"
-    | "other"
-    | undefined;
+  medium?: "print" | "digital" | "audio" | "braille" | "large_print" | "other" | undefined;
   raw?: string | undefined;
 }
 
@@ -212,14 +182,7 @@ export interface ReconciledPhysicalDescription {
 // Content description types
 export interface Description {
   text: string;
-  type?:
-    | "summary"
-    | "abstract"
-    | "blurb"
-    | "synopsis"
-    | "description"
-    | "other"
-    | undefined;
+  type?: "summary" | "abstract" | "blurb" | "synopsis" | "description" | "other" | undefined;
   length?: "short" | "medium" | "long" | undefined;
   quality?: number | undefined; // 0-1 quality score
   language?: string | undefined; // ISO language code
@@ -329,15 +292,7 @@ export interface Work {
   id?: string | undefined;
   title: string;
   normalized?: string | undefined;
-  type?:
-    | "novel"
-    | "short_story"
-    | "novella"
-    | "poem"
-    | "essay"
-    | "play"
-    | "other"
-    | undefined;
+  type?: "novel" | "short_story" | "novella" | "poem" | "essay" | "play" | "other" | undefined;
   originalLanguage?: string | undefined;
   firstPublished?: PublicationDate | undefined;
   authors?: string[] | undefined; // Author names or IDs
@@ -388,22 +343,9 @@ export interface Collection {
 
 export interface CollectionContent {
   title: string;
-  type?:
-    | "novel"
-    | "short_story"
-    | "novella"
-    | "poem"
-    | "essay"
-    | "excerpt"
-    | "other"
-    | undefined;
+  type?: "novel" | "short_story" | "novella" | "poem" | "essay" | "excerpt" | "other" | undefined;
   authors?: string[] | undefined;
-  pageRange?:
-    | {
-        start?: number | undefined;
-        end?: number | undefined;
-      }
-    | undefined;
+  pageRange?: { start?: number | undefined; end?: number | undefined } | undefined;
   position?: number | undefined; // Order within collection
   originalPublication?:
     | {
@@ -499,12 +441,7 @@ export interface DuplicateMatch {
   /** Similarity score (0-1) */
   similarity: number;
   /** Type of match */
-  matchType:
-    | "exact"
-    | "likely"
-    | "possible"
-    | "different_edition"
-    | "related_work";
+  matchType: "exact" | "likely" | "possible" | "different_edition" | "related_work";
   /** Specific fields that matched */
   matchingFields: DuplicateMatchField[];
   /** Confidence in the duplicate detection */

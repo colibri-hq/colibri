@@ -43,33 +43,18 @@ export class Inspect extends BaseCommand<typeof Inspect> {
           { key: "Image", value: publisher.image },
           { key: "Website", value: publisher.url },
           { key: "Sorting Key", value: publisher.sorting_key },
-          {
-            key: "Created",
-            value: publisher.created_at.toLocaleString(
-              this.flags.displayLocale,
-            ),
-          },
+          { key: "Created", value: publisher.created_at.toLocaleString(this.flags.displayLocale) },
           {
             key: "Last Updated",
-            value: publisher.updated_at?.toLocaleString(
-              this.flags.displayLocale,
-            ),
+            value: publisher.updated_at?.toLocaleString(this.flags.displayLocale),
           },
           { key: "Last Updated By", value: publisher.updated_by },
         ],
         [
-          {
-            format: (value) => dim(value),
-            justify: "end",
-            name: "key",
-            wrap: false,
-          },
+          { format: (value) => dim(value), justify: "end", name: "key", wrap: false },
           { justify: "start", name: "value" },
         ],
-        {
-          displayHeader: false,
-          theme: invisibleTheme,
-        },
+        { displayHeader: false, theme: invisibleTheme },
       ),
     );
 

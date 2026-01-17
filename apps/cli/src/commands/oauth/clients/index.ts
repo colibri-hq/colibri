@@ -25,10 +25,7 @@ export default class Index extends BaseCommand<typeof Index> {
 
   async run() {
     //const filters = this.flags.filter ?? [];
-    const spinner = ora({
-      stream: process.stderr,
-      text: "Loading OAuth clients…",
-    }).start();
+    const spinner = ora({ stream: process.stderr, text: "Loading OAuth clients…" }).start();
 
     try {
       // For now, we'll just list all scopes as a placeholder
@@ -45,16 +42,8 @@ export default class Index extends BaseCommand<typeof Index> {
 
       this.log(
         table(scopes, [
-          {
-            accessor: "id",
-            justify: "start",
-            name: "ID",
-          },
-          {
-            accessor: "description",
-            justify: "start",
-            name: "Description",
-          },
+          { accessor: "id", justify: "start", name: "ID" },
+          { accessor: "description", justify: "start", name: "Description" },
         ]),
       );
 

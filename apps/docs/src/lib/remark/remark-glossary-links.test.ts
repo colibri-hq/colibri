@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
 import { remark } from "remark";
+import { describe, it, expect } from "vitest";
 import { remarkGlossaryLinks } from "./remark-glossary-links.js";
 
 describe("remarkGlossaryLinks", () => {
@@ -14,14 +14,11 @@ describe("remarkGlossaryLinks", () => {
       const input = "You need [PostgreSQL](glossary:postgresql) to run this.";
       const result = await processMarkdown(input);
 
-      expect(result).toContain(
-        '<GlossaryTerm term="postgresql">PostgreSQL</GlossaryTerm>',
-      );
+      expect(result).toContain('<GlossaryTerm term="postgresql">PostgreSQL</GlossaryTerm>');
     });
 
     it("should handle multiple glossary links in one paragraph", async () => {
-      const input =
-        "Upload [EPUB](glossary:epub) or [MOBI](glossary:mobi) files.";
+      const input = "Upload [EPUB](glossary:epub) or [MOBI](glossary:mobi) files.";
       const result = await processMarkdown(input);
 
       expect(result).toContain('<GlossaryTerm term="epub">EPUB</GlossaryTerm>');
@@ -29,8 +26,7 @@ describe("remarkGlossaryLinks", () => {
     });
 
     it("should handle glossary links with spaces in text", async () => {
-      const input =
-        "Configure your [environment variables](glossary:environment-variables).";
+      const input = "Configure your [environment variables](glossary:environment-variables).";
       const result = await processMarkdown(input);
 
       expect(result).toContain(
@@ -42,9 +38,7 @@ describe("remarkGlossaryLinks", () => {
       const input = "Store files in [S3 storage](glossary:s3).";
       const result = await processMarkdown(input);
 
-      expect(result).toContain(
-        '<GlossaryTerm term="s3">S3 storage</GlossaryTerm>',
-      );
+      expect(result).toContain('<GlossaryTerm term="s3">S3 storage</GlossaryTerm>');
     });
 
     it("should escape quotes in link text", async () => {
@@ -58,9 +52,7 @@ describe("remarkGlossaryLinks", () => {
       const input = "Use the [`colibri`](glossary:cli) command.";
       const result = await processMarkdown(input);
 
-      expect(result).toContain(
-        '<GlossaryTerm term="cli">colibri</GlossaryTerm>',
-      );
+      expect(result).toContain('<GlossaryTerm term="cli">colibri</GlossaryTerm>');
     });
   });
 
@@ -103,9 +95,7 @@ describe("remarkGlossaryLinks", () => {
       const input = "[](glossary:postgresql)";
       const result = await processMarkdown(input);
 
-      expect(result).toContain(
-        '<GlossaryTerm term="postgresql"></GlossaryTerm>',
-      );
+      expect(result).toContain('<GlossaryTerm term="postgresql"></GlossaryTerm>');
     });
 
     it("should handle term IDs with trailing whitespace", async () => {
@@ -116,8 +106,7 @@ describe("remarkGlossaryLinks", () => {
     });
 
     it("should handle glossary links in lists", async () => {
-      const input =
-        "- Upload [EPUB](glossary:epub) files\n- Upload [MOBI](glossary:mobi) files";
+      const input = "- Upload [EPUB](glossary:epub) files\n- Upload [MOBI](glossary:mobi) files";
       const result = await processMarkdown(input);
 
       expect(result).toContain('<GlossaryTerm term="epub">EPUB</GlossaryTerm>');
@@ -128,9 +117,7 @@ describe("remarkGlossaryLinks", () => {
       const input = "## Using [PostgreSQL](glossary:postgresql)";
       const result = await processMarkdown(input);
 
-      expect(result).toContain(
-        '<GlossaryTerm term="postgresql">PostgreSQL</GlossaryTerm>',
-      );
+      expect(result).toContain('<GlossaryTerm term="postgresql">PostgreSQL</GlossaryTerm>');
     });
 
     it("should handle glossary links with formatted text", async () => {
@@ -138,9 +125,7 @@ describe("remarkGlossaryLinks", () => {
       const result = await processMarkdown(input);
 
       // The plugin extracts text content recursively, including from formatted nodes
-      expect(result).toContain(
-        '<GlossaryTerm term="postgresql">PostgreSQL</GlossaryTerm>',
-      );
+      expect(result).toContain('<GlossaryTerm term="postgresql">PostgreSQL</GlossaryTerm>');
     });
 
     it("should handle multiple paragraphs with glossary links", async () => {
@@ -163,18 +148,14 @@ Second paragraph with [MOBI](glossary:mobi).
       const result = await processMarkdown(input);
 
       expect(result).toContain("[GitHub](https://github.com)");
-      expect(result).toContain(
-        '<GlossaryTerm term="postgresql">PostgreSQL</GlossaryTerm>',
-      );
+      expect(result).toContain('<GlossaryTerm term="postgresql">PostgreSQL</GlossaryTerm>');
     });
 
     it("should handle glossary links in blockquotes", async () => {
       const input = "> Use [PostgreSQL](glossary:postgresql) for best results.";
       const result = await processMarkdown(input);
 
-      expect(result).toContain(
-        '<GlossaryTerm term="postgresql">PostgreSQL</GlossaryTerm>',
-      );
+      expect(result).toContain('<GlossaryTerm term="postgresql">PostgreSQL</GlossaryTerm>');
     });
 
     it("should handle glossary links in table cells", async () => {

@@ -21,29 +21,19 @@ export const load: PageServerLoad = async ({ fetch }) => {
   }
 
   try {
-    const response = await fetch(
-      "https://api.github.com/repos/colibri-hq/colibri/releases",
-      {
-        headers: {
-          Accept: "application/vnd.github+json",
-          "X-GitHub-Api-Version": "2022-11-28",
-        },
-      },
-    );
+    const response = await fetch("https://api.github.com/repos/colibri-hq/colibri/releases", {
+      headers: { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" },
+    });
 
     if (!response.ok) {
-      console.warn(
-        `Failed to fetch GitHub releases: ${response.status} ${response.statusText}`,
-      );
+      console.warn(`Failed to fetch GitHub releases: ${response.status} ${response.statusText}`);
       return { releases: [] as GitHubRelease[] };
     }
 
     const releases: GitHubRelease[] = await response.json();
 
     // Filter out drafts and limit to 50 releases
-    const publishedReleases = releases
-      .filter((release) => !release.draft)
-      .slice(0, 50);
+    const publishedReleases = releases.filter((release) => !release.draft).slice(0, 50);
 
     return { releases: publishedReleases };
   } catch (error) {

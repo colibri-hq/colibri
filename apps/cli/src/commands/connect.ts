@@ -16,9 +16,7 @@ export default class Connect extends BaseCommand<typeof Connect> {
         try {
           return new URL(input);
         } catch {
-          throw new Error(
-            "Invalid DSN format. Please provide a valid Postgres DSN.",
-          );
+          throw new Error("Invalid DSN format. Please provide a valid Postgres DSN.");
         }
       },
       required: true,
@@ -30,8 +28,7 @@ export default class Connect extends BaseCommand<typeof Connect> {
     {
       command:
         "<%= config.bin %> <%= command.id %> postgres://user:pass@host:port/db --instance https://colibri.example.com",
-      description:
-        "To connect to a specific Colibri instance, use the --instance option:",
+      description: "To connect to a specific Colibri instance, use the --instance option:",
     },
   ];
 

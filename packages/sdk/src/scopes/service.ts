@@ -69,9 +69,7 @@ export function satisfiesScope(
   requiredScope: ScopeName,
 ): boolean {
   // Filter to only valid scope names before expanding
-  const validScopes = grantedScopes.filter(
-    (s): s is ScopeName => s in SCOPE_REGISTRY,
-  );
+  const validScopes = grantedScopes.filter((s): s is ScopeName => s in SCOPE_REGISTRY);
   const expanded = expandScopes(validScopes);
   return expanded.has(requiredScope);
 }
@@ -114,9 +112,7 @@ export function isValidScope(scope: string): scope is ScopeName {
 /**
  * Validate that all strings in an array are valid scope names.
  */
-export function validateScopes(
-  scopes: readonly string[],
-): scopes is ScopeName[] {
+export function validateScopes(scopes: readonly string[]): scopes is ScopeName[] {
   return scopes.every(isValidScope);
 }
 

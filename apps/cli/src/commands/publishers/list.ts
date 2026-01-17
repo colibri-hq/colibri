@@ -6,10 +6,7 @@ export class List extends BaseCommand<typeof List> {
   static override aliases = ["publishers", "publishers ls"];
   static override description = "List all publishers";
   static override examples = [
-    {
-      command: "<%= config.bin %> <%= command.id %>",
-      description: "List all publishers",
-    },
+    { command: "<%= config.bin %> <%= command.id %>", description: "List all publishers" },
   ];
 
   async run() {

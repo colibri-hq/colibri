@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { SubjectReconciler } from "./subjects.js";
 import type { MetadataSource, Subject, SubjectInput } from "./types.js";
+import { SubjectReconciler } from "./subjects.js";
 
 describe("SubjectReconciler", () => {
   const reconciler = new SubjectReconciler();
@@ -33,11 +33,7 @@ describe("SubjectReconciler", () => {
     });
 
     it("should normalize subject objects", () => {
-      const input: Subject = {
-        name: "Computer Science",
-        code: "004",
-        scheme: "dewey",
-      };
+      const input: Subject = { name: "Computer Science", code: "004", scheme: "dewey" };
       const result = reconciler.normalizeSubject(input);
       expect(result.name).toBe("Computer Science");
       expect(result.normalized).toBe("computer science");
@@ -61,39 +57,24 @@ describe("SubjectReconciler", () => {
     });
 
     it("should detect LCSH format", () => {
-      const result = reconciler.normalizeSubject(
-        "Computer programming -- Software engineering",
-      );
+      const result = reconciler.normalizeSubject("Computer programming -- Software engineering");
       expect(result.scheme).toBe("lcsh");
-      expect(result.hierarchy).toEqual([
-        "Computer programming",
-        "Software engineering",
-      ]);
+      expect(result.hierarchy).toEqual(["Computer programming", "Software engineering"]);
     });
 
     it("should normalize common genre variations", () => {
-      expect(reconciler.normalizeSubject("sci-fi").normalized).toBe(
-        "science fiction",
-      );
-      expect(reconciler.normalizeSubject("SF").normalized).toBe(
-        "science fiction",
-      );
+      expect(reconciler.normalizeSubject("sci-fi").normalized).toBe("science fiction");
+      expect(reconciler.normalizeSubject("SF").normalized).toBe("science fiction");
       expect(reconciler.normalizeSubject("YA").normalized).toBe("young adult");
-      expect(reconciler.normalizeSubject("non-fiction").normalized).toBe(
-        "nonfiction",
-      );
+      expect(reconciler.normalizeSubject("non-fiction").normalized).toBe("nonfiction");
     });
 
     it("should detect subject types correctly", () => {
       expect(reconciler.normalizeSubject("mystery").type).toBe("genre");
       expect(reconciler.normalizeSubject("programming").type).toBe("tag");
-      expect(reconciler.normalizeSubject("computer programming").type).toBe(
-        "keyword",
-      );
+      expect(reconciler.normalizeSubject("computer programming").type).toBe("keyword");
       expect(
-        reconciler.normalizeSubject(
-          "History of computer science in the 20th century",
-        ).type,
+        reconciler.normalizeSubject("History of computer science in the 20th century").type,
       ).toBe("subject");
     });
 
@@ -119,9 +100,7 @@ describe("SubjectReconciler", () => {
 
   describe("reconcileSubjects", () => {
     it("should handle empty input", () => {
-      expect(() => reconciler.reconcileSubjects([])).toThrow(
-        "No subjects to reconcile",
-      );
+      expect(() => reconciler.reconcileSubjects([])).toThrow("No subjects to reconcile");
     });
 
     it("should handle single source", () => {
@@ -160,17 +139,12 @@ describe("SubjectReconciler", () => {
       expect(normalizedNames).toContain("science fiction");
 
       // Should only have one instance of science fiction
-      const sciFiCount = normalizedNames.filter(
-        (name) => name === "science fiction",
-      ).length;
+      const sciFiCount = normalizedNames.filter((name) => name === "science fiction").length;
       expect(sciFiCount).toBe(1);
     });
 
     it("should handle similar subjects", () => {
-      const input1: SubjectInput = {
-        subjects: ["sci-fi", "detective"],
-        source: mockSource1,
-      };
+      const input1: SubjectInput = { subjects: ["sci-fi", "detective"], source: mockSource1 };
       const input2: SubjectInput = {
         subjects: ["science fiction", "mystery"],
         source: mockSource2,
@@ -239,10 +213,7 @@ describe("SubjectReconciler", () => {
         ],
         source: mockSource1,
       };
-      const input2: SubjectInput = {
-        subjects: ["math", "computing"],
-        source: mockSource2,
-      };
+      const input2: SubjectInput = { subjects: ["math", "computing"], source: mockSource2 };
 
       const result = reconciler.reconcileSubjects([input1, input2]);
 
@@ -251,8 +222,7 @@ describe("SubjectReconciler", () => {
         (s) => s.name === "Mathematics" || s.normalized?.includes("math"),
       );
       const _csSubject = result.value.find(
-        (s) =>
-          s.name === "Computer Science" || s.normalized?.includes("computer"),
+        (s) => s.name === "Computer Science" || s.normalized?.includes("computer"),
       );
 
       // At least one of the math subjects should have the code
@@ -268,29 +238,18 @@ describe("SubjectReconciler", () => {
         subjects: ["Science Fiction", "Mystery"],
         source: mockSource1,
       };
-      const input2: SubjectInput = {
-        subjects: ["Fantasy", "Thriller"],
-        source: mockSource2,
-      };
+      const input2: SubjectInput = { subjects: ["Fantasy", "Thriller"], source: mockSource2 };
 
       const result = reconciler.reconcileSubjects([input1, input2]);
 
       expect(result.conflicts).toBeDefined();
       expect(result.conflicts![0].field).toBe("subjects");
-      expect(result.conflicts![0].resolution).toContain(
-        "Merged and deduplicated",
-      );
+      expect(result.conflicts![0].resolution).toContain("Merged and deduplicated");
     });
 
     it("should handle empty or invalid subjects", () => {
-      const input1: SubjectInput = {
-        subjects: ["", "   ", "Valid Subject"],
-        source: mockSource1,
-      };
-      const input2: SubjectInput = {
-        subjects: [],
-        source: mockSource2,
-      };
+      const input1: SubjectInput = { subjects: ["", "   ", "Valid Subject"], source: mockSource1 };
+      const input2: SubjectInput = { subjects: [], source: mockSource2 };
 
       const result = reconciler.reconcileSubjects([input1, input2]);
 
@@ -333,12 +292,8 @@ describe("SubjectReconciler", () => {
 
       expect(result.value).toHaveLength(2);
 
-      const programmingSubject = result.value.find((s) =>
-        s.name.includes("Computer programming"),
-      );
-      const mathSubject = result.value.find((s) =>
-        s.name.includes("Mathematics"),
-      );
+      const programmingSubject = result.value.find((s) => s.name.includes("Computer programming"));
+      const mathSubject = result.value.find((s) => s.name.includes("Mathematics"));
 
       expect(programmingSubject?.scheme).toBe("lcsh");
       expect(programmingSubject?.hierarchy).toEqual([
@@ -348,20 +303,13 @@ describe("SubjectReconciler", () => {
       ]);
 
       expect(mathSubject?.scheme).toBe("lcsh");
-      expect(mathSubject?.hierarchy).toEqual([
-        "Mathematics",
-        "Algebra",
-        "Linear algebra",
-      ]);
+      expect(mathSubject?.hierarchy).toEqual(["Mathematics", "Algebra", "Linear algebra"]);
     });
   });
 
   describe("edge cases", () => {
     it("should handle subjects with only whitespace", () => {
-      const input: SubjectInput = {
-        subjects: ["   ", "\t\n", ""],
-        source: mockSource1,
-      };
+      const input: SubjectInput = { subjects: ["   ", "\t\n", ""], source: mockSource1 };
 
       const result = reconciler.reconcileSubjects([input]);
       expect(result.value).toHaveLength(0);
@@ -371,10 +319,7 @@ describe("SubjectReconciler", () => {
     it("should handle very long subject names", () => {
       const longSubject =
         "A very long subject name that goes on and on and describes something in great detail with many words and phrases";
-      const input: SubjectInput = {
-        subjects: [longSubject],
-        source: mockSource1,
-      };
+      const input: SubjectInput = { subjects: [longSubject], source: mockSource1 };
 
       const result = reconciler.reconcileSubjects([input]);
       expect(result.value).toHaveLength(1);
@@ -383,11 +328,7 @@ describe("SubjectReconciler", () => {
 
     it("should handle special characters in subject names", () => {
       const input: SubjectInput = {
-        subjects: [
-          "C++ Programming",
-          "Web 2.0 & Social Media",
-          "Science-Fiction/Fantasy",
-        ],
+        subjects: ["C++ Programming", "Web 2.0 & Social Media", "Science-Fiction/Fantasy"],
         source: mockSource1,
       };
 

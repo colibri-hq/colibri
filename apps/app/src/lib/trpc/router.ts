@@ -13,11 +13,7 @@ import { series } from "$lib/trpc/routes/series";
 import { settings } from "$lib/trpc/routes/settings";
 import { users } from "$lib/trpc/routes/users";
 import { t } from "$lib/trpc/t";
-import {
-  type inferRouterInputs,
-  type inferRouterOutputs,
-  type RouterCaller,
-} from "@trpc/server";
+import { type inferRouterInputs, type inferRouterOutputs, type RouterCaller } from "@trpc/server";
 
 export const router = t.router({
   accounts,
@@ -36,8 +32,7 @@ export const router = t.router({
   users,
 });
 
-export const createCaller: RouterCaller<Router["_def"]> =
-  t.createCallerFactory(router);
+export const createCaller: RouterCaller<Router["_def"]> = t.createCallerFactory(router);
 
 export type Router = typeof router;
 export type RouterInputs = inferRouterInputs<Router>;

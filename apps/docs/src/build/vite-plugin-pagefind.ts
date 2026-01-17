@@ -1,3 +1,10 @@
+import type { Plugin, ResolvedConfig, ViteDevServer } from "vite";
+import { glob } from "glob";
+import matter from "gray-matter";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
+import * as pagefind from "pagefind";
+
 /**
  * Vite plugin for Pagefind integration in dev mode.
  *
@@ -7,16 +14,8 @@
  * Build mode: Production indexing is handled by the `pagefind` CLI in the build script (runs after
  * adapter-static writes files to dist/).
  */
-import * as pagefind from "pagefind";
-import { readFile } from "node:fs/promises";
-import { glob } from "glob";
-import matter from "gray-matter";
-import { resolve } from "node:path";
-import type { Plugin, ResolvedConfig, ViteDevServer } from "vite";
 
-type PagefindPluginOptions = {
-  contentDir?: string;
-};
+type PagefindPluginOptions = { contentDir?: string };
 
 export function pagefindPlugin({
   contentDir = resolve(`${import.meta.dirname}/../../content/`),
@@ -33,10 +32,9 @@ export function pagefindPlugin({
     const { index, errors } = await pagefind.createIndex({});
 
     if (!index) {
-      server.config.logger.error(
-        `Failed to create index: ${errors.join(", ")}`,
-        { timestamp: true },
-      );
+      server.config.logger.error(`Failed to create index: ${errors.join(", ")}`, {
+        timestamp: true,
+      });
 
       return;
     }
@@ -76,10 +74,9 @@ export function pagefindPlugin({
 
       indexReady = true;
 
-      server.config.logger.info(
-        `Indexed ${files.length} pages in ${Date.now() - startTime}ms`,
-        { timestamp: true },
-      );
+      server.config.logger.info(`Indexed ${files.length} pages in ${Date.now() - startTime}ms`, {
+        timestamp: true,
+      });
     } finally {
       await index.deleteIndex();
     }
@@ -147,9 +144,7 @@ export function pagefindPlugin({
         return;
       }
 
-      server.config.logger.info(`Content changed: ${file}`, {
-        timestamp: true,
-      });
+      server.config.logger.info(`Content changed: ${file}`, { timestamp: true });
 
       try {
         await buildDevIndex(server);
@@ -159,10 +154,7 @@ export function pagefindPlugin({
           throw error;
         }
 
-        server.config.logger.error("Failed to rebuild index:", {
-          timestamp: true,
-          error,
-        });
+        server.config.logger.error("Failed to rebuild index:", { timestamp: true, error });
       }
     },
   };

@@ -33,10 +33,7 @@ declare module "statue-ssg/cms/content-processor.js" {
       privacyPolicyLastUpdated?: string;
       termsLastUpdated?: string;
       isCaliforniaCompliant?: boolean;
-      doNotSell?: {
-        processingTime?: string;
-        confirmationRequired?: boolean;
-      };
+      doNotSell?: { processingTime?: string; confirmationRequired?: boolean };
     };
     search?: {
       enabled: boolean;
@@ -84,19 +81,9 @@ declare module "statue-ssg/cms/content-processor.js" {
 
   export function getAllDirectoriesSidebar(): SidebarItem[];
 
-  type SidebarItem = {
-    title: string;
-    url?: string;
-    order?: number;
-    children?: SidebarItem[];
-  };
+  type SidebarItem = { title: string; url?: string; order?: number; children?: SidebarItem[] };
 
-  type ContentDirectory = {
-    name: string;
-    path: string;
-    title: string;
-    url: string;
-  };
+  type ContentDirectory = { name: string; path: string; title: string; url: string };
 
   type ContentEntry = {
     slug: string;
@@ -106,12 +93,10 @@ declare module "statue-ssg/cms/content-processor.js" {
     mainDirectory: string;
     depth: number;
     content: string;
-    metadata: {
-      title: string;
-      description: string;
-      date: string;
-      author: string;
-    } & Record<string, unknown>;
+    metadata: { title: string; description: string; date: string; author: string } & Record<
+      string,
+      unknown
+    >;
   };
 }
 

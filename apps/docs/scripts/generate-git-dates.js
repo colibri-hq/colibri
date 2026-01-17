@@ -11,10 +11,10 @@
  * Output format: { "/slug": "2024-01-15T10:30:00Z", ... }
  */
 
+import { glob } from "glob";
 import { execSync } from "node:child_process";
 import { writeFileSync, readFileSync, mkdirSync, existsSync, statSync } from "node:fs";
 import { dirname } from "node:path";
-import { glob } from "glob";
 
 const CONTENT_DIR = "content";
 const OUTPUT_FILE = "src/lib/data/git-dates.json";
@@ -41,9 +41,7 @@ function fileToSlug(file) {
  */
 function getGitDate(file) {
   try {
-    return execSync(`git log -1 --format=%cI -- "${file}"`, {
-      encoding: "utf-8",
-    }).trim();
+    return execSync(`git log -1 --format=%cI -- "${file}"`, { encoding: "utf-8" }).trim();
   } catch {
     return null;
   }
@@ -58,7 +56,7 @@ function getChangedFilesSince(timestamp) {
     const isoDate = new Date(timestamp).toISOString();
     const output = execSync(
       `git log --since="${isoDate}" --name-only --pretty=format: -- "${CONTENT_DIR}/**/*.md" | sort -u`,
-      { encoding: "utf-8" }
+      { encoding: "utf-8" },
     );
     return output.split("\n").filter((f) => f.trim() && f.endsWith(".md"));
   } catch {
@@ -141,7 +139,7 @@ async function main() {
     writeFileSync(OUTPUT_FILE, JSON.stringify(existingDates, null, 2));
 
     console.log(
-      `Updated git dates (${Object.keys(existingDates).length} total entries) -> ${OUTPUT_FILE}`
+      `Updated git dates (${Object.keys(existingDates).length} total entries) -> ${OUTPUT_FILE}`,
     );
   } else {
     // Full generation
@@ -165,9 +163,7 @@ async function main() {
     // Write the dates to a JSON file
     writeFileSync(OUTPUT_FILE, JSON.stringify(dates, null, 2));
 
-    console.log(
-      `Generated git dates for ${Object.keys(dates).length} files -> ${OUTPUT_FILE}`
-    );
+    console.log(`Generated git dates for ${Object.keys(dates).length} files -> ${OUTPUT_FILE}`);
   }
 }
 

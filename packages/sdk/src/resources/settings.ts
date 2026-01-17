@@ -1,6 +1,6 @@
+import type { Insertable, Selectable } from "kysely";
 import type { Database, Schema } from "../database.js";
 import type { Settings as $Settings } from "../schema.js";
-import type { Insertable, Selectable } from "kysely";
 
 const table = "settings" as const;
 
@@ -24,10 +24,7 @@ export function updateSettings(
     .executeTakeFirstOrThrow();
 }
 
-export async function getSecret(
-  database: Database,
-  key: string,
-): Promise<string | undefined> {
+export async function getSecret(database: Database, key: string): Promise<string | undefined> {
   const result = await database
     .selectFrom("vault.decrypted_secrets")
     .where("name", "=", key)
@@ -58,10 +55,7 @@ export async function getSecrets<T extends string>(
   );
 }
 
-export async function removeSecret(
-  database: Database,
-  key: string,
-): Promise<void> {
+export async function removeSecret(database: Database, key: string): Promise<void> {
   await database.deleteFrom("vault.secrets").where("name", "=", key).execute();
 }
 

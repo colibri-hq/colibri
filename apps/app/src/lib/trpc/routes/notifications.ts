@@ -40,11 +40,7 @@ export const notifications = t.router({
    * Mark a notification as read
    */
   markRead: procedure()
-    .input(
-      z.object({
-        id: z.string(),
-      }),
-    )
+    .input(z.object({ id: z.string() }))
     .mutation(async ({ input: { id }, ctx: { database } }) => {
       await markAsRead(database, id);
     }),
@@ -60,11 +56,7 @@ export const notifications = t.router({
    * Delete a notification
    */
   delete: procedure()
-    .input(
-      z.object({
-        id: z.string(),
-      }),
-    )
+    .input(z.object({ id: z.string() }))
     .mutation(async ({ input: { id }, ctx: { database } }) => {
       await deleteNotification(database, id);
     }),

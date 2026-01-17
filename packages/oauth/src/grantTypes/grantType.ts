@@ -1,5 +1,5 @@
-import { z, type ZodType } from "zod";
 import type { MaybePromise } from "@colibri-hq/shared";
+import { z, type ZodType } from "zod";
 import type { Entities, OAuthGrantType, RequestedToken } from "../types.js";
 
 /**
@@ -96,10 +96,7 @@ export function defineGrantType<
       return validate.call(this, params, client);
     }
 
-    public handle(
-      params: Awaited<W>,
-      client: C,
-    ): MaybePromise<ReturnType<HandleFn<T, U, C, O>>> {
+    public handle(params: Awaited<W>, client: C): MaybePromise<ReturnType<HandleFn<T, U, C, O>>> {
       return handle.call(this, params, client);
     }
   };
@@ -168,29 +165,16 @@ export abstract class GrantType<
    * @param params Validated request data
    * @param client Client data
    */
-  abstract handle(
-    params: Awaited<W>,
-    client: C,
-  ): MaybePromise<ReturnType<HandleFn<T, U, C, O>>>;
+  abstract handle(params: Awaited<W>, client: C): MaybePromise<ReturnType<HandleFn<T, U, C, O>>>;
 }
 
-type ValidateFn<
-  T extends ZodType,
-  U,
-  C extends Entities.Client,
-  O extends GrantTypeOptions,
-> = (
+type ValidateFn<T extends ZodType, U, C extends Entities.Client, O extends GrantTypeOptions> = (
   this: GrantType<O, C, T>,
   params: z.output<T>,
   client: C,
 ) => MaybePromise<U>;
 
-type HandleFn<
-  T extends ZodType,
-  U,
-  C extends Entities.Client,
-  O extends GrantTypeOptions,
-> = (
+type HandleFn<T extends ZodType, U, C extends Entities.Client, O extends GrantTypeOptions> = (
   this: GrantType<O, C, T, U>,
   params: Awaited<U>,
   client: C,
@@ -199,19 +183,15 @@ type HandleFn<
   accessToken?: RequestedToken | undefined;
   refreshToken?: RequestedToken | undefined;
   idToken?:
-    | (Omit<RequestedToken, "exchange" | "scopes"> & {
-        exchange?: never;
-        scopes?: never;
-      })
+    | (Omit<RequestedToken, "exchange" | "scopes"> & { exchange?: never; scopes?: never })
     | undefined;
   userIdentifier?: string | undefined;
 }>;
 
-type ConfigureFn<
-  T extends ZodType,
-  C extends Entities.Client,
-  O extends GrantTypeOptions,
-> = (this: GrantType<O, C, T>, options: O) => O;
+type ConfigureFn<T extends ZodType, C extends Entities.Client, O extends GrantTypeOptions> = (
+  this: GrantType<O, C, T>,
+  options: O,
+) => O;
 
 export interface GrantTypeOptions {
   /**
@@ -234,6 +214,4 @@ export interface GrantTypeOptions {
 export type GrantTypeFactory<
   G extends GrantType,
   O extends GrantTypeOptions = G extends GrantType<infer O> ? O : never,
-> = {
-  new (options: O): G;
-};
+> = { new (options: O): G };

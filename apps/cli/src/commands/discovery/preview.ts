@@ -1,8 +1,4 @@
-import {
-  detectType,
-  type Metadata as EbookMetadata,
-  loadMetadata,
-} from "@colibri-hq/sdk/ebooks";
+import { detectType, type Metadata as EbookMetadata, loadMetadata } from "@colibri-hq/sdk/ebooks";
 import {
   convertEmbeddedMetadata,
   type MetadataRecord,
@@ -20,8 +16,7 @@ import { BaseCommand } from "../../command.js";
 export class Preview extends BaseCommand<typeof Preview> {
   static override args = {
     input: Args.string({
-      description:
-        "Ebook file path or title of the book to discover metadata for",
+      description: "Ebook file path or title of the book to discover metadata for",
       required: false,
     }),
   };
@@ -57,12 +52,10 @@ export class Preview extends BaseCommand<typeof Preview> {
     },
     {
       command: "<%= config .bin %> <%= command.id %> 'The Great Gatsby'",
-      description:
-        "Preview metadata discovery for 'The Great Gatsby' (manual input)",
+      description: "Preview metadata discovery for 'The Great Gatsby' (manual input)",
     },
     {
-      command:
-        "<%= config .bin %> <%= command.id %> --isbn '978-0-7432-7356-5'",
+      command: "<%= config .bin %> <%= command.id %> --isbn '978-0-7432-7356-5'",
       description: "Preview metadata discovery by ISBN only",
     },
     {
@@ -74,8 +67,7 @@ export class Preview extends BaseCommand<typeof Preview> {
   static override flags = {
     creator: Flags.string({
       char: "c",
-      description:
-        "Names of creators/authors (overrides embedded metadata when provided)",
+      description: "Names of creators/authors (overrides embedded metadata when provided)",
       multiple: true,
       required: false,
     }),
@@ -86,8 +78,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     }),
     isbn: Flags.string({
       char: "i",
-      description:
-        "ISBN of the book (overrides embedded metadata when provided)",
+      description: "ISBN of the book (overrides embedded metadata when provided)",
       required: false,
     }),
     language: Flags.string({
@@ -116,19 +107,16 @@ export class Preview extends BaseCommand<typeof Preview> {
     }),
     subject: Flags.string({
       char: "s",
-      description:
-        "Subject/genre terms (overrides embedded metadata when provided)",
+      description: "Subject/genre terms (overrides embedded metadata when provided)",
       multiple: true,
       required: false,
     }),
     "year-from": Flags.integer({
-      description:
-        "Earliest publication year (overrides embedded date when provided)",
+      description: "Earliest publication year (overrides embedded date when provided)",
       required: false,
     }),
     "year-to": Flags.integer({
-      description:
-        "Latest publication year (overrides embedded date when provided)",
+      description: "Latest publication year (overrides embedded date when provided)",
       required: false,
     }),
   };
@@ -177,9 +165,7 @@ export class Preview extends BaseCommand<typeof Preview> {
           this.log(`  File Type: ${fileType.toUpperCase()}`);
         } catch {
           // Handle unsupported file format specifically
-          throw new Error(
-            `Unsupported file format: ${input}. Supported formats: EPUB, MOBI, PDF`,
-          );
+          throw new Error(`Unsupported file format: ${input}. Supported formats: EPUB, MOBI, PDF`);
         }
 
         // Extract embedded metadata with format-specific error handling
@@ -225,9 +211,7 @@ export class Preview extends BaseCommand<typeof Preview> {
           this.log(`  Language: ${embeddedMetadata.language}`);
         }
         if (embeddedMetadata.datePublished) {
-          this.log(
-            `  Publication Date: ${embeddedMetadata.datePublished.getFullYear()}`,
-          );
+          this.log(`  Publication Date: ${embeddedMetadata.datePublished.getFullYear()}`);
         }
         if (embeddedMetadata.numberOfPages) {
           this.log(`  Pages: ${embeddedMetadata.numberOfPages}`);
@@ -235,9 +219,7 @@ export class Preview extends BaseCommand<typeof Preview> {
         if (embeddedMetadata.tags?.length) {
           const subjects = embeddedMetadata.tags.slice(0, 3).join(", ");
           const more =
-            embeddedMetadata.tags.length > 3
-              ? ` (+${embeddedMetadata.tags.length - 3} more)`
-              : "";
+            embeddedMetadata.tags.length > 3 ? ` (+${embeddedMetadata.tags.length - 3} more)` : "";
           this.log(`  Subjects: ${subjects}${more}`);
         }
         this.log("");
@@ -252,16 +234,12 @@ export class Preview extends BaseCommand<typeof Preview> {
         }
 
         // Provide specific fallback suggestions based on error type
-        const fallbackSuggestions = this.generateFileErrorFallbacks(
-          errorDetails,
-          input,
-          {
-            creator: creator || undefined,
-            isbn: isbn || undefined,
-            publisher: publisher || undefined,
-            subject: subject || undefined,
-          },
-        );
+        const fallbackSuggestions = this.generateFileErrorFallbacks(errorDetails, input, {
+          creator: creator || undefined,
+          isbn: isbn || undefined,
+          publisher: publisher || undefined,
+          subject: subject || undefined,
+        });
         this.log("💡 Fallback options:");
         for (const suggestion of fallbackSuggestions) {
           this.log(`  • ${suggestion}`);
@@ -273,10 +251,7 @@ export class Preview extends BaseCommand<typeof Preview> {
           title = input; // Use input as title fallback
         } else {
           // Provide more helpful error message with specific next steps
-          const nextSteps = this.generateFileErrorNextSteps(
-            errorDetails,
-            input,
-          );
+          const nextSteps = this.generateFileErrorNextSteps(errorDetails, input);
           this.log("\n🔧 Next steps:");
           for (const step of nextSteps) {
             this.log(`  ${step}`);
@@ -333,10 +308,7 @@ export class Preview extends BaseCommand<typeof Preview> {
       // Build multi-criteria query from embedded metadata and flags
       const yearRange =
         yearFrom || yearTo
-          ? ([yearFrom || 1000, yearTo || new Date().getFullYear()] as [
-              number,
-              number,
-            ])
+          ? ([yearFrom || 1000, yearTo || new Date().getFullYear()] as [number, number])
           : undefined;
 
       const query: MultiCriteriaQuery = { fuzzy };
@@ -482,10 +454,7 @@ export class Preview extends BaseCommand<typeof Preview> {
           }
 
           // Show recovery suggestions for recoverable errors
-          if (
-            errorDetails.recoverable &&
-            errorDetails.suggestedActions.length > 0
-          ) {
+          if (errorDetails.recoverable && errorDetails.suggestedActions.length > 0) {
             this.log(`     Suggestion: ${errorDetails.suggestedActions[0]}`);
           }
 
@@ -613,19 +582,14 @@ export class Preview extends BaseCommand<typeof Preview> {
             this.log(`Publisher: ${record.publisher}`);
           }
           if (record.publicationDate) {
-            this.log(
-              `Publication Date: ${record.publicationDate.getFullYear()}`,
-            );
+            this.log(`Publication Date: ${record.publicationDate.getFullYear()}`);
           }
           if (record.pageCount) {
             this.log(`Pages: ${record.pageCount}`);
           }
           if (record.subjects?.length) {
             const subjects = record.subjects.slice(0, 5).join(", ");
-            const more =
-              record.subjects.length > 5
-                ? ` (+${record.subjects.length - 5} more)`
-                : "";
+            const more = record.subjects.length > 5 ? ` (+${record.subjects.length - 5} more)` : "";
             this.log(`Subjects: ${subjects}${more}`);
           }
           if (record.description) {
@@ -661,13 +625,7 @@ export class Preview extends BaseCommand<typeof Preview> {
       // Display output based on selected format
       switch (outputFormat) {
         case "json": {
-          this.displayJsonOutput(
-            results,
-            providerResults,
-            providers,
-            query,
-            duration,
-          );
+          this.displayJsonOutput(results, providerResults, providers, query, duration);
           break;
         }
         case "table": {
@@ -675,12 +633,7 @@ export class Preview extends BaseCommand<typeof Preview> {
           break;
         }
         default: {
-          this.displayDetailedOutput(
-            results,
-            providerResults,
-            providers,
-            showConfidence,
-          );
+          this.displayDetailedOutput(results, providerResults, providers, showConfidence);
           break;
         }
       }
@@ -710,14 +663,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     message: string;
     recoverable: boolean;
     suggestedActions: string[];
-    type:
-      | "access"
-      | "corruption"
-      | "format"
-      | "network"
-      | "parsing"
-      | "size"
-      | "unknown";
+    type: "access" | "corruption" | "format" | "network" | "parsing" | "size" | "unknown";
   } {
     const message = error.message.toLowerCase();
     const stack = error.stack?.toLowerCase() || "";
@@ -766,13 +712,9 @@ export class Preview extends BaseCommand<typeof Preview> {
     }
 
     // File format errors
-    if (
-      message.includes("unsupported file format") ||
-      message.includes("unsupported format")
-    ) {
+    if (message.includes("unsupported file format") || message.includes("unsupported format")) {
       return {
-        details:
-          "The file format is not supported. Supported formats: EPUB, MOBI, PDF",
+        details: "The file format is not supported. Supported formats: EPUB, MOBI, PDF",
         message: "Unsupported file format",
         recoverable: true,
         suggestedActions: [
@@ -803,13 +745,9 @@ export class Preview extends BaseCommand<typeof Preview> {
       };
     }
 
-    if (
-      message.includes("zip") &&
-      (message.includes("error") || message.includes("invalid"))
-    ) {
+    if (message.includes("zip") && (message.includes("error") || message.includes("invalid"))) {
       return {
-        details:
-          "EPUB files are ZIP archives, and the ZIP structure is corrupted",
+        details: "EPUB files are ZIP archives, and the ZIP structure is corrupted",
         message: "EPUB file structure is invalid (ZIP corruption)",
         recoverable: false,
         suggestedActions: [
@@ -884,11 +822,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     }
 
     // Parsing-specific errors
-    if (
-      message.includes("parse") ||
-      message.includes("syntax") ||
-      stack.includes("parser")
-    ) {
+    if (message.includes("parse") || message.includes("syntax") || stack.includes("parser")) {
       return {
         details: "The file format is recognized but contains parsing errors",
         message: "File parsing failed",
@@ -921,11 +855,7 @@ export class Preview extends BaseCommand<typeof Preview> {
    */
   private analyzeNoResultsScenario(
     query: MultiCriteriaQuery,
-    providerResults: Array<{
-      error?: Error;
-      provider: string;
-      success: boolean;
-    }>,
+    providerResults: Array<{ error?: Error; provider: string; success: boolean }>,
     embeddedMetadata: EbookMetadata | null,
   ): {
     exampleCommands: string[];
@@ -949,12 +879,7 @@ export class Preview extends BaseCommand<typeof Preview> {
         "Check your internet connection and try again",
         "Wait a few minutes and retry as providers may be experiencing issues",
       );
-      return {
-        ...(reason && { reason }),
-        exampleCommands,
-        providerIssues,
-        suggestions,
-      };
+      return { ...(reason && { reason }), exampleCommands, providerIssues, suggestions };
     }
 
     if (failedProviders.length > 0) {
@@ -964,36 +889,24 @@ export class Preview extends BaseCommand<typeof Preview> {
       for (const failed of failedProviders) {
         const errorType = failed.error?.message.toLowerCase();
         if (errorType?.includes("rate limit") || errorType?.includes("429")) {
-          providerIssues.push(
-            `${failed.provider}: Rate limited - wait before retrying`,
-          );
+          providerIssues.push(`${failed.provider}: Rate limited - wait before retrying`);
         } else if (errorType?.includes("timeout")) {
-          providerIssues.push(
-            `${failed.provider}: Request timed out - provider may be slow`,
-          );
-        } else if (
-          errorType?.includes("network") ||
-          errorType?.includes("fetch failed")
-        ) {
+          providerIssues.push(`${failed.provider}: Request timed out - provider may be slow`);
+        } else if (errorType?.includes("network") || errorType?.includes("fetch failed")) {
           providerIssues.push(`${failed.provider}: Network connection failed`);
         } else {
-          providerIssues.push(
-            `${failed.provider}: ${failed.error?.message || "Unknown error"}`,
-          );
+          providerIssues.push(`${failed.provider}: ${failed.error?.message || "Unknown error"}`);
         }
       }
     }
 
     // Analyze search criteria and suggest improvements
     if (successfulProviders.length > 0) {
-      reason =
-        "Providers responded successfully but no matching books were found";
+      reason = "Providers responded successfully but no matching books were found";
 
       // Suggest fuzzy matching if not enabled
       if (!query.fuzzy) {
-        suggestions.push(
-          "Try using fuzzy matching (--fuzzy) for more flexible search",
-        );
+        suggestions.push("Try using fuzzy matching (--fuzzy) for more flexible search");
         exampleCommands.push(
           `${process.argv[0]} ${process.argv[1]} discovery preview --fuzzy ${query.title ? `"${query.title}"` : ""} ${query.isbn ? `--isbn "${query.isbn}"` : ""}`,
         );
@@ -1001,9 +914,7 @@ export class Preview extends BaseCommand<typeof Preview> {
 
       // Suggest broadening search criteria
       if (query.title && query.authors?.length && query.subjects?.length) {
-        suggestions.push(
-          "Try searching with fewer criteria (e.g., just title or just author)",
-        );
+        suggestions.push("Try searching with fewer criteria (e.g., just title or just author)");
         exampleCommands.push(
           `${process.argv[0]} ${process.argv[1]} discovery preview "${query.title}"`,
         );
@@ -1154,12 +1065,7 @@ export class Preview extends BaseCommand<typeof Preview> {
       reason = reason || "Search criteria may be too restrictive";
     }
 
-    return {
-      ...(reason && { reason }),
-      exampleCommands,
-      providerIssues,
-      suggestions,
-    };
+    return { ...(reason && { reason }), exampleCommands, providerIssues, suggestions };
   }
 
   /**
@@ -1170,14 +1076,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     message: string;
     recoverable: boolean;
     suggestedActions: string[];
-    type:
-      | "auth"
-      | "network"
-      | "query"
-      | "ratelimit"
-      | "server"
-      | "timeout"
-      | "unknown";
+    type: "auth" | "network" | "query" | "ratelimit" | "server" | "timeout" | "unknown";
   } {
     const message = error.message.toLowerCase();
 
@@ -1310,11 +1209,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     }
 
     // JSON parsing errors (common with API responses)
-    if (
-      message.includes("json") ||
-      message.includes("parse") ||
-      message.includes("syntax")
-    ) {
+    if (message.includes("json") || message.includes("parse") || message.includes("syntax")) {
       return {
         details: "The provider returned malformed data",
         message: "Invalid response from provider",
@@ -1329,11 +1224,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     }
 
     // SSL/TLS errors
-    if (
-      message.includes("ssl") ||
-      message.includes("tls") ||
-      message.includes("certificate")
-    ) {
+    if (message.includes("ssl") || message.includes("tls") || message.includes("certificate")) {
       return {
         details: "Unable to establish secure connection to provider",
         message: "SSL/TLS connection error",
@@ -1412,8 +1303,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     const words = name.trim().split(/\s+/);
     if (words.length >= 2 && !name.includes(",")) {
       const hasInitials = words.some(
-        (word) =>
-          word.length <= 2 && (word.includes(".") || word.match(/^[A-Z]$/)),
+        (word) => word.length <= 2 && (word.includes(".") || word.match(/^[A-Z]$/)),
       );
 
       if (!hasInitials) {
@@ -1436,20 +1326,12 @@ export class Preview extends BaseCommand<typeof Preview> {
     // Check if they're likely the same author
     if (!this.areAuthorsSimilar(embeddedAuthor, externalAuthor)) {
       // Different authors - prefer higher confidence
-      return embeddedConfidence > externalConfidence
-        ? embeddedAuthor
-        : externalAuthor;
+      return embeddedConfidence > externalConfidence ? embeddedAuthor : externalAuthor;
     }
 
     // Same author, different formats - apply format preference
-    const embeddedScore = this.calculateAuthorFormatScore(
-      embeddedAuthor,
-      embeddedConfidence,
-    );
-    const externalScore = this.calculateAuthorFormatScore(
-      externalAuthor,
-      externalConfidence,
-    );
+    const embeddedScore = this.calculateAuthorFormatScore(embeddedAuthor, embeddedConfidence);
+    const externalScore = this.calculateAuthorFormatScore(externalAuthor, externalConfidence);
 
     return externalScore > embeddedScore ? externalAuthor : embeddedAuthor;
   }
@@ -1529,8 +1411,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     ];
 
     for (const field of fieldsToCheck) {
-      const embeddedValue =
-        embeddedRecord[field.key as keyof typeof embeddedRecord];
+      const embeddedValue = embeddedRecord[field.key as keyof typeof embeddedRecord];
 
       if (!embeddedValue) {
         continue;
@@ -1554,11 +1435,7 @@ export class Preview extends BaseCommand<typeof Preview> {
       });
 
       if (hasConflict) {
-        conflicts.push({
-          embedded: embeddedValue,
-          external: externalValues,
-          field: field.label,
-        });
+        conflicts.push({ embedded: embeddedValue, external: externalValues, field: field.label });
       }
     }
 
@@ -1595,8 +1472,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     ];
 
     for (const field of fieldsToCheck) {
-      const embeddedValue =
-        embeddedRecord[field.key as keyof typeof embeddedRecord];
+      const embeddedValue = embeddedRecord[field.key as keyof typeof embeddedRecord];
 
       if (!embeddedValue) {
         continue;
@@ -1620,23 +1496,15 @@ export class Preview extends BaseCommand<typeof Preview> {
       });
 
       if (hasConflict) {
-        conflicts.push({
-          embedded: embeddedValue,
-          external: externalValues,
-          field: field.label,
-        });
+        conflicts.push({ embedded: embeddedValue, external: externalValues, field: field.label });
       }
     }
 
     if (conflicts.length === 0) {
-      this.log(
-        "✅ No conflicts detected between embedded and external metadata.",
-      );
+      this.log("✅ No conflicts detected between embedded and external metadata.");
       this.log("All sources provide consistent information.");
     } else {
-      this.log(
-        `⚠️  Found ${conflicts.length} conflict(s) between embedded and external metadata:`,
-      );
+      this.log(`⚠️  Found ${conflicts.length} conflict(s) between embedded and external metadata:`);
       this.log("");
 
       for (const conflict of conflicts) {
@@ -1650,11 +1518,7 @@ export class Preview extends BaseCommand<typeof Preview> {
         for (const external of conflict.external) {
           const externalDisplay = this.formatValueForDisplay(external.value);
           const confidenceIcon =
-            external.confidence >= 0.8
-              ? "🟢"
-              : external.confidence > 0.5
-                ? "🟡"
-                : "🔴";
+            external.confidence >= 0.8 ? "🟢" : external.confidence > 0.5 ? "🟡" : "🔴";
           if (showConfidence) {
             this.log(
               `  🌐 ${external.source}: ${externalDisplay} (${confidenceIcon} ${(external.confidence * 100).toFixed(1)}%)`,
@@ -1689,12 +1553,8 @@ export class Preview extends BaseCommand<typeof Preview> {
     showConfidence: boolean,
   ): void {
     // Separate embedded metadata from external provider results
-    const embeddedRecords = results.filter(
-      (record) => record.source === "embedded",
-    );
-    const externalRecords = results.filter(
-      (record) => record.source !== "embedded",
-    );
+    const embeddedRecords = results.filter((record) => record.source === "embedded");
+    const externalRecords = results.filter((record) => record.source !== "embedded");
 
     // Display embedded metadata section
     if (embeddedRecords.length > 0) {
@@ -1814,9 +1674,7 @@ export class Preview extends BaseCommand<typeof Preview> {
           current.confidence > best.confidence ? current : best,
         );
 
-        this.log(
-          `Best match confidence: ${(bestProviderRecord.confidence * 100).toFixed(1)}%`,
-        );
+        this.log(`Best match confidence: ${(bestProviderRecord.confidence * 100).toFixed(1)}%`);
         this.log("");
 
         // Display external metadata fields
@@ -1902,11 +1760,7 @@ export class Preview extends BaseCommand<typeof Preview> {
 
     // Display conflicts and reconciliation
     if (embeddedRecords.length > 0 && externalRecords.length > 0) {
-      this.displayConflictsAndReconciliation(
-        embeddedRecords[0],
-        externalRecords,
-        showConfidence,
-      );
+      this.displayConflictsAndReconciliation(embeddedRecords[0], externalRecords, showConfidence);
     }
 
     // Display final reconciled metadata
@@ -1921,9 +1775,7 @@ export class Preview extends BaseCommand<typeof Preview> {
         for (const type of dataTypes) {
           const score = provider.getReliabilityScore(type);
           const supported = provider.supportsDataType(type);
-          this.log(
-            `  ${type}: ${(score * 100).toFixed(1)}% ${supported ? "✓" : "✗"}`,
-          );
+          this.log(`  ${type}: ${(score * 100).toFixed(1)}% ${supported ? "✓" : "✗"}`);
         }
       }
     }
@@ -1945,12 +1797,8 @@ export class Preview extends BaseCommand<typeof Preview> {
       this.log(`\n=== Provider Performance ===`);
       for (const result of providerResults) {
         const status = result.success ? "✅" : "❌";
-        const recordInfo = result.success
-          ? `${result.records.length} records`
-          : "failed";
-        this.log(
-          `${status} ${result.provider}: ${recordInfo} (${result.duration}ms)`,
-        );
+        const recordInfo = result.success ? `${result.records.length} records` : "failed";
+        this.log(`${status} ${result.provider}: ${recordInfo} (${result.duration}ms)`);
         if (!result.success && result.error) {
           this.log(`    Error: ${result.error.message}`);
         }
@@ -1975,12 +1823,8 @@ export class Preview extends BaseCommand<typeof Preview> {
     duration: number,
   ): void {
     // Separate embedded and external metadata
-    const embeddedRecords = results.filter(
-      (record) => record.source === "embedded",
-    );
-    const externalRecords = results.filter(
-      (record) => record.source !== "embedded",
-    );
+    const embeddedRecords = results.filter((record) => record.source === "embedded");
+    const externalRecords = results.filter((record) => record.source !== "embedded");
 
     // Create reconciled metadata
     const embeddedRecord = embeddedRecords[0];
@@ -1996,19 +1840,13 @@ export class Preview extends BaseCommand<typeof Preview> {
       embeddedRecord || bestExternalRecord
         ? {
             authors: embeddedRecord?.authors || bestExternalRecord?.authors,
-            coverImage:
-              embeddedRecord?.coverImage || bestExternalRecord?.coverImage,
-            description:
-              embeddedRecord?.description || bestExternalRecord?.description,
+            coverImage: embeddedRecord?.coverImage || bestExternalRecord?.coverImage,
+            description: embeddedRecord?.description || bestExternalRecord?.description,
             isbn: embeddedRecord?.isbn || bestExternalRecord?.isbn,
             language: embeddedRecord?.language || bestExternalRecord?.language,
-            pageCount:
-              embeddedRecord?.pageCount || bestExternalRecord?.pageCount,
-            publicationDate:
-              embeddedRecord?.publicationDate ||
-              bestExternalRecord?.publicationDate,
-            publisher:
-              embeddedRecord?.publisher || bestExternalRecord?.publisher,
+            pageCount: embeddedRecord?.pageCount || bestExternalRecord?.pageCount,
+            publicationDate: embeddedRecord?.publicationDate || bestExternalRecord?.publicationDate,
+            publisher: embeddedRecord?.publisher || bestExternalRecord?.publisher,
             series: embeddedRecord?.series || bestExternalRecord?.series,
             sourceAttribution: this.createSourceAttribution(
               embeddedRecord,
@@ -2094,8 +1932,7 @@ export class Preview extends BaseCommand<typeof Preview> {
       query,
       reconciledMetadata,
       summary: {
-        conflictsDetected: this.detectConflicts(embeddedRecord, externalRecords)
-          .length,
+        conflictsDetected: this.detectConflicts(embeddedRecord, externalRecords).length,
         embeddedRecords: embeddedRecords.length,
         externalRecords: externalRecords.length,
         failedProviders: providerResults.filter((r) => !r.success).length,
@@ -2159,8 +1996,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     this.log(`${label}: ${displayValue}`);
 
     if (showConfidence) {
-      const confidenceIcon =
-        confidence >= 0.8 ? "🟢" : confidence > 0.5 ? "🟡" : "🔴";
+      const confidenceIcon = confidence >= 0.8 ? "🟢" : confidence > 0.5 ? "🟡" : "🔴";
       this.log(
         `  ${sourceIcon} Source: ${source} | ${confidenceIcon} Confidence: ${(confidence * 100).toFixed(1)}%`,
       );
@@ -2174,23 +2010,14 @@ export class Preview extends BaseCommand<typeof Preview> {
   /**
    * Display the final reconciled metadata that would be used in the library
    */
-  private displayReconciledMetadata(
-    results: MetadataRecord[],
-    showConfidence: boolean,
-  ): void {
+  private displayReconciledMetadata(results: MetadataRecord[], showConfidence: boolean): void {
     this.log("\n=== 📚 Final Reconciled Metadata (Library Preview) ===");
-    this.log(
-      "This is how the book would appear in your library after processing:",
-    );
+    this.log("This is how the book would appear in your library after processing:");
     this.log("");
 
     // For now, use simple reconciliation: prefer embedded metadata, then highest confidence external
-    const embeddedRecord = results.find(
-      (record) => record.source === "embedded",
-    );
-    const externalRecords = results.filter(
-      (record) => record.source !== "embedded",
-    );
+    const embeddedRecord = results.find((record) => record.source === "embedded");
+    const externalRecords = results.filter((record) => record.source !== "embedded");
     const bestExternalRecord =
       externalRecords.length > 0
         ? // eslint-disable-next-line unicorn/no-array-reduce -- most straightforward here
@@ -2201,21 +2028,16 @@ export class Preview extends BaseCommand<typeof Preview> {
 
     // Create reconciled metadata by preferring embedded, falling back to external
     // Special handling for authors to prefer better format
-    const reconciledAuthors = this.reconcileAuthors(
-      embeddedRecord,
-      bestExternalRecord,
-    );
+    const reconciledAuthors = this.reconcileAuthors(embeddedRecord, bestExternalRecord);
 
     const reconciledMetadata = {
       authors: reconciledAuthors,
       coverImage: embeddedRecord?.coverImage || bestExternalRecord?.coverImage,
-      description:
-        embeddedRecord?.description || bestExternalRecord?.description,
+      description: embeddedRecord?.description || bestExternalRecord?.description,
       isbn: embeddedRecord?.isbn || bestExternalRecord?.isbn,
       language: embeddedRecord?.language || bestExternalRecord?.language,
       pageCount: embeddedRecord?.pageCount || bestExternalRecord?.pageCount,
-      publicationDate:
-        embeddedRecord?.publicationDate || bestExternalRecord?.publicationDate,
+      publicationDate: embeddedRecord?.publicationDate || bestExternalRecord?.publicationDate,
       publisher: embeddedRecord?.publisher || bestExternalRecord?.publisher,
       series: embeddedRecord?.series || bestExternalRecord?.series,
       subjects: embeddedRecord?.subjects || bestExternalRecord?.subjects,
@@ -2238,8 +2060,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     ];
 
     for (const field of fieldsToDisplay) {
-      const value =
-        reconciledMetadata[field.key as keyof typeof reconciledMetadata];
+      const value = reconciledMetadata[field.key as keyof typeof reconciledMetadata];
       if (!value) {
         continue;
       }
@@ -2266,19 +2087,12 @@ export class Preview extends BaseCommand<typeof Preview> {
         confidence = 0.7; // Default confidence for reconciled values
       }
 
-      this.displayMetadataFieldWithSource(
-        field.label,
-        value,
-        source,
-        confidence,
-        showConfidence,
-      );
+      this.displayMetadataFieldWithSource(field.label, value, source, confidence, showConfidence);
     }
 
     // Show reconciliation summary
     const embeddedFields = fieldsToDisplay.filter((field) => {
-      const value =
-        reconciledMetadata[field.key as keyof typeof reconciledMetadata];
+      const value = reconciledMetadata[field.key as keyof typeof reconciledMetadata];
       const embeddedValue = embeddedRecord
         ? embeddedRecord[field.key as keyof typeof embeddedRecord]
         : null;
@@ -2286,8 +2100,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     }).length;
 
     const externalFields = fieldsToDisplay.filter((field) => {
-      const value =
-        reconciledMetadata[field.key as keyof typeof reconciledMetadata];
+      const value = reconciledMetadata[field.key as keyof typeof reconciledMetadata];
       const embeddedValue = embeddedRecord
         ? embeddedRecord[field.key as keyof typeof embeddedRecord]
         : null;
@@ -2295,20 +2108,13 @@ export class Preview extends BaseCommand<typeof Preview> {
         ? bestExternalRecord[field.key as keyof typeof bestExternalRecord]
         : null;
 
-      return (
-        value &&
-        !embeddedValue &&
-        externalValue &&
-        this.valuesMatch(value, externalValue)
-      );
+      return value && !embeddedValue && externalValue && this.valuesMatch(value, externalValue);
     }).length;
 
     this.log("📊 Reconciliation Summary:");
     this.log(`  📖 Fields from embedded metadata: ${embeddedFields}`);
     this.log(`  🌐 Fields from external providers: ${externalFields}`);
-    this.log(
-      `  ⚖️  Total fields reconciled: ${embeddedFields + externalFields}`,
-    );
+    this.log(`  ⚖️  Total fields reconciled: ${embeddedFields + externalFields}`);
   }
 
   /**
@@ -2337,9 +2143,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     // Title
     if (query.title) {
       const isOverride =
-        embeddedMetadata?.title &&
-        flags.title &&
-        flags.title !== embeddedMetadata.title;
+        embeddedMetadata?.title && flags.title && flags.title !== embeddedMetadata.title;
       const source = isOverride
         ? " (🔧 flag override)"
         : embeddedMetadata?.title
@@ -2354,9 +2158,8 @@ export class Preview extends BaseCommand<typeof Preview> {
     // Authors/Creators
     if (query.authors?.length) {
       const embeddedAuthors =
-        embeddedMetadata?.contributors
-          ?.filter((c) => c.roles.includes("aut"))
-          .map((c) => c.name) || [];
+        embeddedMetadata?.contributors?.filter((c) => c.roles.includes("aut")).map((c) => c.name) ||
+        [];
       const isOverride =
         embeddedAuthors.length > 0 &&
         flags.creator?.length &&
@@ -2377,12 +2180,10 @@ export class Preview extends BaseCommand<typeof Preview> {
     // ISBN
     if (query.isbn) {
       const embeddedIsbns =
-        embeddedMetadata?.identifiers
-          ?.filter((id) => id.type === "isbn")
-          .map((id) => id.value) || [];
+        embeddedMetadata?.identifiers?.filter((id) => id.type === "isbn").map((id) => id.value) ||
+        [];
       const embeddedIsbn = embeddedIsbns[0];
-      const isOverride =
-        embeddedIsbn && flags.isbn && flags.isbn !== embeddedIsbn;
+      const isOverride = embeddedIsbn && flags.isbn && flags.isbn !== embeddedIsbn;
       const source = isOverride
         ? " (🔧 flag override)"
         : embeddedIsbn
@@ -2407,9 +2208,7 @@ export class Preview extends BaseCommand<typeof Preview> {
           : " (📝 manual input)";
       this.log(`  Language: ${query.language}${source}`);
       if (isOverride) {
-        overrides.push(
-          `Language: "${embeddedMetadata.language}" → "${flags.language}"`,
-        );
+        overrides.push(`Language: "${embeddedMetadata.language}" → "${flags.language}"`);
       }
     }
 
@@ -2436,14 +2235,11 @@ export class Preview extends BaseCommand<typeof Preview> {
     // Publisher
     if (query.publisher) {
       const embeddedPublishers =
-        embeddedMetadata?.contributors
-          ?.filter((c) => c.roles.includes("bkp"))
-          .map((c) => c.name) || [];
+        embeddedMetadata?.contributors?.filter((c) => c.roles.includes("bkp")).map((c) => c.name) ||
+        [];
       const embeddedPublisher = embeddedPublishers[0];
       const isOverride =
-        embeddedPublisher &&
-        flags.publisher &&
-        flags.publisher !== embeddedPublisher;
+        embeddedPublisher && flags.publisher && flags.publisher !== embeddedPublisher;
       const source = isOverride
         ? " (🔧 flag override)"
         : embeddedPublisher
@@ -2451,9 +2247,7 @@ export class Preview extends BaseCommand<typeof Preview> {
           : " (📝 manual input)";
       this.log(`  Publisher: "${query.publisher}"${source}`);
       if (isOverride) {
-        overrides.push(
-          `Publisher: "${embeddedPublisher}" → "${flags.publisher}"`,
-        );
+        overrides.push(`Publisher: "${embeddedPublisher}" → "${flags.publisher}"`);
       }
     }
 
@@ -2463,16 +2257,13 @@ export class Preview extends BaseCommand<typeof Preview> {
       const isOverride =
         embeddedYear &&
         (flags.yearFrom || flags.yearTo) &&
-        (query.yearRange[0] !== embeddedYear - 1 ||
-          query.yearRange[1] !== embeddedYear + 1);
+        (query.yearRange[0] !== embeddedYear - 1 || query.yearRange[1] !== embeddedYear + 1);
       const source = isOverride
         ? " (🔧 flag override)"
         : embeddedYear
           ? " (📖 from file)"
           : " (📝 manual input)";
-      this.log(
-        `  Year Range: ${query.yearRange[0]} - ${query.yearRange[1]}${source}`,
-      );
+      this.log(`  Year Range: ${query.yearRange[0]} - ${query.yearRange[1]}${source}`);
       if (isOverride) {
         overrides.push(
           `Year Range: "${embeddedYear}" → "${query.yearRange[0]}-${query.yearRange[1]}"`,
@@ -2497,10 +2288,7 @@ export class Preview extends BaseCommand<typeof Preview> {
   /**
    * Display results in table format
    */
-  private displayTableOutput(
-    results: MetadataRecord[],
-    showConfidence: boolean,
-  ): void {
+  private displayTableOutput(results: MetadataRecord[], showConfidence: boolean): void {
     if (results.length === 0) {
       this.log("No results to display in table format.");
       return;
@@ -2521,9 +2309,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     }
 
     // Display header
-    const headerRow = headers
-      .map((header, i) => header.padEnd(colWidths[i]))
-      .join(" | ");
+    const headerRow = headers.map((header, i) => header.padEnd(colWidths[i])).join(" | ");
     this.log(headerRow);
     this.log("-".repeat(headerRow.length));
 
@@ -2534,24 +2320,16 @@ export class Preview extends BaseCommand<typeof Preview> {
 
       const row = [
         (index + 1).toString().padEnd(colWidths[0]),
-        (result.title || "Unknown")
-          .slice(0, Math.max(0, colWidths[1] - 3))
-          .padEnd(colWidths[1]),
+        (result.title || "Unknown").slice(0, Math.max(0, colWidths[1] - 3)).padEnd(colWidths[1]),
         (result.authors?.join(", ") || "Unknown")
           .slice(0, Math.max(0, colWidths[2] - 3))
           .padEnd(colWidths[2]),
-        (result.publicationDate?.getFullYear()?.toString() || "N/A").padEnd(
-          colWidths[3],
-        ),
-        sourceDisplay
-          .slice(0, Math.max(0, colWidths[4] - 3))
-          .padEnd(colWidths[4]),
+        (result.publicationDate?.getFullYear()?.toString() || "N/A").padEnd(colWidths[3]),
+        sourceDisplay.slice(0, Math.max(0, colWidths[4] - 3)).padEnd(colWidths[4]),
       ];
 
       if (showConfidence) {
-        row.push(
-          `${(result.confidence * 100).toFixed(1)}%`.padEnd(colWidths[5]),
-        );
+        row.push(`${(result.confidence * 100).toFixed(1)}%`.padEnd(colWidths[5]));
       }
 
       this.log(row.join(" | "));
@@ -2582,9 +2360,7 @@ export class Preview extends BaseCommand<typeof Preview> {
 
     if (typeof value === "object") {
       if ("name" in value) {
-        return (
-          value.name + ("volume" in value ? ` (Volume ${value.volume})` : "")
-        );
+        return value.name + ("volume" in value ? ` (Volume ${value.volume})` : "");
       }
 
       if ("url" in value && value.url) {
@@ -2623,10 +2399,7 @@ export class Preview extends BaseCommand<typeof Preview> {
 
     // If we have manual flags, suggest continuing with those
     const hasManualFlags =
-      flags.isbn ||
-      flags.creator?.length ||
-      flags.subject?.length ||
-      flags.publisher;
+      flags.isbn || flags.creator?.length || flags.subject?.length || flags.publisher;
     if (hasManualFlags) {
       suggestions.push("Continue with manual search criteria (flags provided)");
     } else {
@@ -2637,9 +2410,7 @@ export class Preview extends BaseCommand<typeof Preview> {
 
     // File-specific suggestions
     if (errorDetails.type === "format") {
-      suggestions.push(
-        "Use the filename as a title search if it contains book information",
-      );
+      suggestions.push("Use the filename as a title search if it contains book information");
     }
 
     if (errorDetails.type === "access") {
@@ -2649,9 +2420,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     // Add format-specific conversion suggestions
     const extension = filePath.split(".").pop()?.toLowerCase();
     if (extension && !["epub", "mobi", "pdf"].includes(extension)) {
-      suggestions.push(
-        `Convert .${extension} file to EPUB, MOBI, or PDF format`,
-      );
+      suggestions.push(`Convert .${extension} file to EPUB, MOBI, or PDF format`);
     }
 
     return suggestions;
@@ -2788,11 +2557,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     // Both sources have authors - apply format preference
     const reconciledAuthors: string[] = [];
 
-    for (
-      let i = 0;
-      i < Math.max(embeddedAuthors.length, externalAuthors.length);
-      i++
-    ) {
+    for (let i = 0; i < Math.max(embeddedAuthors.length, externalAuthors.length); i++) {
       const embeddedAuthor = embeddedAuthors[i];
       const externalAuthor = externalAuthors[i];
 
@@ -2834,9 +2599,7 @@ export class Preview extends BaseCommand<typeof Preview> {
     if (isbn) {
       const cleanIsbn = isbn.replaceAll(/[-\s]/g, "");
       if (!/^\d{10}(\d{3})?$/.test(cleanIsbn)) {
-        errors.push(
-          "ISBN must be 10 or 13 digits (hyphens and spaces are allowed)",
-        );
+        errors.push("ISBN must be 10 or 13 digits (hyphens and spaces are allowed)");
       }
     }
 
@@ -2873,19 +2636,14 @@ export class Preview extends BaseCommand<typeof Preview> {
 
     // Year range validation
     const currentYear = new Date().getFullYear();
-    if (
-      yearFrom !== undefined &&
-      (yearFrom < 1000 || yearFrom > currentYear + 10)
-    ) {
+    if (yearFrom !== undefined && (yearFrom < 1000 || yearFrom > currentYear + 10)) {
       errors.push(
         `Invalid year-from: ${yearFrom}. Expected year between 1000 and ${currentYear + 10}`,
       );
     }
 
     if (yearTo !== undefined && (yearTo < 1000 || yearTo > currentYear + 10)) {
-      errors.push(
-        `Invalid year-to: ${yearTo}. Expected year between 1000 and ${currentYear + 10}`,
-      );
+      errors.push(`Invalid year-to: ${yearTo}. Expected year between 1000 and ${currentYear + 10}`);
     }
 
     if (yearFrom !== undefined && yearTo !== undefined && yearFrom > yearTo) {
@@ -2911,9 +2669,7 @@ export class Preview extends BaseCommand<typeof Preview> {
         return false;
       }
 
-      return value1.every((item, index) =>
-        this.valuesMatch(item, value2[index]),
-      );
+      return value1.every((item, index) => this.valuesMatch(item, value2[index]));
     }
 
     // Handle dates
@@ -2936,10 +2692,7 @@ export class Preview extends BaseCommand<typeof Preview> {
       }
 
       return keys1.every((key) =>
-        this.valuesMatch(
-          value1[key as keyof typeof value1],
-          value2[key as keyof typeof value2],
-        ),
+        this.valuesMatch(value1[key as keyof typeof value1], value2[key as keyof typeof value2]),
       );
     }
 

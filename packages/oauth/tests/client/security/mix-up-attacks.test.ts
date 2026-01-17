@@ -182,11 +182,7 @@ describe("Mix-Up Attack Prevention (RFC 9700 Section 4.4)", () => {
         if (urlString.includes("/token")) {
           tokenEndpointCalled = urlString;
           return createJsonResponse(
-            {
-              access_token: "access_token",
-              token_type: "Bearer",
-              expires_in: 3600,
-            },
+            { access_token: "access_token", token_type: "Bearer", expires_in: 3600 },
             200,
           );
         }
@@ -281,10 +277,7 @@ describe("Mix-Up Attack Prevention (RFC 9700 Section 4.4)", () => {
         redirectUri: "https://app.example.com/callback",
         fetch: mockFetch,
         tokenStore: mockTokenStore,
-        serverMetadata: {
-          ...mockMetadata,
-          issuer: "https://idp1.example.com",
-        },
+        serverMetadata: { ...mockMetadata, issuer: "https://idp1.example.com" },
       });
 
       const client2 = new AuthorizationCodeClient({
@@ -293,10 +286,7 @@ describe("Mix-Up Attack Prevention (RFC 9700 Section 4.4)", () => {
         redirectUri: "https://app.example.com/callback",
         fetch: mockFetch,
         tokenStore: mockTokenStore,
-        serverMetadata: {
-          ...mockMetadata,
-          issuer: "https://idp2.example.com",
-        },
+        serverMetadata: { ...mockMetadata, issuer: "https://idp2.example.com" },
       });
 
       const result1 = await client1.createAuthorizationUrl();
@@ -316,10 +306,7 @@ describe("Mix-Up Attack Prevention (RFC 9700 Section 4.4)", () => {
         redirectUri: "https://app.example.com/callback",
         fetch: mockFetch,
         tokenStore: mockTokenStore,
-        serverMetadata: {
-          ...mockMetadata,
-          issuer: "https://idp1.example.com",
-        },
+        serverMetadata: { ...mockMetadata, issuer: "https://idp1.example.com" },
       });
 
       // Generate state for IdP1
@@ -345,20 +332,13 @@ describe("Mix-Up Attack Prevention (RFC 9700 Section 4.4)", () => {
         if (urlString.includes("/token")) {
           calledEndpoint = urlString;
           return createJsonResponse(
-            {
-              access_token: "access_token",
-              token_type: "Bearer",
-              expires_in: 3600,
-            },
+            { access_token: "access_token", token_type: "Bearer", expires_in: 3600 },
             200,
           );
         }
         if (urlString.includes("/.well-known/")) {
           return createJsonResponse(
-            {
-              ...mockMetadata,
-              token_endpoint: "https://auth.example.com/oauth/token",
-            },
+            { ...mockMetadata, token_endpoint: "https://auth.example.com/oauth/token" },
             200,
           );
         }
@@ -391,11 +371,7 @@ describe("Mix-Up Attack Prevention (RFC 9700 Section 4.4)", () => {
           // The fetch implementation should NOT follow cross-origin redirects for token requests
           // This test verifies the expected behavior
           return createJsonResponse(
-            {
-              access_token: "access_token",
-              token_type: "Bearer",
-              expires_in: 3600,
-            },
+            { access_token: "access_token", token_type: "Bearer", expires_in: 3600 },
             200,
           );
         }

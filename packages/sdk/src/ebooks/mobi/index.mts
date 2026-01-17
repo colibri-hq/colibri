@@ -118,10 +118,7 @@ const FONT_HEADER = {
   keyStart: [20, 4, "uint"],
 } satisfies HeaderDefinition;
 
-const mobiEncoding = {
-  1252: "windows-1252",
-  65001: "utf-8",
-};
+const mobiEncoding = { 1252: "windows-1252", 65001: "utf-8" };
 
 const exthRecordType = {
   100: ["creator", "string", true],
@@ -327,18 +324,12 @@ function bufferToUint(buffer: ArrayBuffer) {
   return view.getUint8(0);
 }
 
-function getStruct<T extends HeaderDefinition>(
-  definition: T,
-  buffer: ArrayBuffer,
-) {
+function getStruct<T extends HeaderDefinition>(definition: T, buffer: ArrayBuffer) {
   return Object.fromEntries(
     Object.entries(definition).map(([key, [offset, size, type]]) => {
       const slice = buffer.slice(offset, offset + size);
 
-      return [
-        key,
-        type === "string" ? bufferToString(slice) : bufferToUint(slice),
-      ] as const;
+      return [key, type === "string" ? bufferToString(slice) : bufferToUint(slice)] as const;
     }),
   );
 }
@@ -363,9 +354,7 @@ function getVarLen(byteArray: TypedArray, i = 0) {
 }
 
 // variable-length quantity, but read from the end of data
-function getVarLengthFromEnd<T extends Uint8Array | Uint16Array | Uint32Array>(
-  bytes: T,
-) {
+function getVarLengthFromEnd<T extends Uint8Array | Uint16Array | Uint32Array>(bytes: T) {
   let value = 0;
 
   for (const byte of bytes.subarray(-4)) {
@@ -445,10 +434,7 @@ function read32Bits(byteArray, from) {
   return (bits >> (8n - BigInt(end & 7))) & 0xffffffffn;
 }
 
-async function huffcdic(
-  mobi,
-  loadRecord: (index: number) => Promise<ArrayBuffer>,
-) {
+async function huffcdic(mobi, loadRecord: (index: number) => Promise<ArrayBuffer>) {
   const huffRecord = await loadRecord(mobi.huffcdic);
   const { magic, offset1, offset2 } = getStruct(huffHeader, huffRecord);
   if (magic !== "HUFF") {
@@ -477,19 +463,14 @@ async function huffcdic(
     }
     // `numEntries` is the total number of dictionary data across CDIC records
     // so `n` here is the number of entries in *this* record
-    const n = Math.min(
-      1 << cdic.codeLength,
-      cdic.numEntries - dictionary.length,
-    );
+    const n = Math.min(1 << cdic.codeLength, cdic.numEntries - dictionary.length);
     const buffer = record.slice(cdic.length);
     for (let i = 0; i < n; i++) {
       const offset = bufferToUint(buffer.slice(i * 2, i * 2 + 2));
       const x = bufferToUint(buffer.slice(offset, offset + 2));
       const length = x & 0x7fff;
       const decompressed = x & 0x8000;
-      const value = new Uint8Array(
-        buffer.slice(offset + 2, offset + 2 + length),
-      );
+      const value = new Uint8Array(buffer.slice(offset + 2, offset + 2 + length));
       dictionary.push([value, decompressed]);
     }
   }
@@ -528,10 +509,7 @@ async function huffcdic(
   return decompress;
 }
 
-async function getIndexData(
-  offset: number,
-  loadRecord: (index: number) => Promise<ArrayBuffer>,
-) {
+async function getIndexData(offset: number, loadRecord: (index: number) => Promise<ArrayBuffer>) {
   const record = await loadRecord(offset);
   const indx = getStruct(INDX_HEADER, record);
 
@@ -587,9 +565,7 @@ async function getIndexData(
       const offset = bufferToUint(record.slice(offsetOffset, offsetOffset + 2));
 
       const length = bufferToUint(record.slice(offset, offset + 1));
-      const name = bufferToString(
-        record.slice(offset + 1, offset + 1 + length),
-      );
+      const name = bufferToString(record.slice(offset + 1, offset + 1 + length));
 
       const tags = [];
       const startPos = offset + 1 + length;
@@ -651,10 +627,7 @@ async function getIndexData(
   return { table, cncx };
 }
 
-async function getNCX(
-  offset: number,
-  loadRecord: (index: number) => Promise<ArrayBuffer>,
-) {
+async function getNCX(offset: number, loadRecord: (index: number) => Promise<ArrayBuffer>) {
   const { table, cncx } = await getIndexData(offset, loadRecord);
   const items = table.map(({ tagMap }, index) => ({
     index,
@@ -673,16 +646,12 @@ async function getNCX(
       return item;
     }
 
-    item.children = items
-      .filter(({ parent }) => parent === item.index)
-      .map(getChildren);
+    item.children = items.filter(({ parent }) => parent === item.index).map(getChildren);
 
     return item;
   };
 
-  return items
-    .filter(({ headingLevel }) => headingLevel === 0)
-    .map(getChildren);
+  return items.filter(({ headingLevel }) => headingLevel === 0).map(getChildren);
 }
 
 function getEXTH(buffer: ArrayBuffer, encoding: keyof typeof mobiEncoding) {
@@ -720,10 +689,7 @@ function getEXTH(buffer: ArrayBuffer, encoding: keyof typeof mobiEncoding) {
 }
 
 async function getFont(buffer: ArrayBuffer, unzlib) {
-  const { flags, dataStart, keyLength, keyStart } = getStruct(
-    FONT_HEADER,
-    buffer,
-  );
+  const { flags, dataStart, keyLength, keyStart } = getStruct(FONT_HEADER, buffer);
   const array = new Uint8Array(buffer.slice(dataStart));
 
   // deobfuscate font
@@ -787,9 +753,7 @@ class PDB {
   public async loadMagic(index: number) {
     const start = this.#offsets[index][0];
 
-    return bufferToString(
-      await this.#file.slice(start, start + 4).arrayBuffer(),
-    );
+    return bufferToString(await this.#file.slice(start, start + 4).arrayBuffer());
   }
 }
 
@@ -923,9 +887,7 @@ export class MOBI extends PDB {
     mobi.language = lang?.[localeRegion >> 2] ?? lang?.[0];
 
     const exth =
-      mobi.exthFlag & 0b100_0000
-        ? getEXTH(buf.slice(mobi.length + 16), mobi.encoding)
-        : undefined;
+      mobi.exthFlag & 0b100_0000 ? getEXTH(buf.slice(mobi.length + 16), mobi.encoding) : undefined;
     const kf8 = mobi.version >= 8 ? getStruct(kf8Header, buf) : undefined;
     return { palmdoc, mobi, exth, kf8 } as MobiHeaders;
   }
@@ -1034,9 +996,7 @@ class MOBI6 implements Format {
     // convert to string so we can use regex note that `filepos` are byte
     // offsets, so it needs to preserve each byte as a separate character
     // (see https://stackoverflow.com/q/50198017)
-    const str = Array.from(new Uint8Array(array), (c) =>
-      String.fromCharCode(c),
-    ).join("");
+    const str = Array.from(new Uint8Array(array), (c) => String.fromCharCode(c)).join("");
 
     // split content into sections at each `<mbp:pagebreak>`
     this.#sections = [0]
@@ -1044,9 +1004,7 @@ class MOBI6 implements Format {
       .map((x, i, a) => str.slice(x, a[i + 1]))
 
       // recover the original raw bytes
-      .map((str: string) =>
-        Uint8Array.from(str, (value) => value.charCodeAt(0)),
-      )
+      .map((str: string) => Uint8Array.from(str, (value) => value.charCodeAt(0)))
       .map((raw) => ({ book: this, raw }))
 
       // get start and end filepos for each section
@@ -1055,11 +1013,7 @@ class MOBI6 implements Format {
         const start = last?.end ?? 0;
         const end = start + section.raw.byteLength;
 
-        return sections.concat({
-          ...section,
-          start,
-          end,
-        });
+        return sections.concat({ ...section, start, end });
       }, []);
 
     this.sections = this.#sections.map((section, index) => ({
@@ -1071,9 +1025,7 @@ class MOBI6 implements Format {
 
     try {
       this.landmarks = await this.getGuide();
-      const tocHref = this.landmarks.find(({ type }) =>
-        type?.includes("toc"),
-      )?.href;
+      const tocHref = this.landmarks.find(({ type }) => type?.includes("toc"))?.href;
       if (tocHref) {
         const { index } = this.resolveHref(tocHref);
         const doc = await this.sections[index].createDocument();
@@ -1082,44 +1034,40 @@ class MOBI6 implements Format {
         let lastIndent = 0;
         const lastLevelOfIndent = new Map();
         const lastParentOfLevel = new Map();
-        this.toc = Array.from(doc.querySelectorAll("a[filepos]")).reduce(
-          (arr, a) => {
-            const indent = getIndent(a);
-            const item = {
-              label: a.innerText?.trim() ?? "",
-              href: `filepos:${a.getAttribute("filepos")}`,
-            };
-            const level =
-              indent > lastIndent
-                ? lastLevel + 1
-                : indent === lastIndent
-                  ? lastLevel
-                  : (lastLevelOfIndent.get(indent) ??
-                    Math.max(0, lastLevel - 1));
-            if (level > lastLevel) {
-              if (lastItem) {
-                lastItem.subitems ??= [];
-                lastItem.subitems.push(item);
-                lastParentOfLevel.set(level, lastItem);
-              } else {
-                arr.push(item);
-              }
+        this.toc = Array.from(doc.querySelectorAll("a[filepos]")).reduce((arr, a) => {
+          const indent = getIndent(a);
+          const item = {
+            label: a.innerText?.trim() ?? "",
+            href: `filepos:${a.getAttribute("filepos")}`,
+          };
+          const level =
+            indent > lastIndent
+              ? lastLevel + 1
+              : indent === lastIndent
+                ? lastLevel
+                : (lastLevelOfIndent.get(indent) ?? Math.max(0, lastLevel - 1));
+          if (level > lastLevel) {
+            if (lastItem) {
+              lastItem.subitems ??= [];
+              lastItem.subitems.push(item);
+              lastParentOfLevel.set(level, lastItem);
             } else {
-              const parent = lastParentOfLevel.get(level);
-              if (parent) {
-                parent.subitems.push(item);
-              } else {
-                arr.push(item);
-              }
+              arr.push(item);
             }
-            lastItem = item;
-            lastLevel = level;
-            lastIndent = indent;
-            lastLevelOfIndent.set(indent, level);
-            return arr;
-          },
-          [],
-        );
+          } else {
+            const parent = lastParentOfLevel.get(level);
+            if (parent) {
+              parent.subitems.push(item);
+            } else {
+              arr.push(item);
+            }
+          }
+          lastItem = item;
+          lastLevel = level;
+          lastIndent = indent;
+          lastLevelOfIndent.set(indent, level);
+          return arr;
+        }, []);
       }
     } catch (e) {
       console.warn(e);
@@ -1128,9 +1076,7 @@ class MOBI6 implements Format {
     // get list of all `filepos` references in the book,
     // which will be used to insert anchor elements
     // because only then can they be referenced in the DOM
-    this.#fileposList = [
-      ...new Set(Array.from(str.matchAll(fileposRegex), (m) => m[1])),
-    ]
+    this.#fileposList = [...new Set(Array.from(str.matchAll(fileposRegex), (m) => m[1]))]
       .map((filepos) => ({ filepos, number: Number(filepos) }))
       .sort((a, b) => a.number - b.number);
 
@@ -1174,20 +1120,16 @@ class MOBI6 implements Format {
       }
     }
 
-    for (const media of Array.from(
-      document.querySelectorAll("[mediarecindex]"),
-    )) {
+    for (const media of Array.from(document.querySelectorAll("[mediarecindex]"))) {
       const mediaRecIndex = Number(media.getAttribute("mediarecindex"));
       const recIndex = Number(media.getAttribute("recindex"));
 
       try {
-        (media as HTMLMediaElement).src =
-          await this.loadRecIndex(mediaRecIndex);
+        (media as HTMLMediaElement).src = await this.loadRecIndex(mediaRecIndex);
 
         if (recIndex) {
           // @ts-ignore
-          (media as HTMLMediaElement).poster =
-            await this.loadRecIndex(recIndex);
+          (media as HTMLMediaElement).poster = await this.loadRecIndex(recIndex);
         }
       } catch {
         console.warn(`Failed to load media ${mediaRecIndex}`);
@@ -1266,8 +1208,7 @@ class MOBI6 implements Format {
     const filepos = href.match(/filepos:(.*)/)[1];
     const number = Number(filepos);
     const index = this.#sections.findIndex((section) => section.end > number);
-    const anchor = (document: Document) =>
-      document.getElementById(`filepos${filepos}`);
+    const anchor = (document: Document) => document.getElementById(`filepos${filepos}`);
 
     return { index, anchor };
   }
@@ -1299,8 +1240,7 @@ class MOBI6 implements Format {
 }
 
 // handlers for `kindle:` uris
-const kindleResourceRegex =
-  /kindle:(flow|embed):(\w+)(?:\?mime=(\w+\/[-+.\w]+))?/;
+const kindleResourceRegex = /kindle:(flow|embed):(\w+)(?:\?mime=(\w+\/[-+.\w]+))?/;
 const kindlePosRegex = /kindle:pos:fid:(\w+):off:(\w+)/;
 
 function parseResourceURI(uri: string) {
@@ -1312,10 +1252,7 @@ function parseResourceURI(uri: string) {
 function parsePosURI(uri: string) {
   const [fid, off] = uri.match(kindlePosRegex)!.slice(1);
 
-  return {
-    fid: parseInt(fid, 32),
-    off: parseInt(off, 32),
-  };
+  return { fid: parseInt(fid, 32), off: parseInt(off, 32) };
 }
 
 function makePosURI(fid = 0, off = 0) {
@@ -1361,17 +1298,11 @@ async function replaceSeries(
 
 const getPageSpread = (properties: string[]) => {
   for (const property of properties) {
-    if (
-      property === "page-spread-left" ||
-      property === "rendition:page-spread-left"
-    ) {
+    if (property === "page-spread-left" || property === "rendition:page-spread-left") {
       return "left";
     }
 
-    if (
-      property === "page-spread-right" ||
-      property === "rendition:page-spread-right"
-    ) {
+    if (property === "page-spread-right" || property === "rendition:page-spread-right") {
       return "right";
     }
 
@@ -1382,13 +1313,7 @@ const getPageSpread = (properties: string[]) => {
 };
 
 type Kf8Section = {
-  skel: {
-    index: number;
-    name: string;
-    numFrag: number;
-    offset: number;
-    length: number;
-  };
+  skel: { index: number; name: string; numFrag: number; offset: number; length: number };
   frags: {
     insertOffset: number;
     selector: string;
@@ -1411,13 +1336,7 @@ class KF8 implements Format {
   #fragmentSelectors = new Map();
   #tables!: {
     fdstTable: (readonly [number, number])[];
-    skelTable: {
-      index: number;
-      name: string;
-      numFrag: number;
-      offset: number;
-      length: number;
-    }[];
+    skelTable: { index: number; name: string; numFrag: number; offset: number; length: number }[];
     fragTable: {
       insertOffset: number;
       selector: string;
@@ -1462,15 +1381,15 @@ class KF8 implements Format {
       this.#fullRawLength = fdstTable[fdstTable.length - 1][1];
     } catch {}
 
-    const skelTable = (
-      await getIndexData(Number(kf8.skel), loadRecord)
-    ).table.map(({ name, tagMap }, index) => ({
-      index,
-      name,
-      numFrag: tagMap[1][0],
-      offset: tagMap[6][0],
-      length: tagMap[6][1],
-    }));
+    const skelTable = (await getIndexData(Number(kf8.skel), loadRecord)).table.map(
+      ({ name, tagMap }, index) => ({
+        index,
+        name,
+        numFrag: tagMap[1][0],
+        offset: tagMap[6][0],
+        length: tagMap[6][1],
+      }),
+    );
     const fragData = await getIndexData(kf8.frag, loadRecord);
     const fragTable = fragData.table.map(({ name, tagMap }) => ({
       insertOffset: parseInt(name),
@@ -1487,8 +1406,7 @@ class KF8 implements Format {
       const fragStart = last?.fragEnd ?? 0,
         fragEnd = fragStart + skel.numFrag;
       const frags = fragTable.slice(fragStart, fragEnd);
-      const length =
-        skel.length + frags.map((f) => f.length).reduce((a, b) => a + b);
+      const length = skel.length + frags.map((f) => f.length).reduce((a, b) => a + b);
       const totalLength = (last?.totalLength ?? 0) + length;
       return arr.concat({ skel, frags, fragEnd, length, totalLength });
     }, []);
@@ -1505,10 +1423,7 @@ class KF8 implements Format {
       const opf = this.#parser.parseFromString(xmlStr, MIME.XML);
       for (const $itemref of opf.querySelectorAll("spine > itemref")) {
         const i = parseInt($itemref.getAttribute("skelid"));
-        pageSpreads.set(
-          i,
-          getPageSpread($itemref.getAttribute("properties")?.split(" ") ?? []),
-        );
+        pageSpreads.set(i, getPageSpread($itemref.getAttribute("properties")?.split(" ") ?? []));
       }
     }
 
@@ -1535,11 +1450,7 @@ class KF8 implements Format {
         } else {
           this.#fragmentOffsets.set(fid, [off]);
         }
-        return {
-          label: unescapeHTML(label),
-          href,
-          subitems: children?.map(map),
-        };
+        return { label: unescapeHTML(label), href, subitems: children?.map(map) };
       };
       this.toc = ncx?.map(map);
       this.landmarks = await this.getGuide();
@@ -1600,14 +1511,11 @@ class KF8 implements Format {
   async loadResourceBlob(str: string) {
     const { resourceType, id, type } = parseResourceURI(str);
     const raw =
-      resourceType === "flow"
-        ? await this.loadFlow(id)
-        : await this.mobi.loadResource(id - 1);
+      resourceType === "flow" ? await this.loadFlow(id) : await this.mobi.loadResource(id - 1);
     const result = [MIME.XHTML, MIME.HTML, MIME.CSS, MIME.SVG].includes(type)
       ? await this.replaceResources(this.mobi.decode(raw))
       : raw;
-    const doc =
-      type === MIME.SVG ? this.#parser.parseFromString(result, type) : null;
+    const doc = type === MIME.SVG ? this.#parser.parseFromString(result, type) : null;
 
     return [
       new Blob([result], { type }),
@@ -1650,9 +1558,7 @@ class KF8 implements Format {
     // required offsets; at worst you'd have to load half the book at once
     const distanceHead = end - this.#rawHead.length;
     const distanceEnd =
-      this.#fullRawLength == null
-        ? Infinity
-        : this.#fullRawLength - this.#rawTail.length - start;
+      this.#fullRawLength == null ? Infinity : this.#fullRawLength - this.#rawTail.length - start;
     // load from the start
     if (distanceHead < 0 || distanceHead < distanceEnd) {
       while (this.#rawHead.length < end) {
@@ -1664,8 +1570,7 @@ class KF8 implements Format {
     }
     // load from the end
     while (this.#fullRawLength - this.#rawTail.length > start) {
-      const index =
-        this.mobi.headers.palmdoc.numTextRecords - 1 - ++this.#lastLoadedTail;
+      const index = this.mobi.headers.palmdoc.numTextRecords - 1 - ++this.#lastLoadedTail;
       const data = await this.mobi.loadText(index);
       this.#rawTail = concatTypedArrays(data, this.#rawTail);
     }
@@ -1725,18 +1630,13 @@ class KF8 implements Format {
     // By default, the type is XHTML; change to HTML if it's not valid XHTML
     let document = this.#parser.parseFromString(replaced, this.type);
 
-    if (
-      document.querySelector("parsererror") ||
-      !document.documentElement?.namespaceURI
-    ) {
+    if (document.querySelector("parsererror") || !document.documentElement?.namespaceURI) {
       this.type = "text/html";
       document = this.#parser.parseFromString(replaced, this.type);
     }
 
     for (const [url, node] of this.#inlineMap) {
-      const elements = Array.from(
-        document.querySelectorAll(`img[src="${url}"]`),
-      );
+      const elements = Array.from(document.querySelectorAll(`img[src="${url}"]`));
 
       for (const element of elements) {
         element.replaceWith(node);
@@ -1744,9 +1644,7 @@ class KF8 implements Format {
     }
 
     const url = URL.createObjectURL(
-      new Blob([this.serializer.serializeToString(document)], {
-        type: this.type,
-      }),
+      new Blob([this.serializer.serializeToString(document)], { type: this.type }),
     );
     this.#cache.set(section, url);
 
@@ -1754,9 +1652,7 @@ class KF8 implements Format {
   }
 
   getIndexByFID(fid: number) {
-    return this.#sections.findIndex(({ frags }) =>
-      frags.some(({ index }) => index === fid),
-    );
+    return this.#sections.findIndex(({ frags }) => frags.some(({ index }) => index === fid));
   }
 
   async resolveHref(href: string) {
@@ -1770,10 +1666,7 @@ class KF8 implements Format {
     const saved = this.#fragmentSelectors.get(fid)?.get(off);
 
     if (saved) {
-      return {
-        index,
-        anchor: (document: Document) => document.querySelector(saved),
-      };
+      return { index, anchor: (document: Document) => document.querySelector(saved) };
     }
 
     const { skel, frags } = this.#sections[index];

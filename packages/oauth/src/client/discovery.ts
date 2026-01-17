@@ -106,23 +106,17 @@ async function fetchMetadata(
 
     response = await fetchFn(url.toString(), {
       method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
+      headers: { Accept: "application/json" },
       signal: controller.signal,
     });
 
     clearTimeout(timeoutId);
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
-      throw new DiscoveryError(`Request to ${url} timed out after ${timeout}ms`, {
-        cause: error,
-      });
+      throw new DiscoveryError(`Request to ${url} timed out after ${timeout}ms`, { cause: error });
     }
 
-    throw new NetworkError(`Failed to fetch server metadata from ${url}`, {
-      cause: error,
-    });
+    throw new NetworkError(`Failed to fetch server metadata from ${url}`, { cause: error });
   }
 
   if (!response.ok) {
@@ -148,14 +142,10 @@ async function fetchMetadata(
 /**
  * Validate server metadata
  */
-function validateMetadata(
-  metadata: AuthorizationServerMetadata,
-  expectedIssuer: string,
-): void {
+function validateMetadata(metadata: AuthorizationServerMetadata, expectedIssuer: string): void {
   // Validate issuer (must match exactly per RFC 8414 Section 3.3)
-  const metadataIssuer = typeof metadata.issuer === "string"
-    ? metadata.issuer
-    : metadata.issuer?.toString();
+  const metadataIssuer =
+    typeof metadata.issuer === "string" ? metadata.issuer : metadata.issuer?.toString();
 
   if (!metadataIssuer) {
     throw new DiscoveryError("Server metadata is missing required 'issuer' field");
@@ -177,10 +167,7 @@ function validateMetadata(
   }
 
   // Validate required response_types_supported
-  if (
-    !metadata.response_types_supported ||
-    !Array.isArray(metadata.response_types_supported)
-  ) {
+  if (!metadata.response_types_supported || !Array.isArray(metadata.response_types_supported)) {
     throw new DiscoveryError(
       "Server metadata is missing required 'response_types_supported' field",
     );
@@ -226,9 +213,7 @@ export function getAuthorizationEndpoint(
   const endpoint = resolveEndpoint(metadata.authorization_endpoint, issuer);
 
   if (!endpoint) {
-    throw new DiscoveryError(
-      "Server metadata does not include an authorization endpoint",
-    );
+    throw new DiscoveryError("Server metadata does not include an authorization endpoint");
   }
 
   return endpoint;
@@ -237,10 +222,7 @@ export function getAuthorizationEndpoint(
 /**
  * Get the token endpoint URL from server metadata
  */
-export function getTokenEndpoint(
-  metadata: AuthorizationServerMetadata,
-  issuer: string | URL,
-): URL {
+export function getTokenEndpoint(metadata: AuthorizationServerMetadata, issuer: string | URL): URL {
   const endpoint = resolveEndpoint(metadata.token_endpoint, issuer);
 
   if (!endpoint) {
@@ -260,9 +242,7 @@ export function getDeviceAuthorizationEndpoint(
   const endpoint = resolveEndpoint(metadata.device_authorization_endpoint, issuer);
 
   if (!endpoint) {
-    throw new DiscoveryError(
-      "Server metadata does not include a device authorization endpoint",
-    );
+    throw new DiscoveryError("Server metadata does not include a device authorization endpoint");
   }
 
   return endpoint;
@@ -275,10 +255,7 @@ export function getPushedAuthorizationRequestEndpoint(
   metadata: AuthorizationServerMetadata,
   issuer: string | URL,
 ): URL {
-  const endpoint = resolveEndpoint(
-    metadata.pushed_authorization_request_endpoint,
-    issuer,
-  );
+  const endpoint = resolveEndpoint(metadata.pushed_authorization_request_endpoint, issuer);
 
   if (!endpoint) {
     throw new DiscoveryError(

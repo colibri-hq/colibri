@@ -13,20 +13,12 @@ const PROTOCOL_VERSION = "2025-03-26";
 /**
  * Server information
  */
-const SERVER_INFO = {
-  name: "colibri-docs",
-  version: "1.0.0",
-};
+const SERVER_INFO = { name: "colibri-docs", version: "1.0.0" };
 
 /**
  * Server capabilities - we only support resources (read-only documentation)
  */
-const CAPABILITIES = {
-  resources: {
-    subscribe: false,
-    listChanged: false,
-  },
-};
+const CAPABILITIES = { resources: { subscribe: false, listChanged: false } };
 
 /**
  * JSON-RPC error codes
@@ -51,11 +43,7 @@ type JsonRpcResponse = {
   jsonrpc: "2.0";
   id: string | number | null;
   result?: unknown;
-  error?: {
-    code: number;
-    message: string;
-    data?: unknown;
-  };
+  error?: { code: number; message: string; data?: unknown };
 };
 
 /**
@@ -81,20 +69,13 @@ function errorResponse(
  * Handle the initialize method
  */
 function handleInitialize(): unknown {
-  return {
-    protocolVersion: PROTOCOL_VERSION,
-    capabilities: CAPABILITIES,
-    serverInfo: SERVER_INFO,
-  };
+  return { protocolVersion: PROTOCOL_VERSION, capabilities: CAPABILITIES, serverInfo: SERVER_INFO };
 }
 
 /**
  * Handle the resources/list method by fetching prerendered data
  */
-async function handleResourcesList(
-  fetchFn: typeof fetch,
-  origin: string,
-): Promise<unknown> {
+async function handleResourcesList(fetchFn: typeof fetch, origin: string): Promise<unknown> {
   const response = await fetchFn(`${origin}/mcp/data/resources.json`);
   if (!response.ok) {
     throw new Error(`Failed to fetch resources: ${response.status}`);
@@ -111,10 +92,7 @@ async function handleResourcesRead(
   params: Record<string, unknown> | undefined,
 ): Promise<unknown> {
   if (!params?.uri || typeof params.uri !== "string") {
-    throw {
-      code: ErrorCodes.InvalidParams,
-      message: "Missing or invalid 'uri' parameter",
-    };
+    throw { code: ErrorCodes.InvalidParams, message: "Missing or invalid 'uri' parameter" };
   }
 
   const uri = params.uri as string;
@@ -134,10 +112,7 @@ async function handleResourcesRead(
   const response = await fetchFn(`${origin}/mcp/data/content/${slug}.json`);
   if (!response.ok) {
     if (response.status === 404) {
-      throw {
-        code: ErrorCodes.ResourceNotFound,
-        message: `Resource not found: ${uri}`,
-      };
+      throw { code: ErrorCodes.ResourceNotFound, message: `Resource not found: ${uri}` };
     }
     throw new Error(`Failed to fetch resource: ${response.status}`);
   }
@@ -155,9 +130,7 @@ export const POST: RequestHandler = async ({ request, fetch, url }) => {
   try {
     requestBody = await request.json();
   } catch {
-    return json(
-      errorResponse(null, ErrorCodes.ParseError, "Parse error: Invalid JSON"),
-    );
+    return json(errorResponse(null, ErrorCodes.ParseError, "Parse error: Invalid JSON"));
   }
 
   // Validate JSON-RPC request structure
@@ -167,11 +140,7 @@ export const POST: RequestHandler = async ({ request, fetch, url }) => {
     requestBody.id === undefined
   ) {
     return json(
-      errorResponse(
-        requestBody?.id ?? null,
-        ErrorCodes.InvalidRequest,
-        "Invalid JSON-RPC request",
-      ),
+      errorResponse(requestBody?.id ?? null, ErrorCodes.InvalidRequest, "Invalid JSON-RPC request"),
     );
   }
 
@@ -203,20 +172,10 @@ export const POST: RequestHandler = async ({ request, fetch, url }) => {
         break;
 
       default:
-        return json(
-          errorResponse(
-            id,
-            ErrorCodes.MethodNotFound,
-            `Method not found: ${method}`,
-          ),
-        );
+        return json(errorResponse(id, ErrorCodes.MethodNotFound, `Method not found: ${method}`));
     }
 
-    return json(success(id, result), {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    return json(success(id, result), { headers: { "Content-Type": "application/json" } });
   } catch (err) {
     // Handle typed errors with code
     if (err && typeof err === "object" && "code" in err && "message" in err) {
@@ -244,8 +203,7 @@ export const OPTIONS: RequestHandler = async () => {
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers":
-        "Content-Type, MCP-Protocol-Version, MCP-Session-Id",
+      "Access-Control-Allow-Headers": "Content-Type, MCP-Protocol-Version, MCP-Session-Id",
       "Access-Control-Max-Age": "86400",
     },
   });

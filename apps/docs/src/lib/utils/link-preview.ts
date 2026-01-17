@@ -1,4 +1,4 @@
-import { getPage, getBreadcrumbs, normalizeSlug } from '$lib/content/content';
+import { getPage, getBreadcrumbs, normalizeSlug } from "$lib/content/content";
 
 export type LinkPreviewData = {
   title: string;
@@ -15,19 +15,17 @@ export function isInternalDocLink(href: string): boolean {
   if (!href) return false;
 
   // Anchor-only links are not previewable
-  if (href.startsWith('#')) return false;
+  if (href.startsWith("#")) return false;
 
   // Protocol links (mailto:, tel:, etc.) are external
-  if (href.includes(':') && !href.startsWith('http')) return false;
+  if (href.includes(":") && !href.startsWith("http")) return false;
 
   // Absolute URLs - check if they're to the docs domain
-  if (href.startsWith('http://') || href.startsWith('https://')) {
+  if (href.startsWith("http://") || href.startsWith("https://")) {
     try {
       const url = new URL(href);
       // Consider localhost and colibri domains as internal
-      const isInternal =
-        url.hostname === 'localhost' ||
-        url.hostname.includes('colibri');
+      const isInternal = url.hostname === "localhost" || url.hostname.includes("colibri");
       return isInternal;
     } catch {
       return false;
@@ -44,11 +42,11 @@ export function isInternalDocLink(href: string): boolean {
  */
 export function getLinkPreviewData(href: string): LinkPreviewData | null {
   // Remove anchor from href
-  const hrefWithoutAnchor = href.split('#')[0] ?? href;
+  const hrefWithoutAnchor = href.split("#")[0] ?? href;
 
   // Handle absolute URLs by extracting pathname
   let slug = hrefWithoutAnchor;
-  if (slug.startsWith('http://') || slug.startsWith('https://')) {
+  if (slug.startsWith("http://") || slug.startsWith("https://")) {
     try {
       const url = new URL(slug);
       slug = url.pathname;

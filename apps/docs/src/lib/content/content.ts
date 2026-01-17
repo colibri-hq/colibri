@@ -37,12 +37,7 @@ export class Page {
  * Uses discriminator property to avoid instanceof issues across module boundaries.
  */
 export function isPage(item: unknown): item is Page {
-  return (
-    typeof item === "object" &&
-    item !== null &&
-    "__type" in item &&
-    item.__type === "Page"
-  );
+  return typeof item === "object" && item !== null && "__type" in item && item.__type === "Page";
 }
 
 /**
@@ -51,10 +46,7 @@ export function isPage(item: unknown): item is Page {
  */
 export function isDirectory(item: unknown): item is Directory {
   return (
-    typeof item === "object" &&
-    item !== null &&
-    "__type" in item &&
-    item.__type === "Directory"
+    typeof item === "object" && item !== null && "__type" in item && item.__type === "Directory"
   );
 }
 
@@ -98,9 +90,7 @@ export class Directory {
 }
 
 // Eager-load all Markdown files at build/initialization time
-const paths = import.meta.glob<PageModule>("$content/**/*.md", {
-  eager: true,
-});
+const paths = import.meta.glob<PageModule>("$content/**/*.md", { eager: true });
 const rawFiles = import.meta.glob<string>("$content/**/*.md", {
   eager: true,
   query: "?raw",
@@ -111,9 +101,7 @@ const cache: Map<string, Page> = new Map();
 
 for (const [path, item] of Object.entries(paths)) {
   let slug = (
-    path.startsWith(CONTENT_ROOT_DIR)
-      ? path.slice(CONTENT_ROOT_DIR.length)
-      : path
+    path.startsWith(CONTENT_ROOT_DIR) ? path.slice(CONTENT_ROOT_DIR.length) : path
   ).replace(".md", "");
 
   const isIndexPage = slug.endsWith("/index") || slug.endsWith("/overview");
@@ -122,27 +110,15 @@ for (const [path, item] of Object.entries(paths)) {
     slug = slug.replace(/\/(index|overview)$/, "");
   }
 
-  if (
-    !item ||
-    typeof item !== "object" ||
-    !("metadata" in item) ||
-    !("default" in item) ||
-    !slug
-  ) {
+  if (!item || typeof item !== "object" || !("metadata" in item) || !("default" in item) || !slug) {
     continue;
   }
 
   if (!item.metadata?.draft) {
     const rawContent = rawFiles[path];
-    const readingTime = rawContent
-      ? calculateReadingTime(rawContent)
-      : undefined;
+    const readingTime = rawContent ? calculateReadingTime(rawContent) : undefined;
 
-    const metadata: PageMetadata = {
-      ...item.metadata,
-      slug,
-      readingTime,
-    };
+    const metadata: PageMetadata = { ...item.metadata, slug, readingTime };
 
     cache.set(slug, new Page(slug, metadata, item.default, isIndexPage));
   }
@@ -165,9 +141,7 @@ function buildContentTree(): (Page | Directory)[] {
   const root: Map<string, BuilderNode> = new Map();
   const topLevelPages: Page[] = [];
 
-  function ensureNode(
-    segments: string[] | [string, ...string[]],
-  ): BuilderNode | undefined {
+  function ensureNode(segments: string[] | [string, ...string[]]): BuilderNode | undefined {
     if (segments.length === 0) {
       return undefined;
     }
@@ -176,12 +150,7 @@ function buildContentTree(): (Page | Directory)[] {
     let node = root.get(first);
 
     if (!node) {
-      node = {
-        name: first,
-        slug: `/${first}`,
-        pages: [],
-        subDirectories: new Map(),
-      };
+      node = { name: first, slug: `/${first}`, pages: [], subDirectories: new Map() };
       root.set(first, node);
     }
 
@@ -262,18 +231,14 @@ function buildContentTree(): (Page | Directory)[] {
 
   function getTitle(item: Page | Directory): string {
     if (item instanceof Page) {
-      return (
-        item.metadata.title ?? formatTitle(item.slug.split("/").pop() ?? "")
-      );
+      return item.metadata.title ?? formatTitle(item.slug.split("/").pop() ?? "");
     }
 
     return item.title;
   }
 
   function toDirectory(node: BuilderNode): Directory {
-    const subDirectories = Array.from(node.subDirectories.values()).map(
-      toDirectory,
-    );
+    const subDirectories = Array.from(node.subDirectories.values()).map(toDirectory);
     const children = [...node.pages, ...subDirectories].toSorted((a, b) => {
       const orderA = getOrder(a);
       const orderB = getOrder(b);
@@ -457,10 +422,7 @@ function buildParentCache(): Map<string, ParentInfo> {
     const parentDir = directoryMap.get(parentPath);
 
     if (parentDir) {
-      cache.set(page.slug, {
-        title: parentDir.title,
-        href: parentDir.slug,
-      });
+      cache.set(page.slug, { title: parentDir.title, href: parentDir.slug });
     } else {
       const lastSegment = parentSegments[parentSegments.length - 1];
 
@@ -540,19 +502,13 @@ export function getSiblingPages(slug: string): SiblingPages {
   if (currentIndex > 0) {
     const prev = pages[currentIndex - 1]!;
 
-    result.previous = {
-      title: prev.metadata.title,
-      href: prev.slug,
-    };
+    result.previous = { title: prev.metadata.title, href: prev.slug };
   }
 
   if (currentIndex < pages.length - 1) {
     const next = pages[currentIndex + 1]!;
 
-    result.next = {
-      title: next.metadata.title,
-      href: next.slug,
-    };
+    result.next = { title: next.metadata.title, href: next.slug };
   }
 
   return result;
@@ -624,10 +580,7 @@ export type TocHeading = {
   level: number;
 };
 
-type PageModule = {
-  metadata: PageMetadata;
-  default: Component;
-};
+type PageModule = { metadata: PageMetadata; default: Component };
 
 export type PageMetadata = {
   title: string;
@@ -647,25 +600,13 @@ export type PageMetadata = {
   headings?: TocHeading[];
 };
 
-export type ParentInfo = {
-  title: string;
-  href: string;
-};
+export type ParentInfo = { title: string; href: string };
 
-export type SiblingInfo = {
-  title: string;
-  href: string;
-};
+export type SiblingInfo = { title: string; href: string };
 
-export type SiblingPages = {
-  previous?: SiblingInfo;
-  next?: SiblingInfo;
-};
+export type SiblingPages = { previous?: SiblingInfo; next?: SiblingInfo };
 
-export type BreadcrumbItem = {
-  title: string;
-  href: string;
-};
+export type BreadcrumbItem = { title: string; href: string };
 
 type BuilderNode = {
   name: string;

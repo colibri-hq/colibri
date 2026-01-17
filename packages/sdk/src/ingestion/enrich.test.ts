@@ -1,15 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { enrichMetadata } from "./enrich.js";
-import type { ExtractedMetadata } from "./types.js";
 import type { MetadataRecord } from "../metadata/provider.js";
+import type { ExtractedMetadata } from "./types.js";
 import { globalProviderRegistry } from "../metadata/registry.js";
+import { enrichMetadata } from "./enrich.js";
 
 // Mock the provider registry
 vi.mock("../metadata/registry.js", () => ({
-  globalProviderRegistry: {
-    getProvider: vi.fn(),
-    getEnabledProviders: vi.fn(),
-  },
+  globalProviderRegistry: { getProvider: vi.fn(), getEnabledProviders: vi.fn() },
 }));
 
 describe("enrichMetadata", () => {
@@ -22,9 +19,7 @@ describe("enrichMetadata", () => {
 
     const metadata: ExtractedMetadata = {
       title: "Test Book",
-      contributors: [
-        { name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" },
-      ],
+      contributors: [{ name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" }],
     };
 
     const result = await enrichMetadata(metadata);
@@ -37,23 +32,23 @@ describe("enrichMetadata", () => {
   it("should search by ISBN if available", async () => {
     const mockProvider = {
       name: "TestProvider",
-      searchByISBN: vi.fn().mockResolvedValue([
-        {
-          id: "test-1",
-          source: "TestProvider",
-          confidence: 0.9,
-          timestamp: new Date(),
-          title: "Enriched Title",
-          authors: ["Enriched Author"],
-          description: "Enriched description",
-        } as MetadataRecord,
-      ]),
+      searchByISBN: vi
+        .fn()
+        .mockResolvedValue([
+          {
+            id: "test-1",
+            source: "TestProvider",
+            confidence: 0.9,
+            timestamp: new Date(),
+            title: "Enriched Title",
+            authors: ["Enriched Author"],
+            description: "Enriched description",
+          } as MetadataRecord,
+        ]),
       searchMultiCriteria: vi.fn().mockResolvedValue([]),
     };
 
-    vi.mocked(globalProviderRegistry.getEnabledProviders).mockReturnValue([
-      mockProvider as any,
-    ]);
+    vi.mocked(globalProviderRegistry.getEnabledProviders).mockReturnValue([mockProvider as any]);
 
     const metadata: ExtractedMetadata = {
       title: "Test Book",
@@ -71,36 +66,31 @@ describe("enrichMetadata", () => {
     const mockProvider = {
       name: "TestProvider",
       searchByISBN: vi.fn().mockResolvedValue([]),
-      searchMultiCriteria: vi.fn().mockResolvedValue([
-        {
-          id: "test-1",
-          source: "TestProvider",
-          confidence: 0.85,
-          timestamp: new Date(),
-          title: "Found Title",
-          authors: ["Found Author"],
-        } as MetadataRecord,
-      ]),
+      searchMultiCriteria: vi
+        .fn()
+        .mockResolvedValue([
+          {
+            id: "test-1",
+            source: "TestProvider",
+            confidence: 0.85,
+            timestamp: new Date(),
+            title: "Found Title",
+            authors: ["Found Author"],
+          } as MetadataRecord,
+        ]),
     };
 
-    vi.mocked(globalProviderRegistry.getEnabledProviders).mockReturnValue([
-      mockProvider as any,
-    ]);
+    vi.mocked(globalProviderRegistry.getEnabledProviders).mockReturnValue([mockProvider as any]);
 
     const metadata: ExtractedMetadata = {
       title: "Test Book",
-      contributors: [
-        { name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" },
-      ],
+      contributors: [{ name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" }],
     };
 
     const result = await enrichMetadata(metadata, { fillMissingOnly: false });
 
     expect(mockProvider.searchMultiCriteria).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: "Test Book",
-        authors: ["Test Author"],
-      }),
+      expect.objectContaining({ title: "Test Book", authors: ["Test Author"] }),
     );
     expect(result.enriched.title).toBe("Found Title");
   });
@@ -109,21 +99,21 @@ describe("enrichMetadata", () => {
     const mockProvider = {
       name: "TestProvider",
       searchByISBN: vi.fn().mockResolvedValue([]),
-      searchMultiCriteria: vi.fn().mockResolvedValue([
-        {
-          id: "test-1",
-          source: "TestProvider",
-          confidence: 0.9,
-          timestamp: new Date(),
-          title: "New Title",
-          description: "New Description",
-        } as MetadataRecord,
-      ]),
+      searchMultiCriteria: vi
+        .fn()
+        .mockResolvedValue([
+          {
+            id: "test-1",
+            source: "TestProvider",
+            confidence: 0.9,
+            timestamp: new Date(),
+            title: "New Title",
+            description: "New Description",
+          } as MetadataRecord,
+        ]),
     };
 
-    vi.mocked(globalProviderRegistry.getEnabledProviders).mockReturnValue([
-      mockProvider as any,
-    ]);
+    vi.mocked(globalProviderRegistry.getEnabledProviders).mockReturnValue([mockProvider as any]);
 
     const metadata: ExtractedMetadata = {
       title: "Existing Title",
@@ -153,18 +143,11 @@ describe("enrichMetadata", () => {
       ]),
     };
 
-    vi.mocked(globalProviderRegistry.getEnabledProviders).mockReturnValue([
-      mockProvider as any,
-    ]);
+    vi.mocked(globalProviderRegistry.getEnabledProviders).mockReturnValue([mockProvider as any]);
 
-    const metadata: ExtractedMetadata = {
-      title: undefined,
-    };
+    const metadata: ExtractedMetadata = { title: undefined };
 
-    const result = await enrichMetadata(metadata, {
-      fillMissingOnly: true,
-      minConfidence: 0.7,
-    });
+    const result = await enrichMetadata(metadata, { fillMissingOnly: true, minConfidence: 0.7 });
 
     // Should not enrich because confidence is below threshold
     expect(result.enriched.title).toBeUndefined();
@@ -174,16 +157,18 @@ describe("enrichMetadata", () => {
     const provider1 = {
       name: "Provider1",
       searchByISBN: vi.fn().mockResolvedValue([]),
-      searchMultiCriteria: vi.fn().mockResolvedValue([
-        {
-          id: "p1-1",
-          source: "Provider1",
-          confidence: 0.8,
-          timestamp: new Date(),
-          title: "Title from Provider 1",
-          description: "Description from Provider 1",
-        } as MetadataRecord,
-      ]),
+      searchMultiCriteria: vi
+        .fn()
+        .mockResolvedValue([
+          {
+            id: "p1-1",
+            source: "Provider1",
+            confidence: 0.8,
+            timestamp: new Date(),
+            title: "Title from Provider 1",
+            description: "Description from Provider 1",
+          } as MetadataRecord,
+        ]),
     };
 
     const provider2 = {
@@ -208,9 +193,7 @@ describe("enrichMetadata", () => {
 
     const metadata: ExtractedMetadata = {
       title: "Search Query",
-      contributors: [
-        { name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" },
-      ],
+      contributors: [{ name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" }],
     };
 
     const result = await enrichMetadata(metadata, { fillMissingOnly: false });
@@ -230,23 +213,23 @@ describe("enrichMetadata", () => {
     const failingProvider = {
       name: "FailingProvider",
       searchByISBN: vi.fn().mockRejectedValue(new Error("Network error")),
-      searchMultiCriteria: vi
-        .fn()
-        .mockRejectedValue(new Error("Network error")),
+      searchMultiCriteria: vi.fn().mockRejectedValue(new Error("Network error")),
     };
 
     const workingProvider = {
       name: "WorkingProvider",
       searchByISBN: vi.fn().mockResolvedValue([]),
-      searchMultiCriteria: vi.fn().mockResolvedValue([
-        {
-          id: "working-1",
-          source: "WorkingProvider",
-          confidence: 0.9,
-          timestamp: new Date(),
-          title: "Working Title",
-        } as MetadataRecord,
-      ]),
+      searchMultiCriteria: vi
+        .fn()
+        .mockResolvedValue([
+          {
+            id: "working-1",
+            source: "WorkingProvider",
+            confidence: 0.9,
+            timestamp: new Date(),
+            title: "Working Title",
+          } as MetadataRecord,
+        ]),
     };
 
     vi.mocked(globalProviderRegistry.getEnabledProviders).mockReturnValue([
@@ -256,9 +239,7 @@ describe("enrichMetadata", () => {
 
     const metadata: ExtractedMetadata = {
       title: "Search Query",
-      contributors: [
-        { name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" },
-      ],
+      contributors: [{ name: "Test Author", roles: ["aut"], sortingKey: "Author, Test" }],
     };
 
     const result = await enrichMetadata(metadata, { fillMissingOnly: false });
@@ -274,15 +255,11 @@ describe("enrichMetadata", () => {
       name: "SlowProvider",
       searchByISBN: vi
         .fn()
-        .mockImplementation(
-          () => new Promise((resolve) => setTimeout(() => resolve([]), 5000)),
-        ),
+        .mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve([]), 5000))),
       searchMultiCriteria: vi.fn().mockResolvedValue([]),
     };
 
-    vi.mocked(globalProviderRegistry.getEnabledProviders).mockReturnValue([
-      slowProvider as any,
-    ]);
+    vi.mocked(globalProviderRegistry.getEnabledProviders).mockReturnValue([slowProvider as any]);
 
     const metadata: ExtractedMetadata = {
       title: "Test",
@@ -318,14 +295,9 @@ describe("enrichMetadata", () => {
       ]),
     };
 
-    vi.mocked(globalProviderRegistry.getEnabledProviders).mockReturnValue([
-      mockProvider as any,
-    ]);
+    vi.mocked(globalProviderRegistry.getEnabledProviders).mockReturnValue([mockProvider as any]);
 
-    const metadata: ExtractedMetadata = {
-      title: "Test",
-      subjects: undefined,
-    };
+    const metadata: ExtractedMetadata = { title: "Test", subjects: undefined };
 
     const result = await enrichMetadata(metadata, { fillMissingOnly: true });
 
@@ -340,64 +312,59 @@ describe("enrichMetadata", () => {
     const mockProvider = {
       name: "TestProvider",
       searchByISBN: vi.fn().mockResolvedValue([]),
-      searchMultiCriteria: vi.fn().mockResolvedValue([
-        {
-          id: "test-1",
-          source: "TestProvider",
-          confidence: 0.9,
-          timestamp: new Date(),
-          series: {
-            name: "The Lord of the Rings",
-            volume: 2,
-          },
-        } as MetadataRecord,
-      ]),
+      searchMultiCriteria: vi
+        .fn()
+        .mockResolvedValue([
+          {
+            id: "test-1",
+            source: "TestProvider",
+            confidence: 0.9,
+            timestamp: new Date(),
+            series: { name: "The Lord of the Rings", volume: 2 },
+          } as MetadataRecord,
+        ]),
     };
 
-    vi.mocked(globalProviderRegistry.getEnabledProviders).mockReturnValue([
-      mockProvider as any,
-    ]);
+    vi.mocked(globalProviderRegistry.getEnabledProviders).mockReturnValue([mockProvider as any]);
 
-    const metadata: ExtractedMetadata = {
-      title: "The Two Towers",
-      series: undefined,
-    };
+    const metadata: ExtractedMetadata = { title: "The Two Towers", series: undefined };
 
     const result = await enrichMetadata(metadata, { fillMissingOnly: true });
 
-    expect(result.enriched.series).toEqual({
-      name: "The Lord of the Rings",
-      position: 2,
-    });
+    expect(result.enriched.series).toEqual({ name: "The Lord of the Rings", position: 2 });
   });
 
   it("should use specific providers when specified", async () => {
     const provider1 = {
       name: "Provider1",
       searchByISBN: vi.fn().mockResolvedValue([]),
-      searchMultiCriteria: vi.fn().mockResolvedValue([
-        {
-          id: "p1-1",
-          source: "Provider1",
-          confidence: 0.9,
-          timestamp: new Date(),
-          title: "Title from Provider 1",
-        } as MetadataRecord,
-      ]),
+      searchMultiCriteria: vi
+        .fn()
+        .mockResolvedValue([
+          {
+            id: "p1-1",
+            source: "Provider1",
+            confidence: 0.9,
+            timestamp: new Date(),
+            title: "Title from Provider 1",
+          } as MetadataRecord,
+        ]),
     };
 
     const provider2 = {
       name: "Provider2",
       searchByISBN: vi.fn().mockResolvedValue([]),
-      searchMultiCriteria: vi.fn().mockResolvedValue([
-        {
-          id: "p2-1",
-          source: "Provider2",
-          confidence: 0.95,
-          timestamp: new Date(),
-          title: "Title from Provider 2",
-        } as MetadataRecord,
-      ]),
+      searchMultiCriteria: vi
+        .fn()
+        .mockResolvedValue([
+          {
+            id: "p2-1",
+            source: "Provider2",
+            confidence: 0.95,
+            timestamp: new Date(),
+            title: "Title from Provider 2",
+          } as MetadataRecord,
+        ]),
     };
 
     vi.mocked(globalProviderRegistry.getProvider).mockImplementation((name) => {
@@ -406,9 +373,7 @@ describe("enrichMetadata", () => {
       return undefined;
     });
 
-    const metadata: ExtractedMetadata = {
-      title: "Search Query",
-    };
+    const metadata: ExtractedMetadata = { title: "Search Query" };
 
     const result = await enrichMetadata(metadata, {
       providers: ["Provider1"],

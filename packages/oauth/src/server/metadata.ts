@@ -1,10 +1,7 @@
-import type {
-  AuthorizationServerMetadata,
-  AuthorizationServerOptions,
-} from "../types.js";
+import type { AuthorizationServerMetadata, AuthorizationServerOptions } from "../types.js";
+import { OAuthError } from "../errors.js";
 import { createAuthorizationServer } from "../server.js";
 import { jsonResponse } from "../utilities.js";
-import { OAuthError } from "../errors.js";
 
 /**
  * Authorization Server Metadata Endpoint
@@ -106,21 +103,17 @@ import { OAuthError } from "../errors.js";
  *
  * @see https://datatracker.ietf.org/doc/html/rfc8414#section-3 RFC 8414, Section 3
  */
-export async function handleServerMetadataRequest<
-  T extends AuthorizationServerOptions,
->(
+export async function handleServerMetadataRequest<T extends AuthorizationServerOptions>(
   _request: Request,
   {
     configuration: {
       authorizationEndpoint: authorization_endpoint,
-      authorizationResponseIssParameterSupported:
-        authorization_response_iss_parameter_supported,
+      authorizationResponseIssParameterSupported: authorization_response_iss_parameter_supported,
       codeChallengeMethodsSupported: code_challenge_methods_supported,
       deviceAuthorizationEndpoint: device_authorization_endpoint,
       grantTypesSupported: grant_types_supported,
       introspectionEndpoint: introspection_endpoint,
-      introspectionEndpointAuthMethodsSupported:
-        introspection_endpoint_auth_methods_supported,
+      introspectionEndpointAuthMethodsSupported: introspection_endpoint_auth_methods_supported,
       issuer: issuer,
       jwksUri: jwks_uri,
       opPolicyUri: op_policy_uri,
@@ -131,21 +124,16 @@ export async function handleServerMetadataRequest<
       responseModesSupported: response_modes_supported,
       responseTypesSupported: response_types_supported = [],
       revocationEndpoint: revocation_endpoint,
-      revocationEndpointAuthMethodsSupported:
-        revocation_endpoint_auth_methods_supported,
+      revocationEndpointAuthMethodsSupported: revocation_endpoint_auth_methods_supported,
       serviceDocumentation: service_documentation,
       tokenEndpoint: token_endpoint,
       tokenEndpointAuthMethodsSupported: token_endpoint_auth_methods_supported,
-      tokenEndpointAuthSigningAlgValuesSupported:
-        token_endpoint_auth_signing_alg_values_supported,
+      tokenEndpointAuthSigningAlgValuesSupported: token_endpoint_auth_signing_alg_values_supported,
       uiLocalesSupported: ui_locales_supported,
       userinfoEndpoint: userinfo_endpoint,
     },
     options: { serverMetadata, loadScopes },
-  }: {
-    configuration: Configuration;
-    options: T;
-  },
+  }: { configuration: Configuration; options: T },
 ) {
   if (!serverMetadata) {
     throw new OAuthError(
@@ -184,6 +172,4 @@ export async function handleServerMetadataRequest<
   } satisfies AuthorizationServerMetadata);
 }
 
-type Configuration = ReturnType<
-  typeof createAuthorizationServer
->["configuration"];
+type Configuration = ReturnType<typeof createAuthorizationServer>["configuration"];

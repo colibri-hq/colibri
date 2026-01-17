@@ -87,11 +87,7 @@ export { PhysicalReconciler } from "./physical.js";
 export { ContentReconciler } from "./content.js";
 export { SeriesReconciler } from "./series.js";
 export { WorkReconciler } from "./works.js";
-export type {
-  WorkReconciliationConfig,
-  WorkCluster,
-  EditionComparison,
-} from "./works.js";
+export type { WorkReconciliationConfig, WorkCluster, EditionComparison } from "./works.js";
 
 // Export metadata coordinator and query strategy
 export { MetadataCoordinator } from "./fetch.js";
@@ -122,25 +118,15 @@ export {
 } from "./similarity.js";
 
 // Export duplicate detection
-export {
-  DuplicateDetector,
-  detectDuplicates,
-  DEFAULT_DUPLICATE_CONFIG,
-} from "./duplicates.js";
+export { DuplicateDetector, detectDuplicates, DEFAULT_DUPLICATE_CONFIG } from "./duplicates.js";
 export type { DuplicateDetectorConfig } from "./duplicates.js";
 
 // Export edition selection
-export {
-  EditionSelector,
-  DEFAULT_EDITION_SELECTOR_CONFIG,
-} from "./editions.js";
+export { EditionSelector, DEFAULT_EDITION_SELECTOR_CONFIG } from "./editions.js";
 export type { EditionSelectorConfig } from "./editions.js";
 
 // Export series analysis
-export {
-  SeriesAnalyzer,
-  DEFAULT_SERIES_ANALYZER_CONFIG,
-} from "./series-analysis.js";
+export { SeriesAnalyzer, DEFAULT_SERIES_ANALYZER_CONFIG } from "./series-analysis.js";
 export type { SeriesAnalyzerConfig } from "./series-analysis.js";
 
 // Export preview generator
@@ -158,10 +144,7 @@ export type {
 
 // Export quality assessor
 export { QualityAssessor, DEFAULT_QUALITY_ASSESSOR_CONFIG } from "./quality.js";
-export type {
-  QualityAssessorConfig,
-  LibraryQualityAssessment,
-} from "./quality.js";
+export type { QualityAssessorConfig, LibraryQualityAssessment } from "./quality.js";
 
 // Export recommendation generator
 export {

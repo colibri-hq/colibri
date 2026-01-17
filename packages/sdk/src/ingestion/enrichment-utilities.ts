@@ -2,8 +2,8 @@
  * Utilities for metadata enrichment with robust error handling and timeout management
  */
 
-import { TimeoutError } from "../metadata/timeout-manager.js";
 import type { EnrichmentResult, ExtractedMetadata } from "./types.js";
+import { TimeoutError } from "../metadata/timeout-manager.js";
 
 /**
  * Result of a single provider enrichment attempt
@@ -94,12 +94,7 @@ export async function withTimeoutError<T>(
 
   const timeoutPromise = new Promise<never>((_, reject) => {
     timeoutId = setTimeout(() => {
-      reject(
-        new TimeoutError(
-          errorMessage || `Operation timed out after ${ms}ms`,
-          ms,
-        ),
-      );
+      reject(new TimeoutError(errorMessage || `Operation timed out after ${ms}ms`, ms));
     }, ms);
   });
 
@@ -116,11 +111,7 @@ export async function withTimeoutError<T>(
  * Execute multiple provider queries with individual timeouts and error handling
  */
 export async function executeProviderQueries<T>(
-  queries: Array<{
-    provider: string;
-    query: () => Promise<T>;
-    timeout?: number;
-  }>,
+  queries: Array<{ provider: string; query: () => Promise<T>; timeout?: number }>,
   defaultTimeout: number = 10000,
 ): Promise<ProviderEnrichmentResult[]> {
   const startTime = Date.now();
@@ -165,10 +156,7 @@ export async function executeProviderQueries<T>(
       return {
         provider: "unknown",
         success: false,
-        error:
-          result.reason instanceof Error
-            ? result.reason
-            : new Error(String(result.reason)),
+        error: result.reason instanceof Error ? result.reason : new Error(String(result.reason)),
         duration: Date.now() - startTime,
       };
     }
@@ -179,11 +167,7 @@ export async function executeProviderQueries<T>(
  * Execute provider queries in batches to limit parallelism
  */
 export async function executeProviderQueriesBatched<T>(
-  queries: Array<{
-    provider: string;
-    query: () => Promise<T>;
-    timeout?: number;
-  }>,
+  queries: Array<{ provider: string; query: () => Promise<T>; timeout?: number }>,
   batchSize: number,
   defaultTimeout: number = 10000,
 ): Promise<ProviderEnrichmentResult[]> {
@@ -208,9 +192,7 @@ export async function executeProviderQueriesBatched<T>(
  * - Merge arrays (contributors, subjects, identifiers)
  * - Track which providers contributed to each field
  */
-export function mergeEnrichmentResults(
-  results: ProviderEnrichmentResult[],
-): EnrichmentResult {
+export function mergeEnrichmentResults(results: ProviderEnrichmentResult[]): EnrichmentResult {
   const enriched: Partial<ExtractedMetadata> = {};
   const sources: string[] = [];
   const confidence: Record<string, number> = {};
@@ -232,9 +214,7 @@ export function mergeEnrichmentResults(
   // Helper to merge a field with confidence tracking
   const mergeField = <K extends keyof ExtractedMetadata>(
     field: K,
-    getValue: (
-      metadata: Partial<ExtractedMetadata>,
-    ) => ExtractedMetadata[K] | undefined,
+    getValue: (metadata: Partial<ExtractedMetadata>) => ExtractedMetadata[K] | undefined,
   ) => {
     let bestConfidence = 0;
     let bestValue: ExtractedMetadata[K] | undefined;
@@ -307,9 +287,7 @@ export function mergeEnrichmentResults(
   // Deduplicate identifiers by type+value
   if (allIdentifiers.length > 0) {
     enriched.identifiers = Array.from(
-      new Map(
-        allIdentifiers.map((id) => [`${id.type}:${id.value}`, id]),
-      ).values(),
+      new Map(allIdentifiers.map((id) => [`${id.type}:${id.value}`, id])).values(),
     );
     confidence.identifiers = 0.8; // Higher confidence for identifiers
   }
@@ -372,26 +350,20 @@ export function createEnrichmentSummary(
 } {
   const successful = results.filter((r) => r.success).length;
   const failed = results.filter((r) => !r.success).length;
-  const timeouts = results.filter(
-    (r) => !r.success && r.error instanceof TimeoutError,
-  ).length;
+  const timeouts = results.filter((r) => !r.success && r.error instanceof TimeoutError).length;
 
   const fieldsEnriched = Object.keys(enrichment.enriched).length;
   const confidenceValues = Object.values(enrichment.confidence);
   const averageConfidence =
     confidenceValues.length > 0
-      ? confidenceValues.reduce((sum, c) => sum + c, 0) /
-        confidenceValues.length
+      ? confidenceValues.reduce((sum, c) => sum + c, 0) / confidenceValues.length
       : 0;
 
   const totalDuration = results.reduce((sum, r) => sum + r.duration, 0);
 
   const errors = results
     .filter((r) => !r.success && r.error)
-    .map((r) => ({
-      provider: r.provider,
-      error: r.error!.message,
-    }));
+    .map((r) => ({ provider: r.provider, error: r.error!.message }));
 
   return {
     totalProviders: results.length,

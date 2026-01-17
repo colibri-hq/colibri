@@ -30,9 +30,7 @@ describe("MetadataConfigManager", () => {
 
       expect(config.maxConcurrentQueries).toBe(10);
       expect(config.enableCaching).toBe(false);
-      expect(config.defaultRateLimit).toEqual(
-        DEFAULT_METADATA_CONFIG.defaultRateLimit,
-      );
+      expect(config.defaultRateLimit).toEqual(DEFAULT_METADATA_CONFIG.defaultRateLimit);
     });
   });
 
@@ -51,11 +49,7 @@ describe("MetadataConfigManager", () => {
     });
 
     it("should merge nested configuration objects", () => {
-      const updates: Partial<MetadataSystemConfig> = {
-        defaultRateLimit: {
-          maxRequests: 200,
-        },
-      };
+      const updates: Partial<MetadataSystemConfig> = { defaultRateLimit: { maxRequests: 200 } };
 
       configManager.updateConfig(updates);
       const config = configManager.getConfig();
@@ -79,9 +73,7 @@ describe("MetadataConfigManager", () => {
       const updates: Partial<ProviderConfig> = {
         enabled: false,
         priority: 100,
-        rateLimit: {
-          maxRequests: 50,
-        },
+        rateLimit: { maxRequests: 50 },
       };
 
       configManager.updateProviderConfig("open-library", updates);
@@ -93,10 +85,7 @@ describe("MetadataConfigManager", () => {
     });
 
     it("should create new provider configuration", () => {
-      const newProviderConfig: Partial<ProviderConfig> = {
-        enabled: true,
-        priority: 60,
-      };
+      const newProviderConfig: Partial<ProviderConfig> = { enabled: true, priority: 60 };
 
       configManager.updateProviderConfig("new-provider", newProviderConfig);
       const config = configManager.getProviderConfig("new-provider");
@@ -128,17 +117,11 @@ describe("MetadataConfigManager", () => {
     });
 
     it("should merge provider-specific rate limit with defaults", () => {
-      configManager.updateProviderConfig("test-provider", {
-        rateLimit: {
-          maxRequests: 50,
-        },
-      });
+      configManager.updateProviderConfig("test-provider", { rateLimit: { maxRequests: 50 } });
 
       const rateLimit = configManager.getEffectiveRateLimit("test-provider");
       expect(rateLimit.maxRequests).toBe(50);
-      expect(rateLimit.windowMs).toBe(
-        DEFAULT_METADATA_CONFIG.defaultRateLimit.windowMs,
-      );
+      expect(rateLimit.windowMs).toBe(DEFAULT_METADATA_CONFIG.defaultRateLimit.windowMs);
     });
 
     it("should return effective timeout configuration", () => {
@@ -151,10 +134,7 @@ describe("MetadataConfigManager", () => {
       const priority = configManager.getEffectivePriority("open-library", 50);
       expect(priority).toBe(80); // From configuration
 
-      const defaultPriority = configManager.getEffectivePriority(
-        "unknown-provider",
-        50,
-      );
+      const defaultPriority = configManager.getEffectivePriority("unknown-provider", 50);
       expect(defaultPriority).toBe(50); // Default value
     });
   });
@@ -214,21 +194,14 @@ describe("MetadataConfigManager", () => {
       const json = configManager.toJson();
       const parsed = JSON.parse(json);
 
-      expect(parsed.maxConcurrentQueries).toBe(
-        DEFAULT_METADATA_CONFIG.maxConcurrentQueries,
-      );
+      expect(parsed.maxConcurrentQueries).toBe(DEFAULT_METADATA_CONFIG.maxConcurrentQueries);
       expect(parsed.providers["open-library"].enabled).toBe(true);
     });
 
     it("should load configuration from JSON", () => {
       const customConfig = {
         maxConcurrentQueries: 30,
-        providers: {
-          "custom-provider": {
-            enabled: true,
-            priority: 95,
-          },
-        },
+        providers: { "custom-provider": { enabled: true, priority: 95 } },
       };
 
       configManager.loadFromJson(JSON.stringify(customConfig));
@@ -262,54 +235,32 @@ describe("MetadataConfigManager", () => {
 
       const validation = configManager.validate();
       expect(validation.valid).toBe(false);
-      expect(validation.errors).toContain(
-        "maxConcurrentQueries must be greater than 0",
-      );
-      expect(validation.errors).toContain(
-        "coordinatorTimeout must be greater than 0",
-      );
+      expect(validation.errors).toContain("maxConcurrentQueries must be greater than 0");
+      expect(validation.errors).toContain("coordinatorTimeout must be greater than 0");
       expect(validation.errors).toContain("cacheTtl must be greater than 0");
     });
 
     it("should detect invalid provider settings", () => {
       configManager.updateProviderConfig("test-provider", {
         priority: -5,
-        rateLimit: {
-          maxRequests: 0,
-          windowMs: -1000,
-        },
-        timeout: {
-          requestTimeout: -1,
-          operationTimeout: 0,
-        },
+        rateLimit: { maxRequests: 0, windowMs: -1000 },
+        timeout: { requestTimeout: -1, operationTimeout: 0 },
       });
 
       const validation = configManager.validate();
       expect(validation.valid).toBe(false);
+      expect(validation.errors.some((e) => e.includes("priority must be non-negative"))).toBe(true);
+      expect(validation.errors.some((e) => e.includes("maxRequests must be greater than 0"))).toBe(
+        true,
+      );
+      expect(validation.errors.some((e) => e.includes("windowMs must be greater than 0"))).toBe(
+        true,
+      );
       expect(
-        validation.errors.some((e) =>
-          e.includes("priority must be non-negative"),
-        ),
+        validation.errors.some((e) => e.includes("requestTimeout must be greater than 0")),
       ).toBe(true);
       expect(
-        validation.errors.some((e) =>
-          e.includes("maxRequests must be greater than 0"),
-        ),
-      ).toBe(true);
-      expect(
-        validation.errors.some((e) =>
-          e.includes("windowMs must be greater than 0"),
-        ),
-      ).toBe(true);
-      expect(
-        validation.errors.some((e) =>
-          e.includes("requestTimeout must be greater than 0"),
-        ),
-      ).toBe(true);
-      expect(
-        validation.errors.some((e) =>
-          e.includes("operationTimeout must be greater than 0"),
-        ),
+        validation.errors.some((e) => e.includes("operationTimeout must be greater than 0")),
       ).toBe(true);
     });
   });

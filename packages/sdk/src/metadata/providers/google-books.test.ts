@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { globalRateLimiterRegistry } from "../rate-limiter.js";
 import { GoogleBooksMetadataProvider } from "./google-books.js";
 import { MetadataType } from "./provider.js";
-import { globalRateLimiterRegistry } from "../rate-limiter.js";
 
 describe("GoogleBooksMetadataProvider", () => {
   let provider: GoogleBooksMetadataProvider;
@@ -34,10 +34,7 @@ describe("GoogleBooksMetadataProvider", () => {
     });
 
     it("should have higher rate limit with API key", () => {
-      const providerWithKey = new GoogleBooksMetadataProvider(
-        mockFetch,
-        "test-api-key",
-      );
+      const providerWithKey = new GoogleBooksMetadataProvider(mockFetch, "test-api-key");
       expect(providerWithKey.rateLimit.maxRequests).toBe(100);
       expect(providerWithKey.rateLimit.windowMs).toBe(60000);
       expect(providerWithKey.rateLimit.requestDelay).toBe(200);
@@ -81,10 +78,7 @@ describe("GoogleBooksMetadataProvider", () => {
         ],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByISBN("978-1-234567-89-0");
 
@@ -120,11 +114,7 @@ describe("GoogleBooksMetadataProvider", () => {
     it("should handle empty results", async () => {
       mockFetch.mockResolvedValue({
         ok: true,
-        json: async () => ({
-          kind: "books#volumes",
-          totalItems: 0,
-          items: [],
-        }),
+        json: async () => ({ kind: "books#volumes", totalItems: 0, items: [] }),
       });
 
       const results = await provider.searchByISBN("0000000000");
@@ -154,10 +144,7 @@ describe("GoogleBooksMetadataProvider", () => {
         ],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByISBN("123");
 
@@ -183,14 +170,9 @@ describe("GoogleBooksMetadataProvider", () => {
         ],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
-      const results = await provider.searchByTitle({
-        title: "The Great Gatsby",
-      });
+      const results = await provider.searchByTitle({ title: "The Great Gatsby" });
 
       expect(results).toHaveLength(1);
       expect(results[0].title).toBe("The Great Gatsby");
@@ -218,27 +200,12 @@ describe("GoogleBooksMetadataProvider", () => {
         kind: "books#volumes",
         totalItems: 2,
         items: [
-          {
-            id: "book1",
-            volumeInfo: {
-              title: "Book One",
-              authors: ["Jane Doe"],
-            },
-          },
-          {
-            id: "book2",
-            volumeInfo: {
-              title: "Book Two",
-              authors: ["Jane Doe", "John Smith"],
-            },
-          },
+          { id: "book1", volumeInfo: { title: "Book One", authors: ["Jane Doe"] } },
+          { id: "book2", volumeInfo: { title: "Book Two", authors: ["Jane Doe", "John Smith"] } },
         ],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByCreator({ name: "Jane Doe" });
 
@@ -265,10 +232,7 @@ describe("GoogleBooksMetadataProvider", () => {
         ],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       await provider.searchMultiCriteria({
         isbn: "123",
@@ -287,10 +251,7 @@ describe("GoogleBooksMetadataProvider", () => {
         json: async () => ({ kind: "books#volumes", totalItems: 0 }),
       });
 
-      await provider.searchMultiCriteria({
-        title: "Test Book",
-        authors: ["Test Author"],
-      });
+      await provider.searchMultiCriteria({ title: "Test Book", authors: ["Test Author"] });
 
       const callUrl = mockFetch.mock.calls[0][0] as string;
       expect(callUrl).toContain("intitle");
@@ -315,10 +276,7 @@ describe("GoogleBooksMetadataProvider", () => {
         ],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchMultiCriteria({
         title: "Exact Match Book",
@@ -359,10 +317,7 @@ describe("GoogleBooksMetadataProvider", () => {
         ],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByTitle({ title: "Test Book" });
 
@@ -379,18 +334,13 @@ describe("GoogleBooksMetadataProvider", () => {
             id: "test-id",
             volumeInfo: {
               title: "Test Book",
-              imageLinks: {
-                thumbnail: "http://example.com/cover.jpg",
-              },
+              imageLinks: { thumbnail: "http://example.com/cover.jpg" },
             },
           },
         ],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByTitle({ title: "Test Book" });
 
@@ -406,18 +356,13 @@ describe("GoogleBooksMetadataProvider", () => {
             id: "test-id",
             volumeInfo: {
               title: "Test Book",
-              imageLinks: {
-                thumbnail: "http://example.com/cover.jpg",
-              },
+              imageLinks: { thumbnail: "http://example.com/cover.jpg" },
             },
           },
         ],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByTitle({ title: "Test Book" });
 
@@ -430,21 +375,10 @@ describe("GoogleBooksMetadataProvider", () => {
       const mockResponse = {
         kind: "books#volumes",
         totalItems: 1,
-        items: [
-          {
-            id: "test-id",
-            volumeInfo: {
-              title: "Test Book",
-              publishedDate: "2020-06-15",
-            },
-          },
-        ],
+        items: [{ id: "test-id", volumeInfo: { title: "Test Book", publishedDate: "2020-06-15" } }],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByTitle({ title: "Test Book" });
 
@@ -455,21 +389,10 @@ describe("GoogleBooksMetadataProvider", () => {
       const mockResponse = {
         kind: "books#volumes",
         totalItems: 1,
-        items: [
-          {
-            id: "test-id",
-            volumeInfo: {
-              title: "Test Book",
-              publishedDate: "2020-06",
-            },
-          },
-        ],
+        items: [{ id: "test-id", volumeInfo: { title: "Test Book", publishedDate: "2020-06" } }],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByTitle({ title: "Test Book" });
 
@@ -480,21 +403,10 @@ describe("GoogleBooksMetadataProvider", () => {
       const mockResponse = {
         kind: "books#volumes",
         totalItems: 1,
-        items: [
-          {
-            id: "test-id",
-            volumeInfo: {
-              title: "Test Book",
-              publishedDate: "2020",
-            },
-          },
-        ],
+        items: [{ id: "test-id", volumeInfo: { title: "Test Book", publishedDate: "2020" } }],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByTitle({ title: "Test Book" });
 
@@ -506,20 +418,11 @@ describe("GoogleBooksMetadataProvider", () => {
         kind: "books#volumes",
         totalItems: 1,
         items: [
-          {
-            id: "test-id",
-            volumeInfo: {
-              title: "Test Book",
-              publishedDate: "invalid-date",
-            },
-          },
+          { id: "test-id", volumeInfo: { title: "Test Book", publishedDate: "invalid-date" } },
         ],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByTitle({ title: "Test Book" });
 
@@ -538,12 +441,7 @@ describe("GoogleBooksMetadataProvider", () => {
           json: async () => ({
             kind: "books#volumes",
             totalItems: 1,
-            items: [
-              {
-                id: "test-id",
-                volumeInfo: { title: "Test Book" },
-              },
-            ],
+            items: [{ id: "test-id", volumeInfo: { title: "Test Book" } }],
           }),
         });
 
@@ -561,14 +459,16 @@ describe("GoogleBooksMetadataProvider", () => {
       const rateLimitError = new Error("Rate limit exceeded: 429");
       (rateLimitError as any).status = 429;
 
-      mockFetch.mockRejectedValueOnce(rateLimitError).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          kind: "books#volumes",
-          totalItems: 1,
-          items: [{ id: "test-id", volumeInfo: { title: "Test" } }],
-        }),
-      });
+      mockFetch
+        .mockRejectedValueOnce(rateLimitError)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            kind: "books#volumes",
+            totalItems: 1,
+            items: [{ id: "test-id", volumeInfo: { title: "Test" } }],
+          }),
+        });
 
       const promise = provider.searchByTitle({ title: "Test" });
       await vi.runAllTimersAsync();
@@ -611,10 +511,7 @@ describe("GoogleBooksMetadataProvider", () => {
 
   describe("API key handling", () => {
     it("should include API key in request when provided", async () => {
-      const providerWithKey = new GoogleBooksMetadataProvider(
-        mockFetch,
-        "test-api-key",
-      );
+      const providerWithKey = new GoogleBooksMetadataProvider(mockFetch, "test-api-key");
 
       mockFetch.mockResolvedValue({
         ok: true,
@@ -651,9 +548,7 @@ describe("GoogleBooksMetadataProvider", () => {
     });
 
     it("should return default score for unsupported types", () => {
-      expect(
-        provider.getReliabilityScore(MetadataType.PHYSICAL_DIMENSIONS),
-      ).toBe(0.3);
+      expect(provider.getReliabilityScore(MetadataType.PHYSICAL_DIMENSIONS)).toBe(0.3);
     });
   });
 
@@ -662,17 +557,13 @@ describe("GoogleBooksMetadataProvider", () => {
       expect(provider.supportsDataType(MetadataType.TITLE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.AUTHORS)).toBe(true);
       expect(provider.supportsDataType(MetadataType.ISBN)).toBe(true);
-      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(
-        true,
-      );
+      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.DESCRIPTION)).toBe(true);
       expect(provider.supportsDataType(MetadataType.COVER_IMAGE)).toBe(true);
     });
 
     it("should not support physical dimensions", () => {
-      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(
-        false,
-      );
+      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(false);
     });
   });
 
@@ -681,20 +572,10 @@ describe("GoogleBooksMetadataProvider", () => {
       const mockResponse = {
         kind: "books#volumes",
         totalItems: 1,
-        items: [
-          {
-            id: "unique-google-books-id",
-            volumeInfo: {
-              title: "Test Book",
-            },
-          },
-        ],
+        items: [{ id: "unique-google-books-id", volumeInfo: { title: "Test Book" } }],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByTitle({ title: "Test Book" });
 
@@ -709,21 +590,10 @@ describe("GoogleBooksMetadataProvider", () => {
       const mockResponse = {
         kind: "books#volumes",
         totalItems: 1,
-        items: [
-          {
-            id: "test-id",
-            volumeInfo: {
-              title: "Test Book",
-              maturityRating: "MATURE",
-            },
-          },
-        ],
+        items: [{ id: "test-id", volumeInfo: { title: "Test Book", maturityRating: "MATURE" } }],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByTitle({ title: "Test Book" });
 
@@ -739,18 +609,12 @@ describe("GoogleBooksMetadataProvider", () => {
         items: [
           {
             id: "test-id",
-            volumeInfo: {
-              title: "Main Title",
-              subtitle: "A Descriptive Subtitle",
-            },
+            volumeInfo: { title: "Main Title", subtitle: "A Descriptive Subtitle" },
           },
         ],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByTitle({ title: "Main Title" });
 
@@ -761,20 +625,10 @@ describe("GoogleBooksMetadataProvider", () => {
       const mockResponse = {
         kind: "books#volumes",
         totalItems: 1,
-        items: [
-          {
-            id: "test-id",
-            volumeInfo: {
-              title: "Main Title",
-            },
-          },
-        ],
+        items: [{ id: "test-id", volumeInfo: { title: "Main Title" } }],
       };
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByTitle({ title: "Main Title" });
 

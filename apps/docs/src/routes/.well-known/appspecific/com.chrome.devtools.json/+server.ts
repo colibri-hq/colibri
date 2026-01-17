@@ -1,5 +1,5 @@
-import { error, json, type RequestHandler } from "@sveltejs/kit";
 import { dev } from "$app/environment";
+import { error, json, type RequestHandler } from "@sveltejs/kit";
 
 /**
  * Chrome DevTools Workspace Discovery endpoint

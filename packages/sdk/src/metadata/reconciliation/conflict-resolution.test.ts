@@ -1,9 +1,4 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { ConflictDetector } from "./conflicts.js";
-import { ConflictDisplayFormatter } from "./conflict-format.js";
-import { PublicationReconciler } from "./publication.js";
-import { SubjectReconciler } from "./subjects.js";
-import { IdentifierReconciler } from "./identifiers.js";
 import type {
   Conflict,
   IdentifierInput,
@@ -14,6 +9,11 @@ import type {
   ReconciledField,
   SubjectInput,
 } from "./types.js";
+import { ConflictDisplayFormatter } from "./conflict-format.js";
+import { ConflictDetector } from "./conflicts.js";
+import { IdentifierReconciler } from "./identifiers.js";
+import { PublicationReconciler } from "./publication.js";
+import { SubjectReconciler } from "./subjects.js";
 
 describe("Conflict Resolution Algorithms", () => {
   let conflictDetector: ConflictDetector;
@@ -95,14 +95,8 @@ describe("Conflict Resolution Algorithms", () => {
       };
 
       const inputs: PublicationInfoInput[] = [
-        {
-          date: "2020",
-          source: olderReliable,
-        },
-        {
-          date: "2021",
-          source: recentReliable,
-        },
+        { date: "2020", source: olderReliable },
+        { date: "2021", source: recentReliable },
       ];
 
       const result = publicationReconciler.reconcilePublicationInfo(inputs);
@@ -115,14 +109,8 @@ describe("Conflict Resolution Algorithms", () => {
 
     it("should document resolution reasoning", () => {
       const inputs: PublicationInfoInput[] = [
-        {
-          date: "2020",
-          source: userGenerated,
-        },
-        {
-          date: "2021",
-          source: authoritative,
-        },
+        { date: "2020", source: userGenerated },
+        { date: "2021", source: authoritative },
       ];
 
       const result = publicationReconciler.reconcilePublicationInfo(inputs);
@@ -143,9 +131,7 @@ describe("Conflict Resolution Algorithms", () => {
         location: "New York, NY",
       };
 
-      const incompletePublisher: Publisher = {
-        name: "Incomplete Pub",
-      };
+      const incompletePublisher: Publisher = { name: "Incomplete Pub" };
 
       const inputs: PublicationInfoInput[] = [
         {
@@ -173,27 +159,13 @@ describe("Conflict Resolution Algorithms", () => {
     });
 
     it("should prefer more precise data", () => {
-      const preciseDate: PublicationDate = {
-        year: 2023,
-        month: 5,
-        day: 15,
-        precision: "day",
-      };
+      const preciseDate: PublicationDate = { year: 2023, month: 5, day: 15, precision: "day" };
 
-      const impreciseDate: PublicationDate = {
-        year: 2023,
-        precision: "year",
-      };
+      const impreciseDate: PublicationDate = { year: 2023, precision: "year" };
 
       const inputs: PublicationInfoInput[] = [
-        {
-          date: impreciseDate,
-          source: authoritative,
-        },
-        {
-          date: preciseDate,
-          source: reliable,
-        },
+        { date: impreciseDate, source: authoritative },
+        { date: preciseDate, source: reliable },
       ];
 
       const result = publicationReconciler.reconcilePublicationInfo(inputs);
@@ -238,27 +210,16 @@ describe("Conflict Resolution Algorithms", () => {
   describe("semantic similarity resolution", () => {
     it("should merge similar subjects", () => {
       const inputs: SubjectInput[] = [
-        {
-          subjects: ["Science Fiction", "Sci-Fi", "SF"],
-          source: community,
-        },
-        {
-          subjects: ["science fiction", "futuristic fiction"],
-          source: reliable,
-        },
-        {
-          subjects: [{ name: "Science fiction", scheme: "lcsh" }],
-          source: authoritative,
-        },
+        { subjects: ["Science Fiction", "Sci-Fi", "SF"], source: community },
+        { subjects: ["science fiction", "futuristic fiction"], source: reliable },
+        { subjects: [{ name: "Science fiction", scheme: "lcsh" }], source: authoritative },
       ];
 
       const result = subjectReconciler.reconcileSubjects(inputs);
 
       // Should merge similar subjects
       const sciFiSubjects = result.value.filter(
-        (s) =>
-          s.normalized?.includes("science fiction") ||
-          s.normalized?.includes("sci-fi"),
+        (s) => s.normalized?.includes("science fiction") || s.normalized?.includes("sci-fi"),
       );
 
       expect(sciFiSubjects.length).toBeGreaterThanOrEqual(1); // Should be merged
@@ -270,18 +231,9 @@ describe("Conflict Resolution Algorithms", () => {
 
     it("should handle publisher name variations", () => {
       const inputs: PublicationInfoInput[] = [
-        {
-          publisher: "Penguin",
-          source: community,
-        },
-        {
-          publisher: "Penguin Books",
-          source: reliable,
-        },
-        {
-          publisher: "Penguin Random House",
-          source: authoritative,
-        },
+        { publisher: "Penguin", source: community },
+        { publisher: "Penguin Books", source: reliable },
+        { publisher: "Penguin Random House", source: authoritative },
       ];
 
       const result = publicationReconciler.reconcilePublicationInfo(inputs);
@@ -306,11 +258,7 @@ describe("Conflict Resolution Algorithms", () => {
         reasoning: "Normalized title variations",
       };
 
-      const conflicts = conflictDetector.detectFieldConflicts(
-        field,
-        "title",
-        titleVariations,
-      );
+      const conflicts = conflictDetector.detectFieldConflicts(field, "title", titleVariations);
 
       // Should detect minor variations but not treat as major conflicts
       // Implementation may or may not detect conflicts for these variations
@@ -326,14 +274,8 @@ describe("Conflict Resolution Algorithms", () => {
   describe("consensus-based resolution", () => {
     it("should prefer values agreed upon by multiple sources", () => {
       const inputs: PublicationInfoInput[] = [
-        {
-          date: "2023",
-          source: community,
-        },
-        {
-          date: "2023",
-          source: reliable,
-        },
+        { date: "2023", source: community },
+        { date: "2023", source: reliable },
         {
           date: "2024", // Outlier
           source: userGenerated,
@@ -351,18 +293,9 @@ describe("Conflict Resolution Algorithms", () => {
 
     it("should handle no clear consensus", () => {
       const inputs: PublicationInfoInput[] = [
-        {
-          date: "2021",
-          source: authoritative,
-        },
-        {
-          date: "2022",
-          source: reliable,
-        },
-        {
-          date: "2023",
-          source: community,
-        },
+        { date: "2021", source: authoritative },
+        { date: "2022", source: reliable },
+        { date: "2023", source: community },
       ];
 
       const result = publicationReconciler.reconcilePublicationInfo(inputs);
@@ -432,18 +365,9 @@ describe("Conflict Resolution Algorithms", () => {
 
     it("should handle date precision conflicts intelligently", () => {
       const inputs: PublicationInfoInput[] = [
-        {
-          date: { year: 2023, precision: "year" },
-          source: community,
-        },
-        {
-          date: { year: 2023, month: 5, precision: "month" },
-          source: reliable,
-        },
-        {
-          date: { year: 2023, month: 5, day: 15, precision: "day" },
-          source: authoritative,
-        },
+        { date: { year: 2023, precision: "year" }, source: community },
+        { date: { year: 2023, month: 5, precision: "month" }, source: reliable },
+        { date: { year: 2023, month: 5, day: 15, precision: "day" }, source: authoritative },
       ];
 
       const result = publicationReconciler.reconcilePublicationInfo(inputs);
@@ -458,18 +382,9 @@ describe("Conflict Resolution Algorithms", () => {
 
     it("should handle subject hierarchy conflicts", () => {
       const inputs: SubjectInput[] = [
-        {
-          subjects: ["Computer Science"],
-          source: community,
-        },
-        {
-          subjects: ["Computer Science -- Programming"],
-          source: reliable,
-        },
-        {
-          subjects: ["Computer Science -- Programming -- Web Development"],
-          source: authoritative,
-        },
+        { subjects: ["Computer Science"], source: community },
+        { subjects: ["Computer Science -- Programming"], source: reliable },
+        { subjects: ["Computer Science -- Programming -- Web Development"], source: authoritative },
       ];
 
       const result = subjectReconciler.reconcileSubjects(inputs);
@@ -478,9 +393,7 @@ describe("Conflict Resolution Algorithms", () => {
       expect(result.value.length).toBeGreaterThanOrEqual(1);
 
       const mostSpecific = result.value.find(
-        (s) =>
-          s.name.includes("Web Development") ||
-          s.hierarchy?.includes("Web Development"),
+        (s) => s.name.includes("Web Development") || s.hierarchy?.includes("Web Development"),
       );
 
       if (mostSpecific) {
@@ -503,12 +416,10 @@ describe("Conflict Resolution Algorithms", () => {
               { value: "Book Title A", source: authoritative },
               { value: "Completely Different Book", source: reliable },
             ],
-            resolution:
-              "Unable to resolve automatically - requires manual review",
+            resolution: "Unable to resolve automatically - requires manual review",
           },
         ],
-        reasoning:
-          "Major conflict between reliable sources requires human judgment",
+        reasoning: "Major conflict between reliable sources requires human judgment",
       };
 
       expect(field.confidence).toBeLessThan(0.5);
@@ -531,9 +442,7 @@ describe("Conflict Resolution Algorithms", () => {
         reasoning: "Low confidence due to conflicting information",
       };
 
-      expect(lowConfidenceField.confidence).toBeLessThan(
-        escalationCriteria.lowConfidence,
-      );
+      expect(lowConfidenceField.confidence).toBeLessThan(escalationCriteria.lowConfidence);
 
       // Test similar reliability escalation
       const similarReliabilitySources = [
@@ -542,12 +451,9 @@ describe("Conflict Resolution Algorithms", () => {
       ];
 
       const reliabilityDiff = Math.abs(
-        similarReliabilitySources[0].reliability -
-          similarReliabilitySources[1].reliability,
+        similarReliabilitySources[0].reliability - similarReliabilitySources[1].reliability,
       );
-      expect(reliabilityDiff).toBeLessThan(
-        escalationCriteria.reliabilityDifferenceThreshold,
-      );
+      expect(reliabilityDiff).toBeLessThan(escalationCriteria.reliabilityDifferenceThreshold);
     });
 
     it("should suggest resolution strategies for manual review", () => {
@@ -727,8 +633,7 @@ describe("Conflict Resolution Algorithms", () => {
         inconsistentResolution.resolvedValue,
       );
       const isConfidenceValid =
-        inconsistentResolution.confidence >= 0 &&
-        inconsistentResolution.confidence <= 1;
+        inconsistentResolution.confidence >= 0 && inconsistentResolution.confidence <= 1;
       const hasReasoning = inconsistentResolution.reasoning.length > 0;
 
       expect(isValueValid).toBe(false);
@@ -742,23 +647,16 @@ describe("Conflict Resolution Algorithms", () => {
         automaticallyResolved: 8,
         manualReviewRequired: 2,
         averageConfidence: 0.75,
-        resolutionStrategiesUsed: [
-          "reliability_based",
-          "consensus_based",
-          "semantic_merge",
-        ],
+        resolutionStrategiesUsed: ["reliability_based", "consensus_based", "semantic_merge"],
         processingTime: 150, // milliseconds
       };
 
-      expect(
-        resolutionMetrics.automaticallyResolved +
-          resolutionMetrics.manualReviewRequired,
-      ).toBe(resolutionMetrics.totalConflicts);
+      expect(resolutionMetrics.automaticallyResolved + resolutionMetrics.manualReviewRequired).toBe(
+        resolutionMetrics.totalConflicts,
+      );
       expect(resolutionMetrics.averageConfidence).toBeGreaterThan(0);
       expect(resolutionMetrics.averageConfidence).toBeLessThanOrEqual(1);
-      expect(resolutionMetrics.resolutionStrategiesUsed.length).toBeGreaterThan(
-        0,
-      );
+      expect(resolutionMetrics.resolutionStrategiesUsed.length).toBeGreaterThan(0);
       expect(resolutionMetrics.processingTime).toBeGreaterThan(0);
     });
   });

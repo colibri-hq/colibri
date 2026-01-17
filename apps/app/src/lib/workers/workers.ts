@@ -3,10 +3,7 @@ export interface WorkerMessage<T extends string = string, P = unknown> {
   payload: P;
 }
 
-export interface WebWorker<
-  I extends WorkerMessage,
-  O extends WorkerMessage,
-> extends Worker {
+export interface WebWorker<I extends WorkerMessage, O extends WorkerMessage> extends Worker {
   onmessage: ((this: Worker, ev: MessageEvent<O>) => unknown) | null;
 
   postMessage(message: I, transfer?: Transferable[]): unknown;
@@ -38,16 +35,9 @@ export interface WebWorker<
   ): unknown;
 }
 
-interface TypedMessagePort<
-  I extends WorkerMessage,
-  O extends WorkerMessage,
-> extends MessagePort {
-  onmessage:
-    | ((this: TypedMessagePort<I, O>, ev: MessageEvent<O>) => unknown)
-    | null;
-  onmessageerror:
-    | ((this: TypedMessagePort<I, O>, ev: MessageEvent) => unknown)
-    | null;
+interface TypedMessagePort<I extends WorkerMessage, O extends WorkerMessage> extends MessagePort {
+  onmessage: ((this: TypedMessagePort<I, O>, ev: MessageEvent<O>) => unknown) | null;
+  onmessageerror: ((this: TypedMessagePort<I, O>, ev: MessageEvent) => unknown) | null;
 
   postMessage(message: I, transfer?: Transferable[]): unknown;
 
@@ -78,10 +68,7 @@ interface TypedMessagePort<
   ): unknown;
 }
 
-interface TypedSharedWorker<
-  I extends WorkerMessage,
-  O extends WorkerMessage,
-> extends SharedWorker {
+interface TypedSharedWorker<I extends WorkerMessage, O extends WorkerMessage> extends SharedWorker {
   port: TypedMessagePort<I, O>;
 
   addEventListener(
@@ -130,19 +117,17 @@ interface SharedWorkerModule<I extends WorkerMessage, O extends WorkerMessage> {
   default: new () => TypedSharedWorker<I, O>;
 }
 
-export async function loadWorker<
-  I extends WorkerMessage,
-  O extends WorkerMessage,
->(module: Promise<WorkerModule<I, O>>) {
+export async function loadWorker<I extends WorkerMessage, O extends WorkerMessage>(
+  module: Promise<WorkerModule<I, O>>,
+) {
   const Worker = await module;
 
   return new Worker.default();
 }
 
-export async function loadSharedWorker<
-  I extends WorkerMessage,
-  O extends WorkerMessage,
->(module: Promise<SharedWorkerModule<I, O>>): Promise<SharedWebWorker<I, O>> {
+export async function loadSharedWorker<I extends WorkerMessage, O extends WorkerMessage>(
+  module: Promise<SharedWorkerModule<I, O>>,
+): Promise<SharedWebWorker<I, O>> {
   const Worker = await module;
 
   console.debug(
@@ -193,17 +178,18 @@ class SharedWorkerImpl<
   }
 }
 
-export function dispatchRequest<
-  I extends WorkerMessage,
-  O extends WorkerMessage,
->(worker: AppWorker<I, O>, message: I, transferables: Transferable[] = []) {
+export function dispatchRequest<I extends WorkerMessage, O extends WorkerMessage>(
+  worker: AppWorker<I, O>,
+  message: I,
+  transferables: Transferable[] = [],
+) {
   worker.postMessage(message, transferables);
 }
 
-export async function expectResponse<
-  I extends WorkerMessage,
-  O extends WorkerMessage,
->(worker: WebWorker<I, O>, expectedType: O["type"]) {
+export async function expectResponse<I extends WorkerMessage, O extends WorkerMessage>(
+  worker: WebWorker<I, O>,
+  expectedType: O["type"],
+) {
   return new Promise((resolve, reject) => {
     worker.addEventListener("message", (event) => {
       const { type, payload } = event.data;
@@ -217,10 +203,7 @@ export async function expectResponse<
   }) satisfies Promise<O["payload"]>;
 }
 
-export async function workerOperation<
-  I extends WorkerMessage,
-  O extends WorkerMessage,
->(
+export async function workerOperation<I extends WorkerMessage, O extends WorkerMessage>(
   module: Promise<WorkerModule<I, O>>,
   message: I,
   transferables?: Transferable[],

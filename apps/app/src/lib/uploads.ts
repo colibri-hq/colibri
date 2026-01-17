@@ -1,4 +1,3 @@
-import { browser } from "$app/environment";
 import type {
   CancelUploadRequest,
   DuplicateCheckResult,
@@ -7,24 +6,17 @@ import type {
   UploadResponse,
   UploadStatus,
 } from "$lib/workers/upload.worker.types";
-import { loadWorker, type WebWorker } from "$lib/workers/workers";
+import { browser } from "$app/environment";
 import { success, error as notifyError, warning } from "$lib/notifications";
+import { loadWorker, type WebWorker } from "$lib/workers/workers";
 import { generateRandomUuid } from "@colibri-hq/shared";
 import { derived, get, writable } from "svelte/store";
 
 export const supportedUploadFormats = [
-  {
-    description: "EPUB eBook",
-    accept: {
-      "application/epub+zip": ".epub",
-    },
-  },
+  { description: "EPUB eBook", accept: { "application/epub+zip": ".epub" } },
   {
     description: "PDF Document",
-    accept: {
-      "application/pdf": ".pdf",
-      "application/x-pdf": ".pdf",
-    },
+    accept: { "application/pdf": ".pdf", "application/x-pdf": ".pdf" },
   },
   {
     description: "Amazon eBook",
@@ -43,10 +35,8 @@ export const supportedUploadFormats = [
   },
 ] satisfies FilePickerAcceptType[];
 
-let worker: WebWorker<
-  UploadRequest | ResumeRequest | CancelUploadRequest,
-  UploadResponse
-> | null = null;
+let worker: WebWorker<UploadRequest | ResumeRequest | CancelUploadRequest, UploadResponse> | null =
+  null;
 
 export async function upload(items: (File | FileSystemFileHandle)[]) {
   const worker = await loadUploadsWorker();
@@ -76,13 +66,9 @@ export async function upload(items: (File | FileSystemFileHandle)[]) {
 
   worker.addEventListener("message", ({ data: { payload } }) => {
     if (payload.failed) {
-      notifyError("Upload failed", {
-        message: `Failed to upload ${payload.name}`,
-      });
+      notifyError("Upload failed", { message: `Failed to upload ${payload.name}` });
     } else if ("duplicate" in payload && payload.duplicate) {
-      warning("Duplicate detected", {
-        message: `${payload.name} already exists in your library`,
-      });
+      warning("Duplicate detected", { message: `${payload.name} already exists in your library` });
     }
     // Note: Success notifications are now handled via SSE events
   });
@@ -131,10 +117,7 @@ export async function resume() {
     console.log("Got worker result", { type, payload });
   });
 
-  worker.postMessage({
-    type: "resume",
-    payload: { ids },
-  });
+  worker.postMessage({ type: "resume", payload: { ids } });
 }
 
 export async function promptForFiles() {
@@ -151,10 +134,9 @@ async function loadUploadsWorker() {
   if (worker === null) {
     const workerModule = import("$lib/workers/upload.worker?worker");
 
-    worker = await loadWorker<
-      UploadRequest | ResumeRequest | CancelUploadRequest,
-      UploadResponse
-    >(workerModule);
+    worker = await loadWorker<UploadRequest | ResumeRequest | CancelUploadRequest, UploadResponse>(
+      workerModule,
+    );
 
     worker.addEventListener("message", ({ data: { payload } }) => {
       queue.update((currentQueue) => {
@@ -163,11 +145,7 @@ async function loadUploadsWorker() {
             if (item.id !== payload.id) return item;
 
             if (payload.failed) {
-              return {
-                ...item,
-                status: "failed" as const,
-                error: payload.error,
-              };
+              return { ...item, status: "failed" as const, error: payload.error };
             }
 
             if ("duplicate" in payload && payload.duplicate) {
@@ -177,10 +155,7 @@ async function loadUploadsWorker() {
 
             if ("status" in payload) {
               // Update status based on worker progress
-              return {
-                ...item,
-                status: payload.status as QueuedUploadStatus,
-              };
+              return { ...item, status: payload.status as QueuedUploadStatus };
             }
 
             return item;
@@ -194,9 +169,7 @@ async function loadUploadsWorker() {
 }
 
 const key = "colibri.uploads.queue";
-const initialValue = browser
-  ? deserialize(localStorage.getItem(key) || "[]")
-  : [];
+const initialValue = browser ? deserialize(localStorage.getItem(key) || "[]") : [];
 
 const queue = writable(initialValue);
 
@@ -218,13 +191,10 @@ export const uploadProgress = derived(queue, ($queue) => {
   // Exclude failed items from progress calculation - they shouldn't affect the count
   const relevantQueue = $queue.filter((item) => item.status !== "failed");
   const total = relevantQueue.length;
-  const completed = relevantQueue.filter(
-    (item) => item.status === "completed",
-  ).length;
+  const completed = relevantQueue.filter((item) => item.status === "completed").length;
   const failed = $queue.filter((item) => item.status === "failed").length;
   const active = relevantQueue.filter(
-    (item) =>
-      !["completed", "failed", "needs-confirmation"].includes(item.status),
+    (item) => !["completed", "failed", "needs-confirmation"].includes(item.status),
   ).length;
   const needsConfirmation = relevantQueue.filter(
     (item) => item.status === "needs-confirmation",
@@ -266,11 +236,7 @@ export function updateQueueFromSSE(event: {
             return null;
 
           case "failed":
-            return {
-              ...item,
-              status: "failed" as const,
-              error: event.error,
-            };
+            return { ...item, status: "failed" as const, error: event.error };
 
           default:
             return item;
@@ -285,9 +251,7 @@ export function updateQueueFromSSE(event: {
  */
 export function clearCompletedUploads() {
   queue.update((currentQueue) =>
-    currentQueue.filter(
-      (item) => !["completed", "failed"].includes(item.status),
-    ),
+    currentQueue.filter((item) => !["completed", "failed"].includes(item.status)),
   );
 }
 

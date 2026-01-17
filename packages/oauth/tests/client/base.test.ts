@@ -284,19 +284,21 @@ describe("OAuthClientBase", () => {
 
       const newTokenResponse = mockTokenResponse();
       const mockFetchWithRefresh = createMockFetch();
-      mockFetchWithRefresh.mockImplementation(async (url: RequestInfo | URL, init?: RequestInit) => {
-        const urlString = url.toString();
-        if (urlString.includes("/.well-known/")) {
-          return createJsonResponse(mockMetadata);
-        }
-        if (urlString.includes("/token")) {
-          const body = init?.body as string;
-          expect(body).toContain("grant_type=refresh_token");
-          expect(body).toContain("refresh_token=refresh_token_123");
-          return createJsonResponse(newTokenResponse);
-        }
-        return new Response("Not Found", { status: 404 });
-      });
+      mockFetchWithRefresh.mockImplementation(
+        async (url: RequestInfo | URL, init?: RequestInit) => {
+          const urlString = url.toString();
+          if (urlString.includes("/.well-known/")) {
+            return createJsonResponse(mockMetadata);
+          }
+          if (urlString.includes("/token")) {
+            const body = init?.body as string;
+            expect(body).toContain("grant_type=refresh_token");
+            expect(body).toContain("refresh_token=refresh_token_123");
+            return createJsonResponse(newTokenResponse);
+          }
+          return new Response("Not Found", { status: 404 });
+        },
+      );
 
       const client = new AuthorizationCodeClient({
         issuer: "https://auth.example.com",
@@ -421,10 +423,7 @@ describe("OAuthClientBase", () => {
     });
 
     it("should throw ConfigurationError when server doesn't support revocation", async () => {
-      const metadataWithoutRevocation = {
-        ...mockMetadata,
-        revocation_endpoint: undefined,
-      };
+      const metadataWithoutRevocation = { ...mockMetadata, revocation_endpoint: undefined };
 
       const client = new AuthorizationCodeClient({
         issuer: "https://auth.example.com",
@@ -474,10 +473,7 @@ describe("OAuthClientBase", () => {
     });
 
     it("should throw ConfigurationError when server doesn't support introspection", async () => {
-      const metadataWithoutIntrospection = {
-        ...mockMetadata,
-        introspection_endpoint: undefined,
-      };
+      const metadataWithoutIntrospection = { ...mockMetadata, introspection_endpoint: undefined };
 
       const client = new AuthorizationCodeClient({
         issuer: "https://auth.example.com",

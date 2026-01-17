@@ -1,8 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { PublicationReconciler } from "./publication.js";
-import { SubjectReconciler } from "./subjects.js";
-import { IdentifierReconciler } from "./identifiers.js";
-import { ContentReconciler } from "./content.js";
 import type {
   ContentDescriptionInput,
   IdentifierInput,
@@ -10,6 +6,10 @@ import type {
   PublicationInfoInput,
   SubjectInput,
 } from "./types.js";
+import { ContentReconciler } from "./content.js";
+import { IdentifierReconciler } from "./identifiers.js";
+import { PublicationReconciler } from "./publication.js";
+import { SubjectReconciler } from "./subjects.js";
 
 describe("Publication Reconciliation Integration", () => {
   const reconciler = new PublicationReconciler();
@@ -34,18 +34,8 @@ describe("Publication Reconciliation Integration", () => {
 
   it("should reconcile complete publication information from multiple sources", () => {
     const inputs: PublicationInfoInput[] = [
-      {
-        date: "2023",
-        publisher: "Penguin",
-        place: "New York City",
-        source: openLibrarySource,
-      },
-      {
-        date: "2023-05-15",
-        publisher: "Random House",
-        place: "NYC",
-        source: wikiDataSource,
-      },
+      { date: "2023", publisher: "Penguin", place: "New York City", source: openLibrarySource },
+      { date: "2023-05-15", publisher: "Random House", place: "NYC", source: wikiDataSource },
       {
         date: "2023-05",
         publisher: "Penguin Random House Publishers Inc.",
@@ -91,18 +81,9 @@ describe("Publication Reconciliation Integration", () => {
 
   it("should handle partial information gracefully", () => {
     const inputs: PublicationInfoInput[] = [
-      {
-        date: "1984",
-        source: openLibrarySource,
-      },
-      {
-        publisher: "Secker & Warburg",
-        source: wikiDataSource,
-      },
-      {
-        place: "London, England",
-        source: locSource,
-      },
+      { date: "1984", source: openLibrarySource },
+      { publisher: "Secker & Warburg", source: wikiDataSource },
+      { place: "London, England", source: locSource },
     ];
 
     const result = reconciler.reconcilePublicationInfo(inputs);
@@ -188,12 +169,7 @@ describe("Subject Reconciliation Integration", () => {
         source: openLibrarySource,
       },
       {
-        subjects: [
-          "sci-fi",
-          "futuristic",
-          "space travel",
-          "Fiction -- Science fiction",
-        ],
+        subjects: ["sci-fi", "futuristic", "space travel", "Fiction -- Science fiction"],
         source: wikiDataSource,
       },
       {
@@ -214,9 +190,7 @@ describe("Subject Reconciliation Integration", () => {
     expect(normalizedNames).toContain("adventure");
 
     // Should not have duplicates of science fiction (sci-fi should be normalized)
-    const sciFiCount = normalizedNames.filter(
-      (name) => name === "science fiction",
-    ).length;
+    const sciFiCount = normalizedNames.filter((name) => name === "science fiction").length;
     expect(sciFiCount).toBe(1);
 
     // Should preserve classification codes and schemes
@@ -247,12 +221,8 @@ describe("Subject Reconciliation Integration", () => {
 
     expect(result.value).toHaveLength(2);
 
-    const programmingSubject = result.value.find((s) =>
-      s.name.includes("Computer programming"),
-    );
-    const mathSubject = result.value.find((s) =>
-      s.name.includes("Mathematics"),
-    );
+    const programmingSubject = result.value.find((s) => s.name.includes("Computer programming"));
+    const mathSubject = result.value.find((s) => s.name.includes("Mathematics"));
 
     expect(programmingSubject?.scheme).toBe("lcsh");
     expect(programmingSubject?.hierarchy).toEqual([
@@ -262,11 +232,7 @@ describe("Subject Reconciliation Integration", () => {
     ]);
 
     expect(mathSubject?.scheme).toBe("lcsh");
-    expect(mathSubject?.hierarchy).toEqual([
-      "Mathematics",
-      "Algebra",
-      "Linear algebra",
-    ]);
+    expect(mathSubject?.hierarchy).toEqual(["Mathematics", "Algebra", "Linear algebra"]);
   });
 
   it("should organize subjects by type and quality", () => {
@@ -327,11 +293,7 @@ describe("Identifier Reconciliation Integration", () => {
     const reconciler = new IdentifierReconciler();
 
     const inputs: IdentifierInput[] = [
-      {
-        isbn: "978-0-123-45678-6",
-        oclc: "123456789",
-        source: openLibrarySource,
-      },
+      { isbn: "978-0-123-45678-6", oclc: "123456789", source: openLibrarySource },
       {
         isbn: "9780123456786", // Same ISBN, different format
         doi: "10.1000/182",
@@ -475,15 +437,9 @@ describe("Content Reconciliation Integration", () => {
     const inputs: ContentDescriptionInput[] = [
       {
         descriptions: ["A thrilling adventure story set in space."],
-        tableOfContents:
-          "Chapter 1: Launch\nChapter 2: Journey\nChapter 3: Discovery",
+        tableOfContents: "Chapter 1: Launch\nChapter 2: Journey\nChapter 3: Discovery",
         reviews: [
-          {
-            text: "Great book with amazing characters!",
-            rating: 5,
-            scale: 5,
-            verified: false,
-          },
+          { text: "Great book with amazing characters!", rating: 5, scale: 5, verified: false },
         ],
         ratings: [{ value: 4.2, scale: 5, count: 150 }],
         coverImages: ["https://example.com/small-cover.jpg"],
@@ -549,9 +505,7 @@ describe("Content Reconciliation Integration", () => {
     const result = contentReconciler.reconcileContentDescription(inputs);
 
     // Should select highest quality description (from publisher)
-    expect(result.description.value.text).toContain(
-      "masterful work of science fiction",
-    );
+    expect(result.description.value.text).toContain("masterful work of science fiction");
     expect(result.description.value.type).toBe("summary");
     expect(result.description.confidence).toBeGreaterThan(0.8);
 
@@ -559,9 +513,7 @@ describe("Content Reconciliation Integration", () => {
     expect(result.tableOfContents.value.entries).toHaveLength(8);
     expect(result.tableOfContents.value.format).toBe("hierarchical");
     expect(result.tableOfContents.value.pageNumbers).toBe(true);
-    expect(result.tableOfContents.value.entries[0].title).toBe(
-      "Prologue: The Call",
-    );
+    expect(result.tableOfContents.value.entries[0].title).toBe("Prologue: The Call");
 
     // Should aggregate and sort reviews by quality
     expect(result.reviews.value).toHaveLength(2);
@@ -575,9 +527,7 @@ describe("Content Reconciliation Integration", () => {
     expect(result.rating.value.count).toBe(500); // Total from all sources
 
     // Should select highest quality cover image
-    expect(result.coverImage.value.url).toBe(
-      "https://example.com/hd-cover.jpg",
-    );
+    expect(result.coverImage.value.url).toBe("https://example.com/hd-cover.jpg");
     expect(result.coverImage.value.width).toBe(600);
     expect(result.coverImage.value.height).toBe(900);
     expect(result.coverImage.value.verified).toBe(true);
@@ -625,22 +575,11 @@ describe("Content Reconciliation Integration", () => {
 
   it("should handle partial content information gracefully", () => {
     const inputs: ContentDescriptionInput[] = [
-      {
-        descriptions: ["A good book about adventure."],
-        source: openLibrarySource,
-      },
-      {
-        ratings: [{ value: 4.0, scale: 5, count: 50 }],
-        source: wikiDataSource,
-      },
+      { descriptions: ["A good book about adventure."], source: openLibrarySource },
+      { ratings: [{ value: 4.0, scale: 5, count: 50 }], source: wikiDataSource },
       {
         coverImages: [
-          {
-            url: "https://example.com/cover.png",
-            width: 300,
-            height: 450,
-            format: "png",
-          },
+          { url: "https://example.com/cover.png", width: 300, height: 450, format: "png" },
         ],
         source: publisherSource,
       },
@@ -677,21 +616,9 @@ describe("Content Reconciliation Integration", () => {
     const inputs: ContentDescriptionInput[] = [
       {
         descriptions: ["Short description"],
-        reviews: [
-          {
-            text: "Okay book",
-            rating: 3,
-            scale: 5,
-            verified: false,
-          },
-        ],
+        reviews: [{ text: "Okay book", rating: 3, scale: 5, verified: false }],
         coverImages: [
-          {
-            url: "https://example.com/low-res.jpg",
-            width: 100,
-            height: 150,
-            quality: "thumbnail",
-          },
+          { url: "https://example.com/low-res.jpg", width: 100, height: 150, quality: "thumbnail" },
         ],
         source: openLibrarySource,
       },
@@ -730,9 +657,7 @@ describe("Content Reconciliation Integration", () => {
     const result = contentReconciler.reconcileContentDescription(inputs);
 
     // Should select high-quality description
-    expect(result.description.value.text).toContain(
-      "comprehensive and well-researched",
-    );
+    expect(result.description.value.text).toContain("comprehensive and well-researched");
     expect(result.description.confidence).toBeGreaterThan(0.8);
 
     // Should prioritize verified review
@@ -740,9 +665,7 @@ describe("Content Reconciliation Integration", () => {
     expect(result.reviews.value[0].text).toContain("Exceptional work");
 
     // Should select high-resolution, verified cover image
-    expect(result.coverImage.value.url).toBe(
-      "https://example.com/high-res.jpg",
-    );
+    expect(result.coverImage.value.url).toBe("https://example.com/high-res.jpg");
     expect(result.coverImage.value.verified).toBe(true);
     expect(result.coverImage.value.quality).toBe("original");
     expect(result.coverImage.confidence).toBeGreaterThan(0.8);

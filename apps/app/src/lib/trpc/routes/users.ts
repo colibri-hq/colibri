@@ -1,3 +1,4 @@
+import type { AuthenticationUserRole } from "@colibri-hq/sdk/schema";
 import { env } from "$env/dynamic/private";
 import { paginatable, paginatedResults, procedure, t } from "$lib/trpc/t";
 import {
@@ -10,7 +11,6 @@ import {
   type UpdatableUser,
   updateUser,
 } from "@colibri-hq/sdk";
-import type { AuthenticationUserRole } from "@colibri-hq/sdk/schema";
 import { signUrl } from "@colibri-hq/shared";
 import { z } from "zod";
 
@@ -26,10 +26,7 @@ export const users = t.router({
    */
   search: procedure()
     .input(
-      z.object({
-        query: z.string().min(1).max(100),
-        limit: z.number().min(1).max(20).optional(),
-      }),
+      z.object({ query: z.string().min(1).max(100), limit: z.number().min(1).max(20).optional() }),
     )
     .query(({ input: { query, limit }, ctx: { database } }) =>
       searchUsers(database, query, limit ?? 10),
@@ -40,9 +37,7 @@ export const users = t.router({
    */
   load: procedure()
     .input(z.string())
-    .query(({ input, ctx: { database } }) =>
-      findUserByIdentifier(database, input),
-    ),
+    .query(({ input, ctx: { database } }) => findUserByIdentifier(database, input)),
 
   /**
    * Retrieves the current user.
@@ -62,10 +57,7 @@ export const users = t.router({
     .input(z.string())
     .mutation(async ({ input, ctx }) => {
       // TODO: Send confirmation mail
-      return updateUser(ctx.database, ctx.userId, {
-        email: input,
-        verified: false,
-      });
+      return updateUser(ctx.database, ctx.userId, { email: input, verified: false });
     }),
 
   /**
@@ -97,9 +89,7 @@ export const users = t.router({
    */
   removeAuthenticator: procedure()
     .input(z.string())
-    .mutation(async ({ input, ctx: { database } }) =>
-      removeAuthenticator(database, input),
-    ),
+    .mutation(async ({ input, ctx: { database } }) => removeAuthenticator(database, input)),
 
   generateInvitationLink: procedure()
     .input(
@@ -143,14 +133,13 @@ export const users = t.router({
           .default("adult"),
       }),
     )
-    .mutation(
-      ({ input: { name, emailAddress, birthDate, role }, ctx: { database } }) =>
-        createUser(database, {
-          birthdate: birthDate ?? null,
-          name: name,
-          email: emailAddress,
-          verified: true,
-          role,
-        }),
+    .mutation(({ input: { name, emailAddress, birthDate, role }, ctx: { database } }) =>
+      createUser(database, {
+        birthdate: birthDate ?? null,
+        name: name,
+        email: emailAddress,
+        verified: true,
+        role,
+      }),
     ),
 });

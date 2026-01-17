@@ -98,11 +98,7 @@ export const palmDb = Parser.start()
   // Offset 0, 0x00, 4 Bytes: Database name. This name is zero-terminated in the field and will be
   // used as the file name on a computer. For eBooks this usually contains the title and may have
   // the author depending on the length available
-  .string("identifier", {
-    length: 32,
-    encoding: "utf8",
-    stripNull: true,
-  })
+  .string("identifier", { length: 32, encoding: "utf8", stripNull: true })
 
   // Offset 32, 0x20, 2 Bytes: File Attribute bits:
   //  - 0x0002: Read-Only
@@ -126,21 +122,15 @@ export const palmDb = Parser.start()
   .uint16be("version")
 
   // Offset 36, 0x24, 4 Bytes: Time of creation, in seconds since the start of January 1, 1904.
-  .uint32be("creationTime", {
-    formatter: parseTimestamp,
-  })
+  .uint32be("creationTime", { formatter: parseTimestamp })
 
   // Offset 40, 0x28, 4 Bytes: Time of the last modification, in seconds since the start of January
   // 1, 1904.
-  .uint32be("modificationTime", {
-    formatter: parseTimestamp,
-  })
+  .uint32be("modificationTime", { formatter: parseTimestamp })
 
   // Offset 44, 0x2C, 4 Bytes: Time of the last backup, in seconds since the start of January
   // 1, 1904.
-  .uint32be("lastBackupTime", {
-    formatter: parseTimestamp,
-  })
+  .uint32be("lastBackupTime", { formatter: parseTimestamp })
 
   // Offset 48, 0x30, 4 Bytes: Unknown
   .uint32be("modificationNumber", { formatter: lowPassFilter })
@@ -201,11 +191,7 @@ export const palmDb = Parser.start()
         formatter(value) {
           const view = new DataView(value.buffer);
 
-          return (
-            (view.getUint8(0) << 16) |
-            (view.getUint8(1) << 8) |
-            view.getUint8(2)
-          );
+          return (view.getUint8(0) << 16) | (view.getUint8(1) << 8) | view.getUint8(2);
         },
       }),
     length: "numberOfRecords",
@@ -232,13 +218,7 @@ export const palmDoc = Parser.start()
   // Offset 0, 0x00, 4 Bytes: Compression type
   .uint16be("compression", {
     formatter(value) {
-      return (
-        {
-          1: "none",
-          2: "PalmDOC",
-          17480: "HUFF/CDIC",
-        }[value] ?? "unknown"
-      );
+      return { 1: "none", 2: "PalmDOC", 17480: "HUFF/CDIC" }[value] ?? "unknown";
     },
   })
 
@@ -257,13 +237,7 @@ export const palmDoc = Parser.start()
   // Offset 12, 0x0C, 2 Bytes: Encryption method used
   .uint16be("encryptionType", {
     formatter(value) {
-      return (
-        {
-          0: "none",
-          1: "legacy",
-          2: "Mobipocket",
-        }[value] ?? "unknown"
-      );
+      return { 0: "none", 1: "legacy", 2: "Mobipocket" }[value] ?? "unknown";
     },
   })
   .seek(2);
@@ -399,9 +373,7 @@ export const mobi = Parser.start()
   .uint32be("huffmanTableLength")
 
   // Offset 128, 0x80, 4 Bytes: Bitfield; if bit 6 (0x40) is set, then there's an EXTH record
-  .uint32be("hasExtendedHeader", {
-    formatter: (value) => (value & 0x40) !== 0,
-  })
+  .uint32be("hasExtendedHeader", { formatter: (value) => (value & 0x40) !== 0 })
 
   // Offset 132–167, 0x84–0xA7, 36 Bytes: Unknown
   .seek(36)
@@ -501,13 +473,7 @@ const exthRecordParser = Parser.start()
 
     // Choice parser to pick the correct parser based on the type of the record
     // @ts-ignore
-    type: Parser.start<
-      ExtendedHeader,
-      {
-        type: number;
-        length: number;
-      }
-    >().choice("value", {
+    type: Parser.start<ExtendedHeader, { type: number; length: number }>().choice("value", {
       tag: function () {
         return this.$parent.type;
       },
@@ -580,9 +546,7 @@ const exthRecordParser = Parser.start()
          * @see https://idpf.org/epub/20/spec/OPF_2.0_final_spec.html#Section2.2.7
          * @see www.dublincore.org/specifications/dublin-core/dcmi-terms/elements11/date/
          */
-        106: exthStringParser("publishingDate", {
-          formatter: (date) => new Date(date),
-        }),
+        106: exthStringParser("publishingDate", { formatter: (date) => new Date(date) }),
         107: exthStringParser("review"),
 
         /**
@@ -653,15 +617,11 @@ const exthRecordParser = Parser.start()
         /**
          * Whether this book is intended for adults.
          */
-        117: exthStringParser("isAdult", {
-          formatter: (value) => value === "yes",
-        }),
+        117: exthStringParser("isAdult", { formatter: (value) => value === "yes" }),
         118: exthStringParser("retailPrice", { formatter: Number }),
         119: exthStringParser("retailPriceCurrency"),
         121: Parser.start<object, object>().uint32be("kf8BoundaryOffset"),
-        122: exthStringParser("isFixedLayout", {
-          formatter: (value) => value === "true",
-        }),
+        122: exthStringParser("isFixedLayout", { formatter: (value) => value === "true" }),
 
         /**
          * @example "comic", "graphicNovel", "textbook", "magazine", "novel"
@@ -680,12 +640,8 @@ const exthRecordParser = Parser.start()
             return [Number(x), Number(y)] as const;
           },
         }),
-        127: exthStringParser("zeroGutter", {
-          formatter: (value) => value === "true",
-        }),
-        128: exthStringParser("zeroMargin", {
-          formatter: (value) => value === "true",
-        }),
+        127: exthStringParser("zeroGutter", { formatter: (value) => value === "true" }),
+        128: exthStringParser("zeroMargin", { formatter: (value) => value === "true" }),
         129: exthStringParser("coverURI"),
         131: Parser.start<object, object>().uint32be("__unknown_131__"),
         132: exthStringParser("regionMagnification"),
@@ -705,9 +661,7 @@ const exthRecordParser = Parser.start()
               202: "kindlegen (Mac)",
             };
 
-            return value in labels
-              ? labels[value as keyof typeof labels]
-              : `Unknown (${value})`;
+            return value in labels ? labels[value as keyof typeof labels] : `Unknown (${value})`;
           },
         }),
         205: Parser.start<object, object>().uint32be("generatorMajorVersion"),
@@ -728,23 +682,13 @@ const exthRecordParser = Parser.start()
         405: Parser.start<object, object>().uint32be("isRental", {
           formatter: (value) => value > 0,
         }),
-        406: exthStringParser("rentalExpirationDate", {
-          formatter: (date) => new Date(date),
-        }),
+        406: exthStringParser("rentalExpirationDate", { formatter: (date) => new Date(date) }),
         501: exthStringParser("documentType", {
           formatter(value) {
-            return (
-              {
-                PDOC: "Personal",
-                EBOK: "eBook",
-                EBSP: "eBook Sample",
-              }[value] ?? "unknown"
-            );
+            return { PDOC: "Personal", EBOK: "eBook", EBSP: "eBook Sample" }[value] ?? "unknown";
           },
         }),
-        502: exthStringParser("lastUpdateTime", {
-          formatter: (date) => new Date(date),
-        }),
+        502: exthStringParser("lastUpdateTime", { formatter: (date) => new Date(date) }),
         503: exthStringParser("title"),
         504: exthStringParser("asin504"),
         508: exthStringParser("titleFileAs"),
@@ -755,9 +699,7 @@ const exthRecordParser = Parser.start()
         527: exthStringParser("pageProgressionDirection", {
           assert: (value) => ["rtl", "ltr"].includes(value),
         }),
-        528: exthStringParser("overrideFonts", {
-          formatter: (value) => value === "true",
-        }),
+        528: exthStringParser("overrideFonts", { formatter: (value) => value === "true" }),
         529: exthStringParser("originalSourceDescription"),
         535: exthStringParser("kindlegenBuildRevisionNumber"),
 
@@ -873,10 +815,7 @@ export const extended = Parser.start()
   .uint32be("count")
 
   // Offset 12, 0x0C, 4 Bytes: Repeated EXTH records to the end of the EXTH length
-  .array("records", {
-    type: exthRecordParser,
-    length: "count",
-  });
+  .array("records", { type: exthRecordParser, length: "count" });
 
 // endregion
 
@@ -885,22 +824,14 @@ export const extended = Parser.start()
 export const index = Parser.start()
 
   // Offset 0, 0x00, 4 Bytes: the characters "INDX"
-  .string("magic", {
-    encoding: "utf-8",
-    assert: "INDX",
-    length: 4,
-  })
+  .string("magic", { encoding: "utf-8", assert: "INDX", length: 4 })
 
   // Offset 4, 0x04, 4 Bytes: Length of the INDX header, including the previous 4 bytes
   .uint32be("length")
 
   // Offset 8, 0x08, 4 Bytes: The type of index. 0 for normal, 2 for inflections.
   .uint32be("type", {
-    formatter: (value) =>
-      ({
-        0: "normal",
-        2: "inflections",
-      })[value] ?? "unknown",
+    formatter: (value) => ({ 0: "normal", 2: "inflections" })[value] ?? "unknown",
   })
 
   // Offset 12–19, 0x0C–0x13, 8 Bytes: Unknown

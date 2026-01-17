@@ -8,9 +8,7 @@ describe("Content JSON/MD Endpoints", () => {
       const response = await fetch(`${BASE_URL}/getting-started.json`);
 
       expect(response.status).toBe(200);
-      expect(response.headers.get("content-type")).toContain(
-        "application/json",
-      );
+      expect(response.headers.get("content-type")).toContain("application/json");
 
       const data = await response.json();
       expect(data).toHaveProperty("type", "page");
@@ -41,9 +39,7 @@ describe("Content JSON/MD Endpoints", () => {
     });
 
     it("returns 404 for non-existent page", async () => {
-      const response = await fetch(
-        `${BASE_URL}/this-page-definitely-does-not-exist-xyz.json`,
-      );
+      const response = await fetch(`${BASE_URL}/this-page-definitely-does-not-exist-xyz.json`);
 
       expect(response.status).toBe(404);
     });
@@ -69,9 +65,7 @@ describe("Content JSON/MD Endpoints", () => {
     });
 
     it("returns 404 for non-existent page", async () => {
-      const response = await fetch(
-        `${BASE_URL}/this-page-definitely-does-not-exist-xyz.md`,
-      );
+      const response = await fetch(`${BASE_URL}/this-page-definitely-does-not-exist-xyz.md`);
 
       expect(response.status).toBe(404);
     });
@@ -82,9 +76,7 @@ describe("Content JSON/MD Endpoints", () => {
       const response = await fetch(`${BASE_URL}/index.json`);
 
       expect(response.status).toBe(200);
-      expect(response.headers.get("content-type")).toContain(
-        "application/json",
-      );
+      expect(response.headers.get("content-type")).toContain("application/json");
 
       const data = await response.json();
       expect(data).toHaveProperty("type");
@@ -114,9 +106,7 @@ describe("Content JSON/MD Endpoints", () => {
   describe("Nested content paths", () => {
     it("handles nested JSON paths", async () => {
       // Try a nested path that should exist
-      const response = await fetch(
-        `${BASE_URL}/getting-started/quick-start.json`,
-      );
+      const response = await fetch(`${BASE_URL}/getting-started/quick-start.json`);
 
       // Either 200 (exists) or 404 (doesn't exist) is valid
       expect([200, 404]).toContain(response.status);
@@ -129,9 +119,7 @@ describe("Content JSON/MD Endpoints", () => {
     });
 
     it("handles nested MD paths", async () => {
-      const response = await fetch(
-        `${BASE_URL}/getting-started/quick-start.md`,
-      );
+      const response = await fetch(`${BASE_URL}/getting-started/quick-start.md`);
 
       // Either 200 (exists) or 404 (doesn't exist) is valid
       expect([200, 404]).toContain(response.status);

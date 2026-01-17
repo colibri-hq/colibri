@@ -28,16 +28,11 @@ import type {
 export type { DB as Schema } from "./schema.js";
 
 // Work types
-export type Work = SchemaWork & {
-  language_name?: string;
-  cover_blurhash?: string | null;
-};
+export type Work = SchemaWork & { language_name?: string; cover_blurhash?: string | null };
 
 export type WorkWithMainEdition<T extends Work = Work> = T & Edition;
 
-export type WorkWithCreators<T extends Work = Work> = T & {
-  creators: Creator[];
-};
+export type WorkWithCreators<T extends Work = Work> = T & { creators: Creator[] };
 
 // Creator type
 export type Creator = SchemaCreator;
@@ -49,10 +44,7 @@ export type Publisher = SchemaPublisher;
 export type Collection = SchemaCollection;
 
 // Comment types
-export type Comment = Omit<
-  SchemaComment,
-  "created_at" | "updated_at" | "hidden_at"
-> & {
+export type Comment = Omit<SchemaComment, "created_at" | "updated_at" | "hidden_at"> & {
   created_at: string | Date;
   updated_at: string | Date | null;
   hidden_at: string | Date | null;
@@ -66,12 +58,9 @@ export type CommentWithUser = Omit<Comment, "created_by"> & {
   mention_usernames?: string[];
 };
 
-export type CommentWithReactions = Comment & {
-  reactions: CommentReaction[];
-};
+export type CommentWithReactions = Comment & { reactions: CommentReaction[] };
 
-export type CommentWithUserAndReactions = CommentWithUser &
-  CommentWithReactions;
+export type CommentWithUserAndReactions = CommentWithUser & CommentWithReactions;
 
 export type CommentReport = SchemaCommentReport & {
   reporter_name?: string | null;
@@ -88,18 +77,9 @@ export type ModerationStats = {
   unresolvedReports: number;
   resolvedThisWeek: number;
   resolvedThisMonth: number;
-  byResolution: {
-    dismissed: number;
-    hidden: number;
-    deleted: number;
-  };
+  byResolution: { dismissed: number; hidden: number; deleted: number };
   hiddenComments: number;
-  topReporters: Array<{
-    userId: string;
-    name: string;
-    email: string | null;
-    count: number;
-  }>;
+  topReporters: Array<{ userId: string; name: string; email: string | null; count: number }>;
   averageResolutionTimeHours: number | null;
 };
 
@@ -127,11 +107,7 @@ export type ModerationLogEntry = {
 };
 
 // Bulk resolve result type
-export type BulkResolveResult = {
-  resolved: number;
-  failed: number;
-  commentIds: string[];
-};
+export type BulkResolveResult = { resolved: number; failed: number; commentIds: string[] };
 
 // User type
 export type User = Omit<AuthenticationUser, "created_at" | "updated_at"> & {

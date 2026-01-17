@@ -1,9 +1,4 @@
-import {
-  type Creator,
-  loadCreator,
-  NoResultError,
-  updateCreator,
-} from "@colibri-hq/sdk";
+import { type Creator, loadCreator, NoResultError, updateCreator } from "@colibri-hq/sdk";
 import { Args, Flags } from "@oclif/core";
 import { bold, dim } from "ansis";
 import { BaseCommand } from "../../command.js";
@@ -18,11 +13,7 @@ export default class Edit extends BaseCommand<typeof Edit> {
   };
   static override description = "Edit an existing creator";
   static override flags = {
-    "amazon-id": Flags.string({
-      char: "a",
-      description: "Amazon Author ID",
-      required: false,
-    }),
+    "amazon-id": Flags.string({ char: "a", description: "Amazon Author ID", required: false }),
     description: Flags.string({
       char: "d",
       description: "Description of the creator",
@@ -33,33 +24,19 @@ export default class Edit extends BaseCommand<typeof Edit> {
       description: "Goodreads Author ID",
       required: false,
     }),
-    image: Flags.file({
-      char: "I",
-      description: "Image file for the creator",
-      required: false,
-    }),
-    name: Flags.string({
-      char: "n",
-      description: "Name of the creator",
-      required: false,
-    }),
+    image: Flags.file({ char: "I", description: "Image file for the creator", required: false }),
+    name: Flags.string({ char: "n", description: "Name of the creator", required: false }),
     "sorting-key": Flags.string({
       char: "s",
       description: "Key used for sorting. Defaults to the creator's name",
       required: false,
     }),
-    url: Flags.url({
-      char: "u",
-      description: "URL to creator's website",
-      required: false,
-    }),
+    url: Flags.url({ char: "u", description: "URL to creator's website", required: false }),
     "wikipedia-url": Flags.url({
       char: "w",
       description: "URL to creator's Wikipedia page",
       async parse(input: string) {
-        if (
-          !/^(https?:\/\/)?((www|[a-z]+)\.)?wikipedia\.org\/wiki\//.test(input)
-        ) {
+        if (!/^(https?:\/\/)?((www|[a-z]+)\.)?wikipedia\.org\/wiki\//.test(input)) {
           throw new Error("Invalid Wikipedia URL");
         }
 

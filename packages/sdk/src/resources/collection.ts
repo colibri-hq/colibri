@@ -1,12 +1,7 @@
-import {
-  type InsertObject,
-  type Selectable,
-  type SelectQueryBuilder,
-  sql,
-} from "kysely";
-import type { User } from "./authentication/index.js";
+import { type InsertObject, type Selectable, type SelectQueryBuilder, sql } from "kysely";
 import type { Database, Schema } from "../database.js";
 import type { DB } from "../schema.js";
+import type { User } from "./authentication/index.js";
 import type { CommentWithUserAndReactions } from "./comment.js";
 
 const table = "collection" as const;
@@ -15,38 +10,19 @@ export function loadAllCollections(database: Database) {
   return database.selectFrom(table).selectAll().execute();
 }
 
-export function loadCollection(
-  database: Database,
-  collection: string | number,
-) {
-  return database
-    .selectFrom(table)
-    .selectAll()
-    .where("id", "=", collection.toString())
-    .execute();
+export function loadCollection(database: Database, collection: string | number) {
+  return database.selectFrom(table).selectAll().where("id", "=", collection.toString()).execute();
 }
 
-export function loadCollectionsForUser(
-  database: Database,
-  user: User | string | number,
-) {
-  const userId =
-    typeof user === "number" || typeof user === "string"
-      ? user.toString()
-      : user.id;
+export function loadCollectionsForUser(database: Database, user: User | string | number) {
+  const userId = typeof user === "number" || typeof user === "string" ? user.toString() : user.id;
 
   return applyAccessControls(database.selectFrom(table), userId)
-    .leftJoin(
-      "collection_entry",
-      "collection_entry.collection_id",
-      "collection.id",
-    )
+    .leftJoin("collection_entry", "collection_entry.collection_id", "collection.id")
     .select((eb) =>
       eb
         .selectFrom("collection_entry")
-        .select(({ fn }) =>
-          fn.count("collection_entry.work_id").as("entry_count"),
-        )
+        .select(({ fn }) => fn.count("collection_entry.work_id").as("entry_count"))
         .whereRef("collection_entry.collection_id", "=", "collection.id")
         .as("entry_count"),
     )
@@ -59,10 +35,7 @@ export function loadCollectionForUser(
   collection: string | number,
   user: User | string | number,
 ) {
-  const userId =
-    typeof user === "number" || typeof user === "string"
-      ? user.toString()
-      : user.id;
+  const userId = typeof user === "number" || typeof user === "string" ? user.toString() : user.id;
 
   return applyAccessControls(database.selectFrom(table), userId)
     .selectAll("collection")
@@ -70,17 +43,10 @@ export function loadCollectionForUser(
     .executeTakeFirstOrThrow();
 }
 
-export function loadCollectionCommentsLegacy(
-  database: Database,
-  id: number | string,
-) {
+export function loadCollectionCommentsLegacy(database: Database, id: number | string) {
   return database
     .selectFrom(table)
-    .innerJoin(
-      "collection_comment",
-      "collection_comment.collection_id",
-      "collection.id",
-    )
+    .innerJoin("collection_comment", "collection_comment.collection_id", "collection.id")
     .innerJoin("comment", "collection_comment.comment_id", "comment.id")
     .leftJoin("authentication.user as u", "u.id", "comment.created_by")
     .leftJoinLateral(
@@ -96,19 +62,14 @@ export function loadCollectionCommentsLegacy(
               .as("reaction"),
           )
           .select(({ fn, ref }) =>
-            fn("jsonb_object_agg", [
-              ref("reaction.emoji"),
-              ref("reaction.count"),
-            ]).as("reactions"),
+            fn("jsonb_object_agg", [ref("reaction.emoji"), ref("reaction.count")]).as("reactions"),
           )
           .as("result"),
       (join) => join.onTrue(),
     )
     .selectAll("comment")
     .select(({ fn }) => fn.toJson("u").as("created_by"))
-    .select(({ fn, ref, val }) =>
-      fn.coalesce(ref("result.reactions"), val("{}")).as("reactions"),
-    )
+    .select(({ fn, ref, val }) => fn.coalesce(ref("result.reactions"), val("{}")).as("reactions"))
     .where("collection.id", "=", id.toString())
     .groupBy("comment.id")
     .groupBy("result.reactions")
@@ -122,11 +83,7 @@ export function loadCollectionComments(
 ): Promise<CommentWithUserAndReactions[]> {
   return database
     .selectFrom(table)
-    .innerJoin(
-      "collection_comment",
-      "collection_comment.collection_id",
-      "collection.id",
-    )
+    .innerJoin("collection_comment", "collection_comment.collection_id", "collection.id")
     .innerJoin("comment", "collection_comment.comment_id", "comment.id")
     .leftJoin("authentication.user as u", "u.id", "comment.created_by")
     .leftJoinLateral(
@@ -141,12 +98,7 @@ export function loadCollectionComments(
     .selectAll("comment")
     .select(({ fn, val }) =>
       fn
-        .coalesce(
-          fn
-            .jsonAgg("reactions")
-            .filterWhere("reactions.emoji", "is not", null),
-          val("[]"),
-        )
+        .coalesce(fn.jsonAgg("reactions").filterWhere("reactions.emoji", "is not", null), val("[]"))
         .as("reactions"),
     )
     .select(({ fn }) => fn.toJson("u").as("created_by"))
@@ -168,11 +120,7 @@ export function loadCollectionComments(
 export function loadCollectionWorks(database: Database, id: number | string) {
   return database
     .selectFrom(table)
-    .innerJoin(
-      "collection_entry",
-      "collection_entry.collection_id",
-      "collection.id",
-    )
+    .innerJoin("collection_entry", "collection_entry.collection_id", "collection.id")
     .innerJoin("work", "collection_entry.work_id", "work.id")
     .leftJoin("edition", "work.main_edition_id", "edition.id")
     .leftJoin("image", "edition.cover_image_id", "image.id")
@@ -203,10 +151,7 @@ export async function addCollectionComment(
 
     await transaction
       .insertInto("collection_comment")
-      .values({
-        collection_id: collectionId,
-        comment_id: id,
-      })
+      .values({ collection_id: collectionId, comment_id: id })
       .execute();
 
     return id;
@@ -219,14 +164,9 @@ export async function addCollectionComment(
  * - shared = null (shared): Accessible by all authenticated instance users
  * - shared = false (private): Only accessible by the owner
  */
-function applyAccessControls(
-  query: SelectQueryBuilder<DB, typeof table, unknown>,
-  userId: string,
-) {
+function applyAccessControls(query: SelectQueryBuilder<DB, typeof table, unknown>, userId: string) {
   return query
-    .leftJoin("authentication.user", (join) =>
-      join.on("authentication.user.id", "=", userId),
-    )
+    .leftJoin("authentication.user", (join) => join.on("authentication.user.id", "=", userId))
     .where((builder) =>
       builder.and([
         // region Visibility controls
@@ -240,11 +180,7 @@ function applyAccessControls(
           // Private collections (shared = false) are only accessible by owner
           builder.and([
             builder.eb("collection.shared", "=", false),
-            builder.eb(
-              "collection.created_by",
-              "=",
-              builder.ref("authentication.user.id"),
-            ),
+            builder.eb("collection.created_by", "=", builder.ref("authentication.user.id")),
           ]),
         ]),
         // end region
@@ -279,9 +215,7 @@ function applyAccessControls(
  * Apply access controls for public (unauthenticated) access.
  * Only public collections with no age requirement are accessible.
  */
-function _applyPublicAccessControls(
-  query: SelectQueryBuilder<DB, typeof table, unknown>,
-) {
+function _applyPublicAccessControls(query: SelectQueryBuilder<DB, typeof table, unknown>) {
   return query.where((builder) =>
     builder.and([
       // Only public collections
@@ -336,26 +270,11 @@ export function updateCollection(
   database: Database,
   id: string,
   userId: string,
-  {
-    name,
-    description,
-    icon,
-    color,
-    shared,
-    ageRequirement: age_requirement,
-  }: UpdatedCollection,
+  { name, description, icon, color, shared, ageRequirement: age_requirement }: UpdatedCollection,
 ) {
   return database
     .updateTable(table)
-    .set({
-      name,
-      description,
-      icon,
-      color,
-      shared,
-      age_requirement,
-      updated_by: userId,
-    })
+    .set({ name, description, icon, color, shared, age_requirement, updated_by: userId })
     .where("id", "=", id)
     .returningAll()
     .executeTakeFirstOrThrow();
@@ -448,9 +367,7 @@ export async function toggleCollectionLike(
 
       await trx
         .updateTable("collection")
-        .set((eb) => ({
-          like_count: eb("like_count", "-", 1),
-        }))
+        .set((eb) => ({ like_count: eb("like_count", "-", 1) }))
         .where("id", "=", collectionId)
         .execute();
     });
@@ -467,17 +384,12 @@ export async function toggleCollectionLike(
     await database.transaction().execute(async (trx) => {
       await trx
         .insertInto("user_collection_favorite")
-        .values({
-          collection_id: collectionId,
-          user_id: userId,
-        })
+        .values({ collection_id: collectionId, user_id: userId })
         .execute();
 
       await trx
         .updateTable("collection")
-        .set((eb) => ({
-          like_count: eb("like_count", "+", 1),
-        }))
+        .set((eb) => ({ like_count: eb("like_count", "+", 1) }))
         .where("id", "=", collectionId)
         .execute();
     });
@@ -523,11 +435,7 @@ export async function reorderCollectionEntries(
     for (const { workId, position } of entries) {
       await trx
         .updateTable("collection_entry")
-        .set({
-          position,
-          updated_by: userId,
-          updated_at: new Date(),
-        })
+        .set({ position, updated_by: userId, updated_at: new Date() })
         .where("collection_id", "=", collectionId)
         .where("work_id", "=", workId)
         .execute();

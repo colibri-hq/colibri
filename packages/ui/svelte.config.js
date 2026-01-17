@@ -3,10 +3,7 @@ import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
 /** @type {import("@sveltejs/kit").Config} */
 const config = {
-  compilerOptions: {
-    modernAst: true,
-    discloseVersion: true,
-  },
+  compilerOptions: { modernAst: true, discloseVersion: true },
   kit: {
     adapter: adapter({
       pages: "dist/preview",

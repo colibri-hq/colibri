@@ -14,8 +14,7 @@ export default class Import extends BaseCommand<typeof Import> {
     }),
   };
 
-  static override description =
-    "Batch import multiple ebooks from a directory or glob pattern";
+  static override description = "Batch import multiple ebooks from a directory or glob pattern";
 
   static override examples = [
     "<%= config.bin %> <%= command.id %> './books/*.epub'",
@@ -61,38 +60,26 @@ export default class Import extends BaseCommand<typeof Import> {
     // Expand glob pattern
     const files = (
       await Array.fromAsync(
-        glob(pattern, {
-          exclude: (entry) => !entry.isFile(),
-          withFileTypes: true,
-        }),
+        glob(pattern, { exclude: (entry) => !entry.isFile(), withFileTypes: true }),
       )
     ).map(({ name, parentPath }) => resolve(parentPath, name));
 
     // Filter to supported formats
     const supportedExtensions = new Set([".epub", ".mobi", ".pdf"]);
-    const ebookFiles = files.filter((file) =>
-      supportedExtensions.has(extname(file).toLowerCase()),
-    );
+    const ebookFiles = files.filter((file) => supportedExtensions.has(extname(file).toLowerCase()));
 
     if (ebookFiles.length === 0) {
       this.error(`No ebook files found matching pattern: ${pattern}`);
     }
 
-    this.log(
-      `Found ${ebookFiles.length} ebook file${ebookFiles.length === 1 ? "" : "s"}`,
-    );
+    this.log(`Found ${ebookFiles.length} ebook file${ebookFiles.length === 1 ? "" : "s"}`);
 
     if (dryRun) {
       this.log("\nDry run - files that would be imported:");
       for (const file of ebookFiles) {
         this.log(`  ${basename(file)}`);
       }
-      return {
-        failed: [],
-        skipped: [],
-        successful: [],
-        total: ebookFiles.length,
-      };
+      return { failed: [], skipped: [], successful: [], total: ebookFiles.length };
     }
 
     // Create File objects
@@ -104,10 +91,7 @@ export default class Import extends BaseCommand<typeof Import> {
     );
 
     // Setup spinner for progress
-    const spinner = ora({
-      spinner: "dots",
-      text: "Starting import...",
-    }).start();
+    const spinner = ora({ spinner: "dots", text: "Starting import..." }).start();
 
     // Import files
     const result = await batchImport(database, fileObjects, {
@@ -151,10 +135,7 @@ export default class Import extends BaseCommand<typeof Import> {
     return result;
   }
 
-  private formatSummary(
-    result: Awaited<ReturnType<typeof batchImport>>,
-    duration: string,
-  ): string {
+  private formatSummary(result: Awaited<ReturnType<typeof batchImport>>, duration: string): string {
     const parts = [];
 
     if (result.successful.length > 0) {

@@ -1,3 +1,4 @@
+import { resolveLocaleByTag } from "./locale.js";
 import {
   extended,
   type ExtendedHeader,
@@ -8,7 +9,6 @@ import {
   type PalmDbHeader,
   palmDoc,
 } from "./parser.js";
-import { resolveLocaleByTag } from "./locale.js";
 
 function parseMetadata(
   buffer: Uint8Array<ArrayBufferLike>,
@@ -21,13 +21,8 @@ function parseMetadata(
   const exthBuffer = buffer.slice(16 + mobiHeader.length);
   const { records } = extended.parse(exthBuffer);
 
-  type ExtendedHeaderRecord<
-    K extends keyof ExtendedHeader = keyof ExtendedHeader,
-  > = {
-    record: {
-      field: K;
-      value: ExtendedHeader[K] extends Array<infer T> ? T : ExtendedHeader[K];
-    };
+  type ExtendedHeaderRecord<K extends keyof ExtendedHeader = keyof ExtendedHeader> = {
+    record: { field: K; value: ExtendedHeader[K] extends Array<infer T> ? T : ExtendedHeader[K] };
   };
 
   const metadata = (records as ExtendedHeaderRecord[])

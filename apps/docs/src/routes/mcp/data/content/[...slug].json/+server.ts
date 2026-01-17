@@ -1,10 +1,5 @@
+import { getAllPages, getPage, normalizeSlug, type Page } from "$lib/content/content.js";
 import { error, json } from "@sveltejs/kit";
-import {
-  getAllPages,
-  getPage,
-  normalizeSlug,
-  type Page,
-} from "$lib/content/content.js";
 import type { EntryGenerator, RequestHandler } from "./$types.js";
 
 export const prerender = true;
@@ -42,9 +37,7 @@ export const entries = function entries() {
 
       return page && !page.metadata.draft && !page.metadata.hideFromMenu;
     })
-    .map((slug) => ({
-      slug: slug.replace(/^\//, ""),
-    }));
+    .map((slug) => ({ slug: slug.replace(/^\//, "") }));
 } satisfies EntryGenerator;
 
 export const GET = async function GET({ params }) {
@@ -68,10 +61,7 @@ export const GET = async function GET({ params }) {
       uri: `docs://colibri${page.slug}`,
       mimeType: "text/markdown",
       text: content,
-      annotations: {
-        audience: ["user", "assistant"],
-        priority: calculatePriority(page),
-      },
+      annotations: { audience: ["user", "assistant"], priority: calculatePriority(page) },
     },
     {
       headers: {

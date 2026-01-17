@@ -1,11 +1,11 @@
-import { browser, dev } from "$app/environment";
 import type { PaginationData } from "$lib/trpc/client";
 import type { Context } from "$lib/trpc/context";
+import type { MaybePromise } from "@colibri-hq/shared";
+import { browser, dev } from "$app/environment";
 import { auth } from "$lib/trpc/middleware/auth";
 import { logger } from "$lib/trpc/middleware/logger";
 import { initTRPC } from "@trpc/server";
 import { z, type ZodRawShape } from "zod";
-import type { MaybePromise } from "@colibri-hq/shared";
 
 export const t = initTRPC.context<Context>().create({
   isServer: !browser,

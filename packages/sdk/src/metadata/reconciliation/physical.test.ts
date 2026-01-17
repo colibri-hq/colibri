@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { PhysicalReconciler } from "./physical.js";
 import type { MetadataSource, PhysicalDescriptionInput } from "./types.js";
+import { PhysicalReconciler } from "./physical.js";
 
 describe("PhysicalReconciler", () => {
   const reconciler = new PhysicalReconciler();
@@ -57,9 +57,7 @@ describe("PhysicalReconciler", () => {
       expect(result2.height).toBe(297);
       expect(result2.unit).toBe("mm");
 
-      const result3 = reconciler.normalizeDimensions(
-        "15.2 cm x 22.9 cm x 2.5 cm",
-      );
+      const result3 = reconciler.normalizeDimensions("15.2 cm x 22.9 cm x 2.5 cm");
       expect(result3.width).toBe(152);
       expect(result3.height).toBe(229);
       expect(result3.depth).toBe(25);
@@ -67,11 +65,7 @@ describe("PhysicalReconciler", () => {
     });
 
     it("should handle dimension objects", () => {
-      const input = {
-        width: 8.5,
-        height: 11,
-        unit: "in" as const,
-      };
+      const input = { width: 8.5, height: 11, unit: "in" as const };
 
       const result = reconciler.normalizeDimensions(input);
       expect(result.width).toBeCloseTo(215.9, 1);
@@ -97,16 +91,10 @@ describe("PhysicalReconciler", () => {
     it("should detect binding types", () => {
       expect(reconciler.normalizeFormat("Hardcover").binding).toBe("hardcover");
       expect(reconciler.normalizeFormat("Paperback").binding).toBe("paperback");
-      expect(reconciler.normalizeFormat("Mass Market Paperback").binding).toBe(
-        "mass_market",
-      );
-      expect(reconciler.normalizeFormat("Board Book").binding).toBe(
-        "board_book",
-      );
+      expect(reconciler.normalizeFormat("Mass Market Paperback").binding).toBe("mass_market");
+      expect(reconciler.normalizeFormat("Board Book").binding).toBe("board_book");
       expect(reconciler.normalizeFormat("Spiral Bound").binding).toBe("spiral");
-      expect(reconciler.normalizeFormat("Leather Bound").binding).toBe(
-        "leather",
-      );
+      expect(reconciler.normalizeFormat("Leather Bound").binding).toBe("leather");
     });
 
     it("should detect format and medium types", () => {
@@ -178,9 +166,7 @@ describe("PhysicalReconciler", () => {
 
   describe("reconcilePageCounts", () => {
     it("should handle single page count", () => {
-      const inputs: PhysicalDescriptionInput[] = [
-        { pageCount: 320, source: mockSource1 },
-      ];
+      const inputs: PhysicalDescriptionInput[] = [{ pageCount: 320, source: mockSource1 }];
 
       const result = reconciler.reconcilePageCounts(inputs);
       expect(result.value).toBe(320);
@@ -257,14 +243,8 @@ describe("PhysicalReconciler", () => {
 
     it("should handle missing data gracefully", () => {
       const inputs: PhysicalDescriptionInput[] = [
-        {
-          pageCount: 320,
-          source: mockSource1,
-        },
-        {
-          dimensions: "210 x 297 mm",
-          source: mockSource2,
-        },
+        { pageCount: 320, source: mockSource1 },
+        { dimensions: "210 x 297 mm", source: mockSource2 },
       ];
 
       const result = reconciler.reconcilePhysicalDescriptions(inputs);

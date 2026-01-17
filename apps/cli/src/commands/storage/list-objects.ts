@@ -49,16 +49,12 @@ export class ListObjects extends BaseCommand<typeof ListObjects> {
         },
         {
           accessor: "LastModified",
-          format: (date) =>
-            date?.toLocaleString(this.flags.displayLocale) ?? "—",
+          format: (date) => date?.toLocaleString(this.flags.displayLocale) ?? "—",
           name: "Last Modified",
         },
         { accessor: "Owner", name: "Owner" },
         { accessor: "StorageClass", name: "Storage Class" },
-        {
-          format: (etag) => etag?.toString()?.replaceAll('"', "") ?? "—",
-          name: "ETag",
-        },
+        { format: (etag) => etag?.toString()?.replaceAll('"', "") ?? "—", name: "ETag" },
       ]),
     );
 

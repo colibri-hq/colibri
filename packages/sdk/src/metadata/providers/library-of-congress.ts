@@ -1,4 +1,12 @@
 import {
+  extractBibliographicData,
+  extractSruRecordCount,
+  type MarcBibliographicData,
+  type MarcRecord,
+  parseMarcXmlRecords,
+} from "../utils/marc-parser.js";
+import { cleanIsbn } from "../utils/normalization.js";
+import {
   type CreatorQuery,
   type MetadataRecord,
   MetadataType,
@@ -8,14 +16,6 @@ import {
   type TitleQuery,
 } from "./provider.js";
 import { RetryableMetadataProvider } from "./retryable-provider.js";
-import {
-  extractBibliographicData,
-  extractSruRecordCount,
-  type MarcBibliographicData,
-  type MarcRecord,
-  parseMarcXmlRecords,
-} from "../utils/marc-parser.js";
-import { cleanIsbn } from "../utils/normalization.js";
 
 type Fetch = typeof globalThis.fetch;
 
@@ -98,18 +98,12 @@ export class LibraryOfCongressMetadataProvider extends RetryableMetadataProvider
    */
   async searchByTitle(query: TitleQuery): Promise<MetadataRecord[]> {
     return this.executeWithRetry(async () => {
-      const searchQuery = query.exactMatch
-        ? `title="${query.title}"`
-        : `title=${query.title}`;
+      const searchQuery = query.exactMatch ? `title="${query.title}"` : `title=${query.title}`;
 
       const results = await this.#searchLoCSRU(searchQuery);
 
       return results.map((result, index) =>
-        this.#mapMarcRecordToMetadata(
-          result,
-          `${this.name}-title-${Date.now()}-${index}`,
-          "title",
-        ),
+        this.#mapMarcRecordToMetadata(result, `${this.name}-title-${Date.now()}-${index}`, "title"),
       );
     }, `title search for "${query.title}"`);
   }
@@ -125,11 +119,7 @@ export class LibraryOfCongressMetadataProvider extends RetryableMetadataProvider
       const results = await this.#searchLoCSRU(searchQuery);
 
       return results.map((result, index) =>
-        this.#mapMarcRecordToMetadata(
-          result,
-          `${this.name}-isbn-${cleanedIsbn}-${index}`,
-          "isbn",
-        ),
+        this.#mapMarcRecordToMetadata(result, `${this.name}-isbn-${cleanedIsbn}-${index}`, "isbn"),
       );
     }, `ISBN search for "${isbn}"`);
   }
@@ -139,9 +129,7 @@ export class LibraryOfCongressMetadataProvider extends RetryableMetadataProvider
    */
   async searchByCreator(query: CreatorQuery): Promise<MetadataRecord[]> {
     return this.executeWithRetry(async () => {
-      const searchQuery = query.fuzzy
-        ? `author=${query.name}`
-        : `author="${query.name}"`;
+      const searchQuery = query.fuzzy ? `author=${query.name}` : `author="${query.name}"`;
 
       const results = await this.#searchLoCSRU(searchQuery);
 
@@ -158,9 +146,7 @@ export class LibraryOfCongressMetadataProvider extends RetryableMetadataProvider
   /**
    * Search using multiple criteria
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     return this.executeWithRetry(async () => {
       const searchParts: string[] = [];
 
@@ -172,9 +158,7 @@ export class LibraryOfCongressMetadataProvider extends RetryableMetadataProvider
 
       if (query.authors && query.authors.length > 0) {
         // Use first author for search
-        const authorQuery = query.fuzzy
-          ? query.authors[0]
-          : `"${query.authors[0]}"`;
+        const authorQuery = query.fuzzy ? query.authors[0] : `"${query.authors[0]}"`;
         searchParts.push(`author=${authorQuery}`);
       }
 
@@ -188,17 +172,13 @@ export class LibraryOfCongressMetadataProvider extends RetryableMetadataProvider
       }
 
       if (query.publisher) {
-        const publisherQuery = query.fuzzy
-          ? query.publisher
-          : `"${query.publisher}"`;
+        const publisherQuery = query.fuzzy ? query.publisher : `"${query.publisher}"`;
         searchParts.push(`publisher=${publisherQuery}`);
       }
 
       if (query.yearRange) {
         // LoC supports date range queries
-        searchParts.push(
-          `date>=${query.yearRange[0]} and date<=${query.yearRange[1]}`,
-        );
+        searchParts.push(`date>=${query.yearRange[0]} and date<=${query.yearRange[1]}`);
       }
 
       // Combine search parts with AND
@@ -239,15 +219,12 @@ export class LibraryOfCongressMetadataProvider extends RetryableMetadataProvider
     const response = await this.#fetch(url, {
       headers: {
         Accept: "application/xml, text/xml",
-        "User-Agent":
-          "colibri-metadata-discovery/1.0 (https://github.com/colibri-hq/colibri)",
+        "User-Agent": "colibri-metadata-discovery/1.0 (https://github.com/colibri-hq/colibri)",
       },
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Library of Congress SRU error: ${response.status} ${response.statusText}`,
-      );
+      throw new Error(`Library of Congress SRU error: ${response.status} ${response.statusText}`);
     }
 
     const xmlText = await response.text();
@@ -275,9 +252,8 @@ export class LibraryOfCongressMetadataProvider extends RetryableMetadataProvider
     const bibData = extractBibliographicData(record);
 
     // Build the metadata object
-    const metadata: Partial<
-      Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">
-    > = {};
+    const metadata: Partial<Omit<MetadataRecord, "id" | "source" | "timestamp" | "confidence">> =
+      {};
 
     if (bibData.title) {
       metadata.title = bibData.title;
@@ -314,19 +290,13 @@ export class LibraryOfCongressMetadataProvider extends RetryableMetadataProvider
     if (bibData.dimensions) {
       const heightMatch = bibData.dimensions.match(/(\d+)/);
       if (heightMatch) {
-        metadata.physicalDimensions = {
-          height: parseInt(heightMatch[1]),
-          unit: "cm" as const,
-        };
+        metadata.physicalDimensions = { height: parseInt(heightMatch[1]), unit: "cm" as const };
       }
     }
 
     if (bibData.seriesName) {
       const volume = this.#parseSeriesVolume(bibData.seriesPosition);
-      metadata.series = {
-        name: bibData.seriesName,
-        ...(volume !== undefined && { volume }),
-      };
+      metadata.series = { name: bibData.seriesName, ...(volume !== undefined && { volume }) };
     }
 
     if (bibData.edition) {
@@ -442,11 +412,7 @@ export class LibraryOfCongressMetadataProvider extends RetryableMetadataProvider
     // Calculate final confidence, capped at 0.99
     const finalConfidence = Math.min(
       0.99,
-      baseConfidence +
-        completenessBoost +
-        authorityBoost +
-        recordQualityBoost +
-        criteriaMatchBoost,
+      baseConfidence + completenessBoost + authorityBoost + recordQualityBoost + criteriaMatchBoost,
     );
 
     // Round to 2 decimal places

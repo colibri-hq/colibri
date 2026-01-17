@@ -7,10 +7,7 @@ export async function POST({ request }: RequestEvent) {
     const { dsn } = await request.json();
 
     if (!dsn) {
-      return json(
-        { error: "Connection string is required", success: false },
-        { status: 400 },
-      );
+      return json({ error: "Connection string is required", success: false }, { status: 400 });
     }
 
     // Validate DSN format
@@ -19,29 +16,21 @@ export async function POST({ request }: RequestEvent) {
       if (url.protocol !== "postgres:" && url.protocol !== "postgresql:") {
         return json(
           {
-            error:
-              "Must be a valid PostgreSQL connection string (postgres://...)",
+            error: "Must be a valid PostgreSQL connection string (postgres://...)",
             success: false,
           },
           { status: 400 },
         );
       }
     } catch {
-      return json(
-        { error: "Invalid connection string format", success: false },
-        { status: 400 },
-      );
+      return json({ error: "Invalid connection string format", success: false }, { status: 400 });
     }
 
     // Test connection
     const db = initialize(dsn);
 
     try {
-      await db
-        .selectFrom("authentication.user")
-        .select("id")
-        .limit(1)
-        .execute();
+      await db.selectFrom("authentication.user").select("id").limit(1).execute();
       await db.destroy();
       return json({ success: true });
     } catch (error) {
@@ -59,19 +48,13 @@ export async function POST({ request }: RequestEvent) {
       }
 
       return json(
-        {
-          error: error instanceof Error ? error.message : "Connection failed",
-          success: false,
-        },
+        { error: error instanceof Error ? error.message : "Connection failed", success: false },
         { status: 400 },
       );
     }
   } catch (error) {
     return json(
-      {
-        error: error instanceof Error ? error.message : "Unknown error",
-        success: false,
-      },
+      { error: error instanceof Error ? error.message : "Unknown error", success: false },
       { status: 500 },
     );
   }

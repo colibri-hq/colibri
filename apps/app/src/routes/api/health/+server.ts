@@ -1,7 +1,7 @@
 import { json } from "@sveltejs/kit";
 import { uptime } from "node:process";
-import packageJson from "../../../../package.json" with { type: "json" };
 import type { RequestHandler } from "./$types";
+import packageJson from "../../../../package.json" with { type: "json" };
 
 const { version: releaseId } = packageJson;
 
@@ -12,9 +12,7 @@ export const GET = function handler() {
       version: releaseId.split(".", 1).pop(),
       releaseId,
       timestamp: new Date().toISOString(),
-      checks: {
-        uptime: uptimeCheck(),
-      },
+      checks: { uptime: uptimeCheck() },
     },
     {
       status: 200,

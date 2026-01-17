@@ -1,35 +1,31 @@
-import js from '@eslint/js';
-import type { Config as SvelteConfig } from '@sveltejs/kit';
-import svelte from 'eslint-plugin-svelte';
-import ts, { type ConfigArray } from 'typescript-eslint';
+import type { Config as SvelteConfig } from "@sveltejs/kit";
 // import tailwind from 'eslint-plugin-tailwindcss';
-import type { Linter } from 'eslint';
-import prettier from 'eslint-config-prettier/flat';
-import oxlint from 'eslint-plugin-oxlint';
-import globals from 'globals';
-import { resolve } from 'node:path';
+import type { Linter } from "eslint";
+import js from "@eslint/js";
+import prettier from "eslint-config-prettier/flat";
+import oxlint from "eslint-plugin-oxlint";
+import svelte from "eslint-plugin-svelte";
+import globals from "globals";
+import { resolve } from "node:path";
+import ts, { type ConfigArray } from "typescript-eslint";
 
 export function config(
   {
     tsconfigRootDir = import.meta.dirname,
     svelteConfig,
     ignores = [],
-  }: {
-    tsconfigRootDir?: string;
-    svelteConfig?: Partial<SvelteConfig>;
-    ignores?: string[];
-  } = {},
+  }: { tsconfigRootDir?: string; svelteConfig?: Partial<SvelteConfig>; ignores?: string[] } = {},
   ...additionalConfigs: Linter.Config[]
 ): ConfigArray {
   return ts.config([
     // region Ignored Files
     {
       ignores: [
-        '.svelte-kit/**/*',
-        'node_modules/**/*',
-        'dist/**/*',
-        '.turbo/**/*',
-        '.cache/**/*',
+        ".svelte-kit/**/*",
+        "node_modules/**/*",
+        "dist/**/*",
+        ".turbo/**/*",
+        ".cache/**/*",
         ...ignores,
       ],
     },
@@ -45,29 +41,22 @@ export function config(
     // endregion
 
     // region Global Configs
-    {
-      rules: { 'no-undef': 'off' },
-    },
+    { rules: { "no-undef": "off" } },
     // endregion
 
     // region CommonJS modules
-    {
-      files: ['**/*.cjs'],
-      rules: {
-        '@typescript-eslint/no-require-imports': 'off',
-      },
-    },
+    { files: ["**/*.cjs"], rules: { "@typescript-eslint/no-require-imports": "off" } },
     // endregion
 
     // region Sources
     {
-      files: ['src/**/*.ts'],
-      ignores: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
+      files: ["src/**/*.ts"],
+      ignores: ["src/**/*.test.ts", "src/**/*.spec.ts"],
       languageOptions: {
         parser: ts.parser,
         parserOptions: {
-          ecmaVersion: 'latest',
-          sourceType: 'module',
+          ecmaVersion: "latest",
+          sourceType: "module",
           tsconfigRootDir,
           projectService: true,
         },
@@ -77,19 +66,15 @@ export function config(
 
     // region Tests
     {
-      files: ['tests/**/*.ts', 'src/**/*.test.ts', 'src/**/*.spec.ts'],
+      files: ["tests/**/*.ts", "src/**/*.test.ts", "src/**/*.spec.ts"],
       languageOptions: {
-        globals: {
-          ...globals.node,
-        },
+        globals: { ...globals.node },
         parser: ts.parser,
         parserOptions: {
-          ecmaVersion: 'latest',
-          sourceType: 'module',
+          ecmaVersion: "latest",
+          sourceType: "module",
           tsconfigRootDir,
-          projectService: {
-            defaultProject: resolve(tsconfigRootDir, 'tsconfig.test.json'),
-          },
+          projectService: { defaultProject: resolve(tsconfigRootDir, "tsconfig.test.json") },
         },
       },
     },
@@ -97,27 +82,22 @@ export function config(
 
     // region Worker Modules
     {
-      ignores: ['src/**/*.worker.ts', 'src/**/*.worker.js'],
-      languageOptions: {
-        globals: {
-          ...globals.browser,
-          ...globals.worker,
-        },
-      },
+      ignores: ["src/**/*.worker.ts", "src/**/*.worker.js"],
+      languageOptions: { globals: { ...globals.browser, ...globals.worker } },
     },
     // endregion
 
     // region All TypeScript Code
     {
-      files: ['src/**/*.ts', 'tests/**/*.ts', 'src/**/*.svelte'],
+      files: ["src/**/*.ts", "tests/**/*.ts", "src/**/*.svelte"],
       rules: {
-        '@typescript-eslint/no-unused-vars': [
-          'warn',
+        "@typescript-eslint/no-unused-vars": [
+          "warn",
           {
-            args: 'all',
-            argsIgnorePattern: '^_',
-            destructuredArrayIgnorePattern: '^_',
-            varsIgnorePattern: '^_',
+            args: "all",
+            argsIgnorePattern: "^_",
+            destructuredArrayIgnorePattern: "^_",
+            varsIgnorePattern: "^_",
             ignoreRestSiblings: true,
           },
         ],
@@ -127,62 +107,51 @@ export function config(
 
     // region Client-side only TypeScript Code
     {
-      files: ['src/**/*.ts'],
+      files: ["src/**/*.ts"],
 
       // Exclude server routes
-      ignores: ['src/routes/**/*.ts'],
+      ignores: ["src/routes/**/*.ts"],
       rules: {
         // Allow logs in the client, but warn
-        'no-console': 'warn',
+        "no-console": "warn",
 
         // Disable `debugger` entirely
-        'no-debugger': 'error',
+        "no-debugger": "error",
       },
     },
     // endregion
 
     // region Server modules
     {
-      files: ['src/lib/server/**/*.ts', '**/*.server.ts'],
-      languageOptions: {
-        globals: {
-          ...globals.browser,
-          ...globals.node,
-        },
-      },
+      files: ["src/lib/server/**/*.ts", "**/*.server.ts"],
+      languageOptions: { globals: { ...globals.browser, ...globals.node } },
       rules: {
         // Allow console logs on the server
-        'no-console': 'off',
+        "no-console": "off",
       },
     },
     // endregion
 
     // region Svelte Components
     {
-      files: ['src/**/*.svelte'],
+      files: ["src/**/*.svelte"],
       languageOptions: {
-        globals: {
-          ...globals.browser,
-        },
+        globals: { ...globals.browser },
         parserOptions: {
           projectService: true,
           parser: ts.parser,
           tsconfigRootDir,
-          extraFileExtensions: ['.svelte'],
+          extraFileExtensions: [".svelte"],
           svelteConfig,
         },
       },
 
-      rules: {
-        'svelte/no-inline-styles': ['error', { allowTransitions: true }],
-      },
+      rules: { "svelte/no-inline-styles": ["error", { allowTransitions: true }] },
     },
     // endregion
 
     ...additionalConfigs,
-    ...oxlint.buildFromOxlintConfigFile(
-      `${import.meta.dirname}/.oxlintrc.json`,
-    ),
+    ...oxlint.buildFromOxlintConfigFile(`${import.meta.dirname}/.oxlintrc.json`),
   ]);
 }
 

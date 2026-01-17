@@ -3,17 +3,12 @@ import { md5 } from "hash-wasm";
 /**
  * Parsed author information
  */
-export type ParsedAuthor = {
-  name: string;
-  email?: string;
-};
+export type ParsedAuthor = { name: string; email?: string };
 
 /**
  * Author with Gravatar URL
  */
-export type AuthorWithGravatar = ParsedAuthor & {
-  gravatarUrl?: string;
-};
+export type AuthorWithGravatar = ParsedAuthor & { gravatarUrl?: string };
 
 // Memoization cache for Gravatar URLs keyed by "email:size"
 const gravatarCache = new Map<string, string>();
@@ -34,10 +29,7 @@ const authorCache = new Map<string, AuthorWithGravatar>();
 export function parseAuthor(author: string): ParsedAuthor {
   const match = author.match(/^(.+?)\s*<([^>]+)>$/);
   if (match) {
-    return {
-      name: match[1]!.trim(),
-      email: match[2]!.trim().toLowerCase(),
-    };
+    return { name: match[1]!.trim(), email: match[2]!.trim().toLowerCase() };
   }
   return { name: author.trim() };
 }
@@ -96,10 +88,7 @@ export async function getAuthorWithGravatar(
 
   let result: AuthorWithGravatar;
   if (parsed.email) {
-    result = {
-      ...parsed,
-      gravatarUrl: await getGravatarUrl(parsed.email, size),
-    };
+    result = { ...parsed, gravatarUrl: await getGravatarUrl(parsed.email, size) };
   } else {
     result = parsed;
   }

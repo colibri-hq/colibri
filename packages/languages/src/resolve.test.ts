@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  isValidLanguageCode,
-  resolveLanguage,
-  resolveLanguages,
-} from "./resolve.js";
+import { isValidLanguageCode, resolveLanguage, resolveLanguages } from "./resolve.js";
 
 describe("resolveLanguage", () => {
   describe("ISO 639-1 codes (2-letter)", () => {

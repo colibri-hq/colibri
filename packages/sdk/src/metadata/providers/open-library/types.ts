@@ -9,13 +9,7 @@ import type { MetadataRecord } from "../provider.js";
 /**
  * Confidence tier classification for result quality
  */
-export type ConfidenceTier =
-  | "exceptional"
-  | "strong"
-  | "good"
-  | "moderate"
-  | "weak"
-  | "poor";
+export type ConfidenceTier = "exceptional" | "strong" | "good" | "moderate" | "weak" | "poor";
 
 /**
  * Detailed confidence factor breakdown for transparency and debugging

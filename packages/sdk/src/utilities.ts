@@ -1,12 +1,7 @@
-import type { DB } from "./schema.js";
+import { type Expression, type RawBuilder, type SelectQueryBuilder, sql } from "kysely";
 import { jsonBuildObject } from "kysely/helpers/postgres";
-import {
-  type Expression,
-  type RawBuilder,
-  type SelectQueryBuilder,
-  sql,
-} from "kysely";
 import type { Database } from "./database.js";
+import type { DB } from "./schema.js";
 
 type ExtractTableAlias<DB, TE> = TE extends `${string} as ${infer TA}`
   ? TA extends keyof DB
@@ -24,9 +19,7 @@ type PaginationData = {
     total: string | number | bigint;
   };
 };
-type PaginationSchema = {
-  _pagination: PaginationData;
-};
+type PaginationSchema = { _pagination: PaginationData };
 
 export type Paginated<T> = Omit<T, "_pagination"> & PaginationData;
 
@@ -35,11 +28,7 @@ export function paginate<T extends keyof DB, O>(
   table: T,
   page: number = 1,
   perPage = 10,
-): SelectQueryBuilder<
-  DB & PaginationSchema,
-  ExtractTableAlias<DB, T> | "_pagination",
-  O
-> {
+): SelectQueryBuilder<DB & PaginationSchema, ExtractTableAlias<DB, T> | "_pagination", O> {
   const limit = Math.max(1, Math.min(100, perPage));
   const offset = limit * Math.max(0, page - 1);
 

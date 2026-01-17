@@ -191,12 +191,7 @@ export class QualityAssessor {
       isEmpty,
     );
 
-    return {
-      score,
-      level,
-      factors,
-      suggestions,
-    };
+    return { score, level, factors, suggestions };
   }
 
   /**
@@ -214,13 +209,10 @@ export class QualityAssessor {
     const accuracy = overallConfidence;
 
     // Consistency is based on field quality scores
-    const validScores = fieldQualityScores.filter(
-      (score) => !isNaN(score) && isFinite(score),
-    );
+    const validScores = fieldQualityScores.filter((score) => !isNaN(score) && isFinite(score));
     const consistency =
       validScores.length > 0
-        ? validScores.reduce((sum, score) => sum + score, 0) /
-          validScores.length
+        ? validScores.reduce((sum, score) => sum + score, 0) / validScores.length
         : 0.5;
 
     // Overall score
@@ -236,15 +228,7 @@ export class QualityAssessor {
       consistency,
     );
 
-    return {
-      score,
-      level,
-      completeness,
-      accuracy,
-      consistency,
-      strengths,
-      improvements,
-    };
+    return { score, level, completeness, accuracy, consistency, strengths, improvements };
   }
 
   /**
@@ -319,9 +303,7 @@ export class QualityAssessor {
       suggestions.push("Review and resolve conflicts between sources");
     }
     if (isEmpty) {
-      suggestions.push(
-        "This field is missing data - consider additional metadata sources",
-      );
+      suggestions.push("This field is missing data - consider additional metadata sources");
     }
 
     return suggestions;
@@ -340,14 +322,11 @@ export class QualityAssessor {
 
     if (completeness > 0.8) strengths.push("High data completeness");
     if (accuracy > 0.8) strengths.push("High confidence in metadata");
-    if (consistency > 0.8)
-      strengths.push("Consistent data quality across fields");
+    if (consistency > 0.8) strengths.push("Consistent data quality across fields");
 
     if (completeness < 0.6) improvements.push("Add more metadata fields");
-    if (accuracy < 0.7)
-      improvements.push("Improve metadata confidence with additional sources");
-    if (consistency < 0.6)
-      improvements.push("Resolve quality inconsistencies between fields");
+    if (accuracy < 0.7) improvements.push("Improve metadata confidence with additional sources");
+    if (consistency < 0.6) improvements.push("Resolve quality inconsistencies between fields");
 
     return { strengths, improvements };
   }

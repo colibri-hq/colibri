@@ -1,5 +1,5 @@
-import type { Database, Schema } from "../../database.js";
 import type { Insertable, Selectable, Updateable } from "kysely";
+import type { Database, Schema } from "../../database.js";
 import { paginate } from "../../utilities.js";
 
 const table = "authentication.user" as const;
@@ -30,16 +30,8 @@ export async function userExists(client: Database, email: string) {
   return Number(count) > 0;
 }
 
-export async function updateUser(
-  client: Database,
-  id: number | string,
-  data: UpdatableUser,
-) {
-  await client
-    .updateTable(table)
-    .set(data)
-    .where("id", "=", id.toString())
-    .execute();
+export async function updateUser(client: Database, id: number | string, data: UpdatableUser) {
+  await client.updateTable(table).set(data).where("id", "=", id.toString()).execute();
 }
 
 export async function listUsers(client: Database, page = 1, perPage = 10) {
@@ -71,24 +63,15 @@ export async function searchUsers(
     .execute();
 }
 
-export async function createUser(
-  client: Database,
-  data: InsertableUser,
-): Promise<User> {
+export async function createUser(client: Database, data: InsertableUser): Promise<User> {
   return await client
     .insertInto(table)
-    .values({
-      ...data,
-      email: data.email.toLowerCase(),
-    })
+    .values({ ...data, email: data.email.toLowerCase() })
     .returningAll()
     .executeTakeFirstOrThrow();
 }
 
-export async function removeUser(
-  client: Database,
-  id: number | string,
-): Promise<void> {
+export async function removeUser(client: Database, id: number | string): Promise<void> {
   await client.deleteFrom(table).where("id", "=", id.toString()).execute();
 }
 
@@ -113,10 +96,7 @@ export async function blockUser(
 ): Promise<void> {
   await database
     .insertInto("user_block")
-    .values({
-      blocker_id: blockerId,
-      blocked_id: blockedId,
-    })
+    .values({ blocker_id: blockerId, blocked_id: blockedId })
     .onConflict((eb) => eb.constraint("user_block_pkey").doNothing())
     .execute();
 }
@@ -139,10 +119,7 @@ export async function unblockUser(
 /**
  * Get list of users blocked by a user
  */
-export async function getBlockedUsers(
-  database: Database,
-  userId: string,
-): Promise<User[]> {
+export async function getBlockedUsers(database: Database, userId: string): Promise<User[]> {
   return database
     .selectFrom("user_block")
     .innerJoin(table, "user_block.blocked_id", `${table}.id`)
@@ -155,10 +132,7 @@ export async function getBlockedUsers(
 /**
  * Get list of blocked user IDs (for filtering comments)
  */
-export async function getBlockedUserIds(
-  database: Database,
-  userId: string,
-): Promise<string[]> {
+export async function getBlockedUserIds(database: Database, userId: string): Promise<string[]> {
   const blocks = await database
     .selectFrom("user_block")
     .select("blocked_id")

@@ -7,11 +7,7 @@ export function logger(t: Trpc) {
     const result = await next();
     const duration = Date.now() - start;
 
-    log(
-      `trpc:${type}`,
-      result.ok ? "info" : "error",
-      `${path} \x1b[2m(${duration}ms)\x1b[0m`,
-    );
+    log(`trpc:${type}`, result.ok ? "info" : "error", `${path} \x1b[2m(${duration}ms)\x1b[0m`);
 
     return result;
   });

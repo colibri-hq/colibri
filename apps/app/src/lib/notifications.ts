@@ -1,7 +1,7 @@
 import { browser } from "$app/environment";
 import { generateRandomUuid } from "@colibri-hq/shared";
-import { derived, get, writable } from "svelte/store";
 import { toast } from "svelte-sonner";
+import { derived, get, writable } from "svelte/store";
 
 export type NotificationLevel = "info" | "success" | "warning" | "error";
 
@@ -37,10 +37,7 @@ const store = writable<Notification[]>(initialValue);
 const exportedNotifications = derived(store, (s) => s);
 export { exportedNotifications as notifications };
 
-export const unreadCount = derived(
-  store,
-  (s) => s.filter((n) => !n.read).length,
-);
+export const unreadCount = derived(store, (s) => s.filter((n) => !n.read).length);
 
 if (browser) {
   store.subscribe((value) => sessionStorage.setItem(key, serialize(value)));
@@ -64,10 +61,7 @@ function deserialize(value: string): Notification[] {
   }
 }
 
-export function notify(
-  title: string,
-  options: NotificationOptions = {},
-): string {
+export function notify(title: string, options: NotificationOptions = {}): string {
   const { level = "info", message, duration } = options;
   const id = generateRandomUuid();
   const notification: Notification = {
@@ -82,11 +76,7 @@ export function notify(
   store.update((notifications) => [notification, ...notifications]);
 
   const toastDuration = duration ?? defaultDurations[level];
-  const toastOptions = {
-    id,
-    description: message,
-    duration: toastDuration,
-  };
+  const toastOptions = { id, description: message, duration: toastDuration };
 
   switch (level) {
     case "success":
@@ -107,31 +97,19 @@ export function notify(
   return id;
 }
 
-export function success(
-  title: string,
-  options: Omit<NotificationOptions, "level"> = {},
-): string {
+export function success(title: string, options: Omit<NotificationOptions, "level"> = {}): string {
   return notify(title, { ...options, level: "success" });
 }
 
-export function error(
-  title: string,
-  options: Omit<NotificationOptions, "level"> = {},
-): string {
+export function error(title: string, options: Omit<NotificationOptions, "level"> = {}): string {
   return notify(title, { ...options, level: "error" });
 }
 
-export function warning(
-  title: string,
-  options: Omit<NotificationOptions, "level"> = {},
-): string {
+export function warning(title: string, options: Omit<NotificationOptions, "level"> = {}): string {
   return notify(title, { ...options, level: "warning" });
 }
 
-export function info(
-  title: string,
-  options: Omit<NotificationOptions, "level"> = {},
-): string {
+export function info(title: string, options: Omit<NotificationOptions, "level"> = {}): string {
   return notify(title, { ...options, level: "info" });
 }
 
@@ -142,9 +120,7 @@ export function markAsRead(id: string): void {
 }
 
 export function markAllAsRead(): void {
-  store.update((notifications) =>
-    notifications.map((n) => ({ ...n, read: true })),
-  );
+  store.update((notifications) => notifications.map((n) => ({ ...n, read: true })));
 }
 
 export function clearHistory(): void {

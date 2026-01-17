@@ -92,25 +92,13 @@ export class SeriesReconciler {
 
   // Relationship type mappings
   private readonly relationshipMappings = new Map([
-    [
-      "sequel",
-      ["sequel", "continuation", "follows", "next", "book 2", "part 2"],
-    ],
+    ["sequel", ["sequel", "continuation", "follows", "next", "book 2", "part 2"]],
     ["prequel", ["prequel", "precedes", "before", "origin", "backstory"]],
-    [
-      "companion",
-      ["companion", "related", "spin-off", "spinoff", "side story"],
-    ],
-    [
-      "adaptation",
-      ["adaptation", "adapted from", "based on", "movie tie-in", "tv tie-in"],
-    ],
+    ["companion", ["companion", "related", "spin-off", "spinoff", "side story"]],
+    ["adaptation", ["adaptation", "adapted from", "based on", "movie tie-in", "tv tie-in"]],
     ["translation", ["translation", "translated from", "translated by"]],
     ["revision", ["revision", "revised", "updated", "new edition", "expanded"]],
-    [
-      "anthology_contains",
-      ["contains", "includes", "anthology of", "collection of"],
-    ],
+    ["anthology_contains", ["contains", "includes", "anthology of", "collection of"]],
     ["collection_contains", ["collected in", "part of collection", "omnibus"]],
     ["part_of", ["part of", "volume in", "book in series"]],
   ]);
@@ -132,10 +120,7 @@ export class SeriesReconciler {
       for (const seriesInput of input.series) {
         const normalized = this.normalizeSeries(seriesInput);
         if (normalized.name && normalized.name.trim().length > 0) {
-          allSeries.push({
-            series: normalized,
-            source: input.source,
-          });
+          allSeries.push({ series: normalized, source: input.source });
         }
       }
     }
@@ -164,14 +149,8 @@ export class SeriesReconciler {
     // Sort by volume number if available, then by name
     reconciledSeries.sort((a, b) => {
       if (a.volume !== undefined && b.volume !== undefined) {
-        const aVol =
-          typeof a.volume === "number"
-            ? a.volume
-            : parseInt(String(a.volume), 10);
-        const bVol =
-          typeof b.volume === "number"
-            ? b.volume
-            : parseInt(String(b.volume), 10);
+        const aVol = typeof a.volume === "number" ? a.volume : parseInt(String(a.volume), 10);
+        const bVol = typeof b.volume === "number" ? b.volume : parseInt(String(b.volume), 10);
         if (!isNaN(aVol) && !isNaN(bVol)) {
           return aVol - bVol;
         }
@@ -210,20 +189,14 @@ export class SeriesReconciler {
       .filter((input) => input.edition)
       .map((input) => ({ edition: input.edition!, source: input.source }));
     const allRelatedWorks = inputs.flatMap((input) =>
-      (input.relatedWorks || []).map((rw) => ({
-        relatedWork: rw,
-        source: input.source,
-      })),
+      (input.relatedWorks || []).map((rw) => ({ relatedWork: rw, source: input.source })),
     );
 
     // Reconcile work
     const reconciledWork = this.reconcileWork(works);
 
     // Reconcile edition
-    const reconciledEdition = this.reconcileEdition(
-      editions,
-      reconciledWork.value,
-    );
+    const reconciledEdition = this.reconcileEdition(editions, reconciledWork.value);
 
     // Reconcile related works
     const reconciledRelatedWorks = this.reconcileRelatedWorks(allRelatedWorks);
@@ -252,10 +225,7 @@ export class SeriesReconciler {
     );
 
     const allContents = inputs.flatMap((input) =>
-      (input.collectionContents || []).map((c) => ({
-        content: c,
-        source: input.source,
-      })),
+      (input.collectionContents || []).map((c) => ({ content: c, source: input.source })),
     );
 
     // Reconcile collections
@@ -264,10 +234,7 @@ export class SeriesReconciler {
     // Reconcile contents
     const reconciledContents = this.reconcileCollectionContents(allContents);
 
-    return {
-      collections: reconciledCollections,
-      collectionContents: reconciledContents,
-    };
+    return { collections: reconciledCollections, collectionContents: reconciledContents };
   }
 
   /**
@@ -329,26 +296,16 @@ export class SeriesReconciler {
 
           const volume = this.parseVolumeNumber(volumeStr);
 
-          return {
-            name: seriesName,
-            volume,
-            raw: trimmed,
-          };
+          return { name: seriesName, volume, raw: trimmed };
         } else if (match.length === 2) {
           // Pattern with just series name
-          return {
-            name: match[1].trim(),
-            raw: trimmed,
-          };
+          return { name: match[1].trim(), raw: trimmed };
         }
       }
     }
 
     // If no pattern matches, treat the entire string as series name
-    return {
-      name: trimmed,
-      raw: trimmed,
-    };
+    return { name: trimmed, raw: trimmed };
   }
 
   /**
@@ -428,8 +385,7 @@ export class SeriesReconciler {
       volume: input.volume,
       position: input.position,
       totalVolumes: input.totalVolumes,
-      seriesType:
-        input.seriesType || this.detectSeriesType(input.name, input.volume),
+      seriesType: input.seriesType || this.detectSeriesType(input.name, input.volume),
       description: input.description,
       identifiers: input.identifiers,
       raw: input.raw || input.name,
@@ -439,10 +395,7 @@ export class SeriesReconciler {
   /**
    * Detect series type based on name and volume information
    */
-  private detectSeriesType(
-    name: string,
-    volume?: number | string,
-  ): Series["seriesType"] {
+  private detectSeriesType(name: string, volume?: number | string): Series["seriesType"] {
     const lowerName = name.toLowerCase();
 
     if (lowerName.includes("anthology")) {
@@ -532,10 +485,7 @@ export class SeriesReconciler {
 
       for (const group of groups) {
         // Check if this series is similar to any in the existing group
-        const similarity = this.calculateSeriesSimilarity(
-          item.series.name,
-          group[0].series.name,
-        );
+        const similarity = this.calculateSeriesSimilarity(item.series.name, group[0].series.name);
         if (similarity > 0.8) {
           group.push(item);
           addedToGroup = true;
@@ -554,17 +504,13 @@ export class SeriesReconciler {
   /**
    * Reconcile a group of similar series
    */
-  private reconcileSeriesGroup(
-    group: { series: Series; source: MetadataSource }[],
-  ): Series {
+  private reconcileSeriesGroup(group: { series: Series; source: MetadataSource }[]): Series {
     if (group.length === 1) {
       return group[0].series;
     }
 
     // Sort by source reliability
-    const sorted = group.toSorted(
-      (a, b) => b.source.reliability - a.source.reliability,
-    );
+    const sorted = group.toSorted((a, b) => b.source.reliability - a.source.reliability);
     const primary = sorted[0].series;
 
     // Merge information from all sources
@@ -614,8 +560,7 @@ export class SeriesReconciler {
         for (const identifier of other.identifiers) {
           if (
             !merged.identifiers!.some(
-              (id) =>
-                id.type === identifier.type && id.value === identifier.value,
+              (id) => id.type === identifier.type && id.value === identifier.value,
             )
           ) {
             merged.identifiers!.push(identifier);
@@ -630,16 +575,12 @@ export class SeriesReconciler {
   /**
    * Calculate confidence score for reconciled series
    */
-  private calculateSeriesConfidence(
-    series: Series[],
-    sources: MetadataSource[],
-  ): number {
+  private calculateSeriesConfidence(series: Series[], sources: MetadataSource[]): number {
     if (series.length === 0) return 0.1;
 
     // Base confidence from source reliability
     const avgSourceReliability =
-      sources.reduce((sum, source) => sum + source.reliability, 0) /
-      sources.length;
+      sources.reduce((sum, source) => sum + source.reliability, 0) / sources.length;
     let confidence = avgSourceReliability;
 
     // Adjust based on completeness of series information
@@ -661,9 +602,7 @@ export class SeriesReconciler {
   /**
    * Reconcile work information
    */
-  private reconcileWork(
-    works: { work: Work; source: MetadataSource }[],
-  ): ReconciledField<Work> {
+  private reconcileWork(works: { work: Work; source: MetadataSource }[]): ReconciledField<Work> {
     if (works.length === 0) {
       return {
         value: { title: "", type: "other" },
@@ -674,9 +613,7 @@ export class SeriesReconciler {
     }
 
     // Sort by source reliability
-    const sorted = works.toSorted(
-      (a, b) => b.source.reliability - a.source.reliability,
-    );
+    const sorted = works.toSorted((a, b) => b.source.reliability - a.source.reliability);
     const primary = sorted[0].work;
 
     // Merge information from all sources
@@ -721,8 +658,7 @@ export class SeriesReconciler {
         for (const identifier of other.identifiers) {
           if (
             !merged.identifiers!.some(
-              (id) =>
-                id.type === identifier.type && id.value === identifier.value,
+              (id) => id.type === identifier.type && id.value === identifier.value,
             )
           ) {
             merged.identifiers!.push(identifier);
@@ -761,12 +697,8 @@ export class SeriesReconciler {
   /**
    * Calculate confidence for work reconciliation
    */
-  private calculateWorkConfidence(
-    work: Work,
-    sources: MetadataSource[],
-  ): number {
-    const avgReliability =
-      sources.reduce((sum, s) => sum + s.reliability, 0) / sources.length;
+  private calculateWorkConfidence(work: Work, sources: MetadataSource[]): number {
+    const avgReliability = sources.reduce((sum, s) => sum + s.reliability, 0) / sources.length;
 
     let completeness = 0.2; // Base for having a title
     if (work.type && work.type !== "other") completeness += 0.2;
@@ -793,9 +725,7 @@ export class SeriesReconciler {
       };
     }
 
-    const sorted = editions.toSorted(
-      (a, b) => b.source.reliability - a.source.reliability,
-    );
+    const sorted = editions.toSorted((a, b) => b.source.reliability - a.source.reliability);
     const primary = sorted[0].edition;
 
     const merged: Edition = {
@@ -819,10 +749,8 @@ export class SeriesReconciler {
       if (!merged.language && other.language) merged.language = other.language;
       if (!merged.publicationDate && other.publicationDate)
         merged.publicationDate = other.publicationDate;
-      if (!merged.publisher && other.publisher)
-        merged.publisher = other.publisher;
-      if (!merged.pageCount && other.pageCount)
-        merged.pageCount = other.pageCount;
+      if (!merged.publisher && other.publisher) merged.publisher = other.publisher;
+      if (!merged.pageCount && other.pageCount) merged.pageCount = other.pageCount;
 
       // Merge ISBNs
       if (other.isbn) {
@@ -838,8 +766,7 @@ export class SeriesReconciler {
         for (const identifier of other.identifiers) {
           if (
             !merged.identifiers!.some(
-              (id) =>
-                id.type === identifier.type && id.value === identifier.value,
+              (id) => id.type === identifier.type && id.value === identifier.value,
             )
           ) {
             merged.identifiers!.push(identifier);
@@ -864,12 +791,8 @@ export class SeriesReconciler {
   /**
    * Calculate confidence for edition reconciliation
    */
-  private calculateEditionConfidence(
-    edition: Edition,
-    sources: MetadataSource[],
-  ): number {
-    const avgReliability =
-      sources.reduce((sum, s) => sum + s.reliability, 0) / sources.length;
+  private calculateEditionConfidence(edition: Edition, sources: MetadataSource[]): number {
+    const avgReliability = sources.reduce((sum, s) => sum + s.reliability, 0) / sources.length;
 
     let completeness = 0.1; // Base score
     if (edition.format) completeness += 0.15;
@@ -898,10 +821,7 @@ export class SeriesReconciler {
     }
 
     // Group by relationship type and similar titles
-    const grouped = new Map<
-      string,
-      { relatedWork: RelatedWork; source: MetadataSource }[]
-    >();
+    const grouped = new Map<string, { relatedWork: RelatedWork; source: MetadataSource }[]>();
 
     for (const item of relatedWorks) {
       const normalizedTitle = this.normalizeTitle(item.relatedWork.title);
@@ -911,10 +831,7 @@ export class SeriesReconciler {
       for (const [key, group] of grouped.entries()) {
         const [existingType, existingTitle] = key.split(":");
         if (existingType === item.relatedWork.relationshipType) {
-          const similarity = this.calculateLevenshteinSimilarity(
-            normalizedTitle,
-            existingTitle,
-          );
+          const similarity = this.calculateLevenshteinSimilarity(normalizedTitle, existingTitle);
           if (similarity > 0.6) {
             // Similar titles with same relationship type
             group.push(item);
@@ -933,23 +850,14 @@ export class SeriesReconciler {
     // Reconcile each group
     const reconciled: RelatedWork[] = [];
     for (const group of grouped.values()) {
-      const sorted = group.toSorted(
-        (a, b) => b.source.reliability - a.source.reliability,
-      );
+      const sorted = group.toSorted((a, b) => b.source.reliability - a.source.reliability);
       const primary = sorted[0].relatedWork;
 
       // Calculate average confidence
       const avgConfidence =
-        group.reduce(
-          (sum, item) => sum + (item.relatedWork.confidence || 0.5),
-          0,
-        ) / group.length;
+        group.reduce((sum, item) => sum + (item.relatedWork.confidence || 0.5), 0) / group.length;
 
-      reconciled.push({
-        ...primary,
-        confidence: avgConfidence,
-        source: sorted[0].source.name,
-      });
+      reconciled.push({ ...primary, confidence: avgConfidence, source: sorted[0].source.name });
     }
 
     const confidence = this.calculateRelatedWorksConfidence(
@@ -977,8 +885,7 @@ export class SeriesReconciler {
     const avgSourceReliability =
       sources.reduce((sum, s) => sum + s.reliability, 0) / sources.length;
     const avgWorkConfidence =
-      relatedWorks.reduce((sum, rw) => sum + (rw.confidence || 0.5), 0) /
-      relatedWorks.length;
+      relatedWorks.reduce((sum, rw) => sum + (rw.confidence || 0.5), 0) / relatedWorks.length;
 
     return Math.max(0.1, Math.min(1, avgSourceReliability * avgWorkConfidence));
   }
@@ -995,10 +902,7 @@ export class SeriesReconciler {
       };
     }
 
-    return {
-      ...input,
-      normalized: input.normalized || this.normalizeCollectionName(input.name),
-    };
+    return { ...input, normalized: input.normalized || this.normalizeCollectionName(input.name) };
   }
 
   /**
@@ -1023,8 +927,7 @@ export class SeriesReconciler {
 
     if (lower.includes("anthology")) return "anthology";
     if (lower.includes("omnibus")) return "omnibus";
-    if (lower.includes("series") && lower.includes("collection"))
-      return "series_collection";
+    if (lower.includes("series") && lower.includes("collection")) return "series_collection";
     if (lower.includes("collection")) return "collection";
 
     return "other";
@@ -1050,23 +953,19 @@ export class SeriesReconciler {
     const reconciled: Collection[] = [];
 
     for (const group of groups) {
-      const sorted = group.toSorted(
-        (a, b) => b.source.reliability - a.source.reliability,
-      );
+      const sorted = group.toSorted((a, b) => b.source.reliability - a.source.reliability);
       const primary = sorted[0].collection;
 
       // Merge information - prefer the most complete name (longest one)
       const allNames = group.map((g) => g.collection.name);
       const longestName = allNames.reduce(
-        (longest, current) =>
-          current.length > longest.length ? current : longest,
+        (longest, current) => (current.length > longest.length ? current : longest),
         primary.name,
       );
 
       // Find the collection with the most specific type (not 'other')
       const bestType =
-        group.find((g) => g.collection.type !== "other")?.collection.type ||
-        primary.type;
+        group.find((g) => g.collection.type !== "other")?.collection.type || primary.type;
 
       const merged: Collection = {
         name: longestName,
@@ -1082,10 +981,8 @@ export class SeriesReconciler {
       for (let i = 1; i < sorted.length; i++) {
         const other = sorted[i].collection;
 
-        if (!merged.description && other.description)
-          merged.description = other.description;
-        if (!merged.totalWorks && other.totalWorks)
-          merged.totalWorks = other.totalWorks;
+        if (!merged.description && other.description) merged.description = other.description;
+        if (!merged.totalWorks && other.totalWorks) merged.totalWorks = other.totalWorks;
 
         // Merge editors
         if (other.editors) {
@@ -1101,9 +998,7 @@ export class SeriesReconciler {
           for (const content of other.contents) {
             if (
               !merged.contents!.some(
-                (c) =>
-                  this.normalizeTitle(c.title) ===
-                  this.normalizeTitle(content.title),
+                (c) => this.normalizeTitle(c.title) === this.normalizeTitle(content.title),
               )
             ) {
               merged.contents!.push(content);
@@ -1170,8 +1065,7 @@ export class SeriesReconciler {
     if (collections.length === 0) return 0.1;
 
     const avgReliability =
-      sources.reduce((sum, { reliability }) => sum + reliability, 0) /
-      sources.length;
+      sources.reduce((sum, { reliability }) => sum + reliability, 0) / sources.length;
 
     const avgCompleteness =
       collections.reduce((sum, { contents, description, editors, type }) => {
@@ -1216,10 +1110,7 @@ export class SeriesReconciler {
     }
 
     // Group by title
-    const grouped = new Map<
-      string,
-      { content: CollectionContent; source: MetadataSource }[]
-    >();
+    const grouped = new Map<string, { content: CollectionContent; source: MetadataSource }[]>();
 
     for (const item of contents) {
       const key = this.normalizeTitle(item.content.title);
@@ -1234,9 +1125,7 @@ export class SeriesReconciler {
     // Reconcile each group
     const reconciled: CollectionContent[] = [];
     for (const group of grouped.values()) {
-      const sorted = group.toSorted(
-        (a, b) => b.source.reliability - a.source.reliability,
-      );
+      const sorted = group.toSorted((a, b) => b.source.reliability - a.source.reliability);
 
       const primary = sorted[0].content;
 
@@ -1252,8 +1141,7 @@ export class SeriesReconciler {
 
       // Merge from other sources
       for (let i = 1; i < sorted.length; i++) {
-        const { authors, originalPublication, pageRange, position, type } =
-          sorted[i].content;
+        const { authors, originalPublication, pageRange, position, type } = sorted[i].content;
 
         if (!merged.type && type) {
           merged.type = type;
@@ -1316,8 +1204,7 @@ export class SeriesReconciler {
     }
 
     const avgReliability =
-      sources.reduce((sum, { reliability }) => sum + reliability, 0) /
-      sources.length;
+      sources.reduce((sum, { reliability }) => sum + reliability, 0) / sources.length;
 
     const avgCompleteness =
       contents.reduce((sum, { authors, pageRange, position, type }) => {

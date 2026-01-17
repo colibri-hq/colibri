@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Database } from "../../database.js";
 import { ISBNdbMetadataProvider } from "./isbndb.js";
 import { MetadataType } from "./provider.js";
-import type { Database } from "../../database.js";
 
 describe("ISBNdbMetadataProvider", () => {
   let provider: ISBNdbMetadataProvider;
@@ -32,21 +32,11 @@ describe("ISBNdbMetadataProvider", () => {
     });
 
     it("should provide reliability scores for different data types", () => {
-      expect(provider.getReliabilityScore(MetadataType.ISBN)).toBeGreaterThan(
-        0.9,
-      );
-      expect(provider.getReliabilityScore(MetadataType.TITLE)).toBeGreaterThan(
-        0.8,
-      );
-      expect(
-        provider.getReliabilityScore(MetadataType.AUTHORS),
-      ).toBeGreaterThan(0.75);
-      expect(
-        provider.getReliabilityScore(MetadataType.PAGE_COUNT),
-      ).toBeGreaterThan(0.8);
-      expect(
-        provider.getReliabilityScore(MetadataType.PHYSICAL_DIMENSIONS),
-      ).toBeGreaterThan(0.7);
+      expect(provider.getReliabilityScore(MetadataType.ISBN)).toBeGreaterThan(0.9);
+      expect(provider.getReliabilityScore(MetadataType.TITLE)).toBeGreaterThan(0.8);
+      expect(provider.getReliabilityScore(MetadataType.AUTHORS)).toBeGreaterThan(0.75);
+      expect(provider.getReliabilityScore(MetadataType.PAGE_COUNT)).toBeGreaterThan(0.8);
+      expect(provider.getReliabilityScore(MetadataType.PHYSICAL_DIMENSIONS)).toBeGreaterThan(0.7);
     });
 
     it("should support expected metadata types", () => {
@@ -54,9 +44,7 @@ describe("ISBNdbMetadataProvider", () => {
       expect(provider.supportsDataType(MetadataType.AUTHORS)).toBe(true);
       expect(provider.supportsDataType(MetadataType.ISBN)).toBe(true);
       expect(provider.supportsDataType(MetadataType.PAGE_COUNT)).toBe(true);
-      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(
-        true,
-      );
+      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(true);
       expect(provider.supportsDataType(MetadataType.PUBLISHER)).toBe(true);
       expect(provider.supportsDataType(MetadataType.DESCRIPTION)).toBe(true);
     });
@@ -111,16 +99,12 @@ describe("ISBNdbMetadataProvider", () => {
         "https://api2.isbndb.com/book/9780132350884",
         expect.objectContaining({
           method: "GET",
-          headers: expect.objectContaining({
-            Authorization: "test-api-key",
-          }),
+          headers: expect.objectContaining({ Authorization: "test-api-key" }),
         }),
       );
 
       expect(results).toHaveLength(1);
-      expect(results[0].title).toBe(
-        "Clean Code: A Handbook of Agile Software Craftsmanship",
-      );
+      expect(results[0].title).toBe("Clean Code: A Handbook of Agile Software Craftsmanship");
       expect(results[0].authors).toEqual(["Robert C. Martin"]);
       expect(results[0].isbn).toContain("9780132350884");
       expect(results[0].publisher).toBe("Prentice Hall");
@@ -135,9 +119,7 @@ describe("ISBNdbMetadataProvider", () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: async () => ({
-          book: { title: "Test Book", isbn13: "9780132350884" },
-        }),
+        json: async () => ({ book: { title: "Test Book", isbn13: "9780132350884" } }),
         headers: new Map(),
       });
 
@@ -183,9 +165,7 @@ describe("ISBNdbMetadataProvider", () => {
     });
 
     it("should handle invalid API key (401)", async () => {
-      vi.spyOn(provider as any, "getApiKey").mockResolvedValue(
-        "invalid-api-key",
-      );
+      vi.spyOn(provider as any, "getApiKey").mockResolvedValue("invalid-api-key");
 
       mockFetch.mockResolvedValue({
         ok: false,
@@ -207,11 +187,7 @@ describe("ISBNdbMetadataProvider", () => {
         ok: true,
         status: 200,
         json: async () => ({
-          book: {
-            title: "Test Book",
-            isbn13: "9780132350884",
-            dimensions: "9.5 x 6.5 x 1.2",
-          },
+          book: { title: "Test Book", isbn13: "9780132350884", dimensions: "9.5 x 6.5 x 1.2" },
         }),
         headers: new Map(),
       });
@@ -234,11 +210,7 @@ describe("ISBNdbMetadataProvider", () => {
         ok: true,
         status: 200,
         json: async () => ({
-          book: {
-            title: "Test Book",
-            isbn13: "9780132350884",
-            date_published: "2008-08-01",
-          },
+          book: { title: "Test Book", isbn13: "9780132350884", date_published: "2008-08-01" },
         }),
         headers: new Map(),
       });
@@ -252,11 +224,7 @@ describe("ISBNdbMetadataProvider", () => {
         ok: true,
         status: 200,
         json: async () => ({
-          book: {
-            title: "Test Book",
-            isbn13: "9780132350884",
-            date_published: "2008",
-          },
+          book: { title: "Test Book", isbn13: "9780132350884", date_published: "2008" },
         }),
         headers: new Map(),
       });
@@ -271,16 +239,8 @@ describe("ISBNdbMetadataProvider", () => {
       vi.spyOn(provider as any, "getApiKey").mockResolvedValue("test-api-key");
 
       const mockBooks = [
-        {
-          title: "Clean Code",
-          isbn13: "9780132350884",
-          authors: ["Robert C. Martin"],
-        },
-        {
-          title: "The Clean Coder",
-          isbn13: "9780137081073",
-          authors: ["Robert C. Martin"],
-        },
+        { title: "Clean Code", isbn13: "9780132350884", authors: ["Robert C. Martin"] },
+        { title: "The Clean Coder", isbn13: "9780137081073", authors: ["Robert C. Martin"] },
       ];
 
       mockFetch.mockResolvedValue({
@@ -312,9 +272,7 @@ describe("ISBNdbMetadataProvider", () => {
         headers: new Map(),
       });
 
-      const results = await provider.searchByTitle({
-        title: "Nonexistent Book Title",
-      });
+      const results = await provider.searchByTitle({ title: "Nonexistent Book Title" });
 
       expect(results).toEqual([]);
     });
@@ -345,21 +303,9 @@ describe("ISBNdbMetadataProvider", () => {
       vi.spyOn(provider as any, "getApiKey").mockResolvedValue("test-api-key");
 
       const mockBooks = [
-        {
-          title: "Clean Code",
-          isbn13: "9780132350884",
-          authors: ["Robert C. Martin"],
-        },
-        {
-          title: "The Clean Coder",
-          isbn13: "9780137081073",
-          authors: ["Robert C. Martin"],
-        },
-        {
-          title: "Irrelevant Book",
-          isbn13: "9780000000000",
-          authors: ["Different Author"],
-        },
+        { title: "Clean Code", isbn13: "9780132350884", authors: ["Robert C. Martin"] },
+        { title: "The Clean Coder", isbn13: "9780137081073", authors: ["Robert C. Martin"] },
+        { title: "Irrelevant Book", isbn13: "9780000000000", authors: ["Different Author"] },
       ];
 
       mockFetch.mockResolvedValue({
@@ -369,9 +315,7 @@ describe("ISBNdbMetadataProvider", () => {
         headers: new Map(),
       });
 
-      const results = await provider.searchByCreator({
-        name: "Robert C. Martin",
-      });
+      const results = await provider.searchByCreator({ name: "Robert C. Martin" });
 
       // Should filter to only include books by Robert C. Martin
       expect(results).toHaveLength(2);
@@ -383,11 +327,7 @@ describe("ISBNdbMetadataProvider", () => {
       vi.spyOn(provider as any, "getApiKey").mockResolvedValue("test-api-key");
 
       const mockBooks = [
-        {
-          title: "Clean Code",
-          isbn13: "9780132350884",
-          authors: ["ROBERT C. MARTIN"],
-        },
+        { title: "Clean Code", isbn13: "9780132350884", authors: ["ROBERT C. MARTIN"] },
       ];
 
       mockFetch.mockResolvedValue({
@@ -397,9 +337,7 @@ describe("ISBNdbMetadataProvider", () => {
         headers: new Map(),
       });
 
-      const results = await provider.searchByCreator({
-        name: "robert c. martin",
-      });
+      const results = await provider.searchByCreator({ name: "robert c. martin" });
 
       expect(results).toHaveLength(1);
     });
@@ -408,15 +346,8 @@ describe("ISBNdbMetadataProvider", () => {
       vi.spyOn(provider as any, "getApiKey").mockResolvedValue("test-api-key");
 
       const mockBooks = [
-        {
-          title: "Book Without Authors",
-          isbn13: "9780000000000",
-        },
-        {
-          title: "Book With Different Author",
-          isbn13: "9780000000001",
-          authors: ["Other Author"],
-        },
+        { title: "Book Without Authors", isbn13: "9780000000000" },
+        { title: "Book With Different Author", isbn13: "9780000000001", authors: ["Other Author"] },
       ];
 
       mockFetch.mockResolvedValue({
@@ -426,9 +357,7 @@ describe("ISBNdbMetadataProvider", () => {
         headers: new Map(),
       });
 
-      const results = await provider.searchByCreator({
-        name: "Robert C. Martin",
-      });
+      const results = await provider.searchByCreator({ name: "Robert C. Martin" });
 
       expect(results).toEqual([]);
     });
@@ -441,12 +370,7 @@ describe("ISBNdbMetadataProvider", () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: async () => ({
-          book: {
-            title: "Clean Code",
-            isbn13: "9780132350884",
-          },
-        }),
+        json: async () => ({ book: { title: "Clean Code", isbn13: "9780132350884" } }),
         headers: new Map(),
       });
 
@@ -473,10 +397,7 @@ describe("ISBNdbMetadataProvider", () => {
         headers: new Map(),
       });
 
-      await provider.searchMultiCriteria({
-        title: "Clean Code",
-        authors: ["Robert C. Martin"],
-      });
+      await provider.searchMultiCriteria({ title: "Clean Code", authors: ["Robert C. Martin"] });
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("Clean%20Code%20Robert%20C.%20Martin"),
@@ -494,9 +415,7 @@ describe("ISBNdbMetadataProvider", () => {
         headers: new Map(),
       });
 
-      await provider.searchMultiCriteria({
-        title: "Clean Code",
-      });
+      await provider.searchMultiCriteria({ title: "Clean Code" });
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("/books/Clean%20Code"),
@@ -514,9 +433,7 @@ describe("ISBNdbMetadataProvider", () => {
         headers: new Map(),
       });
 
-      await provider.searchMultiCriteria({
-        authors: ["Robert C. Martin"],
-      });
+      await provider.searchMultiCriteria({ authors: ["Robert C. Martin"] });
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("/books/Robert%20C.%20Martin"),
@@ -562,15 +479,7 @@ describe("ISBNdbMetadataProvider", () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: async () => ({
-          total: 1,
-          books: [
-            {
-              title: "Test Book",
-              isbn13: "9780132350884",
-            },
-          ],
-        }),
+        json: async () => ({ total: 1, books: [{ title: "Test Book", isbn13: "9780132350884" }] }),
         headers: new Map(),
       });
 
@@ -625,12 +534,7 @@ describe("ISBNdbMetadataProvider", () => {
         .mockResolvedValueOnce({
           ok: true,
           status: 200,
-          json: async () => ({
-            book: {
-              title: "Test Book",
-              isbn13: "9780132350884",
-            },
-          }),
+          json: async () => ({ book: { title: "Test Book", isbn13: "9780132350884" } }),
           headers: new Map(),
         });
 
@@ -648,12 +552,7 @@ describe("ISBNdbMetadataProvider", () => {
         .mockResolvedValueOnce({
           ok: true,
           status: 200,
-          json: async () => ({
-            book: {
-              title: "Test Book",
-              isbn13: "9780132350884",
-            },
-          }),
+          json: async () => ({ book: { title: "Test Book", isbn13: "9780132350884" } }),
           headers: new Map(),
         });
 

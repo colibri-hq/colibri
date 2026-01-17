@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { DateReconciler } from "./dates.js";
 import type { MetadataSource, PublicationInfoInput } from "./types.js";
+import { DateReconciler } from "./dates.js";
 
 describe("DateReconciler", () => {
   const reconciler = new DateReconciler();
@@ -31,27 +31,16 @@ describe("DateReconciler", () => {
 
     it("should parse year-month format", () => {
       const result = reconciler.normalizeDate("2023-05");
-      expect(result).toEqual({
-        year: 2023,
-        month: 5,
-        raw: "2023-05",
-        precision: "month",
-      });
+      expect(result).toEqual({ year: 2023, month: 5, raw: "2023-05", precision: "month" });
     });
 
     it("should parse year only", () => {
       const result = reconciler.normalizeDate("2023");
-      expect(result).toEqual({
-        year: 2023,
-        raw: "2023",
-        precision: "year",
-      });
+      expect(result).toEqual({ year: 2023, raw: "2023", precision: "year" });
     });
 
     it("should extract year from longer strings", () => {
-      const result = reconciler.normalizeDate(
-        "Published in 2023 by Example Press",
-      );
+      const result = reconciler.normalizeDate("Published in 2023 by Example Press");
       expect(result).toEqual({
         year: 2023,
         raw: "Published in 2023 by Example Press",
@@ -61,10 +50,7 @@ describe("DateReconciler", () => {
 
     it("should handle unknown date formats", () => {
       const result = reconciler.normalizeDate("sometime in the past");
-      expect(result).toEqual({
-        raw: "sometime in the past",
-        precision: "unknown",
-      });
+      expect(result).toEqual({ raw: "sometime in the past", precision: "unknown" });
     });
 
     it("should validate PublicationDate objects", () => {
@@ -83,12 +69,7 @@ describe("DateReconciler", () => {
 
   describe("reconcileDates", () => {
     it("should handle single date input", () => {
-      const inputs: PublicationInfoInput[] = [
-        {
-          date: "2023-05-15",
-          source: mockSource1,
-        },
-      ];
+      const inputs: PublicationInfoInput[] = [{ date: "2023-05-15", source: mockSource1 }];
 
       const result = reconciler.reconcileDates(inputs);
       expect(result.value.year).toBe(2023);
@@ -101,14 +82,8 @@ describe("DateReconciler", () => {
 
     it("should prefer more specific dates", () => {
       const inputs: PublicationInfoInput[] = [
-        {
-          date: "2023",
-          source: mockSource1,
-        },
-        {
-          date: "2023-05-15",
-          source: mockSource2,
-        },
+        { date: "2023", source: mockSource1 },
+        { date: "2023-05-15", source: mockSource2 },
       ];
 
       const result = reconciler.reconcileDates(inputs);
@@ -137,14 +112,8 @@ describe("DateReconciler", () => {
 
     it("should handle dates with unknown precision", () => {
       const inputs: PublicationInfoInput[] = [
-        {
-          date: "unknown date",
-          source: mockSource1,
-        },
-        {
-          date: "sometime",
-          source: mockSource2,
-        },
+        { date: "unknown date", source: mockSource1 },
+        { date: "sometime", source: mockSource2 },
       ];
 
       const result = reconciler.reconcileDates(inputs);
@@ -153,9 +122,7 @@ describe("DateReconciler", () => {
     });
 
     it("should throw error for empty input", () => {
-      expect(() => reconciler.reconcileDates([])).toThrow(
-        "No publication dates to reconcile",
-      );
+      expect(() => reconciler.reconcileDates([])).toThrow("No publication dates to reconcile");
     });
   });
 });

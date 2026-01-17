@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MetadataCoordinator } from "./fetch.js";
 import type {
   CreatorQuery,
   MetadataProvider,
@@ -8,18 +7,12 @@ import type {
   TitleQuery,
 } from "../providers/provider.js";
 import { MetadataType } from "../providers/provider.js";
+import { MetadataCoordinator } from "./fetch.js";
 
 // Mock provider implementation
 class MockMetadataProvider implements MetadataProvider {
-  readonly rateLimit = {
-    maxRequests: 100,
-    windowMs: 60000,
-    requestDelay: 0,
-  };
-  readonly timeout = {
-    requestTimeout: 5000,
-    operationTimeout: 10000,
-  };
+  readonly rateLimit = { maxRequests: 100, windowMs: 60000, requestDelay: 0 };
+  readonly timeout = { requestTimeout: 5000, operationTimeout: 10000 };
 
   constructor(
     public readonly name: string,
@@ -41,9 +34,7 @@ class MockMetadataProvider implements MetadataProvider {
     return this.executeQuery();
   }
 
-  async searchMultiCriteria(
-    _query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(_query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     return this.executeQuery();
   }
 
@@ -233,10 +224,7 @@ describe("MetadataCoordinator", () => {
       const record = createMockRecord("1", "provider1", 0.9);
       provider1.setMockRecords([record]);
 
-      const strategy = {
-        primary: { title: "Test Book" },
-        fallbacks: [{ title: "Test" }],
-      };
+      const strategy = { primary: { title: "Test Book" }, fallbacks: [{ title: "Test" }] };
 
       const result = await coordinator.queryWithStrategy(strategy);
 
@@ -253,10 +241,7 @@ describe("MetadataCoordinator", () => {
       // Fallback query returns results
       const fallbackRecord = createMockRecord("1", "provider1", 0.8);
 
-      const strategy = {
-        primary: { title: "Exact Title" },
-        fallbacks: [{ title: "Fuzzy Title" }],
-      };
+      const strategy = { primary: { title: "Exact Title" }, fallbacks: [{ title: "Fuzzy Title" }] };
 
       // Mock the second query call to return results
       let queryCount = 0;
@@ -330,10 +315,7 @@ describe("MetadataCoordinator", () => {
 
   describe("configuration management", () => {
     it("should update configuration", () => {
-      coordinator.updateConfig({
-        globalTimeout: 20000,
-        minConfidence: 0.6,
-      });
+      coordinator.updateConfig({ globalTimeout: 20000, minConfidence: 0.6 });
 
       const config = coordinator.getConfig();
       expect(config.globalTimeout).toBe(20000);
@@ -410,12 +392,8 @@ describe("MetadataCoordinator", () => {
       expect(result1.totalRecords).toBeGreaterThanOrEqual(1);
       expect(result2.totalRecords).toBeGreaterThanOrEqual(1);
       // Should have some results with the expected titles
-      const hasBookA = result1.aggregatedRecords.some(
-        (r) => r.title === "Book A",
-      );
-      const hasBookB = result2.aggregatedRecords.some(
-        (r) => r.title === "Book B",
-      );
+      const hasBookA = result1.aggregatedRecords.some((r) => r.title === "Book A");
+      const hasBookB = result2.aggregatedRecords.some((r) => r.title === "Book B");
       expect(hasBookA || hasBookB).toBe(true);
     });
 
@@ -424,13 +402,10 @@ describe("MetadataCoordinator", () => {
       provider2.setShouldFail(true);
       provider3.setDelay(2000); // Will timeout with short timeout
 
-      const shortTimeoutCoordinator = new MetadataCoordinator(
-        [provider1, provider2, provider3],
-        {
-          providerTimeout: 500,
-          continueOnFailure: true,
-        },
-      );
+      const shortTimeoutCoordinator = new MetadataCoordinator([provider1, provider2, provider3], {
+        providerTimeout: 500,
+        continueOnFailure: true,
+      });
 
       const query: MultiCriteriaQuery = { title: "Test Book" };
       const result = await shortTimeoutCoordinator.query(query);
@@ -449,13 +424,10 @@ describe("MetadataCoordinator", () => {
       provider2.setMockRecords([createMockRecord("2", "provider2", 0.8)]);
       provider3.setMockRecords([createMockRecord("3", "provider3", 0.7)]);
 
-      const fastCoordinator = new MetadataCoordinator(
-        [provider1, provider2, provider3],
-        {
-          globalTimeout: 1000,
-          continueOnFailure: true,
-        },
-      );
+      const fastCoordinator = new MetadataCoordinator([provider1, provider2, provider3], {
+        globalTimeout: 1000,
+        continueOnFailure: true,
+      });
 
       const query: MultiCriteriaQuery = { title: "Test Book" };
       const result = await fastCoordinator.query(query);
@@ -484,11 +456,7 @@ describe("MetadataCoordinator", () => {
       class SpecializedProvider extends MockMetadataProvider {
         private specialization: MetadataType;
 
-        constructor(
-          name: string,
-          priority: number,
-          specialization: MetadataType,
-        ) {
+        constructor(name: string, priority: number, specialization: MetadataType) {
           super(name, priority);
           this.specialization = specialization;
         }
@@ -498,34 +466,17 @@ describe("MetadataCoordinator", () => {
         }
 
         supportsDataType(dataType: MetadataType): boolean {
-          return (
-            dataType === this.specialization || dataType === MetadataType.TITLE
-          );
+          return dataType === this.specialization || dataType === MetadataType.TITLE;
         }
       }
 
-      const titleProvider = new SpecializedProvider(
-        "title-specialist",
-        1,
-        MetadataType.TITLE,
-      );
-      const authorProvider = new SpecializedProvider(
-        "author-specialist",
-        1,
-        MetadataType.AUTHORS,
-      );
+      const titleProvider = new SpecializedProvider("title-specialist", 1, MetadataType.TITLE);
+      const authorProvider = new SpecializedProvider("author-specialist", 1, MetadataType.AUTHORS);
 
-      const specializedCoordinator = new MetadataCoordinator([
-        titleProvider,
-        authorProvider,
-      ]);
+      const specializedCoordinator = new MetadataCoordinator([titleProvider, authorProvider]);
 
-      const titleProviders = specializedCoordinator.getProvidersForDataType(
-        MetadataType.TITLE,
-      );
-      const authorProviders = specializedCoordinator.getProvidersForDataType(
-        MetadataType.AUTHORS,
-      );
+      const titleProviders = specializedCoordinator.getProvidersForDataType(MetadataType.TITLE);
+      const authorProviders = specializedCoordinator.getProvidersForDataType(MetadataType.AUTHORS);
 
       expect(titleProviders).toHaveLength(2); // Both support title
       expect(authorProviders).toHaveLength(1); // Only author specialist supports authors
@@ -546,10 +497,7 @@ describe("MetadataCoordinator", () => {
       }
 
       const errorProvider = new ErrorProvider("error-provider", 1);
-      const resilientCoordinator = new MetadataCoordinator([
-        errorProvider,
-        provider1,
-      ]);
+      const resilientCoordinator = new MetadataCoordinator([errorProvider, provider1]);
 
       provider1.setMockRecords([createMockRecord("1", "provider1", 0.8)]);
 
@@ -560,9 +508,7 @@ describe("MetadataCoordinator", () => {
       expect(result.failedProviders).toBe(1);
       expect(result.totalRecords).toBe(1);
       // The error may be in different positions depending on provider order
-      const hasTypeError = result.providerResults.some(
-        (r) => r.error instanceof TypeError,
-      );
+      const hasTypeError = result.providerResults.some((r) => r.error instanceof TypeError);
       expect(hasTypeError).toBe(true);
     });
 
@@ -574,10 +520,7 @@ describe("MetadataCoordinator", () => {
         timestamp: "not-a-date",
       } as any;
 
-      provider1.setMockRecords([
-        malformedRecord,
-        createMockRecord("2", "provider1", 0.8),
-      ]);
+      provider1.setMockRecords([malformedRecord, createMockRecord("2", "provider1", 0.8)]);
 
       const query: MultiCriteriaQuery = { title: "Test Book" };
       const result = await coordinator.query(query);
@@ -608,13 +551,10 @@ describe("MetadataCoordinator", () => {
     });
 
     it("should handle continueOnFailure = false", async () => {
-      const strictCoordinator = new MetadataCoordinator(
-        [provider1, provider2, provider3],
-        {
-          continueOnFailure: false,
-          globalTimeout: 100, // Very short to force timeout
-        },
-      );
+      const strictCoordinator = new MetadataCoordinator([provider1, provider2, provider3], {
+        continueOnFailure: false,
+        globalTimeout: 100, // Very short to force timeout
+      });
 
       provider1.setDelay(200);
       provider2.setDelay(200);
@@ -633,13 +573,9 @@ describe("MetadataCoordinator", () => {
         (_, i) => new MockMetadataProvider(`provider-${i}`, 1),
       );
 
-      providers.forEach((p) =>
-        p.setMockRecords([createMockRecord("1", p.name, 0.8)]),
-      );
+      providers.forEach((p) => p.setMockRecords([createMockRecord("1", p.name, 0.8)]));
 
-      const limitedCoordinator = new MetadataCoordinator(providers, {
-        maxConcurrency: 3,
-      });
+      const limitedCoordinator = new MetadataCoordinator(providers, { maxConcurrency: 3 });
 
       const startTime = Date.now();
       const query: MultiCriteriaQuery = { title: "Test Book" };

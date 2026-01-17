@@ -1,14 +1,9 @@
-import { OAuthError } from "../errors.js";
-import type { AuthorizationServerOptions, Entities } from "../types.js";
-import { z } from "zod";
-import { defineGrantType, type GrantTypeOptions } from "./grantType.js";
-import {
-  jsonResponse,
-  parseRequestBody,
-  resolveClient,
-  timeOffset,
-} from "../utilities.js";
 import type { MaybePromise } from "@colibri-hq/shared";
+import { z } from "zod";
+import type { AuthorizationServerOptions, Entities } from "../types.js";
+import { OAuthError } from "../errors.js";
+import { jsonResponse, parseRequestBody, resolveClient, timeOffset } from "../utilities.js";
+import { defineGrantType, type GrantTypeOptions } from "./grantType.js";
 
 export interface DeviceCodeGrantOptions<
   T extends Entities.DeviceChallenge = Entities.DeviceChallenge,
@@ -365,9 +360,7 @@ export const DeviceCodeGrant = defineGrantType({
     }
 
     // TODO: This could benefit from a cool-down sliding window?
-    if (
-      isPollingTooFast(deviceChallenge, this.options.devicePollingInterval ?? 5)
-    ) {
+    if (isPollingTooFast(deviceChallenge, this.options.devicePollingInterval ?? 5)) {
       throw new OAuthError("slow_down");
     }
 
@@ -376,10 +369,7 @@ export const DeviceCodeGrant = defineGrantType({
     }
 
     if (!deviceChallenge.approved) {
-      throw new OAuthError(
-        "access_denied",
-        "The resource owner denied the request",
-      );
+      throw new OAuthError("access_denied", "The resource owner denied the request");
     }
 
     const scopes = (deviceChallenge.scopes ?? client.scopes)?.filter(
@@ -387,21 +377,14 @@ export const DeviceCodeGrant = defineGrantType({
     );
 
     return {
-      accessToken: {
-        ttl: this.options.accessTokenTtl,
-      },
-      refreshToken: {
-        ttl: this.options.refreshTokenTtl,
-      },
+      accessToken: { ttl: this.options.accessTokenTtl },
+      refreshToken: { ttl: this.options.refreshTokenTtl },
       scopes,
     };
   },
 });
 
-function isPollingTooFast(
-  { last_poll_at }: Entities.DeviceChallenge,
-  interval: number,
-) {
+function isPollingTooFast({ last_poll_at }: Entities.DeviceChallenge, interval: number) {
   if (last_poll_at === null) {
     return false;
   }
@@ -525,17 +508,12 @@ function isPollingTooFast(
  *
  * @see https://datatracker.ietf.org/doc/html/rfc8628#section-3 RFC 8628, Section 3
  */
-export async function handleDeviceAuthorizationRequest<
-  T extends AuthorizationServerOptions,
->(
+export async function handleDeviceAuthorizationRequest<T extends AuthorizationServerOptions>(
   request: Request,
   {
     grantOptions: { devicePollingInterval, storeDeviceChallenge },
     options,
-  }: {
-    options: T;
-    grantOptions: DeviceCodeGrantOptions;
-  },
+  }: { options: T; grantOptions: DeviceCodeGrantOptions },
 ) {
   const body = await parseRequestBody(request);
   const payload = await z
@@ -548,18 +526,13 @@ export async function handleDeviceAuthorizationRequest<
         .string({ message: "The scope is invalid" })
         .optional()
         .transform((scope) => scope?.split(" ") ?? [])
-        .pipe(
-          options.scopeSchema ??
-            z.string({ message: "The scope is invalid" }).array(),
-        ),
+        .pipe(options.scopeSchema ?? z.string({ message: "The scope is invalid" }).array()),
     })
     .safeParseAsync(body);
 
   if (!payload.success) {
     // TODO: There must be a better way to do this.
-    const message =
-      payload.error?.format().client_id?._errors.join(", ") ??
-      "Invalid request";
+    const message = payload.error?.format().client_id?._errors.join(", ") ?? "Invalid request";
 
     throw new OAuthError("invalid_request", message);
   }

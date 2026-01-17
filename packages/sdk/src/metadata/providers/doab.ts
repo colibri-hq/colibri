@@ -26,6 +26,7 @@
  * - Language
  */
 
+import { cleanIsbn } from "../utils/normalization.js";
 import {
   type CreatorQuery,
   type MetadataRecord,
@@ -36,7 +37,6 @@ import {
   type TitleQuery,
 } from "./provider.js";
 import { RetryableMetadataProvider } from "./retryable-provider.js";
-import { cleanIsbn } from "../utils/normalization.js";
 
 /**
  * DOAB API response types
@@ -53,17 +53,8 @@ interface DOABItem {
   name: string;
   handle: string;
   type: string;
-  metadata: Array<{
-    key: string;
-    value: string;
-    language?: string;
-  }>;
-  bitstreams?: Array<{
-    name: string;
-    format: string;
-    sizeBytes: number;
-    retrieveLink: string;
-  }>;
+  metadata: Array<{ key: string; value: string; language?: string }>;
+  bitstreams?: Array<{ name: string; format: string; sizeBytes: number; retrieveLink: string }>;
 }
 
 interface DOABSearchResponse {
@@ -94,9 +85,7 @@ export class DOABMetadataProvider extends RetryableMetadataProvider {
 
   private readonly baseUrl = "https://directory.doabooks.org/rest";
 
-  constructor(
-    private readonly fetch: typeof globalThis.fetch = globalThis.fetch,
-  ) {
+  constructor(private readonly fetch: typeof globalThis.fetch = globalThis.fetch) {
     super();
   }
 
@@ -104,14 +93,9 @@ export class DOABMetadataProvider extends RetryableMetadataProvider {
    * Search by title
    */
   async searchByTitle(query: TitleQuery): Promise<MetadataRecord[]> {
-    const searchQuery = query.exactMatch
-      ? `dc.title:"${query.title}"`
-      : `dc.title:${query.title}`;
+    const searchQuery = query.exactMatch ? `dc.title:"${query.title}"` : `dc.title:${query.title}`;
 
-    const response = await this.executeSearch(
-      searchQuery,
-      `title search for "${query.title}"`,
-    );
+    const response = await this.executeSearch(searchQuery, `title search for "${query.title}"`);
 
     if (!response?.items) {
       return [];
@@ -164,10 +148,7 @@ export class DOABMetadataProvider extends RetryableMetadataProvider {
       ? `dc.contributor.author:${query.name}`
       : `dc.contributor.author:"${query.name}"`;
 
-    const response = await this.executeSearch(
-      searchQuery,
-      `author search for "${query.name}"`,
-    );
+    const response = await this.executeSearch(searchQuery, `author search for "${query.name}"`);
 
     if (!response?.items) {
       return [];
@@ -179,9 +160,7 @@ export class DOABMetadataProvider extends RetryableMetadataProvider {
   /**
    * Search using multiple criteria
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     // Prioritize ISBN
     if (query.isbn) {
       return this.searchByISBN(query.isbn);
@@ -206,10 +185,7 @@ export class DOABMetadataProvider extends RetryableMetadataProvider {
       return [];
     }
 
-    const response = await this.executeSearch(
-      queryParts.join(" AND "),
-      "multi-criteria search",
-    );
+    const response = await this.executeSearch(queryParts.join(" AND "), "multi-criteria search");
 
     if (!response?.items) {
       return [];
@@ -277,16 +253,11 @@ export class DOABMetadataProvider extends RetryableMetadataProvider {
 
       const response = await this.fetch(url, {
         method: "GET",
-        headers: {
-          Accept: "application/json",
-          "User-Agent": this.userAgent,
-        },
+        headers: { Accept: "application/json", "User-Agent": this.userAgent },
       });
 
       if (!response.ok) {
-        throw new Error(
-          `DOAB API request failed: ${response.status} ${response.statusText}`,
-        );
+        throw new Error(`DOAB API request failed: ${response.status} ${response.statusText}`);
       }
 
       return (await response.json()) as DOABSearchResponse;
@@ -302,10 +273,7 @@ export class DOABMetadataProvider extends RetryableMetadataProvider {
   /**
    * Process DOAB items into MetadataRecords
    */
-  private processItems(
-    items: DOABItem[],
-    searchType: string,
-  ): MetadataRecord[] {
+  private processItems(items: DOABItem[], searchType: string): MetadataRecord[] {
     const records: MetadataRecord[] = [];
 
     for (const item of items) {
@@ -327,8 +295,7 @@ export class DOABMetadataProvider extends RetryableMetadataProvider {
             publisher: metadata.publisher,
             publicationDate: this.parseDate(metadata.publicationDate),
             description: metadata.description,
-            subjects:
-              metadata.subjects.length > 0 ? metadata.subjects : undefined,
+            subjects: metadata.subjects.length > 0 ? metadata.subjects : undefined,
             language: metadata.language,
             providerData: {
               uuid: item.uuid,
@@ -355,9 +322,7 @@ export class DOABMetadataProvider extends RetryableMetadataProvider {
   /**
    * Extract metadata from DOAB item metadata array
    */
-  private extractMetadata(
-    metadata: Array<{ key: string; value: string; language?: string }>,
-  ) {
+  private extractMetadata(metadata: Array<{ key: string; value: string; language?: string }>) {
     const result = {
       title: undefined as string | undefined,
       authors: [] as string[],
@@ -427,9 +392,7 @@ export class DOABMetadataProvider extends RetryableMetadataProvider {
     if (item.bitstreams && item.bitstreams.length > 0) {
       // Prefer PDF
       const pdf = item.bitstreams.find(
-        (b) =>
-          b.format?.toLowerCase().includes("pdf") ||
-          b.name?.toLowerCase().endsWith(".pdf"),
+        (b) => b.format?.toLowerCase().includes("pdf") || b.name?.toLowerCase().endsWith(".pdf"),
       );
       if (pdf) return pdf.retrieveLink;
 

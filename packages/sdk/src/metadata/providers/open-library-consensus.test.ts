@@ -100,10 +100,7 @@ describe("OpenLibraryMetadataProvider - Consensus-based Aggregation", () => {
         }
       });
 
-      const results = await provider.searchByCreator({
-        name: "Mogi, Ken",
-        fuzzy: true,
-      });
+      const results = await provider.searchByCreator({ name: "Mogi, Ken", fuzzy: true });
 
       expect(results).toHaveLength(1);
       // Should recognize both formats as the same author and prefer "First Last"
@@ -183,10 +180,7 @@ describe("OpenLibraryMetadataProvider - Consensus-based Aggregation", () => {
         }
       });
 
-      const results = await provider.searchByTitle({
-        title: "Consensus Book",
-        exactMatch: false,
-      });
+      const results = await provider.searchByTitle({ title: "Consensus Book", exactMatch: false });
 
       expect(results).toHaveLength(1);
       // Confidence should be boosted due to perfect consensus
@@ -375,10 +369,7 @@ describe("OpenLibraryMetadataProvider - Consensus-based Aggregation", () => {
         }
       });
 
-      const results = await provider.searchByCreator({
-        name: "Popular Author",
-        fuzzy: true,
-      });
+      const results = await provider.searchByCreator({ name: "Popular Author", fuzzy: true });
 
       expect(results).toHaveLength(1); // Should return exactly one aggregated result
       expect(results[0].confidence).toBeGreaterThan(0.9); // High confidence due to strong consensus
@@ -427,10 +418,7 @@ describe("OpenLibraryMetadataProvider - Consensus-based Aggregation", () => {
         // No results
       });
 
-      const results = await provider.searchByCreator({
-        name: "Nonexistent Author",
-        fuzzy: true,
-      });
+      const results = await provider.searchByCreator({ name: "Nonexistent Author", fuzzy: true });
 
       expect(results).toHaveLength(0);
     });
@@ -451,10 +439,7 @@ describe("OpenLibraryMetadataProvider - Consensus-based Aggregation", () => {
         }
       });
 
-      const results = await provider.searchByCreator({
-        name: "Single Author",
-        fuzzy: true,
-      });
+      const results = await provider.searchByCreator({ name: "Single Author", fuzzy: true });
 
       expect(results).toHaveLength(1);
       expect(results[0].title).toBe("Single Result Book");
@@ -485,10 +470,7 @@ describe("OpenLibraryMetadataProvider - Consensus-based Aggregation", () => {
         }
       });
 
-      const results = await provider.searchByTitle({
-        title: "Incomplete Book",
-        exactMatch: false,
-      });
+      const results = await provider.searchByTitle({ title: "Incomplete Book", exactMatch: false });
 
       expect(results).toHaveLength(1);
       // Should handle missing fields gracefully
@@ -692,10 +674,7 @@ describe("OpenLibraryMetadataProvider - Consensus-based Aggregation", () => {
         }
       });
 
-      const results = await provider.searchByTitle({
-        title: "Popular Book",
-        exactMatch: false,
-      });
+      const results = await provider.searchByTitle({ title: "Popular Book", exactMatch: false });
 
       expect(results).toHaveLength(1);
       // Should handle many sources efficiently and boost confidence
@@ -789,10 +768,7 @@ describe("OpenLibraryMetadataProvider - Consensus-based Aggregation", () => {
     it("should boost confidence based on number of agreeing sources", async () => {
       // Test with few sources
       const fewSources = [
-        createMockOpenLibraryResult({
-          title: "Few Sources Book",
-          key: "/works/OL1",
-        }),
+        createMockOpenLibraryResult({ title: "Few Sources Book", key: "/works/OL1" }),
       ];
 
       mockSearchBook.mockImplementation(async function* () {
@@ -808,22 +784,10 @@ describe("OpenLibraryMetadataProvider - Consensus-based Aggregation", () => {
 
       // Reset mock for many sources test
       const manySources = [
-        createMockOpenLibraryResult({
-          title: "Many Sources Book",
-          key: "/works/OL1",
-        }),
-        createMockOpenLibraryResult({
-          title: "Many Sources Book",
-          key: "/works/OL2",
-        }),
-        createMockOpenLibraryResult({
-          title: "Many Sources Book",
-          key: "/works/OL3",
-        }),
-        createMockOpenLibraryResult({
-          title: "Many Sources Book",
-          key: "/works/OL4",
-        }),
+        createMockOpenLibraryResult({ title: "Many Sources Book", key: "/works/OL1" }),
+        createMockOpenLibraryResult({ title: "Many Sources Book", key: "/works/OL2" }),
+        createMockOpenLibraryResult({ title: "Many Sources Book", key: "/works/OL3" }),
+        createMockOpenLibraryResult({ title: "Many Sources Book", key: "/works/OL4" }),
       ];
 
       mockSearchBook.mockImplementation(async function* () {
@@ -837,9 +801,7 @@ describe("OpenLibraryMetadataProvider - Consensus-based Aggregation", () => {
         exactMatch: false,
       });
 
-      expect(manyResults[0].confidence).toBeGreaterThan(
-        fewResults[0].confidence,
-      );
+      expect(manyResults[0].confidence).toBeGreaterThan(fewResults[0].confidence);
     });
 
     it("should never assign perfect 1.0 confidence score", async () => {
@@ -865,10 +827,7 @@ describe("OpenLibraryMetadataProvider - Consensus-based Aggregation", () => {
         }
       });
 
-      const results = await provider.searchByTitle({
-        title: "Perfect Book",
-        exactMatch: false,
-      });
+      const results = await provider.searchByTitle({ title: "Perfect Book", exactMatch: false });
 
       expect(results).toHaveLength(1);
       expect(results[0].confidence).toBeLessThan(1.0); // Should never be perfect 1.0
@@ -978,15 +937,10 @@ describe("OpenLibraryMetadataProvider - Consensus-based Aggregation", () => {
         }
       });
 
-      const weakResults = await provider.searchByTitle({
-        title: "Weak Test",
-        exactMatch: false,
-      });
+      const weakResults = await provider.searchByTitle({ title: "Weak Test", exactMatch: false });
 
       // Strong consensus should have higher confidence than weak consensus
-      expect(strongResults[0].confidence).toBeGreaterThan(
-        weakResults[0].confidence,
-      );
+      expect(strongResults[0].confidence).toBeGreaterThan(weakResults[0].confidence);
       expect(strongResults[0].confidence).toBeGreaterThan(0.9); // Strong consensus above 0.9
       expect(weakResults[0].confidence).toBeLessThan(0.9); // Weak consensus below 0.9
     });
@@ -1038,9 +992,7 @@ describe("OpenLibraryMetadataProvider - Consensus-based Aggregation", () => {
       });
 
       // More agreeing sources should result in higher confidence
-      expect(fiveResults[0].confidence).toBeGreaterThan(
-        twoResults[0].confidence,
-      );
+      expect(fiveResults[0].confidence).toBeGreaterThan(twoResults[0].confidence);
     });
   });
 
@@ -1050,27 +1002,17 @@ describe("OpenLibraryMetadataProvider - Consensus-based Aggregation", () => {
     });
 
     it("should provide reliability scores for different data types", () => {
-      expect(provider.getReliabilityScore(MetadataType.TITLE)).toBeGreaterThan(
-        0.9,
-      );
-      expect(
-        provider.getReliabilityScore(MetadataType.AUTHORS),
-      ).toBeGreaterThan(0.8);
-      expect(provider.getReliabilityScore(MetadataType.ISBN)).toBeGreaterThan(
-        0.9,
-      );
-      expect(
-        provider.getReliabilityScore(MetadataType.DESCRIPTION),
-      ).toBeGreaterThan(0.6);
+      expect(provider.getReliabilityScore(MetadataType.TITLE)).toBeGreaterThan(0.9);
+      expect(provider.getReliabilityScore(MetadataType.AUTHORS)).toBeGreaterThan(0.8);
+      expect(provider.getReliabilityScore(MetadataType.ISBN)).toBeGreaterThan(0.9);
+      expect(provider.getReliabilityScore(MetadataType.DESCRIPTION)).toBeGreaterThan(0.6);
     });
 
     it("should support expected metadata types", () => {
       expect(provider.supportsDataType(MetadataType.TITLE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.AUTHORS)).toBe(true);
       expect(provider.supportsDataType(MetadataType.ISBN)).toBe(true);
-      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(
-        false,
-      );
+      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(false);
     });
   });
 });

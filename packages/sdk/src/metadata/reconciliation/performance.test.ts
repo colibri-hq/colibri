@@ -1,6 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { MetadataCoordinator } from "./fetch.js";
-import { PreviewGenerator } from "./preview.js";
 import type {
   CreatorQuery,
   MetadataProvider,
@@ -9,15 +7,13 @@ import type {
   TitleQuery,
 } from "../providers/provider.js";
 import { MetadataType } from "../providers/provider.js";
+import { MetadataCoordinator } from "./fetch.js";
+import { PreviewGenerator } from "./preview.js";
 
 describe("Performance Tests for Metadata Reconciliation", () => {
   // Performance test provider that can simulate various response times
   class PerformanceTestProvider implements MetadataProvider {
-    readonly rateLimit = {
-      maxRequests: 1000,
-      windowMs: 60000,
-      requestDelay: 0,
-    };
+    readonly rateLimit = { maxRequests: 1000, windowMs: 60000, requestDelay: 0 };
     readonly timeout = { requestTimeout: 10000, operationTimeout: 20000 };
 
     constructor(
@@ -40,9 +36,7 @@ describe("Performance Tests for Metadata Reconciliation", () => {
       return this.searchMultiCriteria({ authors: [query.name] });
     }
 
-    async searchMultiCriteria(
-      query: MultiCriteriaQuery,
-    ): Promise<MetadataRecord[]> {
+    async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
       // Simulate response delay
       if (this.responseDelay > 0) {
         await new Promise((resolve) => setTimeout(resolve, this.responseDelay));
@@ -91,9 +85,7 @@ describe("Performance Tests for Metadata Reconciliation", () => {
       const coordinator = new MetadataCoordinator(providers);
 
       const startTime = Date.now();
-      const result = await coordinator.query({
-        title: "Performance Test Book",
-      });
+      const result = await coordinator.query({ title: "Performance Test Book" });
       const duration = Date.now() - startTime;
 
       // Should complete in roughly the time of the slowest provider (plus overhead)
@@ -139,9 +131,7 @@ describe("Performance Tests for Metadata Reconciliation", () => {
       });
 
       const startTime = Date.now();
-      const result = await coordinator.query({
-        title: "Provider Timeout Test",
-      });
+      const result = await coordinator.query({ title: "Provider Timeout Test" });
       const duration = Date.now() - startTime;
 
       expect(duration).toBeLessThan(1000); // Should not wait for timed out provider
@@ -153,13 +143,7 @@ describe("Performance Tests for Metadata Reconciliation", () => {
     it("should handle high concurrency with many providers", async () => {
       const providers = Array.from(
         { length: 20 },
-        (_, i) =>
-          new PerformanceTestProvider(
-            `Provider${i}`,
-            i + 1,
-            Math.random() * 200,
-            1,
-          ),
+        (_, i) => new PerformanceTestProvider(`Provider${i}`, i + 1, Math.random() * 200, 1),
       );
 
       const coordinator = new MetadataCoordinator(providers, {
@@ -167,9 +151,7 @@ describe("Performance Tests for Metadata Reconciliation", () => {
       });
 
       const startTime = Date.now();
-      const result = await coordinator.query({
-        title: "High Concurrency Test",
-      });
+      const result = await coordinator.query({ title: "High Concurrency Test" });
       const duration = Date.now() - startTime;
 
       expect(result.totalRecords).toBe(20);
@@ -187,37 +169,22 @@ describe("Performance Tests for Metadata Reconciliation", () => {
       const coordinator = new MetadataCoordinator(providers);
 
       // Run multiple queries to test failure handling
-      const queries = Array.from({ length: 10 }, (_, i) => ({
-        title: `Test Book ${i}`,
-      }));
-      const results = await Promise.all(
-        queries.map((query) => coordinator.query(query)),
-      );
+      const queries = Array.from({ length: 10 }, (_, i) => ({ title: `Test Book ${i}` }));
+      const results = await Promise.all(queries.map((query) => coordinator.query(query)));
 
       // Should have some successful results from reliable providers
-      const totalSuccessfulResults = results.reduce(
-        (sum, r) => sum + r.totalRecords,
-        0,
-      );
+      const totalSuccessfulResults = results.reduce((sum, r) => sum + r.totalRecords, 0);
       expect(totalSuccessfulResults).toBeGreaterThan(10); // At least some results from reliable providers
 
       // Unreliable provider should have some failures
-      const totalFailures = results.reduce(
-        (sum, r) => sum + r.failedProviders,
-        0,
-      );
+      const totalFailures = results.reduce((sum, r) => sum + r.failedProviders, 0);
       expect(totalFailures).toBeGreaterThan(0);
     });
   });
 
   describe("large dataset performance", () => {
     it("should handle large result sets efficiently", async () => {
-      const provider = new PerformanceTestProvider(
-        "LargeResultProvider",
-        1,
-        100,
-        1000,
-      ); // 1000 results
+      const provider = new PerformanceTestProvider("LargeResultProvider", 1, 100, 1000); // 1000 results
       const coordinator = new MetadataCoordinator([provider]);
 
       const startTime = Date.now();
@@ -228,12 +195,7 @@ describe("Performance Tests for Metadata Reconciliation", () => {
       expect(processingTime).toBeLessThan(2000); // Should process 1000 records quickly
 
       // Test deduplication performance with large dataset
-      const duplicateProvider = new PerformanceTestProvider(
-        "DuplicateProvider",
-        1,
-        50,
-        500,
-      );
+      const duplicateProvider = new PerformanceTestProvider("DuplicateProvider", 1, 50, 500);
       // Override to return duplicate IDs
       duplicateProvider.searchMultiCriteria = async () => {
         return Array.from({ length: 500 }, (_, i) => ({
@@ -248,9 +210,7 @@ describe("Performance Tests for Metadata Reconciliation", () => {
 
       const duplicateCoordinator = new MetadataCoordinator([duplicateProvider]);
       const duplicateStartTime = Date.now();
-      const duplicateResult = await duplicateCoordinator.query({
-        title: "Deduplication Test",
-      });
+      const duplicateResult = await duplicateCoordinator.query({ title: "Deduplication Test" });
       const deduplicationTime = Date.now() - duplicateStartTime;
 
       expect(duplicateResult.totalRecords).toBe(100); // Should deduplicate to 100 unique records
@@ -259,24 +219,21 @@ describe("Performance Tests for Metadata Reconciliation", () => {
 
     it("should handle preview generation with large datasets efficiently", async () => {
       // Generate large metadata dataset
-      const largeMetadataSet: MetadataRecord[] = Array.from(
-        { length: 500 },
-        (_, i) => ({
-          id: `large-${i}`,
-          source: `Provider${i % 10}`,
-          confidence: Math.random() * 0.4 + 0.6,
-          timestamp: new Date(),
-          title: `Book ${i}`,
-          authors: [`Author ${i % 50}`],
-          isbn: [`978000000${String(i).padStart(4, "0")}`],
-          publicationDate: new Date(2000 + (i % 24), i % 12, 1),
-          subjects: [`Subject ${i % 20}`, `Category ${i % 15}`],
-          description: `Description for book ${i}`,
-          language: ["en", "es", "fr", "de"][i % 4],
-          publisher: `Publisher ${i % 30}`,
-          pageCount: 100 + (i % 500),
-        }),
-      );
+      const largeMetadataSet: MetadataRecord[] = Array.from({ length: 500 }, (_, i) => ({
+        id: `large-${i}`,
+        source: `Provider${i % 10}`,
+        confidence: Math.random() * 0.4 + 0.6,
+        timestamp: new Date(),
+        title: `Book ${i}`,
+        authors: [`Author ${i % 50}`],
+        isbn: [`978000000${String(i).padStart(4, "0")}`],
+        publicationDate: new Date(2000 + (i % 24), i % 12, 1),
+        subjects: [`Subject ${i % 20}`, `Category ${i % 15}`],
+        description: `Description for book ${i}`,
+        language: ["en", "es", "fr", "de"][i % 4],
+        publisher: `Publisher ${i % 30}`,
+        pageCount: 100 + (i % 500),
+      }));
 
       const previewGenerator = new PreviewGenerator();
 
@@ -289,8 +246,7 @@ describe("Performance Tests for Metadata Reconciliation", () => {
 
       // Test enhanced preview with large dataset
       const enhancedStartTime = Date.now();
-      const enhancedPreview =
-        previewGenerator.generateEnhancedPreview(largeMetadataSet);
+      const enhancedPreview = previewGenerator.generateEnhancedPreview(largeMetadataSet);
       const enhancedTime = Date.now() - enhancedStartTime;
 
       expect(enhancedPreview.conflictAnalysis).toBeDefined();
@@ -299,22 +255,19 @@ describe("Performance Tests for Metadata Reconciliation", () => {
 
     it("should handle memory efficiently with large datasets", async () => {
       // Test memory usage with very large dataset
-      const veryLargeDataset: MetadataRecord[] = Array.from(
-        { length: 2000 },
-        (_, i) => ({
-          id: `memory-test-${i}`,
-          source: `Provider${i % 5}`,
-          confidence: 0.8,
-          timestamp: new Date(),
-          title: `Memory Test Book ${i}`,
-          authors: [`Author ${i}`],
-          description:
-            `This is a longer description for book ${i} to test memory usage with larger text content. `.repeat(
-              10,
-            ),
-          subjects: Array.from({ length: 10 }, (_, j) => `Subject ${i}-${j}`),
-        }),
-      );
+      const veryLargeDataset: MetadataRecord[] = Array.from({ length: 2000 }, (_, i) => ({
+        id: `memory-test-${i}`,
+        source: `Provider${i % 5}`,
+        confidence: 0.8,
+        timestamp: new Date(),
+        title: `Memory Test Book ${i}`,
+        authors: [`Author ${i}`],
+        description:
+          `This is a longer description for book ${i} to test memory usage with larger text content. `.repeat(
+            10,
+          ),
+        subjects: Array.from({ length: 10 }, (_, j) => `Subject ${i}-${j}`),
+      }));
 
       const previewGenerator = new PreviewGenerator();
 
@@ -334,23 +287,14 @@ describe("Performance Tests for Metadata Reconciliation", () => {
 
   describe("stress testing", () => {
     it("should handle rapid successive queries", async () => {
-      const provider = new PerformanceTestProvider(
-        "StressTestProvider",
-        1,
-        50,
-        1,
-      );
+      const provider = new PerformanceTestProvider("StressTestProvider", 1, 50, 1);
       const coordinator = new MetadataCoordinator([provider]);
 
       // Fire 50 queries rapidly
-      const queries = Array.from({ length: 50 }, (_, i) => ({
-        title: `Stress Test ${i}`,
-      }));
+      const queries = Array.from({ length: 50 }, (_, i) => ({ title: `Stress Test ${i}` }));
 
       const startTime = Date.now();
-      const results = await Promise.all(
-        queries.map((query) => coordinator.query(query)),
-      );
+      const results = await Promise.all(queries.map((query) => coordinator.query(query)));
       const totalTime = Date.now() - startTime;
 
       expect(results).toHaveLength(50);
@@ -380,9 +324,7 @@ describe("Performance Tests for Metadata Reconciliation", () => {
       ];
 
       const startTime = Date.now();
-      const results = await Promise.all(
-        mixedQueries.map((query) => coordinator.query(query)),
-      );
+      const results = await Promise.all(mixedQueries.map((query) => coordinator.query(query)));
       const totalTime = Date.now() - startTime;
 
       expect(results).toHaveLength(8);
@@ -403,14 +345,10 @@ describe("Performance Tests for Metadata Reconciliation", () => {
       const coordinator = new MetadataCoordinator(providers);
 
       // Run many queries to test performance under failure conditions
-      const queries = Array.from({ length: 30 }, (_, i) => ({
-        title: `Failure Test ${i}`,
-      }));
+      const queries = Array.from({ length: 30 }, (_, i) => ({ title: `Failure Test ${i}` }));
 
       const startTime = Date.now();
-      const results = await Promise.all(
-        queries.map((query) => coordinator.query(query)),
-      );
+      const results = await Promise.all(queries.map((query) => coordinator.query(query)));
       const totalTime = Date.now() - startTime;
 
       // Should complete in reasonable time despite failures
@@ -434,14 +372,10 @@ describe("Performance Tests for Metadata Reconciliation", () => {
         continueOnFailure: true,
       });
 
-      const queries = Array.from({ length: 20 }, (_, i) => ({
-        title: `Timeout Test ${i}`,
-      }));
+      const queries = Array.from({ length: 20 }, (_, i) => ({ title: `Timeout Test ${i}` }));
 
       const startTime = Date.now();
-      const results = await Promise.all(
-        queries.map((query) => coordinator.query(query)),
-      );
+      const results = await Promise.all(queries.map((query) => coordinator.query(query)));
       const totalTime = Date.now() - startTime;
 
       // Should complete quickly due to timeouts
@@ -459,12 +393,7 @@ describe("Performance Tests for Metadata Reconciliation", () => {
 
   describe("resource utilization", () => {
     it("should not create excessive promises or memory leaks", async () => {
-      const provider = new PerformanceTestProvider(
-        "ResourceTestProvider",
-        1,
-        10,
-        1,
-      );
+      const provider = new PerformanceTestProvider("ResourceTestProvider", 1, 10, 1);
       const coordinator = new MetadataCoordinator([provider]);
 
       // Track promise creation (basic check)
@@ -482,9 +411,7 @@ describe("Performance Tests for Metadata Reconciliation", () => {
       const initialPromiseCount = promiseCount;
 
       // Run multiple queries
-      const queries = Array.from({ length: 10 }, (_, i) => ({
-        title: `Resource Test ${i}`,
-      }));
+      const queries = Array.from({ length: 10 }, (_, i) => ({ title: `Resource Test ${i}` }));
       await Promise.all(queries.map((query) => coordinator.query(query)));
 
       const finalPromiseCount = promiseCount;
@@ -529,12 +456,7 @@ describe("Performance Tests for Metadata Reconciliation", () => {
 
     it("should handle CPU-intensive operations efficiently", async () => {
       // Create provider that returns complex data requiring processing
-      const complexProvider = new PerformanceTestProvider(
-        "ComplexProvider",
-        1,
-        0,
-        100,
-      );
+      const complexProvider = new PerformanceTestProvider("ComplexProvider", 1, 0, 100);
 
       // Override to return complex data
       complexProvider.searchMultiCriteria = async () => {
@@ -548,11 +470,7 @@ describe("Performance Tests for Metadata Reconciliation", () => {
           subjects: Array.from({ length: 20 }, (_, j) => `Subject ${i}-${j}`),
           description: `Complex description ${i} `.repeat(100),
           isbn: Array.from({ length: 3 }, (_, j) => `978000${i}${j}000`),
-          series: {
-            name: `Series ${i}`,
-            volume: i + 1,
-            totalVolumes: 100,
-          },
+          series: { name: `Series ${i}`, volume: i + 1, totalVolumes: 100 },
         }));
       };
 
@@ -561,9 +479,7 @@ describe("Performance Tests for Metadata Reconciliation", () => {
 
       const startTime = Date.now();
       const result = await coordinator.query({ title: "CPU Test" });
-      const preview = previewGenerator.generatePreview(
-        result.aggregatedRecords,
-      );
+      const preview = previewGenerator.generatePreview(result.aggregatedRecords);
       const totalTime = Date.now() - startTime;
 
       expect(result.totalRecords).toBe(100);

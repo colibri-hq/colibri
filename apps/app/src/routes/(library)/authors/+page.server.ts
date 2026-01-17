@@ -7,7 +7,5 @@ export const load: PageServerLoad = async (event) => {
   const page = parseInt(event.url.searchParams.get("page") || "1", 10);
   const authors = await caller.creators.list({ page });
 
-  return {
-    authors,
-  };
+  return { authors };
 };

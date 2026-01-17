@@ -260,12 +260,7 @@ describe("extractYear", () => {
 
 describe("toDate", () => {
   it("should convert full date", () => {
-    const parsed: ParsedDate = {
-      year: 2020,
-      month: 6,
-      day: 15,
-      original: "2020-06-15",
-    };
+    const parsed: ParsedDate = { year: 2020, month: 6, day: 15, original: "2020-06-15" };
     const date = toDate(parsed);
     expect(date.getFullYear()).toBe(2020);
     expect(date.getMonth()).toBe(5); // JS months are 0-indexed
@@ -273,10 +268,7 @@ describe("toDate", () => {
   });
 
   it("should use defaults for partial dates", () => {
-    const parsed: ParsedDate = {
-      year: 2020,
-      original: "2020",
-    };
+    const parsed: ParsedDate = { year: 2020, original: "2020" };
     const date = toDate(parsed);
     expect(date.getFullYear()).toBe(2020);
     expect(date.getMonth()).toBe(0); // January
@@ -286,50 +278,29 @@ describe("toDate", () => {
 
 describe("formatDate", () => {
   it("should format full date as ISO", () => {
-    const parsed: ParsedDate = {
-      year: 2020,
-      month: 6,
-      day: 15,
-      original: "",
-    };
+    const parsed: ParsedDate = { year: 2020, month: 6, day: 15, original: "" };
     expect(formatDate(parsed, "iso")).toBe("2020-06-15");
   });
 
   it("should format year-month as ISO", () => {
-    const parsed: ParsedDate = {
-      year: 2020,
-      month: 6,
-      original: "",
-    };
+    const parsed: ParsedDate = { year: 2020, month: 6, original: "" };
     expect(formatDate(parsed, "iso")).toBe("2020-06");
   });
 
   it("should format year-only", () => {
-    const parsed: ParsedDate = {
-      year: 2020,
-      original: "",
-    };
+    const parsed: ParsedDate = { year: 2020, original: "" };
     expect(formatDate(parsed, "year-only")).toBe("2020");
     expect(formatDate(parsed, "iso")).toBe("2020");
   });
 
   it("should include circa prefix for approximate dates", () => {
-    const parsed: ParsedDate = {
-      year: 1920,
-      original: "",
-      isApproximate: true,
-    };
+    const parsed: ParsedDate = { year: 1920, original: "", isApproximate: true };
     expect(formatDate(parsed, "year-only")).toBe("c. 1920");
     expect(formatDate(parsed, "iso")).toBe("c. 1920");
   });
 
   it("should pad month and day", () => {
-    const parsed: ParsedDate = {
-      year: 2020,
-      month: 1,
-      day: 5,
-      original: "",
-    };
+    const parsed: ParsedDate = { year: 2020, month: 1, day: 5, original: "" };
     expect(formatDate(parsed, "iso")).toBe("2020-01-05");
   });
 });

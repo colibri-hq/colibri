@@ -2,16 +2,7 @@ import { runCommand } from "@oclif/test";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { resolve } from "node:path";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@colibri-hq/sdk/storage");
 
@@ -37,9 +28,7 @@ describe("colibri storage list", () => {
     vi.stubEnv("COLIBRI_STORAGE_BUCKET", "assets");
     server.use(
       http.get("http://localhost:9000/", ({ request }) => {
-        expect(new URL(request.url).searchParams.get("x-id")).toBe(
-          "ListBuckets",
-        );
+        expect(new URL(request.url).searchParams.get("x-id")).toBe("ListBuckets");
 
         return HttpResponse.xml(
           `<ListAllMyBucketsResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
@@ -54,9 +43,7 @@ describe("colibri storage list", () => {
       }),
     );
 
-    const { error, result } = await runCommand("storage list", {
-      root,
-    });
+    const { error, result } = await runCommand("storage list", { root });
 
     expect(error).toBeUndefined();
     expect(result).toContainEqual({

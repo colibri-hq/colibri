@@ -126,9 +126,10 @@ export interface SettingValueMap {
  * Setting with its current value, for use in UI.
  * Excludes the validation schema since it can't be serialized to JSON.
  */
-export interface SettingWithValue<
-  K extends SettingKey = SettingKey,
-> extends Omit<SettingDefinition<SettingValueMap[K]>, "validation"> {
+export interface SettingWithValue<K extends SettingKey = SettingKey> extends Omit<
+  SettingDefinition<SettingValueMap[K]>,
+  "validation"
+> {
   value: SettingValueMap[K];
   source: "environment" | "database" | "default";
 }

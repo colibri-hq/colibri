@@ -78,12 +78,9 @@ export class ContentReconciler {
       const cleanText = this.cleanDescriptionText(input.text);
       return {
         text: cleanText,
-        type:
-          input.type || this.detectDescriptionType(input.text, input.source),
+        type: input.type || this.detectDescriptionType(input.text, input.source),
         length: input.length || this.detectDescriptionLength(cleanText),
-        quality:
-          input.quality ??
-          this.calculateDescriptionQuality(cleanText, input.source),
+        quality: input.quality ?? this.calculateDescriptionQuality(cleanText, input.source),
         language: input.language,
         source: input.source,
         raw: input.raw || input.text,
@@ -106,9 +103,7 @@ export class ContentReconciler {
   normalizeTableOfContents(input: string | TableOfContents): TableOfContents {
     if (typeof input === "object" && input !== null) {
       return {
-        entries: input.entries.map((entry) =>
-          this.normalizeTableOfContentsEntry(entry),
-        ),
+        entries: input.entries.map((entry) => this.normalizeTableOfContentsEntry(entry)),
         format: input.format || this.detectTableOfContentsFormat(input.entries),
         pageNumbers: input.pageNumbers ?? this.hasPageNumbers(input.entries),
         raw: input.raw,
@@ -137,9 +132,7 @@ export class ContentReconciler {
         format: input.format || this.detectImageFormat(input.url),
         size: input.size,
         quality: input.quality || this.detectImageQuality(input),
-        aspectRatio:
-          input.aspectRatio ||
-          this.calculateAspectRatio(input.width, input.height),
+        aspectRatio: input.aspectRatio || this.calculateAspectRatio(input.width, input.height),
         source: input.source,
         verified: input.verified ?? false,
       };
@@ -156,13 +149,8 @@ export class ContentReconciler {
   /**
    * Reconcile descriptions from multiple sources
    */
-  reconcileDescriptions(
-    inputs: ContentDescriptionInput[],
-  ): ReconciledField<Description> {
-    const allDescriptions: {
-      description: Description;
-      source: MetadataSource;
-    }[] = [];
+  reconcileDescriptions(inputs: ContentDescriptionInput[]): ReconciledField<Description> {
+    const allDescriptions: { description: Description; source: MetadataSource }[] = [];
 
     // Collect and normalize all descriptions
     for (const input of inputs) {
@@ -170,10 +158,7 @@ export class ContentReconciler {
         for (const desc of input.descriptions) {
           const normalized = this.normalizeDescription(desc);
           if (normalized.text && normalized.text.length > 10) {
-            allDescriptions.push({
-              description: normalized,
-              source: input.source,
-            });
+            allDescriptions.push({ description: normalized, source: input.source });
           }
         }
       }
@@ -212,20 +197,13 @@ export class ContentReconciler {
     const conflicts: Conflict[] = [];
     if (allDescriptions.length > 1) {
       const significantlyDifferent = allDescriptions.some(
-        (item) =>
-          this.calculateTextSimilarity(
-            item.description.text,
-            bestDescription.text,
-          ) < 0.7,
+        (item) => this.calculateTextSimilarity(item.description.text, bestDescription.text) < 0.7,
       );
 
       if (significantlyDifferent) {
         conflicts.push({
           field: "description",
-          values: allDescriptions.map((item) => ({
-            value: item.description,
-            source: item.source,
-          })),
+          values: allDescriptions.map((item) => ({ value: item.description, source: item.source })),
           resolution:
             "Selected highest quality description based on content quality and source reliability",
         });
@@ -247,9 +225,7 @@ export class ContentReconciler {
   /**
    * Reconcile table of contents from multiple sources
    */
-  reconcileTableOfContents(
-    inputs: ContentDescriptionInput[],
-  ): ReconciledField<TableOfContents> {
+  reconcileTableOfContents(inputs: ContentDescriptionInput[]): ReconciledField<TableOfContents> {
     const allTocs: { toc: TableOfContents; source: MetadataSource }[] = [];
 
     // Collect and normalize all table of contents
@@ -257,10 +233,7 @@ export class ContentReconciler {
       if (input.tableOfContents) {
         const normalized = this.normalizeTableOfContents(input.tableOfContents);
         if (normalized.entries.length > 0) {
-          allTocs.push({
-            toc: normalized,
-            source: input.source,
-          });
+          allTocs.push({ toc: normalized, source: input.source });
         }
       }
     }
@@ -314,9 +287,7 @@ export class ContentReconciler {
   /**
    * Reconcile reviews from multiple sources
    */
-  reconcileReviews(
-    inputs: ContentDescriptionInput[],
-  ): ReconciledField<Review[]> {
+  reconcileReviews(inputs: ContentDescriptionInput[]): ReconciledField<Review[]> {
     const allReviews: Review[] = [];
 
     // Collect all reviews
@@ -359,8 +330,7 @@ export class ContentReconciler {
     const selectedReviews = sortedReviews.slice(0, 10);
 
     const avgSourceReliability =
-      inputs.reduce((sum, input) => sum + input.source.reliability, 0) /
-      inputs.length;
+      inputs.reduce((sum, input) => sum + input.source.reliability, 0) / inputs.length;
     const confidence = avgSourceReliability * 0.8; // Lower confidence for reviews
 
     return {
@@ -416,49 +386,33 @@ export class ContentReconciler {
     // Use most common scale or default to 5
     const scaleFrequency = new Map<number, number>();
     for (const { rating } of allRatings) {
-      scaleFrequency.set(
-        rating.scale,
-        (scaleFrequency.get(rating.scale) || 0) + 1,
-      );
+      scaleFrequency.set(rating.scale, (scaleFrequency.get(rating.scale) || 0) + 1);
     }
     const mostCommonScale =
-      Array.from(scaleFrequency.entries()).sort(
-        (a, b) => b[1] - a[1],
-      )[0]?.[0] || 5;
+      Array.from(scaleFrequency.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || 5;
 
     // Convert back to target scale
     const finalRating = averageNormalizedRating * mostCommonScale;
 
     // Calculate total count
-    const totalCount = allRatings.reduce(
-      (sum, { rating }) => sum + (rating.count || 0),
-      0,
-    );
+    const totalCount = allRatings.reduce((sum, { rating }) => sum + (rating.count || 0), 0);
 
     const avgSourceReliability =
-      allRatings.reduce((sum, { source }) => sum + source.reliability, 0) /
-      allRatings.length;
+      allRatings.reduce((sum, { source }) => sum + source.reliability, 0) / allRatings.length;
     const confidence = avgSourceReliability * 0.9;
 
     // Check for conflicts (significantly different ratings)
     const conflicts: Conflict[] = [];
     if (allRatings.length > 1) {
-      const normalizedRatings = allRatings.map(
-        ({ rating }) => rating.value / rating.scale,
-      );
-      const maxDiff =
-        Math.max(...normalizedRatings) - Math.min(...normalizedRatings);
+      const normalizedRatings = allRatings.map(({ rating }) => rating.value / rating.scale);
+      const maxDiff = Math.max(...normalizedRatings) - Math.min(...normalizedRatings);
 
       if (maxDiff > 0.3) {
         // More than 30% difference on normalized scale
         conflicts.push({
           field: "rating",
-          values: allRatings.map(({ rating, source }) => ({
-            value: rating,
-            source,
-          })),
-          resolution:
-            "Calculated weighted average based on source reliability and rating counts",
+          values: allRatings.map(({ rating, source }) => ({ value: rating, source })),
+          resolution: "Calculated weighted average based on source reliability and rating counts",
         });
       }
     }
@@ -482,9 +436,7 @@ export class ContentReconciler {
   /**
    * Reconcile cover images from multiple sources
    */
-  reconcileCoverImage(
-    inputs: ContentDescriptionInput[],
-  ): ReconciledField<CoverImage> {
+  reconcileCoverImage(inputs: ContentDescriptionInput[]): ReconciledField<CoverImage> {
     const allImages: { image: CoverImage; source: MetadataSource }[] = [];
 
     // Collect and normalize all cover images
@@ -508,10 +460,8 @@ export class ContentReconciler {
 
     // Sort by image quality score and source reliability
     const sortedImages = allImages.sort((a, b) => {
-      const aScore =
-        this.calculateImageQualityScore(a.image) * a.source.reliability;
-      const bScore =
-        this.calculateImageQualityScore(b.image) * b.source.reliability;
+      const aScore = this.calculateImageQualityScore(a.image) * a.source.reliability;
+      const bScore = this.calculateImageQualityScore(b.image) * b.source.reliability;
       return bScore - aScore;
     });
 
@@ -528,10 +478,7 @@ export class ContentReconciler {
       if (uniqueUrls.size > 1) {
         conflicts.push({
           field: "coverImage",
-          values: allImages.map(({ image, source }) => ({
-            value: image,
-            source,
-          })),
+          values: allImages.map(({ image, source }) => ({ value: image, source })),
           resolution:
             "Selected highest quality image based on resolution, format, and source reliability",
         });
@@ -559,10 +506,7 @@ export class ContentReconciler {
     // Collect all excerpts
     for (const input of inputs) {
       if (input.excerpt && input.excerpt.trim().length > 0) {
-        allExcerpts.push({
-          excerpt: input.excerpt.trim(),
-          source: input.source,
-        });
+        allExcerpts.push({ excerpt: input.excerpt.trim(), source: input.source });
       }
     }
 
@@ -597,17 +541,14 @@ export class ContentReconciler {
       value: bestExcerpt,
       confidence,
       sources: inputs.map((input) => input.source),
-      reasoning:
-        "Selected best excerpt based on source reliability and content quality",
+      reasoning: "Selected best excerpt based on source reliability and content quality",
     };
   }
 
   /**
    * Reconcile all content description fields
    */
-  reconcileContentDescription(
-    inputs: ContentDescriptionInput[],
-  ): ReconciledContentDescription {
+  reconcileContentDescription(inputs: ContentDescriptionInput[]): ReconciledContentDescription {
     if (inputs.length === 0) {
       throw new Error("No content descriptions to reconcile");
     }
@@ -664,10 +605,7 @@ export class ContentReconciler {
   /**
    * Detect the type of description based on content and source
    */
-  private detectDescriptionType(
-    text: string,
-    source?: string,
-  ): Description["type"] {
+  private detectDescriptionType(text: string, source?: string): Description["type"] {
     const lowerText = text.toLowerCase();
     const lowerSource = source?.toLowerCase() || "";
 
@@ -683,19 +621,13 @@ export class ContentReconciler {
     }
 
     // Check content indicators - look for prefixes first
-    if (
-      lowerText.startsWith("synopsis:") ||
-      lowerText.startsWith("synopsis ")
-    ) {
+    if (lowerText.startsWith("synopsis:") || lowerText.startsWith("synopsis ")) {
       return "synopsis";
     }
     if (lowerText.startsWith("summary:") || lowerText.startsWith("summary ")) {
       return "summary";
     }
-    if (
-      lowerText.startsWith("abstract:") ||
-      lowerText.startsWith("abstract ")
-    ) {
+    if (lowerText.startsWith("abstract:") || lowerText.startsWith("abstract ")) {
       return "abstract";
     }
 
@@ -777,13 +709,7 @@ export class ContentReconciler {
     }
 
     // Check for promotional language (reduces quality)
-    const promotionalWords = [
-      "amazing",
-      "incredible",
-      "must-read",
-      "bestseller",
-      "award-winning",
-    ];
+    const promotionalWords = ["amazing", "incredible", "must-read", "bestseller", "award-winning"];
     const promotionalCount = promotionalWords.filter((word) =>
       text.toLowerCase().includes(word),
     ).length;
@@ -797,16 +723,12 @@ export class ContentReconciler {
   /**
    * Normalize a table of contents entry
    */
-  private normalizeTableOfContentsEntry(
-    entry: TableOfContentsEntry,
-  ): TableOfContentsEntry {
+  private normalizeTableOfContentsEntry(entry: TableOfContentsEntry): TableOfContentsEntry {
     return {
       title: entry.title.trim(),
       page: entry.page,
       level: entry.level || 0,
-      children: entry.children?.map((child) =>
-        this.normalizeTableOfContentsEntry(child),
-      ),
+      children: entry.children?.map((child) => this.normalizeTableOfContentsEntry(child)),
     };
   }
 
@@ -848,15 +770,12 @@ export class ContentReconciler {
       // Detect indentation level
       const originalLine = input.split("\n").find((l) => l.trim() === line);
       if (originalLine) {
-        const leadingSpaces =
-          originalLine.length - originalLine.trimStart().length;
+        const leadingSpaces = originalLine.length - originalLine.trimStart().length;
         level = Math.floor(leadingSpaces / 2);
       }
 
       // Clean title - remove chapter numbers and prefixes
-      title = title
-        .replace(/^(chapter\s*\d+:\s*|ch\s*\d+:\s*|\d+\.\s*)/i, "")
-        .trim();
+      title = title.replace(/^(chapter\s*\d+:\s*|ch\s*\d+:\s*|\d+\.\s*)/i, "").trim();
 
       if (title.length > 0) {
         entries.push({ title, page, level });
@@ -869,9 +788,7 @@ export class ContentReconciler {
   /**
    * Detect table of contents format
    */
-  private detectTableOfContentsFormat(
-    entries: TableOfContentsEntry[],
-  ): TableOfContents["format"] {
+  private detectTableOfContentsFormat(entries: TableOfContentsEntry[]): TableOfContents["format"] {
     if (entries.some((entry) => entry.children && entry.children.length > 0)) {
       return "hierarchical";
     }
@@ -928,10 +845,7 @@ export class ContentReconciler {
   /**
    * Calculate aspect ratio
    */
-  private calculateAspectRatio(
-    width?: number,
-    height?: number,
-  ): number | undefined {
+  private calculateAspectRatio(width?: number, height?: number): number | undefined {
     if (!width || !height) return undefined;
     return height / width;
   }
@@ -944,14 +858,8 @@ export class ContentReconciler {
 
     // Resolution scoring
     if (image.width && image.height) {
-      const {
-        minWidth,
-        minHeight,
-        preferredWidth,
-        preferredHeight,
-        maxWidth,
-        maxHeight,
-      } = this.imageQualityFactors;
+      const { minWidth, minHeight, preferredWidth, preferredHeight, maxWidth, maxHeight } =
+        this.imageQualityFactors;
 
       // Width scoring
       if (image.width >= preferredWidth) {
@@ -978,11 +886,8 @@ export class ContentReconciler {
 
       // Aspect ratio scoring
       if (image.aspectRatio) {
-        const { preferredAspectRatio, aspectRatioTolerance } =
-          this.imageQualityFactors;
-        const aspectRatioDiff = Math.abs(
-          image.aspectRatio - preferredAspectRatio,
-        );
+        const { preferredAspectRatio, aspectRatioTolerance } = this.imageQualityFactors;
+        const aspectRatioDiff = Math.abs(image.aspectRatio - preferredAspectRatio);
         if (aspectRatioDiff <= aspectRatioTolerance) {
           score += 0.1;
         } else if (aspectRatioDiff > aspectRatioTolerance * 2) {
@@ -1048,9 +953,7 @@ export class ContentReconciler {
         .filter((w) => w.length > 3),
     );
 
-    const intersection = new Set(
-      [...words1].filter((word) => words2.has(word)),
-    );
+    const intersection = new Set([...words1].filter((word) => words2.has(word)));
     const union = new Set([...words1, ...words2]);
 
     return union.size > 0 ? intersection.size / union.size : 0;
@@ -1059,10 +962,7 @@ export class ContentReconciler {
   /**
    * Calculate confidence for description
    */
-  private calculateDescriptionConfidence(
-    description: Description,
-    source: MetadataSource,
-  ): number {
+  private calculateDescriptionConfidence(description: Description, source: MetadataSource): number {
     let confidence = source.reliability;
 
     // Adjust based on description quality

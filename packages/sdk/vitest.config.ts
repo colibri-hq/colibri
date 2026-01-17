@@ -21,12 +21,7 @@ export default defineConfig({
         "**/*.config.ts",
         "src/schema.d.ts",
       ],
-      thresholds: {
-        statements: 60,
-        branches: 60,
-        functions: 60,
-        lines: 60,
-      },
+      thresholds: { statements: 60, branches: 60, functions: 60, lines: 60 },
     },
   },
 });

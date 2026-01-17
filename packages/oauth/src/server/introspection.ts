@@ -1,7 +1,7 @@
-import { jsonResponse, parseRequestBody } from "../utilities.js";
 import { z } from "zod";
-import { OAuthError } from "../errors.js";
 import type { AuthorizationServerOptions } from "../types.js";
+import { OAuthError } from "../errors.js";
+import { jsonResponse, parseRequestBody } from "../utilities.js";
 import { assertAuthorization } from "./assert.js";
 
 /**
@@ -239,20 +239,12 @@ import { assertAuthorization } from "./assert.js";
  *
  * @see https://datatracker.ietf.org/doc/html/rfc7662#section-2 RFC 7662, Section 2
  */
-export async function handleTokenIntrospection<
-  T extends AuthorizationServerOptions,
->(
+export async function handleTokenIntrospection<T extends AuthorizationServerOptions>(
   request: Request,
-  {
-    loadAccessToken,
-    tokenIntrospection,
-  }: Pick<T, "loadAccessToken" | "tokenIntrospection">,
+  { loadAccessToken, tokenIntrospection }: Pick<T, "loadAccessToken" | "tokenIntrospection">,
 ) {
   if (!tokenIntrospection) {
-    throw new OAuthError(
-      "invalid_request",
-      "The introspection endpoint is not enabled",
-    );
+    throw new OAuthError("invalid_request", "The introspection endpoint is not enabled");
   }
 
   const body = await parseRequestBody(request);
@@ -267,9 +259,7 @@ export async function handleTokenIntrospection<
   let authorizedClientId: string;
 
   try {
-    ({ client_id: authorizedClientId } = await assertAuthorization(request, {
-      loadAccessToken,
-    }));
+    ({ client_id: authorizedClientId } = await assertAuthorization(request, { loadAccessToken }));
   } catch (error) {
     if (!(error instanceof Error)) {
       throw error;
@@ -277,10 +267,7 @@ export async function handleTokenIntrospection<
 
     const { message, cause } = error;
 
-    throw new OAuthError(
-      "invalid_client",
-      message + (cause ? `: ${cause}` : ""),
-    );
+    throw new OAuthError("invalid_client", message + (cause ? `: ${cause}` : ""));
   }
 
   const accessToken = await loadAccessToken(token.data);

@@ -13,8 +13,8 @@ import packageJson from "./package.json" with { type: "json" };
 import { calloutsPreprocessor } from "./src/lib/preprocessors/callouts.js";
 import { footnotesPreprocessor } from "./src/lib/preprocessors/footnotes.js";
 import remarkExtractHeadings from "./src/lib/remark/remark-extract-headings.js";
-import remarkRemoveDuplicateTitle from "./src/lib/remark/remark-remove-duplicate-title.js";
 import { remarkGlossaryLinks } from "./src/lib/remark/remark-glossary-links.js";
+import remarkRemoveDuplicateTitle from "./src/lib/remark/remark-remove-duplicate-title.js";
 import caddyfileLang from "./src/lib/shiki/caddyfile.tmLanguage.json" with { type: "json" };
 
 const {
@@ -32,14 +32,8 @@ const config = {
     mdsvex({
       extensions: [".md"],
       layout: {
-        blog: resolve(
-          import.meta.dirname,
-          "src/lib/components/layouts/BlogPostLayout.svelte",
-        ),
-        _: resolve(
-          import.meta.dirname,
-          "src/lib/components/layouts/DefaultLayout.svelte",
-        ),
+        blog: resolve(import.meta.dirname, "src/lib/components/layouts/BlogPostLayout.svelte"),
+        _: resolve(import.meta.dirname, "src/lib/components/layouts/DefaultLayout.svelte"),
       },
       smartypants: true,
       highlight: {
@@ -94,14 +88,9 @@ const config = {
           let html = escapeSvelte(
             highlighter.codeToHtml(code, {
               // @ts-expect-error -- Plugin types are broken
-              lang: [...languages, ...customLanguages].includes(lang)
-                ? lang
-                : "text",
+              lang: [...languages, ...customLanguages].includes(lang) ? lang : "text",
               defaultColor: "light-dark()",
-              themes: {
-                light: "github-light",
-                dark: "github-dark",
-              },
+              themes: { light: "github-light", dark: "github-dark" },
               transformers: [
                 {
                   name: "shiki-container",
@@ -112,10 +101,7 @@ const config = {
                       children.unshift({
                         type: "element",
                         tagName: "span",
-                        properties: {
-                          className: ["shiki-language"],
-                          "data-language": lang,
-                        },
+                        properties: { className: ["shiki-language"], "data-language": lang },
                         children: [{ type: "text", value: lang }],
                       });
                     }
@@ -126,46 +112,28 @@ const config = {
                         {
                           type: "element",
                           tagName: "figure",
-                          properties: {
-                            className: ["code-block"],
-                          },
+                          properties: { className: ["code-block"] },
                           children: [
                             title
                               ? {
                                   type: "element",
                                   tagName: "span",
-                                  properties: {
-                                    className: ["code-block__title"],
-                                  },
-                                  children: [
-                                    {
-                                      type: "text",
-                                      value: title,
-                                    },
-                                  ],
+                                  properties: { className: ["code-block__title"] },
+                                  children: [{ type: "text", value: title }],
                                 }
                               : null,
                             {
                               type: "element",
                               tagName: "div",
-                              properties: {
-                                className: ["code-block__inner"],
-                              },
+                              properties: { className: ["code-block__inner"] },
                               children,
                             },
                             caption
                               ? {
                                   type: "element",
                                   tagName: "figcaption",
-                                  properties: {
-                                    className: ["code-block__caption"],
-                                  },
-                                  children: [
-                                    {
-                                      type: "text",
-                                      value: caption,
-                                    },
-                                  ],
+                                  properties: { className: ["code-block__caption"] },
+                                  children: [{ type: "text", value: caption }],
                                 }
                               : null,
                           ].filter(Boolean),
@@ -206,19 +174,11 @@ const config = {
       ],
     }),
   ],
-  compilerOptions: {
-    discloseVersion: true,
-    modernAst: true,
-  },
+  compilerOptions: { discloseVersion: true, modernAst: true },
   kit: {
     adapter:
       process.env.ADAPTER === "cloudflare"
-        ? adapterCloudflare({
-            routes: {
-              include: ["/mcp"],
-              exclude: ["<all>"],
-            },
-          })
+        ? adapterCloudflare({ routes: { include: ["/mcp"], exclude: ["<all>"] } })
         : adapterStatic({
             pages: outputDir,
             assets: outputDir,

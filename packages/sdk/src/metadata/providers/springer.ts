@@ -26,6 +26,7 @@
  * - Subject classification
  */
 
+import { cleanIsbn } from "../utils/normalization.js";
 import {
   type CreatorQuery,
   type MetadataRecord,
@@ -36,7 +37,6 @@ import {
   type TitleQuery,
 } from "./provider.js";
 import { RetryableMetadataProvider } from "./retryable-provider.js";
-import { cleanIsbn } from "../utils/normalization.js";
 
 /**
  * Springer Nature API response types
@@ -73,12 +73,7 @@ interface SpringerRecord {
 
 interface SpringerResponse {
   apiMessage?: string;
-  result?: Array<{
-    total: string;
-    start: string;
-    pageLength: string;
-    recordsDisplayed: string;
-  }>;
+  result?: Array<{ total: string; start: string; pageLength: string; recordsDisplayed: string }>;
   records?: SpringerRecord[];
 }
 
@@ -115,19 +110,13 @@ export class SpringerNatureMetadataProvider extends RetryableMetadataProvider {
    * Search by title
    */
   async searchByTitle(query: TitleQuery): Promise<MetadataRecord[]> {
-    const params: Record<string, string> = {
-      q: `title:"${query.title}"`,
-      type: "Book",
-    };
+    const params: Record<string, string> = { q: `title:"${query.title}"`, type: "Book" };
 
     if (!query.exactMatch) {
       params.q = `title:${query.title}`;
     }
 
-    const response = await this.executeRequest(
-      params,
-      `title search for "${query.title}"`,
-    );
+    const response = await this.executeRequest(params, `title search for "${query.title}"`);
 
     if (!response?.records) {
       return [];
@@ -142,14 +131,9 @@ export class SpringerNatureMetadataProvider extends RetryableMetadataProvider {
   async searchByISBN(isbn: string): Promise<MetadataRecord[]> {
     const cleanedIsbn = cleanIsbn(isbn);
 
-    const params: Record<string, string> = {
-      q: `isbn:${cleanedIsbn}`,
-    };
+    const params: Record<string, string> = { q: `isbn:${cleanedIsbn}` };
 
-    const response = await this.executeRequest(
-      params,
-      `ISBN search for "${isbn}"`,
-    );
+    const response = await this.executeRequest(params, `ISBN search for "${isbn}"`);
 
     if (!response?.records) {
       return [];
@@ -165,14 +149,9 @@ export class SpringerNatureMetadataProvider extends RetryableMetadataProvider {
     // Normalize DOI
     const cleanDoi = doi.replace(/^https?:\/\/doi\.org\//i, "").trim();
 
-    const params: Record<string, string> = {
-      q: `doi:${cleanDoi}`,
-    };
+    const params: Record<string, string> = { q: `doi:${cleanDoi}` };
 
-    const response = await this.executeRequest(
-      params,
-      `DOI search for "${doi}"`,
-    );
+    const response = await this.executeRequest(params, `DOI search for "${doi}"`);
 
     if (!response?.records) {
       return [];
@@ -185,15 +164,9 @@ export class SpringerNatureMetadataProvider extends RetryableMetadataProvider {
    * Search by creator/author
    */
   async searchByCreator(query: CreatorQuery): Promise<MetadataRecord[]> {
-    const params: Record<string, string> = {
-      q: `name:${query.name}`,
-      type: "Book",
-    };
+    const params: Record<string, string> = { q: `name:${query.name}`, type: "Book" };
 
-    const response = await this.executeRequest(
-      params,
-      `author search for "${query.name}"`,
-    );
+    const response = await this.executeRequest(params, `author search for "${query.name}"`);
 
     if (!response?.records) {
       return [];
@@ -205,9 +178,7 @@ export class SpringerNatureMetadataProvider extends RetryableMetadataProvider {
   /**
    * Search using multiple criteria
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     // Prioritize ISBN
     if (query.isbn) {
       return this.searchByISBN(query.isbn);
@@ -232,10 +203,7 @@ export class SpringerNatureMetadataProvider extends RetryableMetadataProvider {
       return [];
     }
 
-    const params: Record<string, string> = {
-      q: queryParts.join(" AND "),
-      type: "Book",
-    };
+    const params: Record<string, string> = { q: queryParts.join(" AND "), type: "Book" };
 
     const response = await this.executeRequest(params, "multi-criteria search");
 
@@ -306,16 +274,11 @@ export class SpringerNatureMetadataProvider extends RetryableMetadataProvider {
 
       const response = await this.fetch(url, {
         method: "GET",
-        headers: {
-          Accept: "application/json",
-          "User-Agent": this.userAgent,
-        },
+        headers: { Accept: "application/json", "User-Agent": this.userAgent },
       });
 
       if (!response.ok) {
-        throw new Error(
-          `Springer API request failed: ${response.status} ${response.statusText}`,
-        );
+        throw new Error(`Springer API request failed: ${response.status} ${response.statusText}`);
       }
 
       return (await response.json()) as SpringerResponse;
@@ -331,19 +294,13 @@ export class SpringerNatureMetadataProvider extends RetryableMetadataProvider {
   /**
    * Process Springer records into MetadataRecords
    */
-  private processRecords(
-    records: SpringerRecord[],
-    searchType: string,
-  ): MetadataRecord[] {
+  private processRecords(records: SpringerRecord[], searchType: string): MetadataRecord[] {
     const metadataRecords: MetadataRecord[] = [];
 
     for (const record of records) {
       // Filter for books
       const bookTypes = ["Book", "BookChapter", "ReferenceWorkEntry"];
-      if (
-        record.publicationType &&
-        !bookTypes.includes(record.publicationType)
-      ) {
+      if (record.publicationType && !bookTypes.includes(record.publicationType)) {
         continue;
       }
 
@@ -433,11 +390,7 @@ export class SpringerNatureMetadataProvider extends RetryableMetadataProvider {
   /**
    * Calculate confidence score
    */
-  private calculateConfidence(
-    searchType: string,
-    record: SpringerRecord,
-    isbns: string[],
-  ): number {
+  private calculateConfidence(searchType: string, record: SpringerRecord, isbns: string[]): number {
     let confidence = 0.75; // Base confidence for Springer
 
     // ISBN/DOI searches are most reliable

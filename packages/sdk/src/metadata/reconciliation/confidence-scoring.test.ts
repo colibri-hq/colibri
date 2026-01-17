@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { ConflictDetector } from "./conflicts.js";
-import { PreviewGenerator } from "./preview.js";
-import { SeriesReconciler } from "./series.js";
-import { PublicationReconciler } from "./publication.js";
 import type {
   MetadataSource,
   PublicationInfoInput,
   ReconciledField,
   SeriesInput,
 } from "./types.js";
+import { ConflictDetector } from "./conflicts.js";
+import { PreviewGenerator } from "./preview.js";
+import { PublicationReconciler } from "./publication.js";
+import { SeriesReconciler } from "./series.js";
 
 describe("Confidence Scoring Algorithms", () => {
   let _conflictDetector: ConflictDetector;
@@ -46,11 +46,7 @@ describe("Confidence Scoring Algorithms", () => {
       const field: ReconciledField<string> = {
         value: "Test Value",
         confidence: 0.8,
-        sources: [
-          highReliabilitySource,
-          mediumReliabilitySource,
-          lowReliabilitySource,
-        ],
+        sources: [highReliabilitySource, mediumReliabilitySource, lowReliabilitySource],
         reasoning: "Weighted by source reliability",
       };
 
@@ -113,21 +109,9 @@ describe("Confidence Scoring Algorithms", () => {
   describe("data completeness scoring", () => {
     it("should score completeness based on field presence", () => {
       const completeData = {
-        title: {
-          value: "Complete Book",
-          confidence: 0.9,
-          sources: [highReliabilitySource],
-        },
-        authors: {
-          value: ["Author Name"],
-          confidence: 0.8,
-          sources: [highReliabilitySource],
-        },
-        isbn: {
-          value: ["9780123456789"],
-          confidence: 0.9,
-          sources: [highReliabilitySource],
-        },
+        title: { value: "Complete Book", confidence: 0.9, sources: [highReliabilitySource] },
+        authors: { value: ["Author Name"], confidence: 0.8, sources: [highReliabilitySource] },
+        isbn: { value: ["9780123456789"], confidence: 0.9, sources: [highReliabilitySource] },
         publicationDate: {
           value: { year: 2023, precision: "year" as const },
           confidence: 0.8,
@@ -146,33 +130,22 @@ describe("Confidence Scoring Algorithms", () => {
       };
 
       const incompleteData = {
-        title: {
-          value: "Incomplete Book",
-          confidence: 0.9,
-          sources: [highReliabilitySource],
-        },
+        title: { value: "Incomplete Book", confidence: 0.9, sources: [highReliabilitySource] },
         authors: { value: null, confidence: 0.1, sources: [] },
         isbn: { value: null, confidence: 0.1, sources: [] },
       };
 
       // Calculate completeness scores
       const completeFields = Object.values(completeData).filter(
-        (field) =>
-          field.value !== null &&
-          field.value !== undefined &&
-          field.confidence > 0.5,
+        (field) => field.value !== null && field.value !== undefined && field.confidence > 0.5,
       ).length;
       const totalFields = Object.keys(completeData).length;
       const completenessScore = completeFields / totalFields;
 
       const incompleteFields = Object.values(incompleteData).filter(
-        (field) =>
-          field.value !== null &&
-          field.value !== undefined &&
-          field.confidence > 0.5,
+        (field) => field.value !== null && field.value !== undefined && field.confidence > 0.5,
       ).length;
-      const incompleteScore =
-        incompleteFields / Object.keys(incompleteData).length;
+      const incompleteScore = incompleteFields / Object.keys(incompleteData).length;
 
       expect(completenessScore).toBeGreaterThan(0.8);
       expect(incompleteScore).toBeLessThan(0.5);
@@ -184,30 +157,14 @@ describe("Confidence Scoring Algorithms", () => {
       const optionalFields = ["description", "subjects", "coverImage"];
 
       const dataWithCoreFields = {
-        title: {
-          value: "Book Title",
-          confidence: 0.9,
-          sources: [highReliabilitySource],
-        },
-        authors: {
-          value: ["Author"],
-          confidence: 0.8,
-          sources: [highReliabilitySource],
-        },
-        isbn: {
-          value: ["9780123456789"],
-          confidence: 0.9,
-          sources: [highReliabilitySource],
-        },
+        title: { value: "Book Title", confidence: 0.9, sources: [highReliabilitySource] },
+        authors: { value: ["Author"], confidence: 0.8, sources: [highReliabilitySource] },
+        isbn: { value: ["9780123456789"], confidence: 0.9, sources: [highReliabilitySource] },
         description: { value: null, confidence: 0.1, sources: [] },
       };
 
       const dataWithOptionalFields = {
-        title: {
-          value: "Book Title",
-          confidence: 0.9,
-          sources: [highReliabilitySource],
-        },
+        title: { value: "Book Title", confidence: 0.9, sources: [highReliabilitySource] },
         authors: { value: null, confidence: 0.1, sources: [] },
         isbn: { value: null, confidence: 0.1, sources: [] },
         description: {
@@ -215,11 +172,7 @@ describe("Confidence Scoring Algorithms", () => {
           confidence: 0.8,
           sources: [mediumReliabilitySource],
         },
-        subjects: {
-          value: ["Fiction"],
-          confidence: 0.7,
-          sources: [mediumReliabilitySource],
-        },
+        subjects: { value: ["Fiction"], confidence: 0.7, sources: [mediumReliabilitySource] },
       };
 
       // Core fields should contribute more to overall confidence
@@ -228,11 +181,8 @@ describe("Confidence Scoring Algorithms", () => {
       ).length;
       const coreFieldsScore = coreFieldsPresent / coreFields.length;
 
-      const optionalFieldsPresent = Object.entries(
-        dataWithOptionalFields,
-      ).filter(
-        ([key, field]) =>
-          optionalFields.includes(key) && field.confidence > 0.5,
+      const optionalFieldsPresent = Object.entries(dataWithOptionalFields).filter(
+        ([key, field]) => optionalFields.includes(key) && field.confidence > 0.5,
       ).length;
       const optionalFieldsScore = optionalFieldsPresent / optionalFields.length;
 
@@ -267,9 +217,7 @@ describe("Confidence Scoring Algorithms", () => {
         reasoning: "All sources agree",
       };
 
-      expect(conflictedField.confidence).toBeLessThan(
-        unconflictedField.confidence,
-      );
+      expect(conflictedField.confidence).toBeLessThan(unconflictedField.confidence);
       expect(conflictedField.conflicts).toBeDefined();
       expect(conflictedField.conflicts!.length).toBe(1);
     });
@@ -301,10 +249,7 @@ describe("Confidence Scoring Algorithms", () => {
             field: "title",
             values: [
               { value: "The Great Gatsby", source: highReliabilitySource },
-              {
-                value: "To Kill a Mockingbird",
-                source: mediumReliabilitySource,
-              }, // Major difference
+              { value: "To Kill a Mockingbird", source: mediumReliabilitySource }, // Major difference
             ],
             resolution: "Selected most reliable source due to major conflict",
           },
@@ -312,9 +257,7 @@ describe("Confidence Scoring Algorithms", () => {
         reasoning: "Major conflict resolved by source reliability",
       };
 
-      expect(minorConflictField.confidence).toBeGreaterThan(
-        majorConflictField.confidence,
-      );
+      expect(minorConflictField.confidence).toBeGreaterThan(majorConflictField.confidence);
       expect(minorConflictField.confidence).toBeGreaterThan(0.7);
       expect(majorConflictField.confidence).toBeLessThan(0.7);
     });
@@ -397,56 +340,36 @@ describe("Confidence Scoring Algorithms", () => {
 
       // Test with conflicting dates
       const conflictingInputs: PublicationInfoInput[] = [
-        {
-          date: "2023-05-15",
-          source: highReliabilitySource,
-        },
+        { date: "2023-05-15", source: highReliabilitySource },
         {
           date: "2024-05-15", // Different year
           source: mediumReliabilitySource,
         },
       ];
 
-      const conflictResult =
-        publicationReconciler.reconcilePublicationInfo(conflictingInputs);
+      const conflictResult = publicationReconciler.reconcilePublicationInfo(conflictingInputs);
       // Conflicted result should have lower or equal confidence
-      expect(conflictResult.date.confidence).toBeLessThanOrEqual(
-        result.date.confidence,
-      );
+      expect(conflictResult.date.confidence).toBeLessThanOrEqual(result.date.confidence);
       expect(conflictResult.date.conflicts).toBeDefined();
     });
 
     it("should score series information with volume consistency", () => {
       const consistentSeries: SeriesInput[] = [
-        {
-          series: ["Harry Potter, Book 1"],
-          source: highReliabilitySource,
-        },
-        {
-          series: ["Harry Potter #1"],
-          source: mediumReliabilitySource,
-        },
-        {
-          series: ["Harry Potter Vol. 1"],
-          source: lowReliabilitySource,
-        },
+        { series: ["Harry Potter, Book 1"], source: highReliabilitySource },
+        { series: ["Harry Potter #1"], source: mediumReliabilitySource },
+        { series: ["Harry Potter Vol. 1"], source: lowReliabilitySource },
       ];
 
       const inconsistentSeries: SeriesInput[] = [
-        {
-          series: ["Harry Potter, Book 1"],
-          source: highReliabilitySource,
-        },
+        { series: ["Harry Potter, Book 1"], source: highReliabilitySource },
         {
           series: ["Harry Potter #2"], // Different volume
           source: mediumReliabilitySource,
         },
       ];
 
-      const consistentResult =
-        seriesReconciler.reconcileSeries(consistentSeries);
-      const inconsistentResult =
-        seriesReconciler.reconcileSeries(inconsistentSeries);
+      const consistentResult = seriesReconciler.reconcileSeries(consistentSeries);
+      const inconsistentResult = seriesReconciler.reconcileSeries(inconsistentSeries);
 
       // The actual confidence values may vary based on implementation
       // Just ensure both have reasonable confidence and the consistent one has volume 1
@@ -469,22 +392,15 @@ describe("Confidence Scoring Algorithms", () => {
       ];
 
       // Calculate weighted average
-      const totalWeight = sources.reduce(
-        (sum, s) => sum + s.source.reliability,
-        0,
-      );
-      const weightedSum = sources.reduce(
-        (sum, s) => sum + s.confidence * s.source.reliability,
-        0,
-      );
+      const totalWeight = sources.reduce((sum, s) => sum + s.source.reliability, 0);
+      const weightedSum = sources.reduce((sum, s) => sum + s.confidence * s.source.reliability, 0);
       const weightedAverage = weightedSum / totalWeight;
 
       expect(weightedAverage).toBeGreaterThan(0.7);
       expect(weightedAverage).toBeLessThan(0.9);
 
       // Should be closer to high-reliability source confidence
-      const simpleAverage =
-        sources.reduce((sum, s) => sum + s.confidence, 0) / sources.length;
+      const simpleAverage = sources.reduce((sum, s) => sum + s.confidence, 0) / sources.length;
       expect(weightedAverage).toBeGreaterThan(simpleAverage);
     });
 
@@ -496,9 +412,7 @@ describe("Confidence Scoring Algorithms", () => {
       ];
 
       // When all sources agree, use maximum confidence
-      const maxConfidence = Math.max(
-        ...unanimousSources.map((s) => s.confidence),
-      );
+      const maxConfidence = Math.max(...unanimousSources.map((s) => s.confidence));
       expect(maxConfidence).toBe(0.9);
 
       // Boost confidence for unanimous agreement
@@ -516,10 +430,7 @@ describe("Confidence Scoring Algorithms", () => {
       // With conflicts, use more conservative confidence
       const baseConfidence = conflictingSources[0].confidence; // Highest reliability
       const conflictPenalty = 0.2; // Reduce confidence due to conflicts
-      const conservativeConfidence = Math.max(
-        0.1,
-        baseConfidence - conflictPenalty,
-      );
+      const conservativeConfidence = Math.max(0.1, baseConfidence - conflictPenalty);
 
       expect(conservativeConfidence).toBeLessThan(baseConfidence);
       expect(conservativeConfidence).toBeGreaterThan(0.5);

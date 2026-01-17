@@ -9,8 +9,7 @@ const DEFAULT_VERIFIER_LENGTH = 43;
  * Characters allowed in code verifier per RFC 7636
  * unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
  */
-const UNRESERVED_CHARACTERS =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+const UNRESERVED_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
 
 /**
  * Web Crypto API - available in all modern JS runtimes

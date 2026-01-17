@@ -1,4 +1,13 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import { PerformanceMonitor } from "./performance.js";
+import {
+  BaseMetadataProvider,
+  type CreatorQuery,
+  type MetadataRecord,
+  MetadataType,
+  type MultiCriteriaQuery,
+  type TitleQuery,
+} from "./providers/provider.js";
 import {
   filterByDataTypeSupport,
   filterByLanguageSupport,
@@ -10,15 +19,6 @@ import {
   sortByPriority,
   sortBySpeed,
 } from "./strategy.js";
-import {
-  BaseMetadataProvider,
-  type CreatorQuery,
-  type MetadataRecord,
-  MetadataType,
-  type MultiCriteriaQuery,
-  type TitleQuery,
-} from "./providers/provider.js";
-import { PerformanceMonitor } from "./performance.js";
 
 /**
  * Mock provider for testing
@@ -45,9 +45,7 @@ class MockProvider extends BaseMetadataProvider {
     return [];
   }
 
-  async searchMultiCriteria(
-    _query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(_query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     return [];
   }
 
@@ -145,30 +143,13 @@ describe("Strategy Module", () => {
     });
 
     it("should use priority as tiebreaker when durations are equal", () => {
-      const providers = [
-        new MockProvider("LowPriority", 50),
-        new MockProvider("HighPriority", 90),
-      ];
+      const providers = [new MockProvider("LowPriority", 50), new MockProvider("HighPriority", 90)];
 
       const monitor = new PerformanceMonitor();
 
       // Both have same duration - 100ms
-      monitor.recordOperation(
-        "search",
-        100,
-        true,
-        "LowPriority",
-        undefined,
-        10,
-      );
-      monitor.recordOperation(
-        "search",
-        100,
-        true,
-        "HighPriority",
-        undefined,
-        10,
-      );
+      monitor.recordOperation("search", 100, true, "LowPriority", undefined, 10);
+      monitor.recordOperation("search", 100, true, "HighPriority", undefined, 10);
 
       const sorted = sortBySpeed(providers, monitor);
 
@@ -179,16 +160,9 @@ describe("Strategy Module", () => {
   describe("filterByDataTypeSupport", () => {
     it("should filter providers by required data types", () => {
       const providers = [
-        new MockProvider("Full", 80, [
-          MetadataType.TITLE,
-          MetadataType.AUTHORS,
-          MetadataType.ISBN,
-        ]),
+        new MockProvider("Full", 80, [MetadataType.TITLE, MetadataType.AUTHORS, MetadataType.ISBN]),
         new MockProvider("Partial", 70, [MetadataType.TITLE]),
-        new MockProvider("Different", 75, [
-          MetadataType.PUBLISHER,
-          MetadataType.SUBJECTS,
-        ]),
+        new MockProvider("Different", 75, [MetadataType.PUBLISHER, MetadataType.SUBJECTS]),
       ];
 
       const filtered = filterByDataTypeSupport(providers, [
@@ -237,10 +211,7 @@ describe("Strategy Module", () => {
     });
 
     it("should not exclude providers without language match", () => {
-      const providers = [
-        new MockProvider("English", 80),
-        new MockProvider("Asian", 75),
-      ];
+      const providers = [new MockProvider("English", 80), new MockProvider("Asian", 75)];
 
       const filtered = filterByLanguageSupport(providers, ["ja"]);
 
@@ -261,10 +232,7 @@ describe("Strategy Module", () => {
       registerProviderLanguageSupport("High", ["en", "es"]);
       registerProviderLanguageSupport("Low", ["en", "es"]);
 
-      const providers = [
-        new MockProvider("Low", 70),
-        new MockProvider("High", 90),
-      ];
+      const providers = [new MockProvider("Low", 70), new MockProvider("High", 90)];
 
       const filtered = filterByLanguageSupport(providers, ["en"]);
 
@@ -348,16 +316,12 @@ describe("Strategy Module", () => {
         expect(selected).toHaveLength(3);
         // WikiData and LibraryOfCongress both have priority 85
         expect([selected[0].name, selected[1].name]).toContain("WikiData");
-        expect([selected[0].name, selected[1].name]).toContain(
-          "LibraryOfCongress",
-        );
+        expect([selected[0].name, selected[1].name]).toContain("LibraryOfCongress");
         expect(selected[2].name).toBe("OpenLibrary");
       });
 
       it("should respect maxProviders option", () => {
-        const selected = selectProviders(providers, {}, "all", {
-          maxProviders: 2,
-        });
+        const selected = selectProviders(providers, {}, "all", { maxProviders: 2 });
 
         expect(selected).toHaveLength(2);
       });
@@ -400,28 +364,12 @@ describe("Strategy Module", () => {
         monitor.recordOperation("search", 200, true, "WikiData", undefined, 10);
 
         // Record OpenLibrary as fast - 50ms
-        monitor.recordOperation(
-          "search",
-          50,
-          true,
-          "OpenLibrary",
-          undefined,
-          10,
-        );
+        monitor.recordOperation("search", 50, true, "OpenLibrary", undefined, 10);
 
         // Record LibraryOfCongress as medium - 100ms
-        monitor.recordOperation(
-          "search",
-          100,
-          true,
-          "LibraryOfCongress",
-          undefined,
-          10,
-        );
+        monitor.recordOperation("search", 100, true, "LibraryOfCongress", undefined, 10);
 
-        const selected = selectProviders(providers, {}, "fastest", {
-          performanceMonitor: monitor,
-        });
+        const selected = selectProviders(providers, {}, "fastest", { performanceMonitor: monitor });
 
         expect(selected[0].name).toBe("OpenLibrary");
       });
@@ -464,32 +412,22 @@ describe("Strategy Module", () => {
       });
 
       it("should respect maxProviders for consensus", () => {
-        const selected = selectProviders(
-          providers,
-          { title: "Test" },
-          "consensus",
-          { maxProviders: 1 },
-        );
+        const selected = selectProviders(providers, { title: "Test" }, "consensus", {
+          maxProviders: 1,
+        });
 
         expect(selected).toHaveLength(1);
       });
 
       it("should select providers based on query data types", () => {
         const providers = [
-          new MockProvider("ISBNExpert", 80, [MetadataType.ISBN], {
-            [MetadataType.ISBN]: 0.95,
-          }),
-          new MockProvider("TitleExpert", 85, [MetadataType.TITLE], {
-            [MetadataType.TITLE]: 0.95,
-          }),
+          new MockProvider("ISBNExpert", 80, [MetadataType.ISBN], { [MetadataType.ISBN]: 0.95 }),
+          new MockProvider("TitleExpert", 85, [MetadataType.TITLE], { [MetadataType.TITLE]: 0.95 }),
         ];
 
-        const selected = selectProviders(
-          providers,
-          { isbn: "978-0-123456-78-9" },
-          "consensus",
-          { maxProviders: 2 },
-        );
+        const selected = selectProviders(providers, { isbn: "978-0-123456-78-9" }, "consensus", {
+          maxProviders: 2,
+        });
 
         // Should prefer ISBNExpert for ISBN query
         expect(selected.some((p) => p.name === "ISBNExpert")).toBe(true);
@@ -534,12 +472,7 @@ describe("Strategy Module", () => {
         new MockProvider(
           "Full",
           90,
-          [
-            MetadataType.TITLE,
-            MetadataType.AUTHORS,
-            MetadataType.ISBN,
-            MetadataType.SUBJECTS,
-          ],
+          [MetadataType.TITLE, MetadataType.AUTHORS, MetadataType.ISBN, MetadataType.SUBJECTS],
           {
             [MetadataType.TITLE]: 0.95,
             [MetadataType.AUTHORS]: 0.9,
@@ -547,15 +480,10 @@ describe("Strategy Module", () => {
             [MetadataType.SUBJECTS]: 0.85,
           },
         ),
-        new MockProvider(
-          "Partial",
-          85,
-          [MetadataType.TITLE, MetadataType.AUTHORS],
-          {
-            [MetadataType.TITLE]: 0.7,
-            [MetadataType.AUTHORS]: 0.6,
-          },
-        ),
+        new MockProvider("Partial", 85, [MetadataType.TITLE, MetadataType.AUTHORS], {
+          [MetadataType.TITLE]: 0.7,
+          [MetadataType.AUTHORS]: 0.6,
+        }),
         new MockProvider("Excluded", 95, [
           MetadataType.TITLE,
           MetadataType.AUTHORS,
@@ -563,17 +491,12 @@ describe("Strategy Module", () => {
         ]),
       ];
 
-      const selected = selectProviders(
-        providers,
-        { title: "Test", isbn: "123" },
-        "priority",
-        {
-          maxProviders: 2,
-          requiredDataTypes: [MetadataType.TITLE, MetadataType.ISBN],
-          minReliabilityScore: 0.8,
-          excludeProviders: ["Excluded"],
-        },
-      );
+      const selected = selectProviders(providers, { title: "Test", isbn: "123" }, "priority", {
+        maxProviders: 2,
+        requiredDataTypes: [MetadataType.TITLE, MetadataType.ISBN],
+        minReliabilityScore: 0.8,
+        excludeProviders: ["Excluded"],
+      });
 
       expect(selected).toHaveLength(1);
       expect(selected[0].name).toBe("Full");
@@ -597,9 +520,7 @@ describe("Strategy Module", () => {
         fuzzy: true,
       };
 
-      const providers = [
-        new MockProvider("Comprehensive", 90, Object.values(MetadataType)),
-      ];
+      const providers = [new MockProvider("Comprehensive", 90, Object.values(MetadataType))];
 
       const selected = selectProviders(providers, query, "consensus");
 
@@ -610,9 +531,7 @@ describe("Strategy Module", () => {
   describe("Edge cases", () => {
     it("should handle provider with no supported data types", () => {
       // Create a provider that explicitly supports nothing
-      const emptyProvider = new MockProvider("Empty", 80, [
-        MetadataType.COVER_IMAGE,
-      ]);
+      const emptyProvider = new MockProvider("Empty", 80, [MetadataType.COVER_IMAGE]);
 
       const providers = [emptyProvider];
 
@@ -626,9 +545,7 @@ describe("Strategy Module", () => {
     it("should handle maxProviders = 0", () => {
       const providers = [new MockProvider("A", 80), new MockProvider("B", 90)];
 
-      const selected = selectProviders(providers, {}, "all", {
-        maxProviders: 0,
-      });
+      const selected = selectProviders(providers, {}, "all", { maxProviders: 0 });
 
       expect(selected).toHaveLength(0);
     });
@@ -636,20 +553,14 @@ describe("Strategy Module", () => {
     it("should handle negative maxProviders", () => {
       const providers = [new MockProvider("A", 80), new MockProvider("B", 90)];
 
-      const selected = selectProviders(providers, {}, "all", {
-        maxProviders: -1,
-      });
+      const selected = selectProviders(providers, {}, "all", { maxProviders: -1 });
 
       // Negative maxProviders should be ignored
       expect(selected).toHaveLength(2);
     });
 
     it("should handle reliability score of exactly minimum", () => {
-      const providers = [
-        new MockProvider("Exact", 80, [], {
-          [MetadataType.TITLE]: 0.8,
-        }),
-      ];
+      const providers = [new MockProvider("Exact", 80, [], { [MetadataType.TITLE]: 0.8 })];
 
       const selected = selectProviders(providers, {}, "priority", {
         requiredDataTypes: [MetadataType.TITLE],
@@ -660,14 +571,9 @@ describe("Strategy Module", () => {
     });
 
     it("should handle very large provider list", () => {
-      const providers = Array.from(
-        { length: 100 },
-        (_, i) => new MockProvider(`Provider${i}`, i),
-      );
+      const providers = Array.from({ length: 100 }, (_, i) => new MockProvider(`Provider${i}`, i));
 
-      const selected = selectProviders(providers, {}, "priority", {
-        maxProviders: 5,
-      });
+      const selected = selectProviders(providers, {}, "priority", { maxProviders: 5 });
 
       expect(selected).toHaveLength(5);
       expect(selected[0].priority).toBeGreaterThan(selected[4].priority);

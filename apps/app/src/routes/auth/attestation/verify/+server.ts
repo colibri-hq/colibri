@@ -16,12 +16,7 @@ import {
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 import { UAParser } from "ua-parser-js";
 
-export const POST = async function handler({
-  url,
-  request,
-  cookies,
-  locals: { database },
-}) {
+export const POST = async function handler({ url, request, cookies, locals: { database } }) {
   const sessionId = getAuthSessionIdFromCookie(cookies);
 
   if (!sessionId) {
@@ -103,9 +98,7 @@ export const POST = async function handler({
     } = registrationInfo;
 
     const authenticators = await listAuthenticatorsForUser(database, user);
-    const existingDevice = authenticators.find(
-      ({ identifier }) => identifier === credentialID,
-    );
+    const existingDevice = authenticators.find(({ identifier }) => identifier === credentialID);
 
     if (!existingDevice) {
       await createAuthenticator(database, {
@@ -142,6 +135,4 @@ function inferAgent(request: Request) {
   return browser.name;
 }
 
-export type VerificationResponse = {
-  verified: boolean;
-};
+export type VerificationResponse = { verified: boolean };

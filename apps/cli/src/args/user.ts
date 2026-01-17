@@ -6,9 +6,7 @@ export const userIdentifier = Args.custom<{ email: string } | { id: number }>({
   async parse(input) {
     const schema = z
       .string()
-      .email({
-        message: "Invalid email address",
-      })
+      .email({ message: "Invalid email address" })
       .or(z.coerce.number().int().positive().gt(0));
     const result = schema.safeParse(input);
 

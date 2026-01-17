@@ -2,7 +2,7 @@
 import { XMLParser } from "fast-xml-parser";
 
 // DOM-like wrapper for fast-xml-parser
- 
+
 class _XMLNode {
   _node: any;
   _namespaces: Record<string, string>;
@@ -13,8 +13,7 @@ class _XMLNode {
   constructor(node: any, namespaces: Record<string, string> = {}) {
     this._node = node;
     this._namespaces = namespaces;
-    this.nodeType =
-      typeof node === "object" ? this.ELEMENT_NODE : this.TEXT_NODE;
+    this.nodeType = typeof node === "object" ? this.ELEMENT_NODE : this.TEXT_NODE;
   }
 
   get nodeName() {
@@ -51,9 +50,7 @@ class _XMLNode {
 
   get firstElementChild() {
     if (typeof this._node !== "object") return null;
-    const childElements = this.childNodes.filter(
-      (node) => node.nodeType === node.ELEMENT_NODE,
-    );
+    const childElements = this.childNodes.filter((node) => node.nodeType === node.ELEMENT_NODE);
     return childElements.length > 0 ? childElements[0] : null;
   }
 
@@ -84,12 +81,7 @@ class _XMLNode {
 
     // Regular object with properties
     for (const key in this._node) {
-      if (
-        key === "#text" ||
-        key === "@_xmlns" ||
-        key === "@_xml:lang" ||
-        key.startsWith("@_")
-      )
+      if (key === "#text" || key === "@_xmlns" || key === "@_xml:lang" || key.startsWith("@_"))
         continue;
       if (key === "#name") continue;
 
@@ -194,9 +186,7 @@ class _XMLNode {
     const results: _XMLNode[] = [];
 
     if (selector.includes("[") && selector.includes("]")) {
-      const attrMatch = selector.match(
-        /\[([^\]=]+)(?:=(?:["']([^"']+)["'])?)?\]/,
-      );
+      const attrMatch = selector.match(/\[([^\]=]+)(?:=(?:["']([^"']+)["'])?)?\]/);
       if (attrMatch) {
         const [, attr, value] = attrMatch;
         this._getElementsByAttribute(attr, value, results);
@@ -224,11 +214,7 @@ class _XMLNode {
     return null;
   }
 
-  _getElementsByAttribute(
-    attr: string,
-    value: string | undefined,
-    results: _XMLNode[],
-  ) {
+  _getElementsByAttribute(attr: string, value: string | undefined, results: _XMLNode[]) {
     if (typeof this._node !== "object") return;
 
     if (value === undefined) {
@@ -247,7 +233,6 @@ class _XMLNode {
   }
 }
 
- 
 class _DOMWrapper {
   _parser: XMLParser;
 
@@ -256,7 +241,7 @@ class _DOMWrapper {
       ignoreAttributes: false,
       attributeNamePrefix: "@_",
       textNodeName: "#text",
-       
+
       isArray: (name, _jpath, _isLeafNode, _isAttribute) => {
         // Known elements that should always be arrays
         const arrayElements = [
@@ -283,7 +268,6 @@ class _DOMWrapper {
     });
   }
 
-   
   parseFromString(xmlText: string, _mimeType: string) {
     try {
       const parsed = this._parser.parse(xmlText);
@@ -294,10 +278,7 @@ class _DOMWrapper {
       return new XMLDocument(parsed, namespaces);
     } catch (err) {
       console.error("XML parsing error:", err);
-      const errorDoc = new XMLDocument(
-        [{ error: { message: String(err) } }],
-        {},
-      );
+      const errorDoc = new XMLDocument([{ error: { message: String(err) } }], {});
       return errorDoc;
     }
   }

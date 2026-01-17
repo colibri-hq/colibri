@@ -114,10 +114,7 @@ export class SecureTokenStore implements TokenStore {
       const decrypted = await this.#decrypt(encrypted, cryptoKey);
       const parsed = JSON.parse(decrypted) as StoredTokensJson;
 
-      return {
-        ...parsed,
-        expiresAt: new Date(parsed.expiresAt),
-      };
+      return { ...parsed, expiresAt: new Date(parsed.expiresAt) };
     } catch {
       // Invalid or corrupted data, clear it
       this.#storage.removeItem(key);
@@ -128,10 +125,7 @@ export class SecureTokenStore implements TokenStore {
   async set(clientId: string, tokens: StoredTokens): Promise<void> {
     const key = this.#getKey(clientId);
 
-    const data: StoredTokensJson = {
-      ...tokens,
-      expiresAt: tokens.expiresAt.toISOString(),
-    };
+    const data: StoredTokensJson = { ...tokens, expiresAt: tokens.expiresAt.toISOString() };
 
     const cryptoKey = await this.#getCryptoKey();
     const encrypted = await this.#encrypt(JSON.stringify(data), cryptoKey);
@@ -188,13 +182,10 @@ export class SecureTokenStore implements TokenStore {
     if (source instanceof Uint8Array) {
       // Create a fresh ArrayBuffer to avoid SharedArrayBuffer issues
       const buffer = new Uint8Array(source).buffer as ArrayBuffer;
-      return webcrypto.subtle.importKey(
-        "raw",
-        buffer,
-        { name: ALGORITHM },
-        false,
-        ["encrypt", "decrypt"],
-      );
+      return webcrypto.subtle.importKey("raw", buffer, { name: ALGORITHM }, false, [
+        "encrypt",
+        "decrypt",
+      ]);
     }
 
     // String - derive key using PBKDF2
@@ -209,13 +200,9 @@ export class SecureTokenStore implements TokenStore {
     const passwordBuffer = encoder.encode(password);
 
     // Import password as key material
-    const keyMaterial = await webcrypto.subtle.importKey(
-      "raw",
-      passwordBuffer,
-      "PBKDF2",
-      false,
-      ["deriveKey"],
-    );
+    const keyMaterial = await webcrypto.subtle.importKey("raw", passwordBuffer, "PBKDF2", false, [
+      "deriveKey",
+    ]);
 
     // Use a fixed salt (in production, consider per-user salts stored separately)
     // This salt is fine for our use case since we're not storing passwords
@@ -223,12 +210,7 @@ export class SecureTokenStore implements TokenStore {
 
     // Derive the actual encryption key
     return webcrypto.subtle.deriveKey(
-      {
-        name: "PBKDF2",
-        salt,
-        iterations: 100000,
-        hash: "SHA-256",
-      },
+      { name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" },
       keyMaterial,
       { name: ALGORITHM, length: KEY_LENGTH },
       false,
@@ -247,11 +229,7 @@ export class SecureTokenStore implements TokenStore {
     const iv = webcrypto.getRandomValues(new Uint8Array(IV_LENGTH));
 
     const encrypted = await webcrypto.subtle.encrypt(
-      {
-        name: ALGORITHM,
-        iv,
-        tagLength: TAG_LENGTH,
-      },
+      { name: ALGORITHM, iv, tagLength: TAG_LENGTH },
       key,
       dataBuffer,
     );
@@ -277,11 +255,7 @@ export class SecureTokenStore implements TokenStore {
     const ciphertext = combined.slice(IV_LENGTH);
 
     const decrypted = await webcrypto.subtle.decrypt(
-      {
-        name: ALGORITHM,
-        iv,
-        tagLength: TAG_LENGTH,
-      },
+      { name: ALGORITHM, iv, tagLength: TAG_LENGTH },
       key,
       ciphertext,
     );
@@ -294,9 +268,7 @@ export class SecureTokenStore implements TokenStore {
 /**
  * Internal type for JSON serialization
  */
-type StoredTokensJson = Omit<StoredTokens, "expiresAt"> & {
-  expiresAt: string;
-};
+type StoredTokensJson = Omit<StoredTokens, "expiresAt"> & { expiresAt: string };
 
 /**
  * Base64 encode a Uint8Array

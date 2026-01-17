@@ -32,11 +32,7 @@ export function remarkExtractHeadings() {
       const text = extractText(node);
       const id = slugger.slug(text);
 
-      headings.push({
-        id,
-        text,
-        level: node.depth,
-      });
+      headings.push({ id, text, level: node.depth });
     });
 
     // Ensure file.data.fm exists (mdsvex may have already created it for frontmatter)

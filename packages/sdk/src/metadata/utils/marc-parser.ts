@@ -147,15 +147,11 @@ function parseSingleMarcRecord(recordXml: string): MarcRecord | null {
 
     // Extract control fields
     const controlFields: MarcControlField[] = [];
-    const controlFieldPattern =
-      /<controlfield[^>]*tag="([^"]*)"[^>]*>([^<]*)<\/controlfield>/gi;
+    const controlFieldPattern = /<controlfield[^>]*tag="([^"]*)"[^>]*>([^<]*)<\/controlfield>/gi;
     const cfMatches = recordXml.matchAll(controlFieldPattern);
 
     for (const cfMatch of cfMatches) {
-      controlFields.push({
-        tag: cfMatch[1],
-        value: cfMatch[2],
-      });
+      controlFields.push({ tag: cfMatch[1], value: cfMatch[2] });
     }
 
     // Extract data fields
@@ -166,15 +162,11 @@ function parseSingleMarcRecord(recordXml: string): MarcRecord | null {
 
     for (const dfMatch of dfMatches) {
       const subfields: MarcSubfield[] = [];
-      const subfieldPattern =
-        /<subfield[^>]*code="([^"]*)"[^>]*>([^<]*)<\/subfield>/gi;
+      const subfieldPattern = /<subfield[^>]*code="([^"]*)"[^>]*>([^<]*)<\/subfield>/gi;
       const sfMatches = dfMatch[4].matchAll(subfieldPattern);
 
       for (const sfMatch of sfMatches) {
-        subfields.push({
-          code: sfMatch[1],
-          value: decodeXmlEntities(sfMatch[2]),
-        });
+        subfields.push({ code: sfMatch[1], value: decodeXmlEntities(sfMatch[2]) });
       }
 
       // Also try without explicit attribute quotes for malformed XML
@@ -215,10 +207,7 @@ function decodeXmlEntities(text: string): string {
  * @param tag - Field tag (e.g., "001", "008")
  * @returns Field value or undefined
  */
-export function getControlField(
-  record: MarcRecord,
-  tag: string,
-): string | undefined {
+export function getControlField(record: MarcRecord, tag: string): string | undefined {
   const field = record.controlFields.find((cf) => cf.tag === tag);
   return field?.value;
 }
@@ -230,10 +219,7 @@ export function getControlField(
  * @param tag - Field tag (e.g., "245", "650")
  * @returns Array of matching data fields
  */
-export function getDataFields(
-  record: MarcRecord,
-  tag: string,
-): MarcDataField[] {
+export function getDataFields(record: MarcRecord, tag: string): MarcDataField[] {
   return record.dataFields.filter((df) => df.tag === tag);
 }
 
@@ -244,10 +230,7 @@ export function getDataFields(
  * @param tag - Field tag
  * @returns First matching field or undefined
  */
-export function getDataField(
-  record: MarcRecord,
-  tag: string,
-): MarcDataField | undefined {
+export function getDataField(record: MarcRecord, tag: string): MarcDataField | undefined {
   return record.dataFields.find((df) => df.tag === tag);
 }
 
@@ -258,10 +241,7 @@ export function getDataField(
  * @param code - Subfield code (e.g., "a", "b")
  * @returns First matching subfield value or undefined
  */
-export function getSubfield(
-  field: MarcDataField,
-  code: string,
-): string | undefined {
+export function getSubfield(field: MarcDataField, code: string): string | undefined {
   const subfield = field.subfields.find((sf) => sf.code === code);
   return subfield?.value;
 }
@@ -285,11 +265,7 @@ export function getAllSubfields(field: MarcDataField, code: string): string[] {
  * @param codes - Subfield codes to extract
  * @returns Array of subfield values
  */
-export function getSubfieldValues(
-  record: MarcRecord,
-  tag: string,
-  codes: string[],
-): string[] {
+export function getSubfieldValues(record: MarcRecord, tag: string, codes: string[]): string[] {
   const values: string[] = [];
   const fields = getDataFields(record, tag);
 
@@ -328,14 +304,8 @@ export function getFirstSubfield(
  * @param record - Parsed MARC record
  * @returns Extracted bibliographic data
  */
-export function extractBibliographicData(
-  record: MarcRecord,
-): MarcBibliographicData {
-  const data: MarcBibliographicData = {
-    authors: [],
-    isbns: [],
-    subjects: [],
-  };
+export function extractBibliographicData(record: MarcRecord): MarcBibliographicData {
+  const data: MarcBibliographicData = { authors: [], isbns: [], subjects: [] };
 
   // Control number (001)
   data.controlNumber = getControlField(record, "001");
@@ -379,9 +349,7 @@ export function extractBibliographicData(
   data.seriesPosition = seriesInfo.position;
 
   // Edition (250$a)
-  data.edition = getFirstSubfield(record, "250", "a")
-    ?.replace(/[.]$/, "")
-    .trim();
+  data.edition = getFirstSubfield(record, "250", "a")?.replace(/[.]$/, "").trim();
 
   // Description/Summary (520$a)
   data.description = getFirstSubfield(record, "520", "a");
@@ -445,11 +413,7 @@ export function extractAuthors(record: MarcRecord): string[] {
   // Meeting/conference names
   const meetingFields = ["111", "711"];
 
-  const allAuthorFields = [
-    ...personalAuthorFields,
-    ...corporateAuthorFields,
-    ...meetingFields,
-  ];
+  const allAuthorFields = [...personalAuthorFields, ...corporateAuthorFields, ...meetingFields];
 
   for (const tag of allAuthorFields) {
     const values = getSubfieldValues(record, tag, ["a"]);
@@ -515,10 +479,7 @@ export function extractPublicationInfo(record: MarcRecord): {
   place?: string | undefined;
 } {
   // Try 264 first (RDA format), then 260 (AACR2)
-  const pubFields = [
-    ...getDataFields(record, "264"),
-    ...getDataFields(record, "260"),
-  ];
+  const pubFields = [...getDataFields(record, "264"), ...getDataFields(record, "260")];
 
   let publisher: string | undefined;
   let year: number | undefined;
@@ -555,11 +516,7 @@ export function extractPublicationInfo(record: MarcRecord): {
     if (!place) {
       const placeValue = getSubfield(field, "a");
       if (placeValue) {
-        place = placeValue
-          .replace(/[:]$/, "")
-          .replace(/^\[/, "")
-          .replace(/]$/, "")
-          .trim();
+        place = placeValue.replace(/[:]$/, "").replace(/^\[/, "").replace(/]$/, "").trim();
       }
     }
   }
@@ -693,11 +650,7 @@ function extractGndIds(record: MarcRecord): string[] | undefined {
     const values = getSubfieldValues(record, tag, ["0"]);
     for (const value of values) {
       // Check for various GND ID formats
-      if (
-        value.includes("gnd") ||
-        value.includes("d-nb.info") ||
-        value.includes("DE-588")
-      ) {
+      if (value.includes("gnd") || value.includes("d-nb.info") || value.includes("DE-588")) {
         gndIds.push(value);
       }
     }

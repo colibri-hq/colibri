@@ -1,3 +1,4 @@
+import { cleanIsbn } from "../utils/normalization.js";
 import {
   type CreatorQuery,
   type MetadataRecord,
@@ -8,7 +9,6 @@ import {
   type TitleQuery,
 } from "./provider.js";
 import { RetryableMetadataProvider } from "./retryable-provider.js";
-import { cleanIsbn } from "../utils/normalization.js";
 
 /**
  * WikiData SPARQL query response interfaces
@@ -25,12 +25,8 @@ interface WikiDataResult {
 }
 
 interface WikiDataResponse {
-  head: {
-    vars: string[];
-  };
-  results: {
-    bindings: WikiDataResult[];
-  };
+  head: { vars: string[] };
+  results: { bindings: WikiDataResult[] };
 }
 
 /**
@@ -82,9 +78,7 @@ export class WikiDataMetadataProvider extends RetryableMetadataProvider {
 
   private readonly sparqlEndpoint = "https://query.wikidata.org/sparql";
 
-  constructor(
-    private readonly fetch: typeof globalThis.fetch = globalThis.fetch,
-  ) {
+  constructor(private readonly fetch: typeof globalThis.fetch = globalThis.fetch) {
     super();
   }
 
@@ -92,14 +86,8 @@ export class WikiDataMetadataProvider extends RetryableMetadataProvider {
    * Search for metadata by title
    */
   async searchByTitle(query: TitleQuery): Promise<MetadataRecord[]> {
-    const sparqlQuery = this.buildTitleSearchQuery(
-      query.title,
-      query.exactMatch,
-    );
-    const response = await this.executeQuery(
-      sparqlQuery,
-      `title search for "${query.title}"`,
-    );
+    const sparqlQuery = this.buildTitleSearchQuery(query.title, query.exactMatch);
+    const response = await this.executeQuery(sparqlQuery, `title search for "${query.title}"`);
 
     return this.processSearchResults(response, "title");
   }
@@ -110,10 +98,7 @@ export class WikiDataMetadataProvider extends RetryableMetadataProvider {
   async searchByISBN(isbn: string): Promise<MetadataRecord[]> {
     const cleanedIsbn = cleanIsbn(isbn);
     const sparqlQuery = this.buildISBNSearchQuery(cleanedIsbn);
-    const response = await this.executeQuery(
-      sparqlQuery,
-      `ISBN search for "${isbn}"`,
-    );
+    const response = await this.executeQuery(sparqlQuery, `ISBN search for "${isbn}"`);
 
     return this.processSearchResults(response, "isbn");
   }
@@ -123,10 +108,7 @@ export class WikiDataMetadataProvider extends RetryableMetadataProvider {
    */
   async searchByCreator(query: CreatorQuery): Promise<MetadataRecord[]> {
     const sparqlQuery = this.buildAuthorSearchQuery(query.name);
-    const response = await this.executeQuery(
-      sparqlQuery,
-      `author search for "${query.name}"`,
-    );
+    const response = await this.executeQuery(sparqlQuery, `author search for "${query.name}"`);
 
     return this.processSearchResults(response, "author");
   }
@@ -134,26 +116,18 @@ export class WikiDataMetadataProvider extends RetryableMetadataProvider {
   /**
    * Search using multiple criteria
    */
-  async searchMultiCriteria(
-    query: MultiCriteriaQuery,
-  ): Promise<MetadataRecord[]> {
+  async searchMultiCriteria(query: MultiCriteriaQuery): Promise<MetadataRecord[]> {
     // For multi-criteria, prioritize ISBN > title > author
     if (query.isbn) {
       return await this.searchByISBN(query.isbn);
     }
 
     if (query.title) {
-      return await this.searchByTitle({
-        title: query.title,
-        exactMatch: !query.fuzzy,
-      });
+      return await this.searchByTitle({ title: query.title, exactMatch: !query.fuzzy });
     }
 
     if (query.authors && query.authors.length > 0) {
-      return await this.searchByCreator({
-        name: query.authors[0],
-        fuzzy: query.fuzzy ?? false,
-      });
+      return await this.searchByCreator({ name: query.authors[0], fuzzy: query.fuzzy ?? false });
     }
 
     return [];
@@ -207,26 +181,18 @@ export class WikiDataMetadataProvider extends RetryableMetadataProvider {
   /**
    * Execute SPARQL query with retry logic
    */
-  private async executeQuery(
-    query: string,
-    operationName: string,
-  ): Promise<WikiDataResponse> {
+  private async executeQuery(query: string, operationName: string): Promise<WikiDataResponse> {
     const result = await this.executeWithRetry(async () => {
       const encodedQuery = encodeURIComponent(query);
       const url = `${this.sparqlEndpoint}?query=${encodedQuery}&format=json`;
 
       const response = await this.fetch(url, {
         method: "GET",
-        headers: {
-          Accept: "application/sparql-results+json",
-          "User-Agent": this.userAgent,
-        },
+        headers: { Accept: "application/sparql-results+json", "User-Agent": this.userAgent },
       });
 
       if (!response.ok) {
-        throw new Error(
-          `WikiData SPARQL query failed: ${response.status} ${response.statusText}`,
-        );
+        throw new Error(`WikiData SPARQL query failed: ${response.status} ${response.statusText}`);
       }
 
       return (await response.json()) as WikiDataResponse;
@@ -346,10 +312,7 @@ export class WikiDataMetadataProvider extends RetryableMetadataProvider {
   /**
    * Process SPARQL query results into MetadataRecord objects
    */
-  private processSearchResults(
-    response: WikiDataResponse,
-    searchType: string,
-  ): MetadataRecord[] {
+  private processSearchResults(response: WikiDataResponse, searchType: string): MetadataRecord[] {
     if (!response.results.bindings.length) {
       return [];
     }
@@ -370,11 +333,7 @@ export class WikiDataMetadataProvider extends RetryableMetadataProvider {
     const records: MetadataRecord[] = [];
 
     for (const [bookUri, bindings] of bookGroups) {
-      const record = this.createMetadataRecordFromBindings(
-        bookUri,
-        bindings,
-        searchType,
-      );
+      const record = this.createMetadataRecordFromBindings(bookUri, bindings, searchType);
       if (record) {
         records.push(record);
       }
@@ -395,14 +354,10 @@ export class WikiDataMetadataProvider extends RetryableMetadataProvider {
     if (!firstBinding.title?.value) return null;
 
     // Extract unique authors
-    const authors = [
-      ...new Set(bindings.map((b) => b.authorLabel?.value).filter(Boolean)),
-    ];
+    const authors = [...new Set(bindings.map((b) => b.authorLabel?.value).filter(Boolean))];
 
     // Extract unique ISBNs
-    const isbns = [
-      ...new Set(bindings.map((b) => b.isbn?.value).filter(Boolean)),
-    ];
+    const isbns = [...new Set(bindings.map((b) => b.isbn?.value).filter(Boolean))];
 
     // Parse publication date
     let publicationDate: Date | undefined;
@@ -447,18 +402,9 @@ export class WikiDataMetadataProvider extends RetryableMetadataProvider {
         language: this.mapLanguageCode(firstBinding.languageLabel?.value),
         pageCount,
         description: firstBinding.description?.value,
-        providerData: {
-          wikidataUri: bookUri,
-          wikidataId,
-          searchType,
-        },
+        providerData: { wikidataUri: bookUri, wikidataId, searchType },
       } as Partial<Omit<MetadataRecord, "id" | "source" | "timestamp">>,
-      this.calculateConfidence(
-        firstBinding,
-        searchType,
-        authors.length,
-        isbns.length,
-      ),
+      this.calculateConfidence(firstBinding, searchType, authors.length, isbns.length),
     );
 
     return record;
@@ -529,10 +475,7 @@ export class WikiDataMetadataProvider extends RetryableMetadataProvider {
     // WikiData quality bonus
     const wikidataBonus = 0.05; // WikiData is curated and structured
 
-    const finalConfidence = Math.min(
-      0.92,
-      baseConfidence + completenessBoost + wikidataBonus,
-    );
+    const finalConfidence = Math.min(0.92, baseConfidence + completenessBoost + wikidataBonus);
     return Math.round(finalConfidence * 100) / 100;
   }
 }

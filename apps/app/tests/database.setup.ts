@@ -21,15 +21,8 @@ setup("Seed the database", async ({ context }) => {
     // region User and OAuth Setup
     const user = await trx
       .insertInto("authentication.user")
-      .values({
-        id: TEST_USER_ID,
-        name: "Test User",
-        email: "test@colibri-hq.org",
-        role: "admin",
-      })
-      .onConflict((conflict) =>
-        conflict.column("id").doUpdateSet({ updated_at: new Date() }),
-      )
+      .values({ id: TEST_USER_ID, name: "Test User", email: "test@colibri-hq.org", role: "admin" })
+      .onConflict((conflict) => conflict.column("id").doUpdateSet({ updated_at: new Date() }))
       .returningAll()
       .executeTakeFirstOrThrow();
 
@@ -42,9 +35,7 @@ setup("Seed the database", async ({ context }) => {
         email: "user@colibri-hq.org",
         role: "adult",
       })
-      .onConflict((conflict) =>
-        conflict.column("id").doUpdateSet({ updated_at: new Date() }),
-      )
+      .onConflict((conflict) => conflict.column("id").doUpdateSet({ updated_at: new Date() }))
       .execute();
 
     const client = await trx
@@ -60,9 +51,7 @@ setup("Seed the database", async ({ context }) => {
         revoked: false,
         user_id: user.id,
       })
-      .onConflict((conflict) =>
-        conflict.column("id").doUpdateSet({ updated_at: new Date() }),
-      )
+      .onConflict((conflict) => conflict.column("id").doUpdateSet({ updated_at: new Date() }))
       .returningAll()
       .executeTakeFirstOrThrow();
 
@@ -91,9 +80,7 @@ setup("Seed the database", async ({ context }) => {
         revoked: false,
         user_id: user.id,
       })
-      .onConflict((conflict) =>
-        conflict.column("id").doUpdateSet({ updated_at: new Date() }),
-      )
+      .onConflict((conflict) => conflict.column("id").doUpdateSet({ updated_at: new Date() }))
       .returningAll()
       .executeTakeFirstOrThrow();
 
@@ -115,8 +102,7 @@ setup("Seed the database", async ({ context }) => {
       {
         id: TEST_CREATOR_IDS[1],
         name: "Isaac Asimov",
-        description:
-          "Science fiction legend, author of the Foundation series and robot stories",
+        description: "Science fiction legend, author of the Foundation series and robot stories",
       },
     ];
 
@@ -130,11 +116,13 @@ setup("Seed the database", async ({ context }) => {
           sorting_key: creator.name,
         })
         .onConflict((conflict) =>
-          conflict.column("id").doUpdateSet({
-            name: creator.name,
-            description: creator.description,
-            updated_at: new Date(),
-          }),
+          conflict
+            .column("id")
+            .doUpdateSet({
+              name: creator.name,
+              description: creator.description,
+              updated_at: new Date(),
+            }),
         )
         .execute();
     }
@@ -145,8 +133,7 @@ setup("Seed the database", async ({ context }) => {
       {
         id: TEST_PUBLISHER_IDS[0],
         name: "Tor Books",
-        description:
-          "Major fantasy and science fiction publisher founded in 1980",
+        description: "Major fantasy and science fiction publisher founded in 1980",
       },
     ];
 
@@ -160,11 +147,13 @@ setup("Seed the database", async ({ context }) => {
           sorting_key: publisher.name,
         })
         .onConflict((conflict) =>
-          conflict.column("id").doUpdateSet({
-            name: publisher.name,
-            description: publisher.description,
-            updated_at: new Date(),
-          }),
+          conflict
+            .column("id")
+            .doUpdateSet({
+              name: publisher.name,
+              description: publisher.description,
+              updated_at: new Date(),
+            }),
         )
         .execute();
     }
@@ -176,8 +165,7 @@ setup("Seed the database", async ({ context }) => {
         workId: TEST_WORK_IDS[0],
         editionId: TEST_EDITION_IDS[0],
         title: "The Fantasy Quest",
-        synopsis:
-          "An epic adventure in a magical realm filled with dragons and wizards",
+        synopsis: "An epic adventure in a magical realm filled with dragons and wizards",
       },
       {
         workId: TEST_WORK_IDS[1],
@@ -189,8 +177,7 @@ setup("Seed the database", async ({ context }) => {
         workId: TEST_WORK_IDS[2],
         editionId: TEST_EDITION_IDS[2],
         title: "Mystery Manor",
-        synopsis:
-          "A detective investigates strange occurrences in a haunted house",
+        synopsis: "A detective investigates strange occurrences in a haunted house",
       },
       {
         workId: TEST_WORK_IDS[3],
@@ -210,12 +197,8 @@ setup("Seed the database", async ({ context }) => {
       // Create work
       await trx
         .insertInto("work")
-        .values({
-          id: BigInt(book.workId),
-        })
-        .onConflict((conflict) =>
-          conflict.column("id").doUpdateSet({ updated_at: new Date() }),
-        )
+        .values({ id: BigInt(book.workId) })
+        .onConflict((conflict) => conflict.column("id").doUpdateSet({ updated_at: new Date() }))
         .execute();
 
       // Create edition
@@ -229,11 +212,9 @@ setup("Seed the database", async ({ context }) => {
           sorting_key: book.title,
         })
         .onConflict((conflict) =>
-          conflict.column("id").doUpdateSet({
-            title: book.title,
-            synopsis: book.synopsis,
-            updated_at: new Date(),
-          }),
+          conflict
+            .column("id")
+            .doUpdateSet({ title: book.title, synopsis: book.synopsis, updated_at: new Date() }),
         )
         .execute();
 
@@ -271,11 +252,13 @@ setup("Seed the database", async ({ context }) => {
           shared: true,
         })
         .onConflict((conflict) =>
-          conflict.column("id").doUpdateSet({
-            name: collection.name,
-            description: collection.description,
-            updated_at: new Date(),
-          }),
+          conflict
+            .column("id")
+            .doUpdateSet({
+              name: collection.name,
+              description: collection.description,
+              updated_at: new Date(),
+            }),
         )
         .execute();
     }

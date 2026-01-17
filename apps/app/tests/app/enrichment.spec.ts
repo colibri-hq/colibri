@@ -53,10 +53,7 @@ test.describe("Metadata Enrichment Database Operations", () => {
         user_id: BigInt(TEST_USER_ID),
         status: "pending",
         preview: JSON.stringify({ title: { value: "Test", confidence: 0.9 } }),
-        improvements: JSON.stringify({
-          title: "New Title",
-          synopsis: "New Synopsis",
-        }),
+        improvements: JSON.stringify({ title: "New Title", synopsis: "New Synopsis" }),
         sources: ["OpenLibrary"],
       })
       .execute();
@@ -69,10 +66,7 @@ test.describe("Metadata Enrichment Database Operations", () => {
         eb
           .cast<number>(
             eb.fn("jsonb_array_length", [
-              eb.fn("jsonb_path_query_array", [
-                eb.ref("improvements"),
-                eb.val("$.keyvalue()"),
-              ]),
+              eb.fn("jsonb_path_query_array", [eb.ref("improvements"), eb.val("$.keyvalue()")]),
             ]),
             "integer",
           )
@@ -86,9 +80,7 @@ test.describe("Metadata Enrichment Database Operations", () => {
     expect(result?.sources).toEqual(["OpenLibrary"]);
   });
 
-  test("unique constraint prevents multiple pending enrichments per work", async ({
-    database,
-  }) => {
+  test("unique constraint prevents multiple pending enrichments per work", async ({ database }) => {
     // Insert first pending enrichment
     await database
       .insertInto("enrichment_result")
@@ -124,9 +116,7 @@ test.describe("Metadata Enrichment Database Operations", () => {
     expect(errorThrown).toBe(true);
   });
 
-  test("allows multiple non-pending enrichments for same work", async ({
-    database,
-  }) => {
+  test("allows multiple non-pending enrichments for same work", async ({ database }) => {
     // Insert first enrichment as applied
     await database
       .insertInto("enrichment_result")
@@ -188,10 +178,7 @@ test.describe("Metadata Enrichment Database Operations", () => {
     // Update to applied
     await database
       .updateTable("enrichment_result")
-      .set({
-        status: "applied",
-        applied_at: new Date().toISOString(),
-      })
+      .set({ status: "applied", applied_at: new Date().toISOString() })
       .where("id", "=", created!.id)
       .execute();
 
@@ -224,10 +211,7 @@ test.describe("Metadata Enrichment Database Operations", () => {
     // Update to dismissed
     await database
       .updateTable("enrichment_result")
-      .set({
-        status: "dismissed",
-        dismissed_at: new Date().toISOString(),
-      })
+      .set({ status: "dismissed", dismissed_at: new Date().toISOString() })
       .where("id", "=", created!.id)
       .execute();
 
@@ -242,9 +226,7 @@ test.describe("Metadata Enrichment Database Operations", () => {
     expect(updated?.dismissed_at).toBeDefined();
   });
 
-  test("status check constraint validates allowed values", async ({
-    database,
-  }) => {
+  test("status check constraint validates allowed values", async ({ database }) => {
     let errorThrown = false;
     try {
       await database
@@ -310,23 +292,15 @@ test.describe("Metadata Enrichment Database Operations", () => {
     expect(errorThrown).toBe(true);
   });
 
-  test("cascade delete removes enrichment when work is deleted", async ({
-    database,
-  }) => {
+  test("cascade delete removes enrichment when work is deleted", async ({ database }) => {
     // This test would need a temporary work to avoid affecting other tests
     // Skipping implementation as it would require complex setup
     test.skip();
   });
 
-  test("JSONB fields store and retrieve complex data correctly", async ({
-    database,
-  }) => {
+  test("JSONB fields store and retrieve complex data correctly", async ({ database }) => {
     const complexPreview = {
-      title: {
-        value: "Complex Title",
-        confidence: 0.95,
-        source: "OpenLibrary",
-      },
+      title: { value: "Complex Title", confidence: 0.95, source: "OpenLibrary" },
       description: {
         value: "A complex description with special characters: <>&\"'",
         confidence: 0.8,
@@ -367,17 +341,11 @@ test.describe("Metadata Enrichment Database Operations", () => {
       .where("id", "=", created!.id)
       .executeTakeFirst();
 
-    expect(retrieved?.sources).toEqual([
-      "OpenLibrary",
-      "WikiData",
-      "LibraryOfCongress",
-    ]);
+    expect(retrieved?.sources).toEqual(["OpenLibrary", "WikiData", "LibraryOfCongress"]);
 
     // Parse JSONB fields
     const parsedPreview =
-      typeof retrieved?.preview === "string"
-        ? JSON.parse(retrieved.preview)
-        : retrieved?.preview;
+      typeof retrieved?.preview === "string" ? JSON.parse(retrieved.preview) : retrieved?.preview;
     const parsedImprovements =
       typeof retrieved?.improvements === "string"
         ? JSON.parse(retrieved.improvements)
@@ -404,9 +372,7 @@ test.describe("Enrichment Workflow Integration", () => {
       .execute();
   });
 
-  test("complete enrichment workflow: create -> query -> apply", async ({
-    database,
-  }) => {
+  test("complete enrichment workflow: create -> query -> apply", async ({ database }) => {
     // Step 1: Create pending enrichment (simulating async enrichment completion)
     const enrichment = await database
       .insertInto("enrichment_result")
@@ -453,10 +419,7 @@ test.describe("Enrichment Workflow Integration", () => {
     // Step 4: Apply enrichment (applyEnrichment mutation)
     await database
       .updateTable("enrichment_result")
-      .set({
-        status: "applied",
-        applied_at: new Date().toISOString(),
-      })
+      .set({ status: "applied", applied_at: new Date().toISOString() })
       .where("id", "=", enrichment!.id)
       .execute();
 
@@ -481,9 +444,7 @@ test.describe("Enrichment Workflow Integration", () => {
     expect(applied?.applied_at).toBeDefined();
   });
 
-  test("complete enrichment workflow: create -> query -> dismiss", async ({
-    database,
-  }) => {
+  test("complete enrichment workflow: create -> query -> dismiss", async ({ database }) => {
     // Step 1: Create pending enrichment
     const enrichment = await database
       .insertInto("enrichment_result")
@@ -491,9 +452,7 @@ test.describe("Enrichment Workflow Integration", () => {
         work_id: BigInt(TEST_ENRICHMENT_WORK_ID),
         user_id: BigInt(TEST_USER_ID),
         status: "pending",
-        preview: JSON.stringify({
-          title: { value: "Unwanted", confidence: 0.5 },
-        }),
+        preview: JSON.stringify({ title: { value: "Unwanted", confidence: 0.5 } }),
         improvements: JSON.stringify({ title: "Unwanted Title" }),
         sources: ["WikiData"],
       })
@@ -503,10 +462,7 @@ test.describe("Enrichment Workflow Integration", () => {
     // Step 2: Dismiss enrichment
     await database
       .updateTable("enrichment_result")
-      .set({
-        status: "dismissed",
-        dismissed_at: new Date().toISOString(),
-      })
+      .set({ status: "dismissed", dismissed_at: new Date().toISOString() })
       .where("id", "=", enrichment!.id)
       .execute();
 
@@ -538,9 +494,7 @@ test.describe("Enrichment Workflow Integration", () => {
     expect(newEnrichment?.id).not.toBe(enrichment?.id);
   });
 
-  test("re-enrichment after previous apply works correctly", async ({
-    database,
-  }) => {
+  test("re-enrichment after previous apply works correctly", async ({ database }) => {
     // Step 1: Create and apply first enrichment
     const first = await database
       .insertInto("enrichment_result")

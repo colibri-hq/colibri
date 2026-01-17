@@ -1,9 +1,4 @@
-import {
-  getBlogAuthors,
-  getBlogPosts,
-  getBlogTags,
-  getPostsByYearMonth,
-} from "$lib/content/blog";
+import { getBlogAuthors, getBlogPosts, getBlogTags, getPostsByYearMonth } from "$lib/content/blog";
 import type { LayoutServerLoad } from "./$types.js";
 
 export const prerender = true;

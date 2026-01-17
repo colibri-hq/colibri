@@ -1,22 +1,15 @@
 import { sveltekit } from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
+import { cwd } from "node:process";
 import { defineConfig, searchForWorkspaceRoot } from "vite";
 import packageJson from "./package.json" with { type: "json" };
-import { cwd } from "node:process";
 
 const { homepage, bugs, repository } = packageJson;
 
 export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
-  build: {
-    commonjsOptions: {
-      esmExternals: ["pg-cloudflare"],
-    },
-  },
-  worker: {
-    plugins: () => [sveltekit()],
-    format: "es",
-  },
+  build: { commonjsOptions: { esmExternals: ["pg-cloudflare"] } },
+  worker: { plugins: () => [sveltekit()], format: "es" },
   define: {
     PACKAGE_REPOSITORY_URL: `"${repository.url}"`,
     PACKAGE_HOMEPAGE_URL: `"${homepage}"`,
@@ -25,11 +18,7 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
-    hmr: {
-      overlay: false,
-    },
-    fs: {
-      allow: [searchForWorkspaceRoot(cwd())],
-    },
+    hmr: { overlay: false },
+    fs: { allow: [searchForWorkspaceRoot(cwd())] },
   },
 });

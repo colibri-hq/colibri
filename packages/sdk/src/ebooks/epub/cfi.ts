@@ -1,20 +1,12 @@
-function findIndices<T>(
-  items: T[],
-  callback: (value: T, index: number, items: T[]) => boolean,
-) {
+function findIndices<T>(items: T[], callback: (value: T, index: number, items: T[]) => boolean) {
   return items
-    .map((value, index, items) =>
-      callback(value, index, items) ? index : null,
-    )
+    .map((value, index, items) => (callback(value, index, items) ? index : null))
     .filter((value): value is number => value !== null);
 }
 
 function splitAt<T>(items: T[], indices: number[]) {
   return [-1, ...indices, items.length].reduce<{ values?: T[][]; a?: number }>(
-    ({ values, a }, b) => ({
-      values: values?.concat([items.slice((a ?? 0) + 1, b)]) ?? [],
-      a: b,
-    }),
+    ({ values, a }, b) => ({ values: values?.concat([items.slice((a ?? 0) + 1, b)]) ?? [], a: b }),
     {},
   ).values;
 }
@@ -166,11 +158,7 @@ type Part = {
   side?: number;
 };
 export type RegularCfi = Part[][];
-export type RangeCfi = {
-  parent: RegularCfi;
-  start: RegularCfi;
-  end: RegularCfi;
-};
+export type RangeCfi = { parent: RegularCfi; start: RegularCfi; end: RegularCfi };
 
 export type Cfi = RegularCfi | RangeCfi;
 
@@ -227,15 +215,7 @@ export function parseCfi(cfi: string): Cfi {
   return { parent, start, end };
 }
 
-function partToString({
-  index,
-  id,
-  offset,
-  temporal,
-  spatial,
-  text,
-  side,
-}: Part) {
+function partToString({ index, id, offset, temporal, spatial, text, side }: Part) {
   const param = side ? `;s=${side}` : "";
 
   return (
@@ -245,9 +225,7 @@ function partToString({
     (offset != null && index % 2 ? `:${offset}` : "") +
     (temporal ? `~${temporal}` : "") +
     (spatial ? `@${spatial.join(":")}` : "") +
-    (text || (!id && side)
-      ? "[" + (text?.map(escapeCFI)?.join(",") ?? "") + param + "]"
-      : "")
+    (text || (!id && side) ? "[" + (text?.map(escapeCFI)?.join(",") ?? "") + param + "]" : "")
   );
 }
 
@@ -272,9 +250,7 @@ export function collapse(
     return toString(collapse(parseCfi(value), toEnd));
   }
 
-  return Array.isArray(value)
-    ? value
-    : concatArrays(value.parent, value[toEnd ? "end" : "start"]);
+  return Array.isArray(value) ? value : concatArrays(value.parent, value[toEnd ? "end" : "start"]);
 }
 
 // create range CFI from two CFIs
@@ -337,10 +313,7 @@ export function compare(a: string | Cfi, b: string | Cfi): -1 | 0 | 1 {
   }
 
   if (!Array.isArray(a) || !Array.isArray(b)) {
-    return (
-      compare(collapse(a), collapse(b)) ||
-      compare(collapse(a, true), collapse(b, true))
-    );
+    return compare(collapse(a), collapse(b)) || compare(collapse(a, true), collapse(b, true));
   }
 
   for (let i = 0; i < Math.max(a.length, b.length); i++) {
@@ -401,10 +374,7 @@ function getChildNodes(node: Node, filter?: NodeFilter): Node[] {
   return filter
     ? nodes
         .map((node) => {
-          const accept =
-            typeof filter === "function"
-              ? filter(node)
-              : filter.acceptNode(node);
+          const accept = typeof filter === "function" ? filter(node) : filter.acceptNode(node);
 
           if (accept === NodeFilter.FILTER_REJECT) {
             return null;
@@ -447,11 +417,7 @@ function indexChildNodes(node: Node, filter?: NodeFilter) {
         nodes.push(node);
       }
     } else {
-      if (
-        typeof last === "object" &&
-        !Array.isArray(last) &&
-        isElementNode(last)
-      ) {
+      if (typeof last === "object" && !Array.isArray(last) && isElementNode(last)) {
         nodes.push(null, node);
       } else {
         nodes.push(node);
@@ -496,12 +462,7 @@ function partsToNode(
   node: Element,
   parts: Part[],
   filter?: NodeFilter,
-): {
-  node: Node;
-  offset?: number;
-  before?: boolean;
-  after?: boolean;
-} {
+): { node: Node; offset?: number; before?: boolean; after?: boolean } {
   let _node: Node | Node[] | null = node;
   const { id } = parts[parts.length - 1];
 
@@ -558,11 +519,7 @@ function partsToNode(
   return { node: _node[_node.length - 1], offset: offset - sum };
 }
 
-function nodeToParts(
-  node: Element,
-  offset?: number | null,
-  filter?: NodeFilter,
-): Part[] {
+function nodeToParts(node: Element, offset?: number | null, filter?: NodeFilter): Part[] {
   const { parentNode, id } = node;
 
   if (!parentNode) {
@@ -619,11 +576,7 @@ export function fromRange(range: Range, filter: NodeFilter) {
   return buildRange([start], [end]);
 }
 
-export function cfiToRange(
-  doc: Document,
-  parts: Part[][],
-  filter?: NodeFilter,
-) {
+export function cfiToRange(doc: Document, parts: Part[][], filter?: NodeFilter) {
   const startParts = collapse(parts);
   const endParts = collapse(parts, true);
 
@@ -662,9 +615,7 @@ export function parseCfiFromElements(elements: Element[]) {
   const { parentNode } = elements[0];
   const parts = nodeToParts(parentNode as Element);
 
-  for (const [index, node] of indexChildNodes(
-    parentNode as Element,
-  ).entries()) {
+  for (const [index, node] of indexChildNodes(parentNode as Element).entries()) {
     const element = elements[results.length];
 
     if (node === element) {

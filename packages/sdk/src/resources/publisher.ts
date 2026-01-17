@@ -1,17 +1,14 @@
 import type { Selectable } from "kysely";
 import { sql } from "kysely";
-import { withCover } from "./work.js";
 import type { Database, Schema } from "../database.js";
 import type { Publisher as $Publisher } from "../schema.js";
 import { lower } from "../utilities.js";
+import { withCover } from "./work.js";
 
 const table = "publisher" as const;
 
 export async function listPublishers(database: Database, term?: string) {
-  const query = database
-    .selectFrom(table)
-    .selectAll()
-    .orderBy("updated_at", "desc");
+  const query = database.selectFrom(table).selectAll().orderBy("updated_at", "desc");
 
   if (term) {
     return query.where("name", "like", `%${term}%`).execute();
@@ -21,11 +18,7 @@ export async function listPublishers(database: Database, term?: string) {
 }
 
 export function loadPublisher(database: Database, id: string) {
-  return database
-    .selectFrom(table)
-    .selectAll()
-    .where("id", "=", id)
-    .executeTakeFirstOrThrow();
+  return database.selectFrom(table).selectAll().where("id", "=", id).executeTakeFirstOrThrow();
 }
 
 export function loadWorksForPublisher(database: Database, id: string) {
@@ -95,23 +88,14 @@ export async function findSimilarPublishers(
   const rows = await database
     .selectFrom(table)
     .selectAll()
-    .select(
-      sql<number>`COALESCE(similarity(lower(name), ${normalizedName}), 0)`.as(
-        "similarity",
-      ),
-    )
-    .where(
-      sql<boolean>`similarity(lower(name), ${normalizedName}) >= ${threshold}`,
-    )
+    .select(sql<number>`COALESCE(similarity(lower(name), ${normalizedName}), 0)`.as("similarity"))
+    .where(sql<boolean>`similarity(lower(name), ${normalizedName}) >= ${threshold}`)
     .orderBy(sql`similarity(lower(name), ${normalizedName})`, "desc")
     .execute();
 
   return rows.map((row) => {
     const { similarity, ...publisher } = row;
-    return {
-      publisher: publisher as Publisher,
-      similarity,
-    };
+    return { publisher: publisher as Publisher, similarity };
   });
 }
 
@@ -173,14 +157,7 @@ export function updatePublisher(
 ) {
   return database
     .updateTable(table)
-    .set({
-      description,
-      image_id,
-      name,
-      sorting_key,
-      url,
-      wikipedia_url,
-    })
+    .set({ description, image_id, name, sorting_key, url, wikipedia_url })
     .where("id", "=", id)
     .returningAll()
     .executeTakeFirstOrThrow();

@@ -54,9 +54,7 @@ describe("AmazonPaapiMetadataProvider", () => {
       expect(provider.supportsDataType(MetadataType.AUTHORS)).toBe(true);
       expect(provider.supportsDataType(MetadataType.ISBN)).toBe(true);
       expect(provider.supportsDataType(MetadataType.COVER_IMAGE)).toBe(true);
-      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(
-        true,
-      );
+      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.PAGE_COUNT)).toBe(true);
       expect(provider.supportsDataType(MetadataType.LANGUAGE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.EDITION)).toBe(true);
@@ -76,29 +74,17 @@ describe("AmazonPaapiMetadataProvider", () => {
               ASIN: "B001234567",
               ItemInfo: {
                 Title: { DisplayValue: "Test Book" },
-                ByLineInfo: {
-                  Contributors: [{ Name: "John Doe", Role: "Author" }],
-                },
+                ByLineInfo: { Contributors: [{ Name: "John Doe", Role: "Author" }] },
                 ContentInfo: {
                   PagesCount: { DisplayValue: 350 },
-                  Languages: {
-                    DisplayValues: [{ DisplayValue: "English" }],
-                  },
+                  Languages: { DisplayValues: [{ DisplayValue: "English" }] },
                 },
-                ProductInfo: {
-                  ReleaseDate: { DisplayValue: "2020-01-15T00:00:00.000Z" },
-                },
-                Classifications: {
-                  Binding: { DisplayValue: "Paperback" },
-                },
+                ProductInfo: { ReleaseDate: { DisplayValue: "2020-01-15T00:00:00.000Z" } },
+                Classifications: { Binding: { DisplayValue: "Paperback" } },
               },
               Images: {
                 Primary: {
-                  Large: {
-                    URL: "https://example.com/cover-large.jpg",
-                    Width: 500,
-                    Height: 750,
-                  },
+                  Large: { URL: "https://example.com/cover-large.jpg", Width: 500, Height: 750 },
                 },
               },
             },
@@ -106,10 +92,7 @@ describe("AmazonPaapiMetadataProvider", () => {
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByISBN("978-0-123456-78-9");
 
@@ -162,10 +145,7 @@ describe("AmazonPaapiMetadataProvider", () => {
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByISBN("978-0-123456-78-9");
       expect(results).toEqual([]);
@@ -187,23 +167,16 @@ describe("AmazonPaapiMetadataProvider", () => {
                     { Name: "John Editor", Role: "Editor" },
                   ],
                 },
-                ProductInfo: {
-                  ReleaseDate: { DisplayValue: "2019-05-20T00:00:00.000Z" },
-                },
+                ProductInfo: { ReleaseDate: { DisplayValue: "2019-05-20T00:00:00.000Z" } },
               },
             },
           ],
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockResponse });
 
-      const results = await provider.searchByTitle({
-        title: "The Great Book",
-      });
+      const results = await provider.searchByTitle({ title: "The Great Book" });
 
       expect(results).toHaveLength(1);
       expect(results[0].title).toBe("The Great Book");
@@ -215,22 +188,13 @@ describe("AmazonPaapiMetadataProvider", () => {
       const mockResponse = {
         SearchResult: {
           Items: [
-            {
-              ASIN: "B001234567",
-              ItemInfo: { Title: { DisplayValue: "Book One" } },
-            },
-            {
-              ASIN: "B007654321",
-              ItemInfo: { Title: { DisplayValue: "Book Two" } },
-            },
+            { ASIN: "B001234567", ItemInfo: { Title: { DisplayValue: "Book One" } } },
+            { ASIN: "B007654321", ItemInfo: { Title: { DisplayValue: "Book Two" } } },
           ],
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByTitle({ title: "Book" });
       expect(results).toHaveLength(2);
@@ -246,19 +210,14 @@ describe("AmazonPaapiMetadataProvider", () => {
               ASIN: "B001234567",
               ItemInfo: {
                 Title: { DisplayValue: "Author's Book" },
-                ByLineInfo: {
-                  Contributors: [{ Name: "Famous Author", Role: "Author" }],
-                },
+                ByLineInfo: { Contributors: [{ Name: "Famous Author", Role: "Author" }] },
               },
             },
           ],
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByCreator({ name: "Famous Author" });
 
@@ -303,10 +262,7 @@ describe("AmazonPaapiMetadataProvider", () => {
         json: async () => ({ SearchResult: { Items: [] } }),
       });
 
-      await provider.searchMultiCriteria({
-        title: "Test Book",
-        authors: ["Test Author"],
-      });
+      await provider.searchMultiCriteria({ title: "Test Book", authors: ["Test Author"] });
 
       const requestBody = JSON.parse(mockFetch.mock.calls[0][1].body);
       expect(requestBody.Keywords).toBe("Test Book Test Author");
@@ -380,10 +336,7 @@ describe("AmazonPaapiMetadataProvider", () => {
 
     it("should use different endpoint for UK region", async () => {
       const ukProvider = new AmazonPaapiMetadataProvider(
-        {
-          ...mockConfig,
-          region: "uk",
-        },
+        { ...mockConfig, region: "uk" },
         mockFetch,
       );
 
@@ -415,18 +368,10 @@ describe("AmazonPaapiMetadataProvider", () => {
 
     it("should handle API errors in response", async () => {
       const errorResponse = {
-        Errors: [
-          {
-            Code: "InvalidPartnerTag",
-            Message: "The partner tag is invalid",
-          },
-        ],
+        Errors: [{ Code: "InvalidPartnerTag", Message: "The partner tag is invalid" }],
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => errorResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => errorResponse });
 
       const results = await provider.searchByISBN("978-0-123456-78-9");
 
@@ -437,10 +382,7 @@ describe("AmazonPaapiMetadataProvider", () => {
       mockFetch
         .mockRejectedValueOnce(new Error("Network error"))
         .mockRejectedValueOnce(new Error("Network error"))
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ ItemsResult: { Items: [] } }),
-        });
+        .mockResolvedValueOnce({ ok: true, json: async () => ({ ItemsResult: { Items: [] } }) });
 
       const results = await provider.searchByISBN("978-0-123456-78-9");
 
@@ -457,13 +399,9 @@ describe("AmazonPaapiMetadataProvider", () => {
     });
 
     it("should return empty array when not configured", async () => {
-      const unconfiguredProvider = new AmazonPaapiMetadataProvider(
-        {},
-        mockFetch,
-      );
+      const unconfiguredProvider = new AmazonPaapiMetadataProvider({}, mockFetch);
 
-      const results =
-        await unconfiguredProvider.searchByISBN("978-0-123456-78-9");
+      const results = await unconfiguredProvider.searchByISBN("978-0-123456-78-9");
 
       expect(results).toEqual([]);
       expect(mockFetch).not.toHaveBeenCalled();
@@ -480,16 +418,8 @@ describe("AmazonPaapiMetadataProvider", () => {
               ItemInfo: { Title: { DisplayValue: "Test Book" } },
               Images: {
                 Primary: {
-                  Large: {
-                    URL: "https://example.com/large.jpg",
-                    Width: 500,
-                    Height: 750,
-                  },
-                  Medium: {
-                    URL: "https://example.com/medium.jpg",
-                    Width: 250,
-                    Height: 375,
-                  },
+                  Large: { URL: "https://example.com/large.jpg", Width: 500, Height: 750 },
+                  Medium: { URL: "https://example.com/medium.jpg", Width: 250, Height: 375 },
                 },
               },
             },
@@ -497,10 +427,7 @@ describe("AmazonPaapiMetadataProvider", () => {
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByISBN("978-0-123456-78-9");
 
@@ -520,11 +447,7 @@ describe("AmazonPaapiMetadataProvider", () => {
               ItemInfo: { Title: { DisplayValue: "Test Book" } },
               Images: {
                 Primary: {
-                  Medium: {
-                    URL: "https://example.com/medium.jpg",
-                    Width: 250,
-                    Height: 375,
-                  },
+                  Medium: { URL: "https://example.com/medium.jpg", Width: 250, Height: 375 },
                 },
               },
             },
@@ -532,10 +455,7 @@ describe("AmazonPaapiMetadataProvider", () => {
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByISBN("978-0-123456-78-9");
 
@@ -549,19 +469,11 @@ describe("AmazonPaapiMetadataProvider", () => {
     it("should handle missing cover images gracefully", async () => {
       const mockResponse = {
         ItemsResult: {
-          Items: [
-            {
-              ASIN: "B001234567",
-              ItemInfo: { Title: { DisplayValue: "Test Book" } },
-            },
-          ],
+          Items: [{ ASIN: "B001234567", ItemInfo: { Title: { DisplayValue: "Test Book" } } }],
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByISBN("978-0-123456-78-9");
 
@@ -586,19 +498,14 @@ describe("AmazonPaapiMetadataProvider", () => {
                 ASIN: "B001234567",
                 ItemInfo: {
                   Title: { DisplayValue: "Test Book" },
-                  ContentInfo: {
-                    Languages: { DisplayValues: [{ DisplayValue: name }] },
-                  },
+                  ContentInfo: { Languages: { DisplayValues: [{ DisplayValue: name }] } },
                 },
               },
             ],
           },
         };
 
-        mockFetch.mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockResponse,
-        });
+        mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockResponse });
 
         const results = await provider.searchByISBN("978-0-123456-78-9");
         expect(results[0].language).toBe(code);
@@ -615,19 +522,14 @@ describe("AmazonPaapiMetadataProvider", () => {
               ASIN: "B001234567",
               ItemInfo: {
                 Title: { DisplayValue: "Test Book" },
-                ByLineInfo: {
-                  Contributors: [{ Name: "Author", Role: "Author" }],
-                },
+                ByLineInfo: { Contributors: [{ Name: "Author", Role: "Author" }] },
               },
             },
           ],
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByISBN("978-0-123456-78-9");
 
@@ -639,25 +541,19 @@ describe("AmazonPaapiMetadataProvider", () => {
         ASIN: "B001234567",
         ItemInfo: {
           Title: { DisplayValue: "Complete Book" },
-          ByLineInfo: {
-            Contributors: [{ Name: "Author", Role: "Author" }],
-          },
+          ByLineInfo: { Contributors: [{ Name: "Author", Role: "Author" }] },
           ProductInfo: { ReleaseDate: { DisplayValue: "2020-01-01" } },
           ContentInfo: {
             PagesCount: { DisplayValue: 300 },
             Languages: { DisplayValues: [{ DisplayValue: "English" }] },
           },
         },
-        Images: {
-          Primary: { Large: { URL: "https://example.com/cover.jpg" } },
-        },
+        Images: { Primary: { Large: { URL: "https://example.com/cover.jpg" } } },
       };
 
       const incompleteItem = {
         ASIN: "B001234567",
-        ItemInfo: {
-          Title: { DisplayValue: "Incomplete Book" },
-        },
+        ItemInfo: { Title: { DisplayValue: "Incomplete Book" } },
       };
 
       mockFetch
@@ -671,12 +567,9 @@ describe("AmazonPaapiMetadataProvider", () => {
         });
 
       const completeResults = await provider.searchByISBN("978-0-123456-78-9");
-      const incompleteResults =
-        await provider.searchByISBN("978-0-000000-00-0");
+      const incompleteResults = await provider.searchByISBN("978-0-000000-00-0");
 
-      expect(completeResults[0].confidence).toBeGreaterThan(
-        incompleteResults[0].confidence,
-      );
+      expect(completeResults[0].confidence).toBeGreaterThan(incompleteResults[0].confidence);
     });
   });
 
@@ -696,10 +589,7 @@ describe("AmazonPaapiMetadataProvider", () => {
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByISBN("978-0-123456-78-9");
 
@@ -722,19 +612,14 @@ describe("AmazonPaapiMetadataProvider", () => {
               ASIN: "B001234567",
               ItemInfo: {
                 Title: { DisplayValue: "Test Book" },
-                ProductInfo: {
-                  ReleaseDate: { DisplayValue: "2020-06-15T00:00:00.000Z" },
-                },
+                ProductInfo: { ReleaseDate: { DisplayValue: "2020-06-15T00:00:00.000Z" } },
               },
             },
           ],
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByISBN("978-0-123456-78-9");
 
@@ -758,10 +643,7 @@ describe("AmazonPaapiMetadataProvider", () => {
         },
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockResponse });
 
       const results = await provider.searchByISBN("978-0-123456-78-9");
 

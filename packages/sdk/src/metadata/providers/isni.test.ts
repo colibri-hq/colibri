@@ -55,27 +55,20 @@ describe("ISNIMetadataProvider", () => {
       expect(provider.supportsDataType(MetadataType.SUBJECTS)).toBe(true);
       expect(provider.supportsDataType(MetadataType.TITLE)).toBe(true);
       expect(provider.supportsDataType(MetadataType.LANGUAGE)).toBe(true);
-      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(
-        true,
-      );
+      expect(provider.supportsDataType(MetadataType.PUBLICATION_DATE)).toBe(true);
     });
 
     it("should not support book-specific metadata types", () => {
       expect(provider.supportsDataType(MetadataType.ISBN)).toBe(false);
       expect(provider.supportsDataType(MetadataType.PAGE_COUNT)).toBe(false);
       expect(provider.supportsDataType(MetadataType.COVER_IMAGE)).toBe(false);
-      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(
-        false,
-      );
+      expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(false);
     });
   });
 
   describe("Search Methods", () => {
     const mockISNIResponse = {
-      responseHeader: {
-        status: 0,
-        QTime: 123,
-      },
+      responseHeader: { status: 0, QTime: 123 },
       response: {
         numFound: 1,
         start: 0,
@@ -94,36 +87,21 @@ describe("ISNIMetadataProvider", () => {
             formOfWork: ["novel"],
             subjectOfWork: ["Fantasy literature", "Adventure stories"],
             externalInformation: [
-              {
-                URI: "https://en.wikipedia.org/wiki/J._R._R._Tolkien",
-                information: "Wikipedia",
-              },
+              { URI: "https://en.wikipedia.org/wiki/J._R._R._Tolkien", information: "Wikipedia" },
             ],
-            otherIdentifierOfWork: [
-              {
-                type: "ISBN",
-                value: "9780547928227",
-              },
-            ],
+            otherIdentifierOfWork: [{ type: "ISBN", value: "9780547928227" }],
           },
         ],
       },
     };
 
     beforeEach(() => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => mockISNIResponse,
-      });
+      mockFetch.mockResolvedValue({ ok: true, status: 200, json: async () => mockISNIResponse });
     });
 
     describe("searchByTitle", () => {
       it("should search by title with exact match", async () => {
-        const results = await provider.searchByTitle({
-          title: "The Hobbit",
-          exactMatch: true,
-        });
+        const results = await provider.searchByTitle({ title: "The Hobbit", exactMatch: true });
 
         const fetchCall = mockFetch.mock.calls[0][0] as string;
         expect(fetchCall).toContain("local.title%3D%22%22The+Hobbit%22%22");
@@ -143,10 +121,7 @@ describe("ISNIMetadataProvider", () => {
       });
 
       it("should search by title with fuzzy match", async () => {
-        const results = await provider.searchByTitle({
-          title: "Hobbit",
-          fuzzy: true,
-        });
+        const results = await provider.searchByTitle({ title: "Hobbit", fuzzy: true });
 
         const fetchCall = mockFetch.mock.calls[0][0] as string;
         expect(fetchCall).toContain("local.title%3D%22Hobbit%22");
@@ -160,9 +135,7 @@ describe("ISNIMetadataProvider", () => {
           statusText: "Internal Server Error",
         });
 
-        const results = await provider.searchByTitle({
-          title: "Nonexistent Book",
-        });
+        const results = await provider.searchByTitle({ title: "Nonexistent Book" });
 
         expect(results).toHaveLength(0);
       }, 20000);
@@ -172,18 +145,11 @@ describe("ISNIMetadataProvider", () => {
       it("should search by ISBN and clean the input", async () => {
         const results = await provider.searchByISBN("978-0-547-92822-7");
 
-        const fetchCall = mockFetch.mock.calls[
-          mockFetch.mock.calls.length - 1
-        ][0] as string;
-        expect(fetchCall).toContain(
-          "local.otherIdentifierOfWork%3D%229780547928227%22",
-        );
+        const fetchCall = mockFetch.mock.calls[mockFetch.mock.calls.length - 1][0] as string;
+        expect(fetchCall).toContain("local.otherIdentifierOfWork%3D%229780547928227%22");
         expect(results).toHaveLength(1);
         expect(results[0].providerData?.otherIdentifiers).toEqual([
-          {
-            type: "ISBN",
-            value: "9780547928227",
-          },
+          { type: "ISBN", value: "9780547928227" },
         ]);
       });
 
@@ -195,14 +161,9 @@ describe("ISNIMetadataProvider", () => {
 
     describe("searchByCreator", () => {
       it("should search by creator with exact match", async () => {
-        const results = await provider.searchByCreator({
-          name: "J.R.R. Tolkien",
-          fuzzy: false,
-        });
+        const results = await provider.searchByCreator({ name: "J.R.R. Tolkien", fuzzy: false });
 
-        const fetchCall = mockFetch.mock.calls[
-          mockFetch.mock.calls.length - 1
-        ][0] as string;
+        const fetchCall = mockFetch.mock.calls[mockFetch.mock.calls.length - 1][0] as string;
         expect(fetchCall).toContain(
           "local.forename%3D%22J.R.R.%22+AND+local.surname%3D%22Tolkien%22",
         );
@@ -212,10 +173,7 @@ describe("ISNIMetadataProvider", () => {
       });
 
       it("should search by creator with fuzzy match", async () => {
-        const results = await provider.searchByCreator({
-          name: "Tolkien",
-          fuzzy: true,
-        });
+        const results = await provider.searchByCreator({ name: "Tolkien", fuzzy: true });
 
         const fetchCall = mockFetch.mock.calls[0][0] as string;
         expect(fetchCall).toContain("local.personalName%3D%22Tolkien%22");
@@ -235,10 +193,7 @@ describe("ISNIMetadataProvider", () => {
       });
 
       it("should handle single name correctly", async () => {
-        const results = await provider.searchByCreator({
-          name: "Tolkien",
-          fuzzy: false,
-        });
+        const results = await provider.searchByCreator({ name: "Tolkien", fuzzy: false });
 
         const fetchCall = mockFetch.mock.calls[0][0] as string;
         expect(fetchCall).toContain("local.personalName%3D%22Tolkien%22");
@@ -258,9 +213,7 @@ describe("ISNIMetadataProvider", () => {
 
         const fetchCall = mockFetch.mock.calls[0][0] as string;
         expect(fetchCall).toContain("local.title%3D%22The+Hobbit%22");
-        expect(fetchCall).toContain(
-          "local.personalName%3D%22J.R.R.+Tolkien%22",
-        );
+        expect(fetchCall).toContain("local.personalName%3D%22J.R.R.+Tolkien%22");
         expect(fetchCall).toContain("local.languageOfWork%3D%22eng%22");
         expect(fetchCall).toContain("local.subjectOfWork%3D%22Fantasy%22");
         expect(results).toHaveLength(1);
@@ -305,10 +258,7 @@ describe("ISNIMetadataProvider", () => {
         formOfWork: ["novel"],
         subjectOfWork: ["Fantasy literature", "Adventure stories"],
         externalInformation: [
-          {
-            URI: "https://en.wikipedia.org/wiki/J._R._R._Tolkien",
-            information: "Wikipedia",
-          },
+          { URI: "https://en.wikipedia.org/wiki/J._R._R._Tolkien", information: "Wikipedia" },
         ],
       };
 
@@ -327,10 +277,7 @@ describe("ISNIMetadataProvider", () => {
       expect(record.authors).toEqual(["John Ronald Reuel Tolkien"]);
       expect(record.title).toBe("The Hobbit");
       expect(record.language).toBe("eng");
-      expect(record.subjects).toEqual([
-        "Fantasy literature",
-        "Adventure stories",
-      ]);
+      expect(record.subjects).toEqual(["Fantasy literature", "Adventure stories"]);
       expect(record.publicationDate).toEqual(new Date(1892, 0, 1)); // Parsed from marcDate
       expect(record.providerData).toMatchObject({
         isni: "0000000121032683",
@@ -343,11 +290,7 @@ describe("ISNIMetadataProvider", () => {
     });
 
     it("should handle missing fields gracefully", async () => {
-      const mockResult = {
-        ISN: "0000000121032683",
-        nameType: "Personal",
-        surname: "Tolkien",
-      };
+      const mockResult = { ISN: "0000000121032683", nameType: "Personal", surname: "Tolkien" };
 
       mockFetch.mockResolvedValue({
         ok: true,
@@ -369,21 +312,14 @@ describe("ISNIMetadataProvider", () => {
     });
 
     it("should handle name variations correctly", async () => {
-      const mockResultWithForenameOnly = {
-        ISN: "0000000121032683",
-        forename: "John",
-      };
+      const mockResultWithForenameOnly = { ISN: "0000000121032683", forename: "John" };
 
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         json: async () => ({
           responseHeader: { status: 0, QTime: 123 },
-          response: {
-            numFound: 1,
-            start: 0,
-            docs: [mockResultWithForenameOnly],
-          },
+          response: { numFound: 1, start: 0, docs: [mockResultWithForenameOnly] },
         }),
       });
 
@@ -445,9 +381,7 @@ describe("ISNIMetadataProvider", () => {
           response: { numFound: 1, start: 0, docs: [completeResult] },
         }),
       });
-      const completeResults = await provider.searchByCreator({
-        name: "Tolkien",
-      });
+      const completeResults = await provider.searchByCreator({ name: "Tolkien" });
 
       // Reset mock for incomplete result
       mockFetch.mockClear();
@@ -459,9 +393,7 @@ describe("ISNIMetadataProvider", () => {
           response: { numFound: 1, start: 0, docs: [incompleteResult] },
         }),
       });
-      const incompleteResults = await provider.searchByCreator({
-        name: "Smith",
-      });
+      const incompleteResults = await provider.searchByCreator({ name: "Smith" });
 
       // Complete result should have higher confidence due to more complete data
       expect(completeResults[0].confidence).toBeGreaterThan(0.9);
@@ -481,11 +413,7 @@ describe("ISNIMetadataProvider", () => {
         titleOfWork: ["The Hobbit"],
       };
 
-      const unverifiedResult = {
-        ISN: "0000000121032684",
-        surname: "Smith",
-        source: "local",
-      };
+      const unverifiedResult = { ISN: "0000000121032684", surname: "Smith", source: "local" };
 
       // Test verified result
       mockFetch.mockResolvedValue({
@@ -496,9 +424,7 @@ describe("ISNIMetadataProvider", () => {
           response: { numFound: 1, start: 0, docs: [verifiedResult] },
         }),
       });
-      const verifiedResults = await provider.searchByCreator({
-        name: "Tolkien",
-      });
+      const verifiedResults = await provider.searchByCreator({ name: "Tolkien" });
 
       // Reset mock for unverified result
       mockFetch.mockClear();
@@ -510,15 +436,11 @@ describe("ISNIMetadataProvider", () => {
           response: { numFound: 1, start: 0, docs: [unverifiedResult] },
         }),
       });
-      const unverifiedResults = await provider.searchByCreator({
-        name: "Smith",
-      });
+      const unverifiedResults = await provider.searchByCreator({ name: "Smith" });
 
       expect(verifiedResults[0].confidence).toBeGreaterThan(0.9);
       expect(unverifiedResults[0].confidence).toBeLessThan(1.0);
-      expect(verifiedResults[0].confidence).toBeGreaterThanOrEqual(
-        unverifiedResults[0].confidence,
-      );
+      expect(verifiedResults[0].confidence).toBeGreaterThanOrEqual(unverifiedResults[0].confidence);
     });
   });
 
@@ -540,12 +462,7 @@ describe("ISNIMetadataProvider", () => {
             response: {
               numFound: 1,
               start: 0,
-              docs: [
-                {
-                  ISN: "0000000121032683",
-                  surname: "Recovered",
-                },
-              ],
+              docs: [{ ISN: "0000000121032683", surname: "Recovered" }],
             },
           }),
         };
@@ -559,11 +476,7 @@ describe("ISNIMetadataProvider", () => {
     }, 15000);
 
     it("should handle API errors gracefully", async () => {
-      mockFetch.mockResolvedValue({
-        ok: false,
-        status: 500,
-        statusText: "Internal Server Error",
-      });
+      mockFetch.mockResolvedValue({ ok: false, status: 500, statusText: "Internal Server Error" });
 
       const results = await provider.searchByCreator({ name: "Test" });
 

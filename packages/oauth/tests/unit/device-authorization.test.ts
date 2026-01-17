@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import type { createMockPersistence } from "../utilities";
 import {
   type AuthorizationServerOptions,
   type Entities,
   createAuthorizationServer,
   DeviceAuthorizationGrant,
 } from "../../src";
-import type { createMockPersistence } from "../utilities";
 
 describe("Device Authorization Grant Unit Tests", () => {
   let options: AuthorizationServerOptions;
@@ -14,11 +14,7 @@ describe("Device Authorization Grant Unit Tests", () => {
   beforeEach(() => {
     persistence = createMockPersistence();
 
-    options = {
-      issuer: "http://localhost:3000",
-      jwtSecret: "test-secret",
-      persistence,
-    };
+    options = { issuer: "http://localhost:3000", jwtSecret: "test-secret", persistence };
   });
 
   describe("Device Challenge Creation", () => {
@@ -44,18 +40,14 @@ describe("Device Authorization Grant Unit Tests", () => {
 
       persistence.storeDeviceChallenge.mockResolvedValue(mockChallenge);
 
-      const request = {
-        client_id: "test-client",
-        scope: "read",
-      };
+      const request = { client_id: "test-client", scope: "read" };
 
       const result = await server.handleDeviceAuthorizationRequest(request);
       expect(result).toEqual({
         device_code: mockChallenge.device_code,
         user_code: mockChallenge.user_code,
         verification_uri: "http://localhost:3000/device",
-        verification_uri_complete:
-          "http://localhost:3000/device?user_code=test-user-code",
+        verification_uri_complete: "http://localhost:3000/device?user_code=test-user-code",
         expires_in: 600,
         interval: 5,
       });

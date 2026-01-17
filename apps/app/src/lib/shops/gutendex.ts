@@ -1,30 +1,22 @@
+import type { Shop, SupportsFeaturedBooks } from "$lib/shops/index";
 import { env } from "$env/dynamic/public";
 import { log } from "$lib/logging";
-import type { Shop, SupportsFeaturedBooks } from "$lib/shops/index";
 
 function serializeOptions(options: Partial<SearchParameters>) {
   const parameters = new URLSearchParams();
 
   for (const [key, value] of Object.entries(options)) {
-    parameters.set(
-      key,
-      Array.isArray(value) ? value.join(",") : value.toString(),
-    );
+    parameters.set(key, Array.isArray(value) ? value.join(",") : value.toString());
   }
 
   return parameters.toString();
 }
 
-export async function searchBooks(
-  query: string,
-  options?: Partial<SearchParameters>,
-) {
+export async function searchBooks(query: string, options?: Partial<SearchParameters>) {
   const url = new URL("books", env.PUBLIC_GUTENDEX_INSTANCE_URL);
   url.search = serializeOptions({ ...options, search: query });
 
-  const { results, count: total } = await request<ListingResponse>(
-    new Request(url),
-  );
+  const { results, count: total } = await request<ListingResponse>(new Request(url));
 
   return { results, total };
 }
@@ -82,18 +74,15 @@ async function request<T>(request: Request) {
       throw error;
     }
 
-    throw new Error(
-      `Failed to fetch data from Gutendex API: Connection error: ${error.message}`,
-    );
+    throw new Error(`Failed to fetch data from Gutendex API: Connection error: ${error.message}`);
   }
 
   try {
     body = JSON.parse(plainBody);
   } catch (cause) {
-    throw new Error(
-      `Failed to fetch data Gutendex API: Invalid JSON response: ${plainBody}`,
-      { cause },
-    );
+    throw new Error(`Failed to fetch data Gutendex API: Invalid JSON response: ${plainBody}`, {
+      cause,
+    });
   }
 
   if (!response.ok) {
@@ -103,9 +92,7 @@ async function request<T>(request: Request) {
     );
   }
 
-  log("gutendex", "debug", `Fetched data from Gutendex API: ${request.url}`, {
-    body,
-  });
+  log("gutendex", "debug", `Fetched data from Gutendex API: ${request.url}`, { body });
 
   return body;
 }
@@ -194,10 +181,7 @@ interface BookResponse {
   placeholder: true;
 }
 
-type Format = Record<
-  `${string}/${string}`,
-  `http://${string}` | `https://${string}`
->;
+type Format = Record<`${string}/${string}`, `http://${string}` | `https://${string}`>;
 
 interface Person {
   birth_year: number | null;

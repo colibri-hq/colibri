@@ -1,10 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import {
-  demonstrateInfrastructure,
-  ExampleMetadataProvider,
-} from "./example.js";
-import { MetadataProviderRegistry, MetadataType } from "./index.js";
 import { MetadataConfigManager } from "./config.js";
+import { demonstrateInfrastructure, ExampleMetadataProvider } from "./example.js";
+import { MetadataProviderRegistry, MetadataType } from "./index.js";
 
 describe("Infrastructure Integration", () => {
   let registry: MetadataProviderRegistry;
@@ -36,9 +33,7 @@ describe("Infrastructure Integration", () => {
     // Test provider capabilities
     expect(provider.supportsDataType(MetadataType.TITLE)).toBe(true);
     expect(provider.supportsDataType(MetadataType.ISBN)).toBe(true);
-    expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(
-      false,
-    );
+    expect(provider.supportsDataType(MetadataType.PHYSICAL_DIMENSIONS)).toBe(false);
 
     // Test reliability scores
     expect(provider.getReliabilityScore(MetadataType.TITLE)).toBe(0.9);
@@ -56,9 +51,7 @@ describe("Infrastructure Integration", () => {
     expect(isbnResults[0].isbn).toContain("978-1234567890");
     expect(isbnResults[0].confidence).toBe(0.95);
 
-    const creatorResults = await provider.searchByCreator({
-      name: "Test Author",
-    });
+    const creatorResults = await provider.searchByCreator({ name: "Test Author" });
     expect(creatorResults).toHaveLength(1);
     expect(creatorResults[0].authors).toContain("Test Author");
 
@@ -82,9 +75,7 @@ describe("Infrastructure Integration", () => {
     expect(titleProviders).toHaveLength(1);
     expect(titleProviders[0]).toBe(provider);
 
-    const dimensionProviders = registry.getProvidersForDataType(
-      MetadataType.PHYSICAL_DIMENSIONS,
-    );
+    const dimensionProviders = registry.getProvidersForDataType(MetadataType.PHYSICAL_DIMENSIONS);
     expect(dimensionProviders).toHaveLength(0);
   });
 
@@ -95,14 +86,9 @@ describe("Infrastructure Integration", () => {
     const config = registry.getProviderConfig("example-provider");
     expect(config).toEqual({ customSetting: "test" });
 
-    registry.updateProviderConfig("example-provider", {
-      anotherSetting: "value",
-    });
+    registry.updateProviderConfig("example-provider", { anotherSetting: "value" });
     const updatedConfig = registry.getProviderConfig("example-provider");
-    expect(updatedConfig).toEqual({
-      customSetting: "test",
-      anotherSetting: "value",
-    });
+    expect(updatedConfig).toEqual({ customSetting: "test", anotherSetting: "value" });
   });
 
   it("should handle provider enable/disable", () => {

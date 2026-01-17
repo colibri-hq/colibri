@@ -41,9 +41,7 @@ describe("OpenLibraryMetadataProvider - Performance Testing", () => {
   });
 
   // Helper function to measure performance
-  const measurePerformance = async <T>(
-    operation: () => Promise<T>,
-  ): Promise<T> => {
+  const measurePerformance = async <T>(operation: () => Promise<T>): Promise<T> => {
     // Force garbage collection if available
     if (global.gc) {
       global.gc();
@@ -55,8 +53,7 @@ describe("OpenLibraryMetadataProvider - Performance Testing", () => {
     const result = await operation();
 
     performanceMetrics.endTime = performance.now();
-    performanceMetrics.duration =
-      performanceMetrics.endTime - performanceMetrics.startTime;
+    performanceMetrics.duration = performanceMetrics.endTime - performanceMetrics.startTime;
     performanceMetrics.memoryAfter = process.memoryUsage().heapUsed;
     performanceMetrics.memoryUsed =
       performanceMetrics.memoryAfter - performanceMetrics.memoryBefore;
@@ -99,10 +96,7 @@ describe("OpenLibraryMetadataProvider - Performance Testing", () => {
       });
 
       const results = await measurePerformance(async () => {
-        return await provider.searchByTitle({
-          title: "Small Set Book",
-          exactMatch: false,
-        });
+        return await provider.searchByTitle({ title: "Small Set Book", exactMatch: false });
       });
 
       expect(results).toHaveLength(1);
@@ -127,10 +121,7 @@ describe("OpenLibraryMetadataProvider - Performance Testing", () => {
       });
 
       const results = await measurePerformance(async () => {
-        return await provider.searchByTitle({
-          title: "Medium Set Book",
-          exactMatch: false,
-        });
+        return await provider.searchByTitle({ title: "Medium Set Book", exactMatch: false });
       });
 
       expect(results).toHaveLength(1);
@@ -156,10 +147,7 @@ describe("OpenLibraryMetadataProvider - Performance Testing", () => {
       });
 
       const results = await measurePerformance(async () => {
-        return await provider.searchByTitle({
-          title: "Large Set Book",
-          exactMatch: false,
-        });
+        return await provider.searchByTitle({ title: "Large Set Book", exactMatch: false });
       });
 
       expect(results).toHaveLength(1);
@@ -186,10 +174,7 @@ describe("OpenLibraryMetadataProvider - Performance Testing", () => {
       });
 
       const results = await measurePerformance(async () => {
-        return await provider.searchByTitle({
-          title: "Very Large Set Book",
-          exactMatch: false,
-        });
+        return await provider.searchByTitle({ title: "Very Large Set Book", exactMatch: false });
       });
 
       expect(results).toHaveLength(1);
@@ -253,10 +238,7 @@ describe("OpenLibraryMetadataProvider - Performance Testing", () => {
       });
 
       const results = await measurePerformance(async () => {
-        return await provider.searchByTitle({
-          title: "Complex Names Test",
-          exactMatch: false,
-        });
+        return await provider.searchByTitle({ title: "Complex Names Test", exactMatch: false });
       });
 
       expect(results).toHaveLength(1);
@@ -285,10 +267,7 @@ describe("OpenLibraryMetadataProvider - Performance Testing", () => {
       });
 
       const results = await measurePerformance(async () => {
-        return await provider.searchByTitle({
-          title: "Confidence Test Book",
-          exactMatch: false,
-        });
+        return await provider.searchByTitle({ title: "Confidence Test Book", exactMatch: false });
       });
 
       expect(results).toHaveLength(1);
@@ -314,10 +293,7 @@ describe("OpenLibraryMetadataProvider - Performance Testing", () => {
       });
 
       const results = await measurePerformance(async () => {
-        return await provider.searchByTitle({
-          title: "Disagreement Book",
-          exactMatch: false,
-        });
+        return await provider.searchByTitle({ title: "Disagreement Book", exactMatch: false });
       });
 
       expect(results).toHaveLength(1);
@@ -346,10 +322,7 @@ describe("OpenLibraryMetadataProvider - Performance Testing", () => {
       const initialMemory = process.memoryUsage().heapUsed;
 
       for (let i = 0; i < 10; i++) {
-        await provider.searchByTitle({
-          title: "Memory Test Book",
-          exactMatch: false,
-        });
+        await provider.searchByTitle({ title: "Memory Test Book", exactMatch: false });
       }
 
       // Force garbage collection if available
@@ -403,11 +376,7 @@ describe("OpenLibraryMetadataProvider - Performance Testing", () => {
   describe("Scalability Testing", () => {
     it("should maintain performance with increasing data complexity", async () => {
       const complexityLevels = [10, 25, 50, 100];
-      const performanceResults: Array<{
-        size: number;
-        duration: number;
-        memory: number;
-      }> = [];
+      const performanceResults: Array<{ size: number; duration: number; memory: number }> = [];
 
       for (const size of complexityLevels) {
         const mockResults = Array.from({ length: size }, (_, i) =>
@@ -482,10 +451,7 @@ describe("OpenLibraryMetadataProvider - Performance Testing", () => {
       });
 
       const results = await measurePerformance(async () => {
-        return await provider.searchByTitle({
-          title: "Duplicate Book",
-          exactMatch: false,
-        });
+        return await provider.searchByTitle({ title: "Duplicate Book", exactMatch: false });
       });
 
       expect(results).toHaveLength(1);
@@ -514,10 +480,7 @@ describe("OpenLibraryMetadataProvider - Performance Testing", () => {
 
       // Perform baseline measurement
       const results = await measurePerformance(async () => {
-        return await provider.searchByTitle({
-          title: "Baseline Test Book",
-          exactMatch: false,
-        });
+        return await provider.searchByTitle({ title: "Baseline Test Book", exactMatch: false });
       });
 
       expect(results).toHaveLength(1);
@@ -527,9 +490,7 @@ describe("OpenLibraryMetadataProvider - Performance Testing", () => {
       const BASELINE_MEMORY_MB = 2; // 2MB baseline
 
       expect(performanceMetrics.duration).toBeLessThan(BASELINE_DURATION_MS);
-      expect(performanceMetrics.memoryUsed).toBeLessThan(
-        BASELINE_MEMORY_MB * 1024 * 1024,
-      );
+      expect(performanceMetrics.memoryUsed).toBeLessThan(BASELINE_MEMORY_MB * 1024 * 1024);
     });
 
     it("should provide performance metrics for monitoring", () => {

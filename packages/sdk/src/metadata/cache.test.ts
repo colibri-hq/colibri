@@ -1,15 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import {
-  EvictionStrategy,
-  MemoizationCache,
-  MetadataCache,
-  MetadataRecordCache,
-} from "./cache.js";
-import type {
-  MetadataRecord,
-  MultiCriteriaQuery,
-} from "./providers/provider.js";
 import { sleep } from "@colibri-hq/shared";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import type { MetadataRecord, MultiCriteriaQuery } from "./providers/provider.js";
+import { EvictionStrategy, MemoizationCache, MetadataCache, MetadataRecordCache } from "./cache.js";
 
 describe("MetadataCache", () => {
   let cache: MetadataCache<string>;
@@ -166,10 +158,7 @@ describe("MetadataRecordCache", () => {
   let mockRecords: MetadataRecord[];
 
   beforeEach(() => {
-    cache = new MetadataRecordCache({
-      maxSize: 10,
-      cleanupInterval: 0,
-    });
+    cache = new MetadataRecordCache({ maxSize: 10, cleanupInterval: 0 });
 
     mockRecords = [
       {
@@ -188,10 +177,7 @@ describe("MetadataRecordCache", () => {
 
   describe("query caching", () => {
     it("should cache and retrieve query results", () => {
-      const query: MultiCriteriaQuery = {
-        title: "Test Book",
-        authors: ["Test Author"],
-      };
+      const query: MultiCriteriaQuery = { title: "Test Book", authors: ["Test Author"] };
 
       cache.cacheQuery("test-provider", query, mockRecords);
       const cached = cache.getCachedQuery("test-provider", query);
@@ -200,9 +186,7 @@ describe("MetadataRecordCache", () => {
     });
 
     it("should check if query is cached", () => {
-      const query: MultiCriteriaQuery = {
-        title: "Test Book",
-      };
+      const query: MultiCriteriaQuery = { title: "Test Book" };
 
       expect(cache.hasQuery("test-provider", query)).toBe(false);
 
@@ -211,15 +195,9 @@ describe("MetadataRecordCache", () => {
     });
 
     it("should generate consistent cache keys", () => {
-      const query1: MultiCriteriaQuery = {
-        title: "Test Book",
-        authors: ["Author 1", "Author 2"],
-      };
+      const query1: MultiCriteriaQuery = { title: "Test Book", authors: ["Author 1", "Author 2"] };
 
-      const query2: MultiCriteriaQuery = {
-        title: "Test Book",
-        authors: ["Author 1", "Author 2"],
-      };
+      const query2: MultiCriteriaQuery = { title: "Test Book", authors: ["Author 1", "Author 2"] };
 
       const key1 = MetadataRecordCache.generateQueryKey("provider", query1);
       const key2 = MetadataRecordCache.generateQueryKey("provider", query2);
@@ -243,10 +221,7 @@ describe("MemoizationCache", () => {
   let memoCache: MemoizationCache<[string, number], string>;
 
   beforeEach(() => {
-    memoCache = new MemoizationCache({
-      maxSize: 5,
-      cleanupInterval: 0,
-    });
+    memoCache = new MemoizationCache({ maxSize: 5, cleanupInterval: 0 });
   });
 
   afterEach(() => {
@@ -256,10 +231,7 @@ describe("MemoizationCache", () => {
   describe("function memoization", () => {
     it("should memoize function results", async () => {
       let callCount = 0;
-      const expensiveFunction = async (
-        str: string,
-        num: number,
-      ): Promise<string> => {
+      const expensiveFunction = async (str: string, num: number): Promise<string> => {
         callCount++;
         return `${str}-${num}`;
       };

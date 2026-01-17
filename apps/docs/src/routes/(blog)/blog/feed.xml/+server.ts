@@ -1,5 +1,5 @@
-import { getBlogPosts } from "$lib/content/blog";
 import { parseAuthor } from "$lib/content/author";
+import { getBlogPosts } from "$lib/content/blog";
 import { siteConfig } from "$root/site.config";
 import type { RequestHandler } from "./$types.js";
 
@@ -46,10 +46,7 @@ ${items}
 </rss>`;
 
   return new Response(rss, {
-    headers: {
-      "Content-Type": "application/xml",
-      "Cache-Control": "max-age=3600",
-    },
+    headers: { "Content-Type": "application/xml", "Cache-Control": "max-age=3600" },
   });
 } satisfies RequestHandler;
 

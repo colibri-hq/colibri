@@ -1,5 +1,3 @@
-import { log } from "$lib/logging";
-import { trpc as t } from "$lib/trpc/client";
 import type {
   CancelPayload,
   CancelUploadRequest,
@@ -10,8 +8,10 @@ import type {
   UploadResponse,
   UploadStatus,
 } from "$lib/workers/upload.worker.types";
-import { encodeToBase64 } from "@colibri-hq/shared";
+import { log } from "$lib/logging";
+import { trpc as t } from "$lib/trpc/client";
 import { loadMetadata, type Metadata } from "@colibri-hq/sdk/ebooks";
+import { encodeToBase64 } from "@colibri-hq/shared";
 
 // Re-export types for any code that imports directly from the worker
 export type {
@@ -36,10 +36,7 @@ function getWorkerOriginUrl(): URL {
   return new URL(href);
 }
 
-const trpc = t({
-  fetch,
-  url: getWorkerOriginUrl(),
-});
+const trpc = t({ fetch, url: getWorkerOriginUrl() });
 
 const pending = new Map<string, AbortController>();
 let root: FileSystemDirectoryHandle | null = null;
@@ -85,9 +82,7 @@ async function handleUpload({ files }: UploadPayload) {
     const { signal } = pending.get(id)!;
     signal.throwIfAborted();
 
-    const container = await uploadsDirectory.getDirectoryHandle(id, {
-      create: true,
-    });
+    const container = await uploadsDirectory.getDirectoryHandle(id, { create: true });
 
     let handle: FileSystemFileHandle;
 
@@ -96,12 +91,7 @@ async function handleUpload({ files }: UploadPayload) {
     } catch {
       return self.postMessage({
         type: "upload",
-        payload: {
-          error: "Upload Cancelled",
-          failed: true,
-          id,
-          name,
-        },
+        payload: { error: "Upload Cancelled", failed: true, id, name },
       } satisfies UploadResponse);
     }
 
@@ -146,11 +136,7 @@ async function handleUpload({ files }: UploadPayload) {
       payload: { id, name, status: "processing" as const, failed: false },
     } satisfies UploadResponse);
 
-    await trpc.books.ingest.mutate({
-      uploadId: id,
-      s3Key,
-      filename: name,
-    });
+    await trpc.books.ingest.mutate({ uploadId: id, s3Key, filename: name });
 
     // Step 4: Clean up OPFS
     await finalizeUpload(id);
@@ -170,19 +156,12 @@ async function handleUpload({ files }: UploadPayload) {
   } catch (cause) {
     throw new Error(
       `Failed to upload files: ${(cause as Error).message}: ${(cause as Error).stack}`,
-      {
-        cause,
-      },
+      { cause },
     );
   }
 }
 
-async function uploadAsset(
-  url: string,
-  asset: File,
-  checksum: ArrayBuffer,
-  signal?: AbortSignal,
-) {
+async function uploadAsset(url: string, asset: File, checksum: ArrayBuffer, signal?: AbortSignal) {
   const controller = new AbortController();
   const { signal: uploadSignal } = controller;
 
@@ -191,9 +170,7 @@ async function uploadAsset(
   const response = await fetch(url, {
     signal: uploadSignal,
     method: "PUT",
-    headers: {
-      "Content-Type": asset.type,
-    },
+    headers: { "Content-Type": asset.type },
     body: await asset.arrayBuffer(),
 
     // Streaming won't work on HTTP/1.1, so we'd need TLS during local
@@ -224,12 +201,7 @@ async function finalizeUpload(id: string) {
 }
 
 async function handleResumption({ ids }: ResumePayload) {
-  log(
-    "worker:upload",
-    "info",
-    `Resuming pending upload of ${ids.length} books`,
-    { ids },
-  );
+  log("worker:upload", "info", `Resuming pending upload of ${ids.length} books`, { ids });
 
   const directory = await getUploadsDirectory();
   const resumable = await resolveResumableFiles(directory, ids);
@@ -262,12 +234,7 @@ async function handleResumption({ ids }: ResumePayload) {
       // Notify main thread
       self.postMessage({
         type: "upload",
-        payload: {
-          id,
-          name: file.name,
-          status: "uploading" as const,
-          failed: false,
-        },
+        payload: { id, name: file.name, status: "uploading" as const, failed: false },
       } satisfies UploadResponse);
 
       // Get upload URL
@@ -295,31 +262,17 @@ async function handleResumption({ ids }: ResumePayload) {
       // Trigger ingestion
       self.postMessage({
         type: "upload",
-        payload: {
-          id,
-          name: file.name,
-          status: "processing" as const,
-          failed: false,
-        },
+        payload: { id, name: file.name, status: "processing" as const, failed: false },
       } satisfies UploadResponse);
 
-      await trpc.books.ingest.mutate({
-        uploadId: id,
-        s3Key,
-        filename: file.name,
-      });
+      await trpc.books.ingest.mutate({ uploadId: id, s3Key, filename: file.name });
 
       // Clean up
       await directory.removeEntry(id, { recursive: true });
 
       self.postMessage({
         type: "upload",
-        payload: {
-          id,
-          name: file.name,
-          status: "ingesting" as const,
-          failed: false,
-        },
+        payload: { id, name: file.name, status: "ingesting" as const, failed: false },
       } satisfies UploadResponse);
     } catch (error) {
       self.postMessage({
@@ -421,19 +374,11 @@ async function processFile(
     id,
     cover,
     metadata,
-    file: {
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      lastModified: file.lastModified,
-    },
+    file: { name: file.name, size: file.size, type: file.type, lastModified: file.lastModified },
   };
 }
 
-async function writeMetadataFile(
-  metadata: Metadata,
-  container: FileSystemDirectoryHandle,
-) {
+async function writeMetadataFile(metadata: Metadata, container: FileSystemDirectoryHandle) {
   const metadataFile = new File([JSON.stringify(metadata)], metadataFilename, {
     type: "application/json",
   });
@@ -442,9 +387,7 @@ async function writeMetadataFile(
 }
 
 async function readMetadataFile(container: FileSystemDirectoryHandle) {
-  const metadataFileHandle = await container.getFileHandle(metadataFilename, {
-    create: false,
-  });
+  const metadataFileHandle = await container.getFileHandle(metadataFilename, { create: false });
   const metadataFile = await metadataFileHandle.getFile();
   const plaintext = await metadataFile.text();
 
@@ -462,18 +405,12 @@ async function writeCoverFile(
 }
 
 async function readCoverFile(container: FileSystemDirectoryHandle) {
-  const coverFileHandle = await container.getFileHandle(coverFilename, {
-    create: false,
-  });
+  const coverFileHandle = await container.getFileHandle(coverFilename, { create: false });
 
   return await coverFileHandle.getFile();
 }
 
-async function writeFile(
-  file: File,
-  container: FileSystemDirectoryHandle,
-  signal?: AbortSignal,
-) {
+async function writeFile(file: File, container: FileSystemDirectoryHandle, signal?: AbortSignal) {
   const handle = await container.getFileHandle(file.name, { create: true });
   const writable = await handle.createWritable({ keepExistingData: false });
   const promise = writable.write(file);
@@ -507,23 +444,15 @@ async function getUploadsDirectory() {
   return root.getDirectoryHandle("uploads", { create: true });
 }
 
-async function resolveResumableFiles(
-  directory: FileSystemDirectoryHandle,
-  ids: string[],
-) {
+async function resolveResumableFiles(directory: FileSystemDirectoryHandle, ids: string[]) {
   const fragments = await Promise.all(
     ids.map(async (id) => {
       try {
-        const container = await directory.getDirectoryHandle(id, {
-          create: false,
-        });
+        const container = await directory.getDirectoryHandle(id, { create: false });
         let file: File | undefined = undefined;
 
         for await (const entry of container.values()) {
-          if (
-            entry.kind === "file" &&
-            ![metadataFilename, coverFilename].includes(entry.name)
-          ) {
+          if (entry.kind === "file" && ![metadataFilename, coverFilename].includes(entry.name)) {
             file = await entry.getFile();
             break;
           }
@@ -534,11 +463,7 @@ async function resolveResumableFiles(
         // Directory doesn't exist in OPFS - this can happen if the browser
         // was closed before the upload completed and OPFS was cleaned up
         if (error instanceof DOMException && error.name === "NotFoundError") {
-          log(
-            "worker:upload",
-            "warning",
-            `OPFS directory for upload ${id} not found, skipping`,
-          );
+          log("worker:upload", "warning", `OPFS directory for upload ${id} not found, skipping`);
           return { id, file: undefined, container: undefined };
         }
         throw error;
@@ -554,8 +479,4 @@ async function resolveResumableFiles(
 const metadataFilename = "metadata.json";
 const coverFilename = "cover";
 
-type Resumable = {
-  id: string;
-  file: File;
-  container: FileSystemDirectoryHandle;
-};
+type Resumable = { id: string; file: File; container: FileSystemDirectoryHandle };

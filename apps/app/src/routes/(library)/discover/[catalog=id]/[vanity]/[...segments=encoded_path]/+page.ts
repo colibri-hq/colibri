@@ -29,37 +29,20 @@ export const load = async function load(event) {
 
       // We're building the next breadcrumb by appending the current category data to the previous
       // link, nesting the categories.
-      return [
-        ...breadcrumbs,
-        {
-          link: `${previousLink}/${encoded}`,
-          title,
-        },
-      ];
+      return [...breadcrumbs, { link: `${previousLink}/${encoded}`, title }];
     },
 
     // Use the base URL as the starting value for the reduction.
-    [
-      {
-        link: `/discover/${id}/${catalog.slug}`,
-        title: catalog.title ?? catalog.slug!.toString(),
-      },
-    ],
+    [{ link: `/discover/${id}/${catalog.slug}`, title: catalog.title ?? catalog.slug!.toString() }],
   );
   // endregion
 
   // region Feed retrieval
   // Take the link to the category to fetch from the last decoded segment
   const categoryUrl = segments.at(-1)?.[0] ?? undefined;
-  const feedUrl = categoryUrl
-    ? new URL(categoryUrl, catalog.feed_url).href
-    : catalog.feed_url;
+  const feedUrl = categoryUrl ? new URL(categoryUrl, catalog.feed_url).href : catalog.feed_url;
   const feed = router.catalogs.fetchRemoteCatalog.query({ feedUrl });
   // endregion
 
-  return {
-    catalog,
-    feed: browser ? feed : await feed,
-    breadcrumbs,
-  };
+  return { catalog, feed: browser ? feed : await feed, breadcrumbs };
 } satisfies PageLoad;

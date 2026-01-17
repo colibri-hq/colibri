@@ -1,4 +1,4 @@
-declare module 'binary-parser' {
+declare module "binary-parser" {
   // An empty interface to allow users to augment it.
   export interface ParserRegistry {}
 
@@ -21,10 +21,7 @@ declare module 'binary-parser' {
     TIn = any,
     TOut = TIn,
   > {
-    assert?:
-      | number
-      | string
-      | ((this: ParserContext<T, TParent, TRoot>, item: TOut) => boolean);
+    assert?: number | string | ((this: ParserContext<T, TParent, TRoot>, item: TOut) => boolean);
     formatter?: (this: ParserContext<T, TParent, TRoot>, item: TIn) => any;
   }
 
@@ -33,9 +30,7 @@ declare module 'binary-parser' {
     TParent extends object | null = null,
     TRoot extends object = T,
     TOut = string,
-  > = ParserOptions<T, TParent, TRoot, string, TOut> & {
-    encoding?: string;
-  } & (
+  > = ParserOptions<T, TParent, TRoot, string, TOut> & { encoding?: string } & (
       | { length: FieldLength<T, TParent, TRoot>; stripNull?: boolean }
       | { zeroTerminated: true }
       | { greedy: true }
@@ -45,30 +40,17 @@ declare module 'binary-parser' {
     T extends object,
     TParent extends object | null = null,
     TRoot extends object = T,
-  > =
-    | number
-    | keyof T
-    | ((this: ParserContext<T, TParent, TRoot>, item: any) => number);
-  type ReadUntil<
-    T extends object,
-    TParent extends object | null = null,
-    TRoot extends object = T,
-  > =
-    | 'eof'
-    | ((
-        this: ParserContext<T, TParent, TRoot>,
-        item: any,
-        buffer: ArrayBuffer,
-      ) => boolean);
+  > = number | keyof T | ((this: ParserContext<T, TParent, TRoot>, item: any) => number);
+  type ReadUntil<T extends object, TParent extends object | null = null, TRoot extends object = T> =
+    | "eof"
+    | ((this: ParserContext<T, TParent, TRoot>, item: any, buffer: ArrayBuffer) => boolean);
 
   type BufferParserOptions<
     T extends object,
     TParent extends object | null = null,
     TRoot extends object = T,
     TOut = Uint8Array<ArrayBufferLike>,
-  > = ParserOptions<T, TParent, TRoot, Uint8Array<ArrayBufferLike>, TOut> & {
-    clone?: boolean;
-  } & (
+  > = ParserOptions<T, TParent, TRoot, Uint8Array<ArrayBufferLike>, TOut> & { clone?: boolean } & (
       | { length: FieldLength<T, TParent, TRoot> }
       | { readUntil: ReadUntil<T, TParent, TRoot> }
     );
@@ -81,43 +63,37 @@ declare module 'binary-parser' {
     TOut = TItem[],
   > = ParserOptions<T, TParent, TRoot, TItem[], TOut> & {
     type:
-      | 'int8'
-      | 'int8le'
-      | 'int8be'
-      | 'int16'
-      | 'int16le'
-      | 'int16be'
-      | 'int32'
-      | 'int32le'
-      | 'int32be'
-      | 'uint8'
-      | 'uint8le'
-      | 'uint8be'
-      | 'uint16'
-      | 'uint16le'
-      | 'uint16be'
-      | 'uint32'
-      | 'uint32le'
-      | 'uint32be'
+      | "int8"
+      | "int8le"
+      | "int8be"
+      | "int16"
+      | "int16le"
+      | "int16be"
+      | "int32"
+      | "int32le"
+      | "int32be"
+      | "uint8"
+      | "uint8le"
+      | "uint8be"
+      | "uint16"
+      | "uint16le"
+      | "uint16be"
+      | "uint32"
+      | "uint32le"
+      | "uint32be"
       | Parser<any>;
   } & (
       | {
           length:
             | number
             | keyof T
-            | ((
-                this: ArrayParserContext<T, TParent, TRoot>,
-                item: any,
-              ) => number);
+            | ((this: ArrayParserContext<T, TParent, TRoot>, item: any) => number);
         }
       | {
           lengthInBytes:
             | number
             | keyof T
-            | ((
-                this: ArrayParserContext<T, TParent, TRoot>,
-                item: any,
-              ) => number);
+            | ((this: ArrayParserContext<T, TParent, TRoot>, item: any) => number);
         }
       | { readUntil: ReadUntil<T, TParent, TRoot> }
     );
@@ -133,9 +109,7 @@ declare module 'binary-parser' {
     TParent extends object | null = null,
     TRoot extends object = T,
   > extends ParserOptions<T, TParent, TRoot> {
-    tag:
-      | keyof T
-      | ((this: ParserContext<T, TParent, TRoot>, item: any) => number);
+    tag: keyof T | ((this: ParserContext<T, TParent, TRoot>, item: any) => number);
     choices: { [key: number]: Parser<T, TParent, TRoot> };
     defaultChoice?: keyof T | Parser<T, TParent, TRoot>;
   }
@@ -158,10 +132,7 @@ declare module 'binary-parser' {
     offset:
       | number
       | keyof T
-      | ((
-          this: ParserContext<T, TParent, TRoot>,
-          item: ParserContext<T, null, TRoot>,
-        ) => number);
+      | ((this: ParserContext<T, TParent, TRoot>, item: ParserContext<T, null, TRoot>) => number);
   }
 
   type WrappedParserOptions<
@@ -172,19 +143,14 @@ declare module 'binary-parser' {
   > = ParserOptions<T, TParent, TRoot, U> & {
     wrapper: (buffer: ArrayBuffer) => ArrayBuffer;
     type: Parser<T, TParent, TRoot>;
-  } & (
-      | { length: FieldLength<T, TParent, TRoot> }
-      | { readUntil: ReadUntil<T, TParent, TRoot> }
-    );
+  } & ({ length: FieldLength<T, TParent, TRoot> } | { readUntil: ReadUntil<T, TParent, TRoot> });
 
   type ParserContext<
     TCurrent extends object,
     TParent extends object | null,
     TRoot extends object,
   > = TCurrent & {
-    $parent: TParent extends object
-      ? ParserContext<TParent, Record<string, any>, TRoot>
-      : null;
+    $parent: TParent extends object ? ParserContext<TParent, Record<string, any>, TRoot> : null;
     $root: TRoot;
   };
 
@@ -192,19 +158,13 @@ declare module 'binary-parser' {
     T extends object,
     TParent extends object | null = null,
     TRoot extends object = T,
-  > = ParserContext<T, TParent, TRoot> & {
-    $index: number;
-  };
+  > = ParserContext<T, TParent, TRoot> & { $index: number };
 
   export declare class Parser<
     T extends object = {},
     TParent extends object | null = null,
     TRoot extends object = T,
-    O extends ParserOptions<T, TParent, TRoot> = ParserOptions<
-      T,
-      TParent,
-      TRoot
-    >,
+    O extends ParserOptions<T, TParent, TRoot> = ParserOptions<T, TParent, TRoot>,
     TRegistry = ParserRegistry,
   > {
     options: O;
@@ -216,374 +176,251 @@ declare module 'binary-parser' {
       TInitialParent extends object | null = null,
     >(): Parser<TInitial, TInitialParent, TInitial>;
 
-    endianess(endian: 'big' | 'little'): Parser<T, TParent, TRoot>;
+    endianess(endian: "big" | "little"): Parser<T, TParent, TRoot>;
 
-    namely<TName extends string>(
-      alias: TName,
-    ): Parser<T & { [name in TName]: number }>;
+    namely<TName extends string>(alias: TName): Parser<T & { [name in TName]: number }>;
 
     uint8<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
       TResult = TOptions extends {
-        formatter: (
-          this: ParserContext<T, TParent, TRoot>,
-          item: number,
-        ) => infer R;
+        formatter: (this: ParserContext<T, TParent, TRoot>, item: number) => infer R;
       }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     uint16<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     uint16le<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     uint16be<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     uint32<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     uint32le<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     uint32be<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     int8<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     int16<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     int16le<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     int16be<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     int32<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     int32le<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     int32be<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     int64<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     int64be<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     int64le<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     uint64<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     uint64be<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     uint64le<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     floatle<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     floatbe<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     doublele<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     doublebe<
       TName extends string,
       const TOptions extends ParserOptions<T, TParent, TRoot, number>,
-      TResult = TOptions extends {
-        formatter: (item: number) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: number) => infer R }
         ? R
         : TOptions extends { assert: infer A extends number }
           ? A
           : number,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     bit1<TName extends string>(
       varName: TName,
@@ -747,10 +584,7 @@ declare module 'binary-parser' {
 
     namely(alias: string): this;
 
-    skip(
-      length: FieldLength<T, TParent, TRoot>,
-      options?: ParserOptions<T, TParent, TRoot>,
-    ): this;
+    skip(length: FieldLength<T, TParent, TRoot>, options?: ParserOptions<T, TParent, TRoot>): this;
 
     seek(
       relOffset: FieldLength<T, TParent, TRoot>,
@@ -767,30 +601,24 @@ declare module 'binary-parser' {
         : TOptions extends { assert: infer AssertType extends string | number }
           ? AssertType
           : string,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     buffer<
       TName extends string,
       TOptions extends BufferParserOptions<T, TParent, TRoot>,
       TResult extends TOptions extends Required<
-        Pick<ParserOptions<T, TParent, TRoot>, 'formatter'>
+        Pick<ParserOptions<T, TParent, TRoot>, "formatter">
       > &
         BufferParserOptions<T, TParent, TRoot, infer TResult>
         ? TResult
         : Uint8Array<ArrayBufferLike>,
-    >(
-      varName: TName,
-      options: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     wrapped<
       TName extends string,
       TOptions extends WrappedParserOptions<T, TParent, TRoot>,
       TResult extends TOptions extends Required<
-        Pick<ParserOptions<T, TParent, TRoot>, 'formatter'>
+        Pick<ParserOptions<T, TParent, TRoot>, "formatter">
       > &
         WrappedParserOptions<T, infer TResult>
         ? TResult
@@ -806,25 +634,16 @@ declare module 'binary-parser' {
       TName extends string,
       const TOptions extends ArrayParserOptions<T, TParent, TRoot>,
       // TItemType = TOptions extends { type: Parser<infer U> } ? U : Record<string, any>,
-      TItemType = TOptions extends { type: Parser<infer U> }
-        ? U
-        : Record<string, any>,
+      TItemType = TOptions extends { type: Parser<infer U> } ? U : Record<string, any>,
       TBaseArrayType = TItemType[],
-      TResult = TOptions extends {
-        formatter: (item: TBaseArrayType) => infer R;
-      }
+      TResult = TOptions extends { formatter: (item: TBaseArrayType) => infer R }
         ? R
         : TBaseArrayType,
-    >(
-      varName: TName,
-      options: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     choice<
       TName extends string,
-      const TChoices extends {
-        [key: number]: keyof ParserRegistry | Parser<any, TParent, TRoot>;
-      },
+      const TChoices extends { [key: number]: keyof ParserRegistry | Parser<any, TParent, TRoot> },
       TDefaultChoice extends Parser<any, TParent, TRoot>,
       TOptions extends {
         tag:
@@ -839,21 +658,13 @@ declare module 'binary-parser' {
       },
       TBaseResult = UnionOfChoiceOutputs<TChoices, TRegistry>,
       TResult = TOptions extends {
-        formatter: (
-          this: ParserContext<T, TParent, TRoot>,
-          item: TBaseResult,
-        ) => infer R;
+        formatter: (this: ParserContext<T, TParent, TRoot>, item: TBaseResult) => infer R;
       }
         ? R
         : TBaseResult,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
     choice<
-      const TChoices extends {
-        [key: number]: keyof ParserRegistry | Parser<any, TParent, TRoot>;
-      },
+      const TChoices extends { [key: number]: keyof ParserRegistry | Parser<any, TParent, TRoot> },
       TDefaultChoice extends Parser<any, TParent, TRoot>,
       TOptions extends {
         tag:
@@ -868,10 +679,7 @@ declare module 'binary-parser' {
       },
       TBaseResult = UnionOfChoiceOutputs<TChoices, TRegistry>,
       TResult = TOptions extends {
-        formatter: (
-          this: ParserContext<T, TParent, TRoot>,
-          item: TBaseResult,
-        ) => infer R;
+        formatter: (this: ParserContext<T, TParent, TRoot>, item: TBaseResult) => infer R;
       }
         ? R
         : TBaseResult,
@@ -882,56 +690,37 @@ declare module 'binary-parser' {
       TNested extends object,
       const TOptions extends NestedParserOptions<TNested, T, TRoot>,
       TRegistry = ParserRegistry,
-      TBaseResult = ResolveChoiceType<TOptions['type'], TRegistry>,
+      TBaseResult = ResolveChoiceType<TOptions["type"], TRegistry>,
       // Check for formatter
-      TResult = TOptions extends { formatter: (item: TBaseResult) => infer R }
-        ? R
-        : TBaseResult,
-    >(
-      varName: TName,
-      options: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+      TResult = TOptions extends { formatter: (item: TBaseResult) => infer R } ? R : TBaseResult,
+    >(varName: TName, options: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
     nest<
       TNested extends object,
       const TOptions extends NestedParserOptions<TNested, T, TRoot>,
       TRegistry = ParserRegistry,
-      TBaseResult = ResolveChoiceType<TOptions['type'], TRegistry>,
+      TBaseResult = ResolveChoiceType<TOptions["type"], TRegistry>,
       // Check for formatter
-      TResult = TOptions extends { formatter: (item: TBaseResult) => infer R }
-        ? R
-        : TBaseResult,
+      TResult = TOptions extends { formatter: (item: TBaseResult) => infer R } ? R : TBaseResult,
     >(options: TOptions): Parser<T & TResult, TParent, TRoot>;
 
     pointer<
       TName extends string,
       TNested extends object,
       TOptions extends PointerParserOptions<T, TNested, TParent, TRoot>,
-      TBaseResult = TOptions extends { type: Parser<infer U> }
-        ? U
-        : string | number | ArrayBuffer,
-      TResult = TOptions extends {
-        formatter: (item: TBaseResult) => infer R;
-      }
-        ? R
-        : TBaseResult,
-    >(
-      varName: TName,
-      options?: TOptions,
-    ): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
+      TBaseResult = TOptions extends { type: Parser<infer U> } ? U : string | number | ArrayBuffer,
+      TResult = TOptions extends { formatter: (item: TBaseResult) => infer R } ? R : TBaseResult,
+    >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
     skip(length: number | string | ((item: any) => number)): this;
     seek(relOffset: number | string | ((item: any) => number)): this;
-    saveOffset(
-      varName: string,
-      options?: ParserOptions<T, TParent, TRoot>,
-    ): this;
+    saveOffset(varName: string, options?: ParserOptions<T, TParent, TRoot>): this;
     useContextVars(): this;
 
     parse(buffer: ArrayBuffer | Uint8Array): T;
   }
 }
 
-declare module 'lcid' {
+declare module "lcid" {
   export function from(code: number): string | undefined;
   export function to(name: string): number | undefined;
   export function all(): { [name: string]: number };

@@ -1,9 +1,9 @@
-import type { Storage } from "./types.js";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { encodeToBase64 } from "@colibri-hq/shared";
-import { downloadObject, uploadObject } from "./objects.js";
 import { ReadableStream } from "node:stream/web";
+import type { Storage } from "./types.js";
+import { downloadObject, uploadObject } from "./objects.js";
 
 export async function writeFile(
   storage: Storage,
@@ -52,10 +52,7 @@ export async function generatePresignedDownloadUrl(
   expiresIn: number = 3600,
   bucket: string = defaultBucket,
 ): Promise<string> {
-  const command = new GetObjectCommand({
-    Bucket: bucket,
-    Key: filename,
-  });
+  const command = new GetObjectCommand({ Bucket: bucket, Key: filename });
 
   return await getSignedUrl(client, command, { expiresIn });
 }

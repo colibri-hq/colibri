@@ -1,11 +1,6 @@
-import type { Database, Schema } from "../../database.js";
 import type { Insertable, Selectable } from "kysely";
-import {
-  arrayBufferToHex,
-  generateRandomString,
-  hash,
-  timingSafeEqual,
-} from "@colibri-hq/shared";
+import { arrayBufferToHex, generateRandomString, hash, timingSafeEqual } from "@colibri-hq/shared";
+import type { Database, Schema } from "../../database.js";
 import {
   API_KEY_SCOPES,
   satisfiesScope,
@@ -48,10 +43,7 @@ export async function createApiKey(
   database: Database,
   userId: string,
   name: string,
-  options: {
-    scopes?: ApiKeyScope[];
-    expiresAt?: Date | null;
-  } = {},
+  options: { scopes?: ApiKeyScope[]; expiresAt?: Date | null } = {},
 ): Promise<{ apiKey: ApiKey; plainTextKey: string }> {
   const plainTextKey = generateApiKey();
   const keyHash = await hashApiKey(plainTextKey);
@@ -93,11 +85,7 @@ export function listApiKeysForUser(database: Database, userId: string) {
  * Find an API key by its ID.
  */
 export function findApiKeyById(database: Database, id: string) {
-  return database
-    .selectFrom(table)
-    .selectAll()
-    .where("id", "=", id)
-    .executeTakeFirstOrThrow();
+  return database.selectFrom(table).selectAll().where("id", "=", id).executeTakeFirstOrThrow();
 }
 
 /**
@@ -120,10 +108,7 @@ export function findApiKeyByPrefix(database: Database, prefix: string) {
  * - Key hash matches
  * - Rotation grace period (allows old rotated keys for 15 minutes)
  */
-export async function validateApiKey(
-  database: Database,
-  key: string,
-): Promise<ApiKey | null> {
+export async function validateApiKey(database: Database, key: string): Promise<ApiKey | null> {
   // Basic format check
   if (!key.startsWith(API_KEY_PREFIX)) {
     return null;
@@ -169,17 +154,10 @@ export async function validateApiKey(
 /**
  * Update the last used timestamp and IP for an API key.
  */
-export function updateApiKeyLastUsed(
-  database: Database,
-  id: string,
-  ip?: string | null,
-) {
+export function updateApiKeyLastUsed(database: Database, id: string, ip?: string | null) {
   return database
     .updateTable(table)
-    .set({
-      last_used_at: new Date(),
-      last_used_ip: ip ?? null,
-    })
+    .set({ last_used_at: new Date(), last_used_ip: ip ?? null })
     .where("id", "=", id)
     .execute();
 }
@@ -219,11 +197,7 @@ export async function rotateApiKey(
       .executeTakeFirstOrThrow();
 
     // Mark old key as rotated (it will work for 15 more minutes)
-    await trx
-      .updateTable(table)
-      .set({ rotated_at: new Date() })
-      .where("id", "=", id)
-      .execute();
+    await trx.updateTable(table).set({ rotated_at: new Date() }).where("id", "=", id).execute();
 
     // Create new key
     const plainTextKey = generateApiKey();
@@ -280,10 +254,7 @@ export function hasScope(apiKey: ApiKey, requiredScope: ScopeName): boolean {
  * Check if an API key has any of the required scopes.
  * Uses hierarchical scope expansion.
  */
-export function hasAnyScope(
-  apiKey: ApiKey,
-  requiredScopes: ScopeName[],
-): boolean {
+export function hasAnyScope(apiKey: ApiKey, requiredScopes: ScopeName[]): boolean {
   return checkAnyScopes(apiKey.scopes, requiredScopes);
 }
 
@@ -291,10 +262,7 @@ export function hasAnyScope(
  * Check if an API key has all of the required scopes.
  * Uses hierarchical scope expansion.
  */
-export function hasAllScopes(
-  apiKey: ApiKey,
-  requiredScopes: ScopeName[],
-): boolean {
+export function hasAllScopes(apiKey: ApiKey, requiredScopes: ScopeName[]): boolean {
   return checkAllScopes(apiKey.scopes, requiredScopes);
 }
 
@@ -302,8 +270,7 @@ export function hasAllScopes(
 
 // region Key Generation
 
-const alphabet =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 /**
  * Extract the prefix from an API key for identification.
@@ -317,10 +284,7 @@ export function extractKeyPrefix(key: string): string {
  * Generate a cryptographically secure API key.
  */
 function generateApiKey() {
-  return (
-    API_KEY_PREFIX +
-    generateRandomString(API_KEY_LENGTH - API_KEY_PREFIX.length, alphabet)
-  );
+  return API_KEY_PREFIX + generateRandomString(API_KEY_LENGTH - API_KEY_PREFIX.length, alphabet);
 }
 
 /**
@@ -336,10 +300,7 @@ async function hashApiKey(key: string) {
 /**
  * Verify an API key against a stored hash using timing-safe comparison.
  */
-export async function verifyApiKey(
-  key: string,
-  keyHash: string,
-): Promise<boolean> {
+export async function verifyApiKey(key: string, keyHash: string): Promise<boolean> {
   const computedHash = await hashApiKey(key);
 
   return timingSafeEqual(computedHash, keyHash);

@@ -27,8 +27,4 @@ export function configureInstance(uri: string, config: Config): Instance {
   };
 }
 
-type Instance = {
-  config: Config["instances"][string];
-  database: Database;
-  url: URL;
-};
+type Instance = { config: Config["instances"][string]; database: Database; url: URL };

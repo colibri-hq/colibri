@@ -1,30 +1,19 @@
 import { log } from "$lib/logging";
 import { Parser } from "xml2js";
 
-export async function loadFeed(
-  url: string | URL | AtomLink | OpdsLink,
-  resolveRoot = true,
-) {
+export async function loadFeed(url: string | URL | AtomLink | OpdsLink, resolveRoot = true) {
   const feedUrl = typeof url === "string" ? url : url.href;
   let body: string;
 
   try {
     log("odps", "debug", "Fetching feed", { url: feedUrl });
-    const response = await fetch(feedUrl, {
-      redirect: "follow",
-      method: "GET",
-    });
+    const response = await fetch(feedUrl, { redirect: "follow", method: "GET" });
     body = await response.text();
 
     if (!response.ok) {
       const { status, statusText } = response;
 
-      log("odps", "error", "Failed to fetch feed", {
-        url: feedUrl,
-        status,
-        statusText,
-        body,
-      });
+      log("odps", "error", "Failed to fetch feed", { url: feedUrl, status, statusText, body });
 
       throw new Error(`Server reported an error: ${status}—${statusText}`);
     }
@@ -81,16 +70,11 @@ export async function loadFeed(
     (!selfLink && feedUrl !== catalogLink.href) ||
     (selfLink && selfLink.href !== catalogLink.href)
   ) {
-    log(
-      "odps",
-      "warn",
-      "OPDS feed contains different start link, parsing feed root",
-      {
-        url: feedUrl,
-        selfLink: selfLink?.href,
-        catalogLink: catalogLink.href,
-      },
-    );
+    log("odps", "warn", "OPDS feed contains different start link, parsing feed root", {
+      url: feedUrl,
+      selfLink: selfLink?.href,
+      catalogLink: catalogLink.href,
+    });
     return loadFeed(new URL(catalogLink.href, feedUrl));
   }
 
@@ -142,14 +126,8 @@ function createParser() {
   });
 }
 
-function isAtomFeedXmlDocument(
-  xmlDocument: unknown,
-): xmlDocument is { feed: object } {
-  return (
-    typeof xmlDocument === "object" &&
-    xmlDocument !== null &&
-    "feed" in xmlDocument
-  );
+function isAtomFeedXmlDocument(xmlDocument: unknown): xmlDocument is { feed: object } {
+  return typeof xmlDocument === "object" && xmlDocument !== null && "feed" in xmlDocument;
 }
 
 function isAtomFeed(feed: unknown): feed is AtomFeed | OpdsFeed {
@@ -231,11 +209,7 @@ export class OpdsRecord<
   }
 
   toJSON() {
-    return {
-      id: this.id,
-      title: this.title,
-      lastUpdatedAt: this.lastUpdatedAt,
-    };
+    return { id: this.id, title: this.title, lastUpdatedAt: this.lastUpdatedAt };
   }
 }
 
@@ -248,9 +222,7 @@ export class Feed extends OpdsRecord<OpdsFeed> {
   }
 
   public get links() {
-    return super.links.filter(
-      (link) => link.rel !== "self" && link.rel !== "start",
-    );
+    return super.links.filter((link) => link.rel !== "self" && link.rel !== "start");
   }
 
   public get selfLink() {
@@ -287,8 +259,7 @@ export class Feed extends OpdsRecord<OpdsFeed> {
   public get imageUrl() {
     return this.unrelatedEntries
       .flatMap((entry) => extractLinks(entry))
-      .find((link) => link?.rel === "http://opds-spec.org/image/thumbnail")
-      ?.href;
+      .find((link) => link?.rel === "http://opds-spec.org/image/thumbnail")?.href;
   }
 
   public get authors() {
@@ -305,17 +276,13 @@ export class Feed extends OpdsRecord<OpdsFeed> {
 
   public get unrelatedEntries() {
     return this.#entries.filter(
-      (entry) =>
-        !this.itemEntries.includes(entry) &&
-        !this.categoryEntries.includes(entry),
+      (entry) => !this.itemEntries.includes(entry) && !this.categoryEntries.includes(entry),
     );
   }
 
   private get itemEntries() {
     return this.#entries.filter((entry) =>
-      extractLinks(entry).some((link) =>
-        link.rel.startsWith("http://opds-spec.org/acquisition"),
-      ),
+      extractLinks(entry).some((link) => link.rel.startsWith("http://opds-spec.org/acquisition")),
     );
   }
 
@@ -323,8 +290,7 @@ export class Feed extends OpdsRecord<OpdsFeed> {
     return this.#entries.filter((entry) =>
       extractLinks(entry).some(
         (link) =>
-          typeof link.type === "object" &&
-          ["navigation", "acquisition"].includes(link.type.kind),
+          typeof link.type === "object" && ["navigation", "acquisition"].includes(link.type.kind),
       ),
     );
   }
@@ -400,9 +366,9 @@ function extractLinks({ link = [] }: OpdsFeed | OpdsEntry) {
 }
 
 function extractEntries(feed: OpdsFeed) {
-  return (
-    feed.entry ? (Array.isArray(feed.entry) ? feed.entry : [feed.entry]) : []
-  ).filter(isOpdsEntry);
+  return (feed.entry ? (Array.isArray(feed.entry) ? feed.entry : [feed.entry]) : []).filter(
+    isOpdsEntry,
+  );
 }
 
 function extractTitle(feed: OpdsFeed | AtomFeed | OpdsEntry | AtomEntry) {
@@ -410,17 +376,9 @@ function extractTitle(feed: OpdsFeed | AtomFeed | OpdsEntry | AtomEntry) {
 }
 
 function extractAuthors(feed: OpdsFeed | OpdsEntry) {
-  const authors = feed.author
-    ? Array.isArray(feed.author)
-      ? feed.author
-      : [feed.author]
-    : [];
+  const authors = feed.author ? (Array.isArray(feed.author) ? feed.author : [feed.author]) : [];
 
-  return authors.map(({ name, uri = undefined, email = undefined }) => ({
-    name,
-    uri,
-    email,
-  }));
+  return authors.map(({ name, uri = undefined, email = undefined }) => ({ name, uri, email }));
 }
 
 export interface OpdsFeed extends Omit<AtomFeed, "link" | "entry"> {
@@ -431,9 +389,7 @@ export interface OpdsFeed extends Omit<AtomFeed, "link" | "entry"> {
 export interface OpdsLink extends Omit<AtomLink, "rel"> {
   rel: OpdsLinkRelType;
   href: `http://${string}` | `https://${string}` | string;
-  type:
-    | string
-    | { profile: "opds-catalog"; kind: "acquisition" | "navigation" };
+  type: string | { profile: "opds-catalog"; kind: "acquisition" | "navigation" };
 }
 
 type OpdsLinkRelType =
@@ -636,10 +592,7 @@ export interface AtomEntry {
    *  */
   source?: AtomSource;
 
-  "dc:language"?: {
-    _: string;
-    "xmlns:dc"?: string;
-  };
+  "dc:language"?: { _: string; "xmlns:dc"?: string };
 }
 
 export interface AtomSource {
@@ -715,12 +668,7 @@ export interface AtomPerson {
   email?: string;
 }
 
-export type AtomLinkRelType =
-  | "alternate"
-  | "enclosure"
-  | "related"
-  | "self"
-  | "via";
+export type AtomLinkRelType = "alternate" | "enclosure" | "related" | "self" | "via";
 
 /** representation of &lt;author&gt; element */
 export interface AtomAuthor extends AtomPerson {}
