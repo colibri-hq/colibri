@@ -30,8 +30,8 @@ describe("Images", () => {
   describe("Dimensions", () => {
     beforeEach(() => {
       vi.clearAllMocks();
-      errorCallback = null;
-      loadCallback = null;
+      _errorCallback = null;
+      _loadCallback = null;
     });
 
     describe("getImageDimensions", () => {

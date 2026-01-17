@@ -17,6 +17,10 @@ export function config(
   }: { tsconfigRootDir?: string; svelteConfig?: Partial<SvelteConfig>; ignores?: string[] } = {},
   ...additionalConfigs: Linter.Config[]
 ): ConfigArray {
+  if (svelteConfig?.kit?.typescript?.config) {
+    delete svelteConfig.kit.typescript.config;
+  }
+
   return ts.config([
     // region Ignored Files
     {
@@ -41,7 +45,13 @@ export function config(
     // endregion
 
     // region Global Configs
-    { rules: { "no-undef": "off" } },
+    {
+      rules: {
+        "no-undef": "off",
+        // Disable overly strict navigation rule - see https://github.com/sveltejs/eslint-plugin-svelte/issues/1353
+        "svelte/no-navigation-without-resolve": "off",
+      },
+    },
     // endregion
 
     // region CommonJS modules
@@ -151,7 +161,7 @@ export function config(
     // endregion
 
     ...additionalConfigs,
-    ...oxlint.buildFromOxlintConfigFile(`${import.meta.dirname}/.oxlintrc.json`),
+    ...oxlint.buildFromOxlintConfigFile(resolve(import.meta.dirname, "../../.oxlintrc.json")),
   ]);
 }
 

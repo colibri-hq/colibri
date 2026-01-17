@@ -42,17 +42,17 @@
       "import": "./dist/index.js"
     },
     "./eslint.config": {
-      "types": "./config.d.ts",
+      "types": "./types/eslint.config.d.ts",
       "import": "./eslint.config.ts",
       "default": "./eslint.config.ts"
     },
     "./vitest.config": {
-      "types": "./config.d.ts",
+      "types": "./types/vitest.config.d.ts",
       "import": "./vitest.config.ts",
       "default": "./vitest.config.ts"
     },
     "./vitest.browser.config": {
-      "types": "./config.d.ts",
+      "types": "./types/vitest.browser.config.d.ts",
       "import": "./vitest.browser.config.ts",
       "default": "./vitest.browser.config.ts"
     },
@@ -69,8 +69,8 @@
     "test": "vitest --config ./tsconfig.test.json",
     "test:coverage": "vitest run --config ./tsconfig.test.json --coverage",
     "test:ui": "vitest --config ./tsconfig.test.json --ui",
-    "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
-    "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
+    "lint": "oxlint --fix && eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
+    "lint:ci": "oxlint --format github && eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
     "fmt": "oxfmt --write .",
     "fmt:ci": "oxfmt --check .",
     "prepack": "pnpm run fmt && pnpm run check && pnpm run lint && pnpm run build"
@@ -91,11 +91,11 @@
     "@vitest/ui": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-oxlint": "^1.39.0",
+    "eslint-plugin-oxlint": "catalog:",
     "eslint-plugin-svelte": "^3.14.0",
     "globals": "catalog:",
     "oxfmt": "catalog:",
-    "oxlint": "^1.39.0",
+    "oxlint": "catalog:",
     "rimraf": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",

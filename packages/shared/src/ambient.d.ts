@@ -1,9 +1,11 @@
 declare module "binary-parser" {
   // An empty interface to allow users to augment it.
-  export interface ParserRegistry {}
+  // oxlint-disable-next-line no-empty-object-type
+  export type ParserRegistry = {};
 
   // A helper to resolve a choice (string name or direct parser) to its schema type.
   type ResolveChoiceType<TChoice, TRegistry> =
+    // oxlint-disable-next-line no-explicit-any
     TChoice extends Parser<infer T, any>
       ? T
       : TChoice extends keyof TRegistry
@@ -18,11 +20,12 @@ declare module "binary-parser" {
     T extends object,
     TParent extends object | null = null,
     TRoot extends object = T,
+    // oxlint-disable-next-line no-explicit-any
     TIn = any,
     TOut = TIn,
   > {
     assert?: number | string | ((this: ParserContext<T, TParent, TRoot>, item: TOut) => boolean);
-    formatter?: (this: ParserContext<T, TParent, TRoot>, item: TIn) => any;
+    formatter?: (this: ParserContext<T, TParent, TRoot>, item: TIn) => unknown;
   }
 
   type StringParserOptions<
@@ -40,10 +43,10 @@ declare module "binary-parser" {
     T extends object,
     TParent extends object | null = null,
     TRoot extends object = T,
-  > = number | keyof T | ((this: ParserContext<T, TParent, TRoot>, item: any) => number);
+  > = number | keyof T | ((this: ParserContext<T, TParent, TRoot>, item: unknown) => number);
   type ReadUntil<T extends object, TParent extends object | null = null, TRoot extends object = T> =
     | "eof"
-    | ((this: ParserContext<T, TParent, TRoot>, item: any, buffer: ArrayBuffer) => boolean);
+    | ((this: ParserContext<T, TParent, TRoot>, item: unknown, buffer: ArrayBuffer) => boolean);
 
   type BufferParserOptions<
     T extends object,
@@ -59,7 +62,7 @@ declare module "binary-parser" {
     T extends object,
     TParent extends object | null,
     TRoot extends object,
-    TItem extends object = Record<string, any>,
+    TItem extends object = Record<string, unknown>,
     TOut = TItem[],
   > = ParserOptions<T, TParent, TRoot, TItem[], TOut> & {
     type:
@@ -81,18 +84,21 @@ declare module "binary-parser" {
       | "uint32"
       | "uint32le"
       | "uint32be"
+      // oxlint-disable-next-line no-explicit-any
       | Parser<any>;
   } & (
       | {
           length:
             | number
             | keyof T
+            // oxlint-disable-next-line no-explicit-any
             | ((this: ArrayParserContext<T, TParent, TRoot>, item: any) => number);
         }
       | {
           lengthInBytes:
             | number
             | keyof T
+            // oxlint-disable-next-line no-explicit-any
             | ((this: ArrayParserContext<T, TParent, TRoot>, item: any) => number);
         }
       | { readUntil: ReadUntil<T, TParent, TRoot> }
@@ -100,6 +106,7 @@ declare module "binary-parser" {
 
   export type ParserOutput<P> = P extends Parser<infer T> ? T : never;
 
+  // oxlint-disable-next-line no-explicit-any
   type UnionOfParserOutputs<TChoices extends { [key: number]: Parser<any> }> = {
     [K in keyof TChoices]: ParserOutput<TChoices[K]>;
   }[keyof TChoices];
@@ -109,6 +116,7 @@ declare module "binary-parser" {
     TParent extends object | null = null,
     TRoot extends object = T,
   > extends ParserOptions<T, TParent, TRoot> {
+    // oxlint-disable-next-line no-explicit-any
     tag: keyof T | ((this: ParserContext<T, TParent, TRoot>, item: any) => number);
     choices: { [key: number]: Parser<T, TParent, TRoot> };
     defaultChoice?: keyof T | Parser<T, TParent, TRoot>;
@@ -124,6 +132,7 @@ declare module "binary-parser" {
 
   interface PointerParserOptions<
     T extends object,
+    // oxlint-disable-next-line no-explicit-any
     TType extends keyof T | Parser<any, TParent, TRoot>,
     TParent extends object | null = null,
     TRoot extends object = T,
@@ -139,6 +148,7 @@ declare module "binary-parser" {
     T extends object,
     TParent extends object | null = null,
     TRoot extends object = T,
+    // oxlint-disable-next-line no-explicit-any
     U = any,
   > = ParserOptions<T, TParent, TRoot, U> & {
     wrapper: (buffer: ArrayBuffer) => ArrayBuffer;
@@ -150,7 +160,7 @@ declare module "binary-parser" {
     TParent extends object | null,
     TRoot extends object,
   > = TCurrent & {
-    $parent: TParent extends object ? ParserContext<TParent, Record<string, any>, TRoot> : null;
+    $parent: TParent extends object ? ParserContext<TParent, Record<string, unknown>, TRoot> : null;
     $root: TRoot;
   };
 
@@ -161,6 +171,7 @@ declare module "binary-parser" {
   > = ParserContext<T, TParent, TRoot> & { $index: number };
 
   export declare class Parser<
+    // oxlint-disable-next-line no-empty-object-type
     T extends object = {},
     TParent extends object | null = null,
     TRoot extends object = T,
@@ -172,6 +183,7 @@ declare module "binary-parser" {
     head?: Parser<T, TParent, TRoot>;
 
     static start<
+      // oxlint-disable-next-line no-empty-object-type
       TInitial extends object = {},
       TInitialParent extends object | null = null,
     >(): Parser<TInitial, TInitialParent, TInitial>;
@@ -595,7 +607,7 @@ declare module "binary-parser" {
       TName extends string,
       const TOptions extends StringParserOptions<T, TParent, TRoot>,
       TResult = TOptions extends {
-        formatter: (item: string, context: any) => infer FormatterOutput;
+        formatter: (item: string, context: unknown) => infer FormatterOutput;
       }
         ? FormatterOutput
         : TOptions extends { assert: infer AssertType extends string | number }
@@ -633,8 +645,8 @@ declare module "binary-parser" {
     array<
       TName extends string,
       const TOptions extends ArrayParserOptions<T, TParent, TRoot>,
-      // TItemType = TOptions extends { type: Parser<infer U> } ? U : Record<string, any>,
-      TItemType = TOptions extends { type: Parser<infer U> } ? U : Record<string, any>,
+      // TItemType = TOptions extends { type: Parser<infer U> } ? U : Record<string, unknown>,
+      TItemType = TOptions extends { type: Parser<infer U> } ? U : Record<string, unknown>,
       TBaseArrayType = TItemType[],
       TResult = TOptions extends { formatter: (item: TBaseArrayType) => infer R }
         ? R
@@ -643,7 +655,9 @@ declare module "binary-parser" {
 
     choice<
       TName extends string,
+      // oxlint-disable-next-line no-explicit-any
       const TChoices extends { [key: number]: keyof ParserRegistry | Parser<any, TParent, TRoot> },
+      // oxlint-disable-next-line no-explicit-any
       TDefaultChoice extends Parser<any, TParent, TRoot>,
       TOptions extends {
         tag:
@@ -654,7 +668,7 @@ declare module "binary-parser" {
             ) => number);
         choices: TChoices;
         defaultChoice?: TDefaultChoice;
-        formatter?: (item: TBaseResult) => any;
+        formatter?: (item: TBaseResult) => unknown;
       },
       TBaseResult = UnionOfChoiceOutputs<TChoices, TRegistry>,
       TResult = TOptions extends {
@@ -664,7 +678,9 @@ declare module "binary-parser" {
         : TBaseResult,
     >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
     choice<
+      // oxlint-disable-next-line no-explicit-any
       const TChoices extends { [key: number]: keyof ParserRegistry | Parser<any, TParent, TRoot> },
+      // oxlint-disable-next-line no-explicit-any
       TDefaultChoice extends Parser<any, TParent, TRoot>,
       TOptions extends {
         tag:
@@ -675,7 +691,7 @@ declare module "binary-parser" {
             ) => number);
         choices: TChoices;
         defaultChoice?: TDefaultChoice;
-        formatter?: (item: TBaseResult) => any;
+        formatter?: (item: TBaseResult) => unknown;
       },
       TBaseResult = UnionOfChoiceOutputs<TChoices, TRegistry>,
       TResult = TOptions extends {
@@ -711,9 +727,12 @@ declare module "binary-parser" {
       TResult = TOptions extends { formatter: (item: TBaseResult) => infer R } ? R : TBaseResult,
     >(varName: TName, options?: TOptions): Parser<T & { [name in TName]: TResult }, TParent, TRoot>;
 
-    skip(length: number | string | ((item: any) => number)): this;
-    seek(relOffset: number | string | ((item: any) => number)): this;
+    skip(length: number | string | ((item: unknown) => number)): this;
+
+    seek(relOffset: number | string | ((item: unknown) => number)): this;
+
     saveOffset(varName: string, options?: ParserOptions<T, TParent, TRoot>): this;
+
     useContextVars(): this;
 
     parse(buffer: ArrayBuffer | Uint8Array): T;
@@ -722,6 +741,8 @@ declare module "binary-parser" {
 
 declare module "lcid" {
   export function from(code: number): string | undefined;
+
   export function to(name: string): number | undefined;
+
   export function all(): { [name: string]: number };
 }

@@ -17,9 +17,12 @@ export function parseXmp(buffer: ArrayBufferLike | string) {
     attributeValueProcessor: (name, val) =>
       isValidTagProcessor(name) ? tagProcessors[name](val) : val,
   });
-  const document = parser.parse(text) as Record<string, any>;
+  const document = parser.parse(text) as Record<string, unknown>;
+  const xmpmeta = document?.["x:xmpmeta"] as Record<string, unknown> | undefined;
+  const rdf = xmpmeta?.["rdf:RDF"] as Record<string, unknown> | undefined;
+  const description = rdf?.["rdf:Description"] as Record<string, unknown> | undefined;
 
-  return Object.entries(document?.["x:xmpmeta"]?.["rdf:RDF"]?.["rdf:Description"] ?? {})
+  return Object.entries(description ?? {})
     .filter(([key]) => key.startsWith("dc:") || key.startsWith("@_"))
     .map(([key, value]) => {
       if (key.startsWith("@_")) {
@@ -27,7 +30,7 @@ export function parseXmp(buffer: ArrayBufferLike | string) {
       }
 
       if (typeof value === "object" && value !== null) {
-        value = extractTextContent(value);
+        value = extractTextContent(value as Record<string, unknown>);
       }
 
       return [key, value] as const;
@@ -121,14 +124,16 @@ function isValidTagProcessor(name: string): name is keyof typeof tagProcessors {
   return name in tagProcessors;
 }
 
-function extractTextContent(node: Record<string, any>): string {
+function extractTextContent(node: Record<string, unknown>): string {
   if (Array.isArray(node)) {
     return node.map((item) => item["#text"] ?? item).join(" ");
   }
 
   if (typeof node === "object") {
     return Object.values(node)
-      .map((item) => (typeof item === "string" ? item : extractTextContent(item)))
+      .map((item) =>
+        typeof item === "string" ? item : extractTextContent(item as Record<string, unknown>),
+      )
       .join(" ");
   }
 
