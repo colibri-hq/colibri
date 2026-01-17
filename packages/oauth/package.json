@@ -1,32 +1,72 @@
 {
   "name": "@colibri-hq/oauth",
   "version": "0.1.0",
-  "type": "module",
-  "license": "AGPL-3.0-or-later",
   "description": "OAuth 2.0/2.1 authorization server and client implementation",
   "keywords": [
+    "authorization-server",
     "colibri",
+    "device-flow",
     "oauth",
-    "oauth2",
     "oauth-2.1",
     "oauth-authorization-server",
     "oauth-client",
-    "authorization-server",
-    "pkce",
-    "device-flow"
+    "oauth2",
+    "pkce"
   ],
   "homepage": "https://github.com/colibri-hq/colibri",
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "license": "AGPL-3.0-or-later",
   "author": {
     "name": "Moritz Mazetti",
     "email": "m@9dev.de",
     "url": "https://mazetti.me"
   },
   "repository": {
-    "url": "git+https://github.com/colibri-hq/colibri.git",
-    "type": "git"
+    "type": "git",
+    "url": "git+https://github.com/colibri-hq/colibri.git"
   },
-  "bugs": {
-    "url": "https://github.com/colibri-hq/colibri/issues"
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "import": "./dist/client/index.js"
+    },
+    "./client/authorization-code": {
+      "types": "./dist/client/authorization-code.d.ts",
+      "import": "./dist/client/authorization-code.js"
+    },
+    "./client/client-credentials": {
+      "types": "./dist/client/client-credentials.d.ts",
+      "import": "./dist/client/client-credentials.js"
+    },
+    "./client/device-authorization": {
+      "types": "./dist/client/device-authorization.d.ts",
+      "import": "./dist/client/device-authorization.js"
+    },
+    "./client/storage": {
+      "types": "./dist/client/storage/index.d.ts",
+      "import": "./dist/client/storage/index.js"
+    },
+    "./client/fetch": {
+      "types": "./dist/client/fetch/index.d.ts",
+      "import": "./dist/client/fetch/index.js"
+    },
+    "./grantType": {
+      "types": "./dist/grantTypes/grantType.d.ts",
+      "import": "./dist/grantTypes/grantType.js"
+    }
   },
   "scripts": {
     "build": "rimraf dist; tsc",
@@ -39,8 +79,8 @@
     "coverage": "npx make-coverage-badge --output-path ./badges/coverage.svg",
     "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
     "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
-    "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
-    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content .",
+    "fmt": "oxfmt --write .",
+    "fmt:ci": "oxfmt --check .",
     "prepack": "pnpm run fmt && pnpm run check && pnpm run lint && pnpm run test && pnpm run build"
   },
   "dependencies": {
@@ -58,50 +98,10 @@
     "eslint": "catalog:",
     "fastify": "^5.7.1",
     "msw": "^2.12.7",
-    "prettier": "catalog:",
+    "oxfmt": "catalog:",
     "rimraf": "catalog:",
     "supertest": "^7.2.2",
     "typescript": "catalog:",
     "vitest": "catalog:"
-  },
-  "module": "dist/index.js",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./client": {
-      "import": "./dist/client/index.js",
-      "types": "./dist/client/index.d.ts"
-    },
-    "./client/authorization-code": {
-      "import": "./dist/client/authorization-code.js",
-      "types": "./dist/client/authorization-code.d.ts"
-    },
-    "./client/client-credentials": {
-      "import": "./dist/client/client-credentials.js",
-      "types": "./dist/client/client-credentials.d.ts"
-    },
-    "./client/device-authorization": {
-      "import": "./dist/client/device-authorization.js",
-      "types": "./dist/client/device-authorization.d.ts"
-    },
-    "./client/storage": {
-      "import": "./dist/client/storage/index.js",
-      "types": "./dist/client/storage/index.d.ts"
-    },
-    "./client/fetch": {
-      "import": "./dist/client/fetch/index.js",
-      "types": "./dist/client/fetch/index.d.ts"
-    },
-    "./grantType": {
-      "import": "./dist/grantTypes/grantType.js",
-      "types": "./dist/grantTypes/grantType.d.ts"
-    }
-  },
-  "sideEffects": false,
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ]
+  }
 }

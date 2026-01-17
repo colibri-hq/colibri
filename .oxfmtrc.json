@@ -1,0 +1,33 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 100,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "endOfLine": "lf",
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "embeddedLanguageFormatting": "auto",
+  "experimentalSortImports": { "order": "asc", "ignoreCase": true, "sortSideEffects": true },
+  "experimentalSortPackageJson": true,
+  "experimentalTailwindcss": {
+    "stylesheet": "./packages/shared/theme.css",
+    "preserveWhitespace": false,
+    "preserveDuplicates": false,
+    "functions": ["twMerge"]
+  },
+  "objectWrap": "collapse",
+  "quoteProps": "as-needed",
+  "insertFinalNewline": true,
+  "ignorePatterns": [
+    "**/node_modules",
+    "**/dist",
+    "**/.svelte-kit",
+    "**/coverage",
+    "**/.turbo",
+    "**/.cache",
+    "**/pnpm-lock.yaml"
+  ]
+}

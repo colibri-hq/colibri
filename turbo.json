@@ -12,31 +12,18 @@
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".svelte-kit/**", "dist/**"]
     },
-    "check": {
-      "dependsOn": ["^check"]
-    },
-    "fmt": {
-      "dependsOn": ["^fmt"]
-    },
-    "lint": {
-      "dependsOn": ["^lint"]
-    },
-    "test": {
-      "dependsOn": ["^test"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"]
-    },
+    "check": { "dependsOn": ["^check"] },
+    "fmt": { "dependsOn": ["^fmt"] },
+    "fmt:ci": { "dependsOn": ["^fmt:ci"] },
+    "lint": { "dependsOn": ["^lint"] },
+    "lint:ci": { "dependsOn": ["^lint:ci"] },
+    "test": { "dependsOn": ["^test"], "inputs": ["$TURBO_DEFAULT$", ".env*"] },
     "test:coverage": {
       "dependsOn": ["^test:coverage"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["coverage/**"]
     },
-    "check-types": {
-      "dependsOn": ["^check-types"]
-    },
-    "dev": {
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "cache": false,
-      "persistent": true
-    }
+    "check-types": { "dependsOn": ["^check-types"] },
+    "dev": { "inputs": ["$TURBO_DEFAULT$", ".env*"], "cache": false, "persistent": true }
   }
 }

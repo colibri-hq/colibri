@@ -23,3 +23,11 @@ labels:
     color: "c9581c"
   - name: feature request
     color: "fbca04"
+  - name: dependencies
+    color: "0366d6"
+  - name: github-actions
+    color: "000000"
+  - name: docker
+    color: "2496ed"
+  - name: security
+    color: "d73a4a"

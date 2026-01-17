@@ -2,9 +2,9 @@ pre-commit:
   parallel: true
   commands:
     fmt:
-      run: pnpm exec prettier --write --ignore-unknown {staged_files}
+      run: pnpm exec oxfmt --write {staged_files}
       stage_fixed: true
-      glob: '*.{ts,js,svelte,css,html,json,md}'
+      glob: '*.{ts,js,svelte,json}'
       skip:
         - merge
         - rebase

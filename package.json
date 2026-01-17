@@ -1,31 +1,31 @@
 {
   "name": "@colibri-hq/colibri",
   "version": "0.0.1",
-  "type": "module",
   "private": true,
-  "license": "AGPL-3.0-or-later",
   "description": "The Colibri server",
   "keywords": [
     "colibri",
-    "server",
-    "ebooks",
     "ebook-management",
+    "ebooks",
     "epub",
-    "opds"
+    "opds",
+    "server"
   ],
   "homepage": "https://colibri-hq.org/",
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "license": "AGPL-3.0-or-later",
   "author": {
     "name": "Moritz Mazetti",
     "email": "m@9dev.de",
     "url": "https://mazetti.me"
   },
   "repository": {
-    "url": "git+https://github.com/colibri-hq/colibri.git",
-    "type": "git"
+    "type": "git",
+    "url": "git+https://github.com/colibri-hq/colibri.git"
   },
-  "bugs": {
-    "url": "https://github.com/colibri-hq/colibri/issues"
-  },
+  "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "postinstall": "lefthook install",
@@ -46,6 +46,16 @@
     "test:e2e": "pnpm --filter=@colibri-hq/app run test",
     "storybook": "pnpm --filter=@colibri-hq/ui run storybook"
   },
+  "dependencies": {
+    "glob": "^13.0.0"
+  },
+  "devDependencies": {
+    "@colibri-hq/shared": "workspace:*",
+    "lefthook": "^2.0.15",
+    "oxfmt": "catalog:",
+    "turbo": "^2.7.5"
+  },
+  "packageManager": "pnpm@10.27.0",
   "pnpm": {
     "onlyBuiltDependencies": [
       "canvas",
@@ -57,18 +67,5 @@
       "unrs-resolver",
       "yarn"
     ]
-  },
-  "packageManager": "pnpm@10.27.0",
-  "devDependencies": {
-    "@colibri-hq/shared": "workspace:*",
-    "lefthook": "^2.0.15",
-    "prettier": "^3.8.0",
-    "prettier-plugin-organize-imports": "^4.3.0",
-    "prettier-plugin-svelte": "^3.4.1",
-    "prettier-plugin-tailwindcss": "^0.7.2",
-    "turbo": "^2.7.5"
-  },
-  "dependencies": {
-    "glob": "^13.0.0"
   }
 }

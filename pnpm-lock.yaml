@@ -69,9 +69,9 @@ catalogs:
     jsonwebtoken:
       specifier: ^9.0.3
       version: 9.0.3
-    prettier:
-      specifier: ^3.8.0
-      version: 3.8.0
+    oxfmt:
+      specifier: ^0.24.0
+      version: 0.24.0
     rimraf:
       specifier: ^6.1.2
       version: 6.1.2
@@ -120,18 +120,9 @@ importers:
       lefthook:
         specifier: ^2.0.15
         version: 2.0.15
-      prettier:
-        specifier: ^3.8.0
-        version: 3.8.0
-      prettier-plugin-organize-imports:
-        specifier: ^4.3.0
-        version: 4.3.0(prettier@3.8.0)(typescript@5.9.3)
-      prettier-plugin-svelte:
-        specifier: ^3.4.1
-        version: 3.4.1(prettier@3.8.0)(svelte@5.46.4)
-      prettier-plugin-tailwindcss:
-        specifier: ^0.7.2
-        version: 0.7.2(prettier-plugin-organize-imports@4.3.0(prettier@3.8.0)(typescript@5.9.3))(prettier-plugin-svelte@3.4.1(prettier@3.8.0)(svelte@5.46.4))(prettier@3.8.0)
+      oxfmt:
+        specifier: 'catalog:'
+        version: 0.24.0
       turbo:
         specifier: ^2.7.5
         version: 2.7.5
@@ -286,9 +277,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 9.39.2(jiti@2.6.1)
-      prettier:
+      oxfmt:
         specifier: 'catalog:'
-        version: 3.8.0
+        version: 0.24.0
       svelte-check:
         specifier: 'catalog:'
         version: 4.3.5(picomatch@4.0.3)(svelte@5.46.4)(typescript@5.9.3)
@@ -379,7 +370,7 @@ importers:
         version: 4.4.4(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-import:
         specifier: ^2.32.0
-        version: 2.32.0(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
+        version: 2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-n:
         specifier: ^17.23.2
         version: 17.23.2(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
@@ -398,9 +389,9 @@ importers:
       oclif:
         specifier: ^4.22.65
         version: 4.22.65(@types/node@25.0.9)
-      prettier:
+      oxfmt:
         specifier: 'catalog:'
-        version: 3.8.0
+        version: 0.24.0
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -492,12 +483,12 @@ importers:
       mdsvex:
         specifier: ^0.12.6
         version: 0.12.6(svelte@5.46.4)
+      oxfmt:
+        specifier: 'catalog:'
+        version: 0.24.0
       pagefind:
         specifier: ^1.4.0
         version: 1.4.0
-      prettier:
-        specifier: 'catalog:'
-        version: 3.8.0
       rehype-slug:
         specifier: ^6.0.0
         version: 6.0.0
@@ -552,9 +543,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 9.39.2(jiti@2.6.1)
-      prettier:
+      oxfmt:
         specifier: 'catalog:'
-        version: 3.8.0
+        version: 0.24.0
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -583,9 +574,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 9.39.2(jiti@2.6.1)
-      prettier:
+      oxfmt:
         specifier: 'catalog:'
-        version: 3.8.0
+        version: 0.24.0
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -632,9 +623,9 @@ importers:
       msw:
         specifier: ^2.12.7
         version: 2.12.7(@types/node@25.0.9)(typescript@5.9.3)
-      prettier:
+      oxfmt:
         specifier: 'catalog:'
-        version: 3.8.0
+        version: 0.24.0
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -660,9 +651,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 9.39.2(jiti@2.6.1)
-      prettier:
+      oxfmt:
         specifier: 'catalog:'
-        version: 3.8.0
+        version: 0.24.0
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -685,9 +676,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 9.39.2(jiti@2.6.1)
-      prettier:
+      oxfmt:
         specifier: 'catalog:'
-        version: 3.8.0
+        version: 0.24.0
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -797,9 +788,9 @@ importers:
       kysely-codegen:
         specifier: ^0.19.0
         version: 0.19.0(kysely@0.28.9)(pg@8.17.1)(tarn@3.0.2)(typescript@5.9.3)
-      prettier:
+      oxfmt:
         specifier: 'catalog:'
-        version: 3.8.0
+        version: 0.24.0
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -869,7 +860,7 @@ importers:
         version: 4.4.4(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-import:
         specifier: ^2.32.0
-        version: 2.32.0(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
+        version: 2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-n:
         specifier: ^17.23.2
         version: 17.23.2(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
@@ -885,12 +876,12 @@ importers:
       oclif:
         specifier: ^4.22.65
         version: 4.22.65(@types/node@25.0.9)
+      oxfmt:
+        specifier: 'catalog:'
+        version: 0.24.0
       pg:
         specifier: ^8.17.1
         version: 8.17.1
-      prettier:
-        specifier: 'catalog:'
-        version: 3.8.0
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -964,21 +955,12 @@ importers:
       globals:
         specifier: 'catalog:'
         version: 16.5.0
+      oxfmt:
+        specifier: 'catalog:'
+        version: 0.24.0
       oxlint:
         specifier: ^1.39.0
         version: 1.39.0
-      prettier:
-        specifier: 'catalog:'
-        version: 3.8.0
-      prettier-plugin-organize-imports:
-        specifier: ^4.3.0
-        version: 4.3.0(prettier@3.8.0)(typescript@5.9.3)
-      prettier-plugin-svelte:
-        specifier: ^3.4.1
-        version: 3.4.1(prettier@3.8.0)(svelte@5.46.4)
-      prettier-plugin-tailwindcss:
-        specifier: ^0.7.2
-        version: 0.7.2(prettier-plugin-organize-imports@4.3.0(prettier@3.8.0)(typescript@5.9.3))(prettier-plugin-svelte@3.4.1(prettier@3.8.0)(svelte@5.46.4))(prettier@3.8.0)
       rimraf:
         specifier: 'catalog:'
         version: 6.1.2
@@ -1112,9 +1094,9 @@ importers:
       eslint-plugin-storybook:
         specifier: ^10.1.11
         version: 10.1.11(eslint@9.39.2(jiti@2.6.1))(storybook@10.1.11(@testing-library/dom@10.4.1)(prettier@3.8.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(typescript@5.9.3)
-      prettier:
+      oxfmt:
         specifier: 'catalog:'
-        version: 3.8.0
+        version: 0.24.0
       publint:
         specifier: ^0.3.16
         version: 0.3.16
@@ -2673,6 +2655,46 @@ packages:
 
   '@open-draft/until@2.1.0':
     resolution: {integrity: sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==}
+
+  '@oxfmt/darwin-arm64@0.24.0':
+    resolution: {integrity: sha512-aYXuGf/yq8nsyEcHindGhiz9I+GEqLkVq8CfPbd+6VE259CpPEH+CaGHEO1j6vIOmNr8KHRq+IAjeRO2uJpb8A==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@oxfmt/darwin-x64@0.24.0':
+    resolution: {integrity: sha512-vs3b8Bs53hbiNvcNeBilzE/+IhDTWKjSBB3v/ztr664nZk65j0xr+5IHMBNz3CFppmX7o/aBta2PxY+t+4KoPg==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@oxfmt/linux-arm64-gnu@0.24.0':
+    resolution: {integrity: sha512-ItPDOPoQ0wLj/s8osc5ch57uUcA1Wk8r0YdO8vLRpXA3UNg7KPOm1vdbkIZRRiSUphZcuX5ioOEetEK8H7RlTw==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@oxfmt/linux-arm64-musl@0.24.0':
+    resolution: {integrity: sha512-JkQO3WnQjQTJONx8nxdgVBfl6BBFfpp9bKhChYhWeakwJdr7QPOAWJ/v3FGZfr0TbqINwnNR74aVZayDDRyXEA==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@oxfmt/linux-x64-gnu@0.24.0':
+    resolution: {integrity: sha512-N/SXlFO+2kak5gMt0oxApi0WXQDhwA0PShR0UbkY0PwtHjfSiDqJSOumyNqgQVoroKr1GNnoRmUqjZIz6DKIcw==}
+    cpu: [x64]
+    os: [linux]
+
+  '@oxfmt/linux-x64-musl@0.24.0':
+    resolution: {integrity: sha512-WM0pek5YDCQf50XQ7GLCE9sMBCMPW/NPAEPH/Hx6Qyir37lEsP4rUmSECo/QFNTU6KBc9NnsviAyJruWPpCMXw==}
+    cpu: [x64]
+    os: [linux]
+
+  '@oxfmt/win32-arm64@0.24.0':
+    resolution: {integrity: sha512-vFCseli1KWtwdHrVlT/jWfZ8jP8oYpnPPEjI23mPLW8K/6GEJmmvy0PZP5NpWUFNTzX0lqie58XnrATJYAe9Xw==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@oxfmt/win32-x64@0.24.0':
+    resolution: {integrity: sha512-0tmlNzcyewAnauNeBCq0xmAkmiKzl+H09p0IdHy+QKrTQdtixtf+AOjDAADbRfihkS+heF15Pjc4IyJMdAAJjw==}
+    cpu: [x64]
+    os: [win32]
 
   '@oxlint/darwin-arm64@1.39.0':
     resolution: {integrity: sha512-lT3hNhIa02xCujI6YGgjmYGg3Ht/X9ag5ipUVETaMpx5Rd4BbTNWUPif1WN1YZHxt3KLCIqaAe7zVhatv83HOQ==}
@@ -7107,6 +7129,11 @@ packages:
     resolution: {integrity: sha512-qFOyK5PjiWZd+QQIh+1jhdb9LpxTF0qs7Pm8o5QHYZ0M3vKqSqzsZaEB6oWlxZ+q2sJBMI/Ktgd2N5ZwQoRHfg==}
     engines: {node: '>= 0.4'}
 
+  oxfmt@0.24.0:
+    resolution: {integrity: sha512-UjeM3Peez8Tl7IJ9s5UwAoZSiDRMww7BEc21gDYxLq3S3/KqJnM3mjNxsoSHgmBvSeX6RBhoVc2MfC/+96RdSw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    hasBin: true
+
   oxlint@1.39.0:
     resolution: {integrity: sha512-wSiLr0wjG+KTU6c1LpVoQk7JZ7l8HCKlAkVDVTJKWmCGazsNxexxnOXl7dsar92mQcRnzko5g077ggP3RINSjA==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -7391,77 +7418,6 @@ packages:
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
-
-  prettier-plugin-organize-imports@4.3.0:
-    resolution: {integrity: sha512-FxFz0qFhyBsGdIsb697f/EkvHzi5SZOhWAjxcx2dLt+Q532bAlhswcXGYB1yzjZ69kW8UoadFBw7TyNwlq96Iw==}
-    peerDependencies:
-      prettier: '>=2.0'
-      typescript: '>=2.9'
-      vue-tsc: ^2.1.0 || 3
-    peerDependenciesMeta:
-      vue-tsc:
-        optional: true
-
-  prettier-plugin-svelte@3.4.1:
-    resolution: {integrity: sha512-xL49LCloMoZRvSwa6IEdN2GV6cq2IqpYGstYtMT+5wmml1/dClEoI0MZR78MiVPpu6BdQFfN0/y73yO6+br5Pg==}
-    peerDependencies:
-      prettier: ^3.0.0
-      svelte: ^3.2.0 || ^4.0.0-next.0 || ^5.0.0-next.0
-
-  prettier-plugin-tailwindcss@0.7.2:
-    resolution: {integrity: sha512-LkphyK3Fw+q2HdMOoiEHWf93fNtYJwfamoKPl7UwtjFQdei/iIBoX11G6j706FzN3ymX9mPVi97qIY8328vdnA==}
-    engines: {node: '>=20.19'}
-    peerDependencies:
-      '@ianvs/prettier-plugin-sort-imports': '*'
-      '@prettier/plugin-hermes': '*'
-      '@prettier/plugin-oxc': '*'
-      '@prettier/plugin-pug': '*'
-      '@shopify/prettier-plugin-liquid': '*'
-      '@trivago/prettier-plugin-sort-imports': '*'
-      '@zackad/prettier-plugin-twig': '*'
-      prettier: ^3.0
-      prettier-plugin-astro: '*'
-      prettier-plugin-css-order: '*'
-      prettier-plugin-jsdoc: '*'
-      prettier-plugin-marko: '*'
-      prettier-plugin-multiline-arrays: '*'
-      prettier-plugin-organize-attributes: '*'
-      prettier-plugin-organize-imports: '*'
-      prettier-plugin-sort-imports: '*'
-      prettier-plugin-svelte: '*'
-    peerDependenciesMeta:
-      '@ianvs/prettier-plugin-sort-imports':
-        optional: true
-      '@prettier/plugin-hermes':
-        optional: true
-      '@prettier/plugin-oxc':
-        optional: true
-      '@prettier/plugin-pug':
-        optional: true
-      '@shopify/prettier-plugin-liquid':
-        optional: true
-      '@trivago/prettier-plugin-sort-imports':
-        optional: true
-      '@zackad/prettier-plugin-twig':
-        optional: true
-      prettier-plugin-astro:
-        optional: true
-      prettier-plugin-css-order:
-        optional: true
-      prettier-plugin-jsdoc:
-        optional: true
-      prettier-plugin-marko:
-        optional: true
-      prettier-plugin-multiline-arrays:
-        optional: true
-      prettier-plugin-organize-attributes:
-        optional: true
-      prettier-plugin-organize-imports:
-        optional: true
-      prettier-plugin-sort-imports:
-        optional: true
-      prettier-plugin-svelte:
-        optional: true
 
   prettier@3.8.0:
     resolution: {integrity: sha512-yEPsovQfpxYfgWNhCfECjG5AQaO+K3dp6XERmOepyPDVqcJm+bjyCVO3pmU+nAPe0N5dDvekfGezt/EIiRe1TA==}
@@ -8318,6 +8274,10 @@ packages:
   tinyglobby@0.2.15:
     resolution: {integrity: sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==}
     engines: {node: '>=12.0.0'}
+
+  tinypool@2.0.0:
+    resolution: {integrity: sha512-/RX9RzeH2xU5ADE7n2Ykvmi9ED3FBGPAjw9u3zucrNNaEBIO0HPSYgL0NT7+3p147ojeSdaVu08F6hjpv31HJg==}
+    engines: {node: ^20.0.0 || >=22.0.0}
 
   tinyrainbow@2.0.0:
     resolution: {integrity: sha512-op4nsTR47R6p0vMUUoYl/a+ljLFVtlfaXkLQmqfLR1qHma1h/ysYk4hEXZ880bf2CYgTskvTa/e196Vd5dDQXw==}
@@ -10766,6 +10726,30 @@ snapshots:
       outvariant: 1.4.3
 
   '@open-draft/until@2.1.0': {}
+
+  '@oxfmt/darwin-arm64@0.24.0':
+    optional: true
+
+  '@oxfmt/darwin-x64@0.24.0':
+    optional: true
+
+  '@oxfmt/linux-arm64-gnu@0.24.0':
+    optional: true
+
+  '@oxfmt/linux-arm64-musl@0.24.0':
+    optional: true
+
+  '@oxfmt/linux-x64-gnu@0.24.0':
+    optional: true
+
+  '@oxfmt/linux-x64-musl@0.24.0':
+    optional: true
+
+  '@oxfmt/win32-arm64@0.24.0':
+    optional: true
+
+  '@oxfmt/win32-x64@0.24.0':
+    optional: true
 
   '@oxlint/darwin-arm64@1.39.0':
     optional: true
@@ -13646,14 +13630,15 @@ snapshots:
       tinyglobby: 0.2.15
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1)):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
+      '@typescript-eslint/parser': 8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.39.2(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 4.4.4(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1))
@@ -13667,7 +13652,7 @@ snapshots:
       eslint: 9.39.2(jiti@2.6.1)
       eslint-compat-utils: 0.5.1(eslint@9.39.2(jiti@2.6.1))
 
-  eslint-plugin-import@2.32.0(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1)):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -13678,7 +13663,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.39.2(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -13689,6 +13674,8 @@ snapshots:
       semver: 6.3.1
       string.prototype.trimend: 1.0.9
       tsconfig-paths: 3.15.0
+    optionalDependencies:
+      '@typescript-eslint/parser': 8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -15947,6 +15934,19 @@ snapshots:
       object-keys: 1.1.1
       safe-push-apply: 1.0.0
 
+  oxfmt@0.24.0:
+    dependencies:
+      tinypool: 2.0.0
+    optionalDependencies:
+      '@oxfmt/darwin-arm64': 0.24.0
+      '@oxfmt/darwin-x64': 0.24.0
+      '@oxfmt/linux-arm64-gnu': 0.24.0
+      '@oxfmt/linux-arm64-musl': 0.24.0
+      '@oxfmt/linux-x64-gnu': 0.24.0
+      '@oxfmt/linux-x64-musl': 0.24.0
+      '@oxfmt/win32-arm64': 0.24.0
+      '@oxfmt/win32-x64': 0.24.0
+
   oxlint@1.39.0:
     optionalDependencies:
       '@oxlint/darwin-arm64': 1.39.0
@@ -16227,24 +16227,8 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-organize-imports@4.3.0(prettier@3.8.0)(typescript@5.9.3):
-    dependencies:
-      prettier: 3.8.0
-      typescript: 5.9.3
-
-  prettier-plugin-svelte@3.4.1(prettier@3.8.0)(svelte@5.46.4):
-    dependencies:
-      prettier: 3.8.0
-      svelte: 5.46.4
-
-  prettier-plugin-tailwindcss@0.7.2(prettier-plugin-organize-imports@4.3.0(prettier@3.8.0)(typescript@5.9.3))(prettier-plugin-svelte@3.4.1(prettier@3.8.0)(svelte@5.46.4))(prettier@3.8.0):
-    dependencies:
-      prettier: 3.8.0
-    optionalDependencies:
-      prettier-plugin-organize-imports: 4.3.0(prettier@3.8.0)(typescript@5.9.3)
-      prettier-plugin-svelte: 3.4.1(prettier@3.8.0)(svelte@5.46.4)
-
-  prettier@3.8.0: {}
+  prettier@3.8.0:
+    optional: true
 
   pretty-format@27.5.1:
     dependencies:
@@ -17349,6 +17333,8 @@ snapshots:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.3)
       picomatch: 4.0.3
+
+  tinypool@2.0.0: {}
 
   tinyrainbow@2.0.0: {}
 

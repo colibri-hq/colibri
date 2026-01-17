@@ -1,63 +1,47 @@
 {
   "name": "@colibri-hq/cli",
   "version": "0.0.1",
-  "type": "module",
-  "license": "AGPL-3.0-or-later",
   "description": "The command-line interface for Colibri, an ebook management app",
   "keywords": [
     "colibri",
-    "server",
-    "ebooks",
     "ebook-management",
+    "ebooks",
     "epub",
+    "oclif",
     "opds",
-    "oclif"
+    "server"
   ],
   "homepage": "https://github.com/colibri-hq/colibri",
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "license": "AGPL-3.0-or-later",
   "author": {
     "name": "Moritz Mazetti",
     "email": "m@9dev.de",
     "url": "https://mazetti.me"
   },
   "repository": {
-    "url": "git+https://github.com/colibri-hq/colibri.git",
-    "type": "git"
+    "type": "git",
+    "url": "git+https://github.com/colibri-hq/colibri.git"
   },
-  "bugs": {
-    "url": "https://github.com/colibri-hq/colibri/issues"
+  "bin": {
+    "colibri": "./bin/run.js"
   },
-  "oclif": {
-    "bin": "colibri",
-    "dirname": "colibri",
-    "commands": "./dist/commands",
-    "plugins": [
-      "@oclif/plugin-help",
-      "@oclif/plugin-plugins",
-      "@oclif/plugin-not-found"
-    ],
-    "topicSeparator": " ",
-    "topics": {
-      "works": {
-        "description": "Manage works and editions."
-      },
-      "creators": {
-        "description": "Manage creators and their works."
-      },
-      "publishers": {
-        "description": "Manage publishers and their works."
-      },
-      "storage": {
-        "description": "Manage persistent storage."
-      },
-      "settings": {
-        "description": "Manage instance settings."
-      },
-      "users": {
-        "description": "Manage Colibri user accounts."
-      },
-      "oauth": {
-        "description": "Manage OAuth integrations."
-      }
+  "files": [
+    "bin",
+    "dist",
+    "oclif.manifest.json"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     }
   },
   "scripts": {
@@ -73,8 +57,8 @@
     "check": "tsc --noEmit",
     "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
     "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
-    "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
-    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content .",
+    "fmt": "oxfmt --write .",
+    "fmt:ci": "oxfmt --check .",
     "prepack": "pnpm run fmt && pnpm run check && pnpm run lint && pnpm run package",
     "package": "pnpm run build && oclif readme --tsconfig-path=tsconfig.base.json"
   },
@@ -110,31 +94,47 @@
     "globals": "catalog:",
     "msw": "^2.12.7",
     "oclif": "^4.22.65",
-    "prettier": "catalog:",
+    "oxfmt": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vitest": "catalog:"
   },
-  "engines": {
-    "node": ">=24.0.0"
-  },
-  "main": "dist/index.js",
-  "module": "./dist/index.js",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+  "oclif": {
+    "bin": "colibri",
+    "commands": "./dist/commands",
+    "dirname": "colibri",
+    "plugins": [
+      "@oclif/plugin-help",
+      "@oclif/plugin-plugins",
+      "@oclif/plugin-not-found"
+    ],
+    "topicSeparator": " ",
+    "topics": {
+      "creators": {
+        "description": "Manage creators and their works."
+      },
+      "oauth": {
+        "description": "Manage OAuth integrations."
+      },
+      "publishers": {
+        "description": "Manage publishers and their works."
+      },
+      "settings": {
+        "description": "Manage instance settings."
+      },
+      "storage": {
+        "description": "Manage persistent storage."
+      },
+      "users": {
+        "description": "Manage Colibri user accounts."
+      },
+      "works": {
+        "description": "Manage works and editions."
+      }
     }
   },
-  "sideEffects": false,
-  "types": "./dist/index.d.ts",
-  "files": [
-    "bin",
-    "dist",
-    "oclif.manifest.json"
-  ],
-  "bin": {
-    "colibri": "./bin/run.js"
+  "engines": {
+    "node": ">=24.0.0"
   }
 }

@@ -1,0 +1,142 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TURBO_SCM_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+  TURBO_SCM_HEAD: ${{ github.sha }}
+
+jobs:
+  quality:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # Full history for --affected
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: 'package.json'
+          cache: pnpm
+      - name: Restore tooling cache
+        uses: actions/cache@v5
+        with:
+          path: |
+            **/.cache
+            .turbo
+          key: ${{ runner.os }}-tooling-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-tooling-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-tooling-
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm turbo lint:ci ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+      - name: Format check
+        run: pnpm turbo fmt:ci ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+      - name: Type check
+        run: pnpm turbo check ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: 'package.json'
+          cache: pnpm
+      - name: Restore Turbo cache
+        uses: actions/cache@v5
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-test-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-test-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-turbo-test-
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build packages
+        run: pnpm turbo build ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+      - name: Run unit tests with coverage
+        run: pnpm turbo test:coverage ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: supabase/postgres:15.6.1.143
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 54322:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: 'package.json'
+          cache: pnpm
+      - name: Restore Turbo cache
+        uses: actions/cache@v5
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-e2e-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-e2e-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-turbo-e2e-
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v5
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build packages
+        run: pnpm build
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm --filter @colibri-hq/app exec playwright install --with-deps chromium
+      - name: Install Playwright system deps
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm --filter @colibri-hq/app exec playwright install-deps chromium
+      - name: Run E2E tests
+        run: pnpm test:e2e
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:54322/postgres
+          DATABASE_CERTIFICATE: ""

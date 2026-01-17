@@ -1,11 +1,46 @@
 {
+  "name": "@colibri-hq/app",
+  "version": "0.0.1",
+  "description": "The Colibri server",
+  "keywords": [
+    "colibri",
+    "ebook-management",
+    "ebooks",
+    "epub",
+    "opds",
+    "server"
+  ],
+  "homepage": "https://github.com/colibri-hq/colibri",
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "license": "AGPL-3.0-or-later",
   "author": {
     "name": "Moritz Mazetti",
     "email": "m@9dev.de",
     "url": "https://mazetti.me"
   },
-  "bugs": {
-    "url": "https://github.com/colibri-hq/colibri/issues"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/colibri-hq/colibri.git"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "ORIGIN=http://localhost:5173 vite dev",
+    "start": "node ./dist/index.js",
+    "build": "svelte-kit sync && vite build",
+    "build:ci": "pnpm run build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
+    "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
+    "fmt": "oxfmt --write .",
+    "fmt:ci": "oxfmt --check .",
+    "test-ct": "playwright test -c playwright-ct.config.ts",
+    "test": "playwright test -c playwright.config.ts",
+    "test:vitest": "vitest",
+    "test:browser": "vitest --project browser"
   },
   "dependencies": {
     "@colibri-hq/oauth": "workspace:*",
@@ -42,7 +77,6 @@
     "xml2js": "^0.6.2",
     "zod": "catalog:"
   },
-  "description": "The Colibri server",
   "devDependencies": {
     "@playwright/test": "^1.57.0",
     "@sveltejs/adapter-auto": "catalog:",
@@ -60,7 +94,7 @@
     "@vitest/browser-playwright": "catalog:",
     "dotenv": "^17.2.3",
     "eslint": "catalog:",
-    "prettier": "catalog:",
+    "oxfmt": "catalog:",
     "svelte": "catalog:",
     "svelte-check": "catalog:",
     "tailwindcss": "catalog:",
@@ -68,39 +102,5 @@
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
-  },
-  "homepage": "https://github.com/colibri-hq/colibri",
-  "keywords": [
-    "colibri",
-    "server",
-    "ebooks",
-    "ebook-management",
-    "epub",
-    "opds"
-  ],
-  "license": "AGPL-3.0-or-later",
-  "name": "@colibri-hq/app",
-  "repository": {
-    "url": "git+https://github.com/colibri-hq/colibri.git",
-    "type": "git"
-  },
-  "scripts": {
-    "dev": "ORIGIN=http://localhost:5173 vite dev",
-    "start": "node ./dist/index.js",
-    "build": "svelte-kit sync && vite build",
-    "build:ci": "pnpm run build",
-    "preview": "vite preview",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
-    "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
-    "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
-    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content .",
-    "test-ct": "playwright test -c playwright-ct.config.ts",
-    "test": "playwright test -c playwright.config.ts",
-    "test:vitest": "vitest",
-    "test:browser": "vitest --project browser"
-  },
-  "type": "module",
-  "version": "0.0.1"
+  }
 }

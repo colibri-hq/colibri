@@ -2,31 +2,55 @@
   "name": "@colibri-hq/ui",
   "version": "0.0.1",
   "private": true,
-  "type": "module",
-  "license": "AGPL-3.0-or-later",
   "description": "The Colibri UI component library.",
   "keywords": [
     "colibri",
-    "server",
-    "ebooks",
     "ebook-management",
+    "ebooks",
     "epub",
-    "opds"
+    "opds",
+    "server"
   ],
   "homepage": "https://github.com/colibri-hq/colibri",
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "license": "AGPL-3.0-or-later",
   "author": {
     "name": "Moritz Mazetti",
     "email": "m@9dev.de",
     "url": "https://mazetti.me"
   },
   "repository": {
-    "url": "git+https://github.com/colibri-hq/colibri.git",
-    "type": "git"
+    "type": "git",
+    "url": "git+https://github.com/colibri-hq/colibri.git"
   },
-  "bugs": {
-    "url": "https://github.com/colibri-hq/colibri/issues"
+  "files": [
+    "dist",
+    "!dist/**/*.spec.*",
+    "!dist/**/*.stories.*",
+    "!dist/**/*.test.*"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "module": "dist/index.js",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {
+    ">4.0": {
+      "*": [
+        "./dist/components/*.d.ts"
+      ]
+    }
   },
-  "packageManager": "pnpm@10.9.0",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
     "dev": "svelte-kit sync && svelte-package --watch",
     "build": "vite build && pnpm run prepack",
@@ -36,8 +60,8 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig tsconfig.json --watch",
     "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
     "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
-    "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
-    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content .",
+    "fmt": "oxfmt --write .",
+    "fmt:ci": "oxfmt --check .",
     "prepack": "pnpm run fmt && pnpm run check && pnpm run lint && pnpm run package",
     "package": "svelte-kit sync && svelte-package && publint",
     "storybook": "storybook dev --port 6006",
@@ -88,7 +112,7 @@
     "@vitest/browser-playwright": "catalog:",
     "eslint": "catalog:",
     "eslint-plugin-storybook": "^10.1.11",
-    "prettier": "catalog:",
+    "oxfmt": "catalog:",
     "publint": "^0.3.16",
     "storybook": "^10.1.11",
     "svelte": "catalog:",
@@ -104,29 +128,5 @@
     "@sveltejs/kit": "^2.21.4",
     "svelte": "^5.33.19"
   },
-  "module": "dist/index.js",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "svelte": "./dist/index.js",
-      "import": "./dist/index.js"
-    }
-  },
-  "typesVersions": {
-    ">4.0": {
-      "*": [
-        "./dist/components/*.d.ts"
-      ]
-    }
-  },
-  "sideEffects": [
-    "**/*.css"
-  ],
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist",
-    "!dist/**/*.test.*",
-    "!dist/**/*.stories.*",
-    "!dist/**/*.spec.*"
-  ]
+  "packageManager": "pnpm@10.9.0"
 }

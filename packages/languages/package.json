@@ -1,27 +1,41 @@
 {
   "name": "@colibri-hq/languages",
   "version": "0.0.1",
-  "type": "module",
-  "license": "AGPL-3.0-or-later",
   "description": "ISO 639-3 language code resolution for Colibri",
   "keywords": [
     "colibri",
+    "i18n",
     "iso-639",
-    "languages",
-    "i18n"
+    "languages"
   ],
   "homepage": "https://github.com/colibri-hq/colibri",
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "license": "AGPL-3.0-or-later",
   "author": {
     "name": "Moritz Mazetti",
     "email": "m@9dev.de",
     "url": "https://mazetti.me"
   },
   "repository": {
-    "url": "git+https://github.com/colibri-hq/colibri.git",
-    "type": "git"
+    "type": "git",
+    "url": "git+https://github.com/colibri-hq/colibri.git"
   },
-  "bugs": {
-    "url": "https://github.com/colibri-hq/colibri/issues"
+  "files": [
+    "dist",
+    "src"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "esnext": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
   "scripts": {
     "build": "rimraf dist; tsc",
@@ -35,31 +49,17 @@
     "test:watch": "vitest",
     "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
     "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
-    "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
-    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content .",
+    "fmt": "oxfmt --write .",
+    "fmt:ci": "oxfmt --check .",
     "prepack": "pnpm run fmt && pnpm run check && pnpm run lint && pnpm run build"
   },
   "devDependencies": {
     "@colibri-hq/shared": "workspace:*",
     "eslint": "catalog:",
-    "prettier": "catalog:",
+    "oxfmt": "catalog:",
     "rimraf": "catalog:",
     "tsx": "^4.21.0",
     "typescript": "catalog:",
     "vitest": "catalog:"
-  },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "esnext": "./src/index.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "files": [
-    "dist",
-    "src"
-  ]
+  }
 }

@@ -1,0 +1,59 @@
+name: Security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    # Run CodeQL weekly on main branches
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  claude-security-review:
+    name: Claude Security Review
+    runs-on: ubuntu-latest
+    # Only run on PRs (not scheduled or push events)
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 2
+
+      - name: Claude Security Review
+        uses: anthropics/claude-code-security-review@main
+        with:
+          claude-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          comment-pr: true
+          exclude-directories: node_modules,dist,.svelte-kit,coverage,.turbo
+
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript"

@@ -2,29 +2,64 @@
   "name": "@colibri-hq/shared",
   "version": "0.0.1",
   "private": true,
-  "type": "module",
-  "license": "AGPL-3.0-or-later",
   "description": "The Colibri SDK",
   "keywords": [
     "colibri",
-    "server",
-    "ebooks",
     "ebook-management",
+    "ebooks",
     "epub",
-    "opds"
+    "opds",
+    "server"
   ],
   "homepage": "https://github.com/colibri-hq/colibri",
+  "bugs": {
+    "url": "https://github.com/colibri-hq/colibri/issues"
+  },
+  "license": "AGPL-3.0-or-later",
   "author": {
     "name": "Moritz Mazetti",
     "email": "m@9dev.de",
     "url": "https://mazetti.me"
   },
   "repository": {
-    "url": "git+https://github.com/colibri-hq/colibri.git",
-    "type": "git"
+    "type": "git",
+    "url": "git+https://github.com/colibri-hq/colibri.git"
   },
-  "bugs": {
-    "url": "https://github.com/colibri-hq/colibri/issues"
+  "files": [
+    "dist",
+    "eslint.config.ts",
+    "theme.css",
+    "vitest.browser.config.ts",
+    "vitest.config.ts"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "module": "dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./eslint.config": {
+      "types": "./config.d.ts",
+      "import": "./eslint.config.ts",
+      "default": "./eslint.config.ts"
+    },
+    "./vitest.config": {
+      "types": "./config.d.ts",
+      "import": "./vitest.config.ts",
+      "default": "./vitest.config.ts"
+    },
+    "./vitest.browser.config": {
+      "types": "./config.d.ts",
+      "import": "./vitest.browser.config.ts",
+      "default": "./vitest.browser.config.ts"
+    },
+    "./theme.css": "./theme.css"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "rimraf dist; tsc",
@@ -36,8 +71,8 @@
     "test:ui": "vitest --config ./tsconfig.test.json --ui",
     "lint": "eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
     "lint:ci": "eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
-    "fmt": "prettier --write --cache --cache-location=./.cache/prettier.json --cache-strategy metadata .",
-    "fmt:ci": "prettier --check --cache --cache-location=./.cache/prettier.json --cache-strategy content .",
+    "fmt": "oxfmt --write .",
+    "fmt:ci": "oxfmt --check .",
     "prepack": "pnpm run fmt && pnpm run check && pnpm run lint && pnpm run build"
   },
   "dependencies": {
@@ -59,11 +94,8 @@
     "eslint-plugin-oxlint": "^1.39.0",
     "eslint-plugin-svelte": "^3.14.0",
     "globals": "catalog:",
+    "oxfmt": "catalog:",
     "oxlint": "^1.39.0",
-    "prettier": "catalog:",
-    "prettier-plugin-organize-imports": "^4.3.0",
-    "prettier-plugin-svelte": "^3.4.1",
-    "prettier-plugin-tailwindcss": "^0.7.2",
     "rimraf": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
@@ -71,59 +103,14 @@
   },
   "peerDependencies": {
     "@sveltejs/kit": "^2.21.4",
-    "eslint": "^9.28.0",
-    "prettier": "^3.5.3"
+    "eslint": "^9.28.0"
   },
   "peerDependenciesMeta": {
     "@sveltejs/kit": {
       "optional": true
     },
-    "prettier": {
-      "optional": true
-    },
     "eslint": {
       "optional": true
     }
-  },
-  "module": "dist/index.js",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./prettier.config": {
-      "import": "./prettier.config.ts",
-      "types": "./config.d.ts",
-      "default": "./prettier.config.ts"
-    },
-    "./eslint.config": {
-      "import": "./eslint.config.ts",
-      "types": "./config.d.ts",
-      "default": "./eslint.config.ts"
-    },
-    "./vitest.config": {
-      "import": "./vitest.config.ts",
-      "types": "./config.d.ts",
-      "default": "./vitest.config.ts"
-    },
-    "./vitest.browser.config": {
-      "import": "./vitest.browser.config.ts",
-      "types": "./config.d.ts",
-      "default": "./vitest.browser.config.ts"
-    },
-    "./theme.css": "./theme.css"
-  },
-  "sideEffects": false,
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist",
-    "theme.css",
-    "prettier.config.ts",
-    "eslint.config.ts",
-    "vitest.config.ts",
-    "vitest.browser.config.ts"
-  ],
-  "publishConfig": {
-    "access": "public"
   }
 }
