@@ -53,9 +53,38 @@ export const filterFactory = <T extends string = string>() =>
     multipleNonGreedy: true,
     name: "filter",
     async parse(input) {
-      const [key, operator, value] = input
-        .split(/([=<>!~^$]+|is(?: not)?|(?:not )?in|n?eq|ne|gte?|lte?|(?:not )?like)/)
-        .map((v) => v.trim());
+      // Symbol operators: !=, <=, >=, !~, ^~, $~, or single =, <, >, ~
+      // Word operators with word boundaries to avoid matching within identifiers (e.g., "is" in "is_active")
+      const parts = input
+        .split(
+          /(!=|<=|>=|!~|\^~|\$~|[=<>~]|\b(?:is(?: not)?|(?:not )?in|n?eq|ne|gte?|lte?|(?:not )?like)\b)/,
+        )
+        .map((v) => v.trim())
+        .filter((v) => v !== "");
+
+      // Handle cases like "status=in(active,pending)" where both "=" and "in" are matched
+      // parts would be: ["status", "=", "in", "(active,pending)"]
+      if (parts.length >= 4 && parts[1] === "=" && (parts[2] === "in" || parts[2] === "not in")) {
+        const key = parts[0];
+        const operator = parts[2];
+        // Remove parentheses from value: "(active,pending)" -> "active,pending"
+        const value = parts.slice(3).join("").replace(/^\(/, "").replace(/\)$/, "");
+        return parseFilter(key as T, operator, value);
+      }
+
+      const [key, operator, ...rest] = parts;
+      const value = rest.join("");
+
+      // Handle alternative operator syntax in value (e.g., "age=eq25" -> operator="eq", value="25")
+      const wordOperatorMatch = value?.match(
+        /^(eq|neq?|gte?|lte?|like|not like|is(?: not)?|(?:not )?in)\s*\(?(.*)$/i,
+      );
+      if (wordOperatorMatch) {
+        const [, wordOp, restValue] = wordOperatorMatch;
+        // Remove trailing parenthesis if present (for "in(a,b)" -> "a,b")
+        const cleanValue = restValue.replace(/\)$/, "");
+        return parseFilter(key as T, wordOp.toLowerCase(), cleanValue);
+      }
 
       return parseFilter(key as T, operator, value);
     },
@@ -67,11 +96,20 @@ function parseFilter<K extends string>(
   operator: string | undefined,
   value: string | undefined,
 ) {
-  const parsedValue = parseValue(value);
+  const { negated, value: parsedValue } = parseValue(value);
   const parsedOperator = resolveOperator(operator);
 
   if (parsedOperator === "is" || parsedOperator === "is not" || parsedValue === null) {
-    return buildNullFilter(key, parsedOperator ?? "is not");
+    // Coerce = to "is" and != to "is not" for null values
+    let nullOperator = parsedOperator;
+    if (parsedValue === null) {
+      if (parsedOperator === "=" || !parsedOperator) {
+        nullOperator = "is";
+      } else if (parsedOperator === "!=") {
+        nullOperator = "is not";
+      }
+    }
+    return buildNullFilter(key, nullOperator ?? "is");
   }
 
   if (parsedValue instanceof Date) {
@@ -79,7 +117,16 @@ function parseFilter<K extends string>(
   }
 
   if (typeof parsedValue === "boolean") {
-    return buildBooleanFilter(key, parsedOperator, parsedValue);
+    // If the value was negated (e.g., !true), adjust the operator
+    // At this point, parsedOperator is "=" or "!=" (not "is"/"is not" which were handled above)
+    const effectiveOperator = negated
+      ? parsedOperator === "="
+        ? "is not"
+        : parsedOperator === "!="
+          ? "is"
+          : parsedOperator
+      : parsedOperator;
+    return buildBooleanFilter(key, effectiveOperator, parsedValue);
   }
 
   if (typeof parsedValue === "number") {
@@ -206,32 +253,39 @@ function buildStringFilter<T extends string>(
   return { key, operator, value };
 }
 
-function parseValue(value: string | undefined): FilterValue {
+type ParsedValue = { negated: boolean; value: FilterValue };
+
+function parseValue(value: string | undefined): ParsedValue {
   const lowerValue = value?.toLowerCase();
 
   if (!value || lowerValue === "null") {
-    return null;
+    return { negated: false, value: null };
   }
 
   if (value.startsWith('"') && value.endsWith('"')) {
-    return value.slice(1, -1);
+    return { negated: false, value: value.slice(1, -1) };
+  }
+
+  // Handle negated booleans like !true and !false
+  if (lowerValue === "!true" || lowerValue === "!false") {
+    return { negated: true, value: lowerValue === "!true" };
   }
 
   if (lowerValue === "true" || lowerValue === "false") {
-    return lowerValue === "true";
+    return { negated: false, value: lowerValue === "true" };
   }
 
   if (!Number.isNaN(Number(value))) {
-    return Number(value);
+    return { negated: false, value: Number(value) };
   }
 
   const date = new Date(value);
 
   if (!Number.isNaN(date.getTime())) {
-    return date;
+    return { negated: false, value: date };
   }
 
-  return value;
+  return { negated: false, value };
 }
 
 function resolveOperator(operator: string | undefined) {
@@ -243,11 +297,13 @@ function resolveOperator(operator: string | undefined) {
 
     case "!=":
     case "!~":
+    case "$~":
     case "<":
     case "<=":
     case "=":
     case ">":
     case ">=":
+    case "^~":
     case "in":
     case "is":
     case "is not":
