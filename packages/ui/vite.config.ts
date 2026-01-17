@@ -7,6 +7,8 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
   test: {
+    // Allow passing when no test files exist yet
+    passWithNoTests: true,
     // Renamed from 'workspace' to 'projects' in Vitest 4
     projects: [
       {
