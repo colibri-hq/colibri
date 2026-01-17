@@ -48,9 +48,10 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "canvas",
       "esbuild",
-      "lefthook",
-      "msw"
+      "sharp",
+      "workerd"
     ],
     "ignoredBuiltDependencies": [
       "unrs-resolver",
@@ -60,12 +61,12 @@
   "packageManager": "pnpm@10.27.0",
   "devDependencies": {
     "@colibri-hq/shared": "workspace:*",
-    "lefthook": "^2.0.13",
-    "prettier": "^3.7.4",
+    "lefthook": "^2.0.15",
+    "prettier": "^3.8.0",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-svelte": "^3.4.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "turbo": "^2.7.3"
+    "turbo": "^2.7.5"
   },
   "dependencies": {
     "glob": "^13.0.0"

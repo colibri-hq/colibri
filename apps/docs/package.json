@@ -41,16 +41,15 @@
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
-    "@vitest/browser": "catalog:",
-    "@vitest/browser-playwright": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
-    "vitest": "catalog:",
-    "@cloudflare/workers-types": "^4.20260103.0",
-    "@sveltejs/adapter-cloudflare": "^7.2.4",
+    "@cloudflare/workers-types": "^4.20260117.0",
+    "@sveltejs/adapter-cloudflare": "^7.2.5",
     "@sveltejs/adapter-static": "^3.0.10",
     "@sveltejs/kit": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",
+    "@vitest/browser": "catalog:",
+    "@vitest/browser-playwright": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "eslint": "catalog:",
     "github-slugger": "^2.0.0",
     "glob": "^13.0.0",
@@ -70,7 +69,8 @@
     "tsx": "^4.21.0",
     "typescript": "catalog:",
     "unified": "^11.0.5",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "catalog:"
   },
   "scripts": {
     "dev": "vite --configLoader native dev",

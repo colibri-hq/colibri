@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "blurhash": "^2.0.5",
-    "canvas": "^3.2.0",
+    "canvas": "^3.2.1",
     "exif-reader": "^2.0.3",
     "fast-xml-parser": "^5.3.3"
   },
@@ -56,10 +56,10 @@
     "@vitest/ui": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-oxlint": "^1.38.0",
-    "eslint-plugin-svelte": "^3.13.1",
+    "eslint-plugin-oxlint": "^1.39.0",
+    "eslint-plugin-svelte": "^3.14.0",
     "globals": "catalog:",
-    "oxlint": "^1.38.0",
+    "oxlint": "^1.39.0",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-svelte": "^3.4.1",

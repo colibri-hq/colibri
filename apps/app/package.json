@@ -24,7 +24,7 @@
     "debounce": "^3.0.0",
     "jsonwebtoken": "catalog:",
     "mdsvex": "^0.12.6",
-    "pg-cloudflare": "^1.2.7",
+    "pg-cloudflare": "^1.3.0",
     "playwright": "^1.57.0",
     "svelte": "catalog:",
     "svelte-dnd-action": "^0.9.69",
@@ -38,7 +38,7 @@
     "trpc-sveltekit": "^3.6.3",
     "trpc-transformer": "^3.2.2",
     "turndown": "catalog:",
-    "ua-parser-js": "^2.0.7",
+    "ua-parser-js": "^2.0.8",
     "xml2js": "^0.6.2",
     "zod": "catalog:"
   },
@@ -46,7 +46,7 @@
   "devDependencies": {
     "@playwright/test": "^1.57.0",
     "@sveltejs/adapter-auto": "catalog:",
-    "@sveltejs/adapter-node": "^5.4.0",
+    "@sveltejs/adapter-node": "^5.5.1",
     "@sveltejs/kit": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",

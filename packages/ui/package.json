@@ -61,7 +61,7 @@
     "@fontsource-variable/material-symbols-outlined": "catalog:",
     "@fontsource/neuton": "catalog:",
     "@fontsource/titillium-web": "catalog:",
-    "@humanspeak/svelte-markdown": "^0.8.13",
+    "@humanspeak/svelte-markdown": "^0.8.14",
     "@lucide/svelte": "^0.562.0",
     "bits-ui": "^2.15.4",
     "blurhash": "^2.0.5",
