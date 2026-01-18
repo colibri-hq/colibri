@@ -3,7 +3,7 @@ ARG PACKAGE_NAMESPACE=colibri-hq
 
 # Base Layer: This layer is used as the base for all following images, and can
 # be used to set up the environment for the application.
-FROM node:23-slim AS base
+FROM node:25-slim AS base
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
