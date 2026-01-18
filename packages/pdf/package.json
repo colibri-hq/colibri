@@ -73,6 +73,7 @@
     "pdfjs-dist": "^5.4.530"
   },
   "devDependencies": {
+    "@types/node": "catalog:",
     "eslint": "catalog:",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",

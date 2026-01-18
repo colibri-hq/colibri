@@ -9,4 +9,4 @@ export default [
     files: ["**/*.svelte"],
     rules: { "svelte/no-navigation-without-resolve": "off" },
   },
-] as ReturnType<typeof config>;
+];

@@ -170,7 +170,7 @@ describe("Validation Schemas", () => {
       expect(smtpPortSchema.safeParse(465).success).toBe(true);
       expect(smtpPortSchema.safeParse(587).success).toBe(true);
       expect(smtpPortSchema.safeParse(1).success).toBe(true);
-      expect(smtpPortSchema.safeParse(65535).success).toBe(true);
+      expect(smtpPortSchema.safeParse(65_535).success).toBe(true);
     });
 
     it("should coerce string port numbers", () => {
@@ -183,8 +183,8 @@ describe("Validation Schemas", () => {
     });
 
     it("should reject ports above 65535", () => {
-      expect(smtpPortSchema.safeParse(65536).success).toBe(false);
-      expect(smtpPortSchema.safeParse(100000).success).toBe(false);
+      expect(smtpPortSchema.safeParse(65_536).success).toBe(false);
+      expect(smtpPortSchema.safeParse(100_000).success).toBe(false);
     });
 
     it("should reject negative ports", () => {

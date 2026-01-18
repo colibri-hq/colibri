@@ -1,4 +1,6 @@
 .cache/
 .turbo/
+.svelte-kit/
 dist/
 node_modules/
+test-reports/

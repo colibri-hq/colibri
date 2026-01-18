@@ -9,9 +9,10 @@ export default config(
       parserOptions: { projectService: false, project: "./tsconfig.storybook.json" },
     },
   },
+
   // Allow inline styles for components that need dynamic colors
   {
     files: ["src/lib/ui/ColorPicker/ColorPicker.svelte"],
     rules: { "svelte/no-inline-styles": "off" },
   },
-) as ReturnType<typeof config>;
+);

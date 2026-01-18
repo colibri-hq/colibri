@@ -1,6 +1,7 @@
 import type { Server as HttpServer } from "node:http";
 import type { Http2SecureServer, Http2Server } from "node:http2";
 import type { Server as HttpsServer } from "node:https";
+import type { ReadableStreamController } from "node:stream/web";
 import cors from "@fastify/cors";
 import formBody from "@fastify/formbody";
 import fastify, {
@@ -93,8 +94,6 @@ export function createRequest<Server extends AnyHttpServer>(
 
   if (request.method !== "GET" && request.method !== "HEAD") {
     init.body = createReadableStreamFromReadable(request.raw);
-
-    // @ts-expect-error -- Duplex Streams are not present in the types yet
     init.duplex = "half";
   }
 
@@ -244,6 +243,7 @@ class StreamPump {
       const bytes = chunk instanceof Uint8Array ? chunk : Buffer.from(chunk);
 
       const available = (this._controller.desiredSize || 0) - bytes.byteLength;
+      // @ts-expect-error -- Web Streams typings are incomplete
       this._controller.enqueue(bytes);
 
       if (available <= 0) {

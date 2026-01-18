@@ -17,6 +17,7 @@ export const storageState = join(import.meta.dirname, ".cache", "playwright.json
 export default defineConfig({
   name: "Colibri",
   testDir: "./tests",
+  outputDir: "./test-reports",
 
   //  Run tests in files in parallel
   fullyParallel: true,
@@ -35,7 +36,7 @@ export default defineConfig({
   //  Reporter to use. See https://playwright.dev/docs/test-reporters
   reporter: process.env.CI
     ? [["github"], ["dot"]]
-    : [["list"], ["html", { outputFolder: "test-results", open: "never" }]],
+    : [["list"], ["html", { outputFolder: "test-reports", open: "never" }]],
 
   // Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions.
   use: {

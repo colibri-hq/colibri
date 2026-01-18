@@ -25,7 +25,7 @@ const mockImageBitmap = { width: 100, height: 100 };
 
 // Mock global objects
 global.createImageBitmap = vi.fn().mockResolvedValue(mockImageBitmap);
-global.Image = vi.fn().mockImplementation(function (this: unknown) {
+global.Image = vi.fn().mockImplementation(function (this: any) {
   this.src = "";
   this.width = 100;
   this.height = 100;
@@ -105,7 +105,7 @@ describe("Images", () => {
 
       it("should handle image load errors", async () => {
         // Override Image mock to trigger error instead of load
-        global.Image = vi.fn().mockImplementation(function (this: unknown) {
+        global.Image = vi.fn().mockImplementation(function (this: any) {
           this.src = "";
           this.width = 100;
           this.height = 100;

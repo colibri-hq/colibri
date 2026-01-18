@@ -4,8 +4,9 @@
   "compilerOptions": {
     "composite": true,
     "lib": ["ESNext"],
+    "rootDir": ".",
     "tsBuildInfoFile": ".cache/tsbuildinfo.node.json",
-    "rootDir": "."
+    "types": ["node"]
   },
   "include": ["*.config.ts", "*.config.js"]
 }

@@ -28,5 +28,6 @@
       "outputs": ["badges/coverage.svg"]
     },
     "dev": { "inputs": ["$TURBO_DEFAULT$", ".env*"], "cache": false, "persistent": true }
-  }
+  },
+  "globalDependencies": ["!.cache/**", "!test-reports/**"]
 }

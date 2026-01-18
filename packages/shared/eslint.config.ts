@@ -5,6 +5,7 @@ import js from "@eslint/js";
 import prettier from "eslint-config-prettier/flat";
 import oxlint from "eslint-plugin-oxlint";
 import svelte from "eslint-plugin-svelte";
+import { defineConfig } from "eslint/config";
 import globals from "globals";
 import { resolve } from "node:path";
 import ts, { type ConfigArray } from "typescript-eslint";
@@ -21,13 +22,14 @@ export function config(
     delete svelteConfig.kit.typescript.config;
   }
 
-  return ts.config([
+  return defineConfig([
     // region Ignored Files
     {
       ignores: [
         ".svelte-kit/**/*",
         "node_modules/**/*",
         "dist/**/*",
+        "test-reports/**/*",
         ".turbo/**/*",
         ".cache/**/*",
         ...ignores,
@@ -84,7 +86,9 @@ export function config(
           ecmaVersion: "latest",
           sourceType: "module",
           tsconfigRootDir,
-          projectService: { defaultProject: resolve(tsconfigRootDir, "tsconfig.test.json") },
+          // Use explicit project instead of projectService for test files
+          // since projectService doesn't find tests in separate directories
+          project: resolve(tsconfigRootDir, "tsconfig.test.json"),
         },
       },
     },

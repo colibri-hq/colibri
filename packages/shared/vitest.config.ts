@@ -3,7 +3,7 @@ import { defineConfig, mergeConfig } from "vitest/config";
 export { mergeConfig };
 
 export const config = defineConfig({
-  cacheDir: "./node_modules/.vite",
+  cacheDir: "./.cache/.vite",
   test: {
     coverage: {
       enabled: true,

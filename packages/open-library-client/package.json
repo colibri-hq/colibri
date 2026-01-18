@@ -55,6 +55,7 @@
     "@colibri-hq/shared": "workspace:*"
   },
   "devDependencies": {
+    "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
     "eslint": "catalog:",
