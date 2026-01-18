@@ -55,6 +55,9 @@
     "oxfmt": "catalog:",
     "turbo": "^2.7.5"
   },
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "packageManager": "pnpm@10.27.0",
   "pnpm": {
     "onlyBuiltDependencies": [
