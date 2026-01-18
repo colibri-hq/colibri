@@ -136,7 +136,7 @@ async function applyMigrations(connectionString: string): Promise<void> {
     await client.query(`CREATE EXTENSION IF NOT EXISTS "unaccent" WITH SCHEMA public;`);
 
     // Read and execute migration files
-    const migrationsDir = resolve(currentDir, "../../../../supabase/migrations");
+    const migrationsDir = resolve(currentDir, "../../../supabase/migrations");
     const migrationFiles = ["20251225151111_schema.sql", "20251226212735_pending_ingestion.sql"];
 
     for (const file of migrationFiles) {

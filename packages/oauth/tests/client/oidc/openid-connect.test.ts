@@ -184,9 +184,10 @@ describe("OpenID Connect", () => {
         tokenStore: mockTokenStore,
       });
 
-      await client.createAuthorizationUrl({ state: "test-state" });
+      const { codeVerifier } = await client.createAuthorizationUrl({ state: "test-state" });
       await client.handleCallback(
         "https://app.example.com/callback?code=auth_code&state=test-state",
+        codeVerifier,
         "test-state",
       );
 
@@ -224,9 +225,10 @@ describe("OpenID Connect", () => {
         tokenStore: mockTokenStore,
       });
 
-      await client.createAuthorizationUrl({ state: "test-state" });
+      const { codeVerifier } = await client.createAuthorizationUrl({ state: "test-state" });
       await client.handleCallback(
         "https://app.example.com/callback?code=auth_code&state=test-state",
+        codeVerifier,
         "test-state",
       );
 
@@ -285,9 +287,10 @@ describe("OpenID Connect", () => {
         tokenStore: mockTokenStore,
       });
 
-      await client.createAuthorizationUrl({ state: "test-state" });
+      const { codeVerifier } = await client.createAuthorizationUrl({ state: "test-state" });
       await client.handleCallback(
         "https://app.example.com/callback?code=auth_code&state=test-state",
+        codeVerifier,
         "test-state",
       );
 

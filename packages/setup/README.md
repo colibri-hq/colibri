@@ -206,16 +206,16 @@ packages/setup/
 │   │   └── validation.ts   # Input validation (zod)
 │   ├── lib/
 │   │   └── server.ts       # SvelteKit dev server launcher
-│   ├── routes/             # SvelteKit routes for GUI
-│   │   ├── +layout.svelte
-│   │   ├── +page.svelte    # Main wizard UI
-│   │   └── api/            # API endpoints
-│   │       ├── test-database/+server.ts
-│   │       └── apply-config/+server.ts
-│   └── __tests__/          # E2E tests
-│       ├── setup.e2e.test.ts
-│       ├── api.e2e.test.ts
-│       └── test-utils.ts   # Test utilities with Testcontainers
+│   └── routes/             # SvelteKit routes for GUI
+│       ├── +layout.svelte
+│       ├── +page.svelte    # Main wizard UI
+│       └── api/            # API endpoints
+│           ├── test-database/+server.ts
+│           └── apply-config/+server.ts
+├── tests/          # E2E tests
+│   ├── setup.e2e.test.ts
+│   ├── api.e2e.test.ts
+│   └── test-utils.ts   # Test utilities with Testcontainers
 ├── svelte.config.js
 ├── vite.config.ts
 └── vitest.config.ts
@@ -308,7 +308,7 @@ guidelines.
    - Update CLI prompts in `src/commands/index.ts`
    - Update GUI form in `src/routes/+page.svelte`
    - Update API in `src/routes/api/apply-config/+server.ts`
-   - Add tests in `src/__tests__/`
+   - Add tests in `tests/`
 
 ## Troubleshooting
 

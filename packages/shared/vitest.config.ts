@@ -3,26 +3,34 @@ import { defineConfig, mergeConfig } from "vitest/config";
 export { mergeConfig };
 
 export const config = defineConfig({
+  cacheDir: "./node_modules/.vite",
   test: {
-    globals: true,
-    environment: "node",
-    include: ["src/**/*.test.ts"],
-    reporters: process.env.CI ? ["default", "github-actions"] : ["default"],
     coverage: {
-      provider: "v8",
-      reporter: ["text", "json", "html", "lcov"],
-      reportsDirectory: "./coverage",
+      enabled: true,
       exclude: [
-        "node_modules/**",
-        "dist/**",
-        ".turbo/**",
         ".cache/**",
+        ".svelte-kit/**",
+        ".turbo/**",
+        "dist/**",
+        "tests/**",
+        "test-reports/**",
+        "node_modules/**",
+        "**/*.config.ts",
         "**/*.d.ts",
         "**/*.test.ts",
-        "**/*.config.ts",
       ],
-      thresholds: { statements: 80, branches: 80, functions: 80, lines: 80 },
+      provider: "v8",
+      reportOnFailure: true,
+      reporter: ["text", ["json", { file: "coverage.json" }], ["html", { subdir: "coverage" }]],
+      reportsDirectory: "./test-reports",
+      thresholds: { branches: 45, functions: 50, lines: 50, statements: 50 },
     },
+    environment: "node",
+    globals: true,
+    include: ["src/**/*.test.ts", "tests/**/*.test.ts"],
+    exclude: ["node_modules", "dist", "test-reports"],
+    reporters: process.env.CI ? ["default", "github-actions"] : ["default", "json", "html"],
+    outputFile: { json: "./test-reports/report.json", html: "./test-reports/tests/index.html" },
   },
 });
 

@@ -78,8 +78,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build packages
         run: pnpm turbo build ${{ github.event_name == 'pull_request' && '--affected' || '' }}
-      - name: Run unit tests with coverage
-        run: pnpm turbo test:coverage ${{ github.event_name == 'pull_request' && '--affected' || '' }}
+      - name: Run unit tests
+        run: pnpm turbo test ${{ github.event_name == 'pull_request' && '--affected' || '' }}
 
   e2e-tests:
     name: E2E Tests

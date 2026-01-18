@@ -44,15 +44,17 @@
   "scripts": {
     "build": "rimraf dist && tsc && oclif manifest",
     "build:ci": "pnpm run build",
-    "dev": "tsc --watch",
     "check": "tsc --noEmit",
-    "lint": "oxlint --fix && eslint --fix --report-unused-disable-directives --cache --cache-location=./.cache/eslint.json .",
-    "lint:ci": "oxlint --format github && eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
+    "coverage": "pnpx make-coverage-badge --output-path ./badges/coverage.svg",
+    "dev": "tsc --watch",
     "fmt": "oxfmt --write .",
     "fmt:ci": "oxfmt --check .",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "prepack": "pnpm run build"
+    "lint": "oxlint --fix && eslint --fix --report-unused-disable-directives --cache --cache-location=./.cache/eslint.json .",
+    "lint:ci": "oxlint --format github && eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
+    "prepack": "pnpm run build",
+    "test": "vitest run --coverage --cache",
+    "test:ui": "vitest --ui",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@clack/prompts": "^0.11.0",
@@ -65,12 +67,15 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@colibri-hq/shared": "workspace:*",
     "@eslint/js": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@testcontainers/postgresql": "^11.11.0",
     "@types/node": "catalog:",
     "@types/pg": "^8.16.0",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",

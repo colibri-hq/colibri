@@ -38,7 +38,7 @@ function createSampleTokens(overrides: Partial<StoredTokens> = {}): StoredTokens
     tokenType: "Bearer",
     expiresAt: new Date(Date.now() + 3600 * 1000), // 1 hour from now
     refreshToken: "refresh_token_456",
-    scope: "read write",
+    scopes: ["read", "write"],
     ...overrides,
   };
 }
@@ -66,7 +66,6 @@ describe("LocalStorageTokenStore", () => {
         expect(() => new LocalStorageTokenStore()).toThrow("localStorage is not available");
       } finally {
         // Restore
-        // @ts-expect-error - restoring original value
         globalThis.localStorage = originalLocalStorage;
       }
     });
@@ -203,7 +202,7 @@ describe("LocalStorageTokenStore", () => {
         tokenType: "Bearer",
         expiresAt: new Date(),
         refreshToken: "refresh_456",
-        scope: "read write profile",
+        scopes: ["read", "write", "profile"],
         idToken: "id_token_789",
       };
 
@@ -213,7 +212,7 @@ describe("LocalStorageTokenStore", () => {
       expect(result?.accessToken).toBe(tokens.accessToken);
       expect(result?.tokenType).toBe(tokens.tokenType);
       expect(result?.refreshToken).toBe(tokens.refreshToken);
-      expect(result?.scope).toBe(tokens.scope);
+      expect(result?.scopes).toStrictEqual(tokens.scopes);
       expect(result?.idToken).toBe(tokens.idToken);
     });
   });
@@ -339,6 +338,7 @@ describe("LocalStorageTokenStore", () => {
         accessToken: "token",
         tokenType: "Bearer",
         expiresAt: new Date(),
+        scopes: [],
       };
 
       await store.set("test-client", minimalTokens);
@@ -346,7 +346,7 @@ describe("LocalStorageTokenStore", () => {
 
       expect(result?.accessToken).toBe(minimalTokens.accessToken);
       expect(result?.refreshToken).toBeUndefined();
-      expect(result?.scope).toBeUndefined();
+      expect(result?.scopes).toStrictEqual([]);
     });
   });
 });

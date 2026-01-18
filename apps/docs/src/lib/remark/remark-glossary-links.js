@@ -58,7 +58,7 @@ export function remarkGlossaryLinks() {
       const html = `<GlossaryTerm term="${termId}">${escapedText}</GlossaryTerm>`;
 
       // Replace link node with HTML node
-      if (index) {
+      if (index !== undefined && parent) {
         // @ts-expect-error children property exists on nodes
         parent.children[index] = { type: "html", value: html };
       }

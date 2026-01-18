@@ -52,10 +52,10 @@ describe("Extended Discovery Tests", () => {
     claims_supported: ["sub", "iss", "aud", "exp", "iat", "name", "email"],
   };
 
-  let mockFetch: ReturnType<typeof vi.fn>;
+  let mockFetch: ReturnType<typeof vi.fn> & typeof fetch;
 
   beforeEach(() => {
-    mockFetch = vi.fn();
+    mockFetch = vi.fn<typeof fetch>();
   });
 
   afterEach(() => {
@@ -266,7 +266,7 @@ describe("Extended Discovery Tests", () => {
     it("should return PAR endpoint when present", () => {
       const metadataWithPAR = {
         ...minimalMetadata,
-        pushed_authorization_request_endpoint: "https://auth.example.com/par",
+        pushed_authorization_request_endpoint: "https://auth.example.com/par" as const,
       };
       const endpoint = getPushedAuthorizationRequestEndpoint(
         metadataWithPAR,
@@ -295,7 +295,7 @@ describe("Extended Discovery Tests", () => {
       const invalidMetadata = {
         issuer: "https://auth.example.com",
         token_endpoint: "https://auth.example.com/token",
-        response_types_supported: "code", // Should be array
+        response_types_supported: "code", // Should be an array
       };
 
       mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(invalidMetadata) });

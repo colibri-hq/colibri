@@ -1,7 +1,7 @@
 import type { Database } from "@colibri-hq/sdk";
 import { initialize } from "@colibri-hq/sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { applySetup, buildStorageDsn, type SetupConfig } from "../core/state.js";
+import { applySetup, buildStorageDsn, type SetupConfig } from "../src/index.js";
 import { setupTestDatabase, teardownTestDatabase, type TestContext } from "./test-utils.js";
 
 describe("Setup E2E Tests", () => {

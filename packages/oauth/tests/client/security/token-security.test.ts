@@ -34,9 +34,10 @@ describe("Token Security (RFC 9700 Sections 4.10-4.13)", () => {
         tokenStore: mockTokenStore,
       });
 
-      await client.createAuthorizationUrl({ state: "test-state" });
+      const { codeVerifier } = await client.createAuthorizationUrl({ state: "test-state" });
       await client.handleCallback(
         "https://app.example.com/callback?code=auth_code&state=test-state",
+        codeVerifier,
         "test-state",
       );
 
@@ -90,9 +91,10 @@ describe("Token Security (RFC 9700 Sections 4.10-4.13)", () => {
         tokenStore: mockTokenStore,
       });
 
-      await client.createAuthorizationUrl({ state: "test-state" });
+      const { codeVerifier } = await client.createAuthorizationUrl({ state: "test-state" });
       await client.handleCallback(
         "https://app.example.com/callback?code=auth_code&state=test-state",
+        codeVerifier,
         "test-state",
       );
 
@@ -139,9 +141,10 @@ describe("Token Security (RFC 9700 Sections 4.10-4.13)", () => {
         tokenStore: mockTokenStore,
       });
 
-      await client.createAuthorizationUrl({ state: "test-state" });
+      const { codeVerifier } = await client.createAuthorizationUrl({ state: "test-state" });
       await client.handleCallback(
         "https://app.example.com/callback?code=auth_code&state=test-state",
+        codeVerifier,
         "test-state",
       );
 
@@ -194,9 +197,10 @@ describe("Token Security (RFC 9700 Sections 4.10-4.13)", () => {
       });
 
       // Initial token acquisition
-      await client.createAuthorizationUrl({ state: "test-state" });
+      const { codeVerifier } = await client.createAuthorizationUrl({ state: "test-state" });
       await client.handleCallback(
         "https://app.example.com/callback?code=auth_code&state=test-state",
+        codeVerifier,
         "test-state",
       );
 

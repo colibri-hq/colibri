@@ -175,8 +175,12 @@ describe("Redirect URI Security (RFC 9700 Section 4.1)", () => {
         tokenStore: mockTokenStore,
       });
 
-      await client.createAuthorizationUrl({ state: "test-state" });
-      await client.handleCallback(`${redirectUri}?code=auth_code&state=test-state`, "test-state");
+      const { codeVerifier } = await client.createAuthorizationUrl({ state: "test-state" });
+      await client.handleCallback(
+        `${redirectUri}?code=auth_code&state=test-state`,
+        codeVerifier,
+        "test-state",
+      );
 
       expect(capturedBody).not.toBeNull();
       expect(capturedBody!.get("redirect_uri")).toBe(redirectUri);

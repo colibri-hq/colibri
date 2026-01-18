@@ -10,7 +10,7 @@ import fastify, {
 } from "fastify";
 import Stream, { Readable } from "node:stream";
 import { vi } from "vitest";
-import { type AuthorizationServerOptions, createAuthorizationServer } from "../src";
+import { type AuthorizationServerOptions, createAuthorizationServer } from "../src/index.js";
 
 export async function createTestServer(options: AuthorizationServerOptions) {
   const app = fastify();

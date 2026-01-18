@@ -5,17 +5,20 @@ import imports from "eslint-plugin-import";
 import node from "eslint-plugin-n";
 import { configs as perfectionist } from "eslint-plugin-perfectionist";
 import unicorn from "eslint-plugin-unicorn";
+import { defineConfig } from "eslint/config";
 import globals from "globals";
-import typescript, { configs } from "typescript-eslint";
+import { configs as typescript } from "typescript-eslint";
 
-const config = typescript.config(
+const config = defineConfig(
   // region Ignored files
-  { ignores: [".turbo/**/*", ".cache/**/*", "node_modules/**/*", "dist/**/*"] },
+  {
+    ignores: [".turbo/**/*", ".cache/**/*", "node_modules/**/*", "dist/**/*", "test-reports/**/*"],
+  },
   // endregion
 
   // region Libraries
   eslint.configs.recommended,
-  configs.recommended,
+  typescript.recommended,
   node.configs["flat/recommended-module"],
   unicorn.configs.recommended,
   imports.flatConfigs.recommended,

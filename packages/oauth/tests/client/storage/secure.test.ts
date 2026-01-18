@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import type { StoredTokens } from "../../../src/client/types.js";
 import { SecureTokenStore } from "../../../src/client/storage/secure.js";
 import { generateTestEncryptionKey, generateTestKeyBytes } from "../__helpers__/crypto.js";
@@ -39,7 +39,7 @@ function createSampleTokens(overrides: Partial<StoredTokens> = {}): StoredTokens
     tokenType: "Bearer",
     expiresAt: new Date(Date.now() + 3600 * 1000),
     refreshToken: "refresh_token_456",
-    scope: "read write",
+    scopes: ["read", "write"],
     ...overrides,
   };
 }
@@ -79,7 +79,6 @@ describe("SecureTokenStore", () => {
           "localStorage is not available",
         );
       } finally {
-        // @ts-expect-error - restoring original value
         globalThis.localStorage = originalLocalStorage;
       }
     });
@@ -292,7 +291,7 @@ describe("SecureTokenStore", () => {
         tokenType: "Bearer",
         expiresAt: new Date(),
         refreshToken: "refresh_456",
-        scope: "read write profile",
+        scopes: ["read", "write", "profile"],
         idToken: "id_token_789",
       };
 
@@ -302,7 +301,7 @@ describe("SecureTokenStore", () => {
       expect(result?.accessToken).toBe(tokens.accessToken);
       expect(result?.tokenType).toBe(tokens.tokenType);
       expect(result?.refreshToken).toBe(tokens.refreshToken);
-      expect(result?.scope).toBe(tokens.scope);
+      expect(result?.scopes).toStrictEqual(tokens.scopes);
       expect(result?.idToken).toBe(tokens.idToken);
     });
   });
@@ -393,6 +392,7 @@ describe("SecureTokenStore", () => {
         accessToken: "token",
         tokenType: "Bearer",
         expiresAt: new Date(),
+        scopes: [],
       };
 
       await store.set("test-client", minimalTokens);
@@ -415,12 +415,12 @@ describe("SecureTokenStore", () => {
 
     it("should handle tokens with unicode characters", async () => {
       const store = new SecureTokenStore({ key: "test-password", storage: mockStorage });
-      const tokens = createSampleTokens({ scope: "read write 日本語 emoji:🔐" });
+      const tokens = createSampleTokens({ scopes: ["read write 日本語 emoji:🔐"] });
 
       await store.set("test-client", tokens);
       const result = await store.get("test-client");
 
-      expect(result?.scope).toBe(tokens.scope);
+      expect(result?.scopes).toStrictEqual(tokens.scopes);
     });
   });
 });

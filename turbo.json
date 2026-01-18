@@ -17,13 +17,16 @@
     "fmt:ci": { "dependsOn": ["^fmt:ci"] },
     "lint": { "dependsOn": ["^lint"] },
     "lint:ci": { "dependsOn": ["^lint:ci"] },
-    "test": { "dependsOn": ["^test"], "inputs": ["$TURBO_DEFAULT$", ".env*"] },
-    "test:coverage": {
-      "dependsOn": ["^test:coverage"],
+    "test": {
+      "dependsOn": ["^test"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["coverage/**"]
+      "outputs": ["test-reports/**"]
     },
-    "check-types": { "dependsOn": ["^check-types"] },
+    "coverage": {
+      "dependsOn": ["^test"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["badges/coverage.svg"]
+    },
     "dev": { "inputs": ["$TURBO_DEFAULT$", ".env*"], "cache": false, "persistent": true }
   }
 }

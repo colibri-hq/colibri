@@ -100,11 +100,15 @@ export function createMockFetch() {
 /**
  * Create a successful fetch response
  */
-export function createJsonResponse(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
+export function createJsonResponse(
+  data: unknown,
+  status = 200,
+  extraHeaders?: HeadersInit,
+): Response {
+  const headers = new Headers(extraHeaders);
+  headers.set("Content-Type", "application/json");
+
+  return new Response(JSON.stringify(data), { status, headers });
 }
 
 /**

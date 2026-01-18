@@ -1,7 +1,7 @@
 declare module "@colibri-hq/shared/vitest.config" {
-  import { TestUserConfig } from "vitest/config";
+  import { config as Config } from "../vitest.config";
 
-  export const config: TestUserConfig;
+  export const config: typeof Config;
 
   export default config;
 }

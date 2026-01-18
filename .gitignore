@@ -12,10 +12,11 @@ vite.config.ts.timestamp-*
 
 packages/*/node_modules
 packages/*/dist
-/test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+**/test-reports/
+**/coverage/
 
 *storybook.log
 

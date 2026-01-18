@@ -529,7 +529,7 @@ describe("Extended Error Handling", () => {
       ).rejects.toThrow(PollingTimeoutError);
     });
 
-    it("should handle slow_down error and increase interval", async () => {
+    it("should handle slow_down error and increase interval", { timeout: 20000 }, async () => {
       let callCount = 0;
 
       const slowDownFetch = vi.fn().mockImplementation(async (url: RequestInfo | URL) => {
@@ -544,7 +544,7 @@ describe("Extended Error Handling", () => {
               user_code: "ABCD-EFGH",
               verification_uri: "https://auth.example.com/device",
               expires_in: 1800,
-              interval: 5,
+              interval: 0.005, // 5ms for fast testing
             },
             200,
           );
@@ -567,10 +567,11 @@ describe("Extended Error Handling", () => {
         clientId: "test-client",
         fetch: slowDownFetch,
         tokenStore: mockTokenStore,
+        pollingTimeout: 20, // 20 second timeout (2x slow_down @ 5s each + buffer)
       });
 
       const device = await client.requestDeviceAuthorization();
-      await client.pollForToken(device.device_code, { interval: 0.01, timeout: 10 });
+      await client.pollForToken(device.device_code, 0.005); // 5ms interval
 
       expect(callCount).toBeGreaterThanOrEqual(3);
     });

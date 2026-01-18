@@ -66,9 +66,11 @@
     "package": "svelte-kit sync && svelte-package && publint",
     "storybook": "storybook dev --port 6006",
     "build-storybook": "storybook build",
-    "test:unit": "vitest",
-    "test": "npm run test:unit -- --run && npm run test:e2e",
-    "test:e2e": "playwright test"
+    "test": "pnpm run test:unit -- --run && pnpm run test:e2e",
+    "test:unit": "vitest run --coverage --cache",
+    "test:e2e": "vitest run --project browser",
+    "test:ui": "vitest --ui",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@browser-logos/brave": "^3.0.13",
@@ -110,6 +112,8 @@
     "@types/qrcode": "^1.5.6",
     "@vitest/browser": "catalog:",
     "@vitest/browser-playwright": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
     "eslint": "catalog:",
     "eslint-plugin-storybook": "^10.1.11",
     "oxfmt": "catalog:",

@@ -37,10 +37,10 @@
     "lint:ci": "oxlint --format github && eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
     "fmt": "oxfmt --write .",
     "fmt:ci": "oxfmt --check .",
-    "test-ct": "playwright test -c playwright-ct.config.ts",
-    "test": "playwright test -c playwright.config.ts",
-    "test:vitest": "vitest",
-    "test:browser": "vitest --project browser"
+    "test": "vitest run --coverage --cache",
+    "coverage": "pnpx make-coverage-badge --output-path ./badges/coverage.svg",
+    "test:e2e": "playwright test --config playwright.config.ts",
+    "test:browser": "vitest run --project browser"
   },
   "dependencies": {
     "@colibri-hq/oauth": "workspace:*",
@@ -92,6 +92,8 @@
     "@types/xml2js": "^0.4.14",
     "@vitest/browser": "catalog:",
     "@vitest/browser-playwright": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
     "dotenv": "^17.2.3",
     "eslint": "catalog:",
     "oxfmt": "catalog:",

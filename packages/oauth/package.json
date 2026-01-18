@@ -71,18 +71,17 @@
   "scripts": {
     "build": "rimraf dist; tsc",
     "build:ci": "pnpm run build",
-    "dev": "tsc --watch",
     "check": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "test:ui": "vitest --ui",
-    "coverage": "npx make-coverage-badge --output-path ./badges/coverage.svg",
-    "lint": "oxlint --fix && eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
-    "lint:ci": "oxlint --format github && eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
+    "coverage": "pnpx make-coverage-badge --output-path ./badges/coverage.svg",
+    "dev": "tsc --watch",
     "fmt": "oxfmt --write .",
     "fmt:ci": "oxfmt --check .",
-    "prepack": "pnpm run fmt && pnpm run check && pnpm run lint && pnpm run test && pnpm run build"
+    "lint": "oxlint --fix && eslint --fix --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy metadata .",
+    "lint:ci": "oxlint --format github && eslint --stats --report-unused-disable-directives --report-unused-inline-configs=error --cache --cache-location=./.cache/eslint.json --cache-strategy content .",
+    "prepack": "pnpm run fmt && pnpm run check && pnpm run lint && pnpm run test && pnpm run build",
+    "test": "vitest run --coverage --cache",
+    "test:ui": "vitest --ui",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@colibri-hq/shared": "workspace:*",

@@ -1,6 +1,7 @@
 import type { Database } from "@colibri-hq/sdk";
 import { initialize } from "@colibri-hq/sdk";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { applySetup } from "../src/index.js";
 import {
   clearTestDatabase,
   setupTestDatabase,
@@ -153,9 +154,6 @@ describe("API Endpoint Logic E2E Tests", () => {
     });
 
     it("should apply configuration to database", async () => {
-      // Import the actual applySetup function
-      const { applySetup } = await import("../core/state.js");
-
       await applySetup({
         admin: { email: "api-test@example.com", name: "API Test Admin" },
         database,

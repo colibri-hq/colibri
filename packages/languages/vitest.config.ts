@@ -1,25 +1,23 @@
-import { defineConfig } from "vitest/config";
+import { config } from "@colibri-hq/shared/vitest.config";
+import { defineConfig, mergeConfig } from "vitest/config";
 
-export default defineConfig({
-  test: {
-    globals: true,
-    environment: "node",
-    include: ["src/**/*.test.ts"],
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "json", "html", "lcov"],
-      reportsDirectory: "./coverage",
-      exclude: [
-        "node_modules/**",
-        "dist/**",
-        ".turbo/**",
-        ".cache/**",
-        "**/*.d.ts",
-        "**/*.test.ts",
-        "**/*.config.ts",
-        "scripts/**",
-        "generated/**",
-      ],
+export default mergeConfig(
+  config,
+  defineConfig({
+    test: {
+      coverage: {
+        exclude: [
+          "node_modules/**",
+          "dist/**",
+          ".turbo/**",
+          ".cache/**",
+          "**/*.d.ts",
+          "**/*.test.ts",
+          "**/*.config.ts",
+          "scripts/**",
+          "generated/**",
+        ],
+      },
     },
-  },
-});
+  }),
+);

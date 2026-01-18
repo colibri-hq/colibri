@@ -1,16 +1,16 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ClientCredentialsClient } from "../../src/client/client-credentials.js";
 import { ConfigurationError } from "../../src/client/errors.js";
 import {
-  createMockFetch,
-  createJsonResponse,
-  mockMetadata,
-  mockTokenResponse,
-  createMockTokenStore,
-  createFullMockFetch,
-  createStoredTokens,
   createExpiredTokens,
   createExpiringTokens,
+  createFullMockFetch,
+  createJsonResponse,
+  createMockFetch,
+  createMockTokenStore,
+  createStoredTokens,
+  mockMetadata,
+  mockTokenResponse,
 } from "./__helpers__/mock-server.js";
 
 describe("ClientCredentialsClient", () => {

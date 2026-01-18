@@ -1,26 +1,13 @@
-import { defineConfig } from "vitest/config";
+import { config } from "@colibri-hq/shared/vitest.config";
+import { defineConfig, mergeConfig } from "vitest/config";
 
-export default defineConfig({
-  test: {
-    coverage: {
-      exclude: [
-        "node_modules/**",
-        "dist/**",
-        ".turbo/**",
-        ".cache/**",
-        ".svelte-kit/**",
-        "**/*.d.ts",
-        "**/*.test.ts",
-        "**/*.config.ts",
-      ],
-      provider: "v8",
-      reporter: ["text", "json", "html", "lcov"],
-      reportsDirectory: "./coverage",
+export default mergeConfig(
+  config,
+  defineConfig({
+    test: {
+      // 2 minutes for container startup
+      hookTimeout: 120_000,
+      testTimeout: 120_000,
     },
-    environment: "node",
-    globals: true,
-    hookTimeout: 120_000,
-    include: ["src/**/*.test.ts"],
-    testTimeout: 120_000, // 2 minutes for container startup
-  },
-});
+  }),
+);

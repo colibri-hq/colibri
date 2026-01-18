@@ -202,9 +202,10 @@ describe("Mix-Up Attack Prevention (RFC 9700 Section 4.4)", () => {
         tokenStore: mockTokenStore,
       });
 
-      await client.createAuthorizationUrl({ state: "test-state" });
+      const { codeVerifier } = await client.createAuthorizationUrl({ state: "test-state" });
       await client.handleCallback(
         "https://app.example.com/callback?code=auth_code&state=test-state",
+        codeVerifier,
         "test-state",
       );
 
@@ -358,9 +359,10 @@ describe("Mix-Up Attack Prevention (RFC 9700 Section 4.4)", () => {
         tokenStore: mockTokenStore,
       });
 
-      await client.createAuthorizationUrl({ state: "test-state" });
+      const { codeVerifier } = await client.createAuthorizationUrl({ state: "test-state" });
       await client.handleCallback(
         "https://app.example.com/callback?code=auth_code&state=test-state",
+        codeVerifier,
         "test-state",
       );
 
@@ -394,11 +396,12 @@ describe("Mix-Up Attack Prevention (RFC 9700 Section 4.4)", () => {
         tokenStore: mockTokenStore,
       });
 
-      await client.createAuthorizationUrl({ state: "test-state" });
+      const { codeVerifier } = await client.createAuthorizationUrl({ state: "test-state" });
       // Should complete without following malicious redirects
       await expect(
         client.handleCallback(
           "https://app.example.com/callback?code=auth_code&state=test-state",
+          codeVerifier,
           "test-state",
         ),
       ).resolves.not.toThrow();
