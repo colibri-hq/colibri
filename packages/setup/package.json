@@ -84,7 +84,7 @@
     "eslint-plugin-perfectionist": "^5.3.1",
     "eslint-plugin-unicorn": "^62.0.0",
     "globals": "catalog:",
-    "oclif": "^4.22.65",
+    "oclif": "^4.22.67",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
     "pg": "^8.17.1",

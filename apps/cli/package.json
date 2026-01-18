@@ -94,7 +94,7 @@
     "eslint-plugin-unicorn": "^62.0.0",
     "globals": "catalog:",
     "msw": "^2.12.7",
-    "oclif": "^4.22.65",
+    "oclif": "^4.22.67",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
     "rimraf": "catalog:",
