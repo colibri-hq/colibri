@@ -4,7 +4,7 @@ packages:
 
 catalog:
   '@eslint/js': ^9.39.2
-  '@fontsource-variable/material-symbols-outlined': ^5.2.31
+  '@fontsource-variable/material-symbols-outlined': ^5.2.32
   '@fontsource/neuton': ^5.2.7
   '@fontsource/titillium-web': ^5.2.8
   '@sveltejs/adapter-auto': ^7.0.0

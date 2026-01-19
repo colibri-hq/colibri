@@ -10,8 +10,8 @@ catalogs:
       specifier: ^9.39.2
       version: 9.39.2
     '@fontsource-variable/material-symbols-outlined':
-      specifier: ^5.2.31
-      version: 5.2.31
+      specifier: ^5.2.32
+      version: 5.2.32
     '@fontsource/neuton':
       specifier: ^5.2.7
       version: 5.2.7
@@ -149,7 +149,7 @@ importers:
         version: link:../../packages/ui
       '@fontsource-variable/material-symbols-outlined':
         specifier: 'catalog:'
-        version: 5.2.31
+        version: 5.2.32
       '@fontsource/neuton':
         specifier: 'catalog:'
         version: 5.2.7
@@ -385,7 +385,7 @@ importers:
         version: 4.4.4(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-import:
         specifier: ^2.32.0
-        version: 2.32.0(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
+        version: 2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-n:
         specifier: ^17.23.2
         version: 17.23.2(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
@@ -433,7 +433,7 @@ importers:
         version: link:../../packages/ui
       '@fontsource-variable/material-symbols-outlined':
         specifier: 'catalog:'
-        version: 5.2.31
+        version: 5.2.32
       '@fontsource/neuton':
         specifier: 'catalog:'
         version: 5.2.7
@@ -932,7 +932,7 @@ importers:
         version: 4.4.4(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-import:
         specifier: ^2.32.0
-        version: 2.32.0(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
+        version: 2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
       eslint-plugin-n:
         specifier: ^17.23.2
         version: 17.23.2(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
@@ -1089,7 +1089,7 @@ importers:
         version: link:../sdk
       '@fontsource-variable/material-symbols-outlined':
         specifier: 'catalog:'
-        version: 5.2.31
+        version: 5.2.32
       '@fontsource/neuton':
         specifier: 'catalog:'
         version: 5.2.7
@@ -1969,8 +1969,8 @@ packages:
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
 
-  '@fontsource-variable/material-symbols-outlined@5.2.31':
-    resolution: {integrity: sha512-6tHPfwrxPXfkpxeXu0HuuD+ipIv7MsLmHhGG477Fun8rozTVCqXV1Iu/H00O+RjFZ4DAKqInQeBNRctryruuRQ==}
+  '@fontsource-variable/material-symbols-outlined@5.2.32':
+    resolution: {integrity: sha512-LRdoP6kiTgtIXnlKQ5jXgokYbr4+t2b2LRXDM/IlD9lfWQOediceIYFMefn/SdBJNOPm6Ai/eNy0XSlMwbp+Jg==}
 
   '@fontsource/neuton@5.2.7':
     resolution: {integrity: sha512-5XYm0eAoFFxdTmVpyWNnnLu/tW2h6jkhnx8MjGSpNgCcDBxKbc025pZXNPeqrXIJMM8khyQmpzQ1s3522V0BTQ==}
@@ -10083,7 +10083,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.10': {}
 
-  '@fontsource-variable/material-symbols-outlined@5.2.31': {}
+  '@fontsource-variable/material-symbols-outlined@5.2.32': {}
 
   '@fontsource/neuton@5.2.7': {}
 
@@ -13717,14 +13717,15 @@ snapshots:
       tinyglobby: 0.2.15
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1)):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
+      '@typescript-eslint/parser': 8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.39.2(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 4.4.4(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1))
@@ -13738,7 +13739,7 @@ snapshots:
       eslint: 9.39.2(jiti@2.6.1)
       eslint-compat-utils: 0.5.1(eslint@9.39.2(jiti@2.6.1))
 
-  eslint-plugin-import@2.32.0(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1)):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -13749,7 +13750,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.39.2(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2(jiti@2.6.1))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -13760,6 +13761,8 @@ snapshots:
       semver: 6.3.1
       string.prototype.trimend: 1.0.9
       tsconfig-paths: 3.15.0
+    optionalDependencies:
+      '@typescript-eslint/parser': 8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
