@@ -15,8 +15,8 @@
     "check": { "dependsOn": ["^check"] },
     "fmt": { "dependsOn": ["^fmt"] },
     "fmt:ci": { "dependsOn": ["^fmt:ci"] },
-    "lint": { "dependsOn": ["^lint"] },
-    "lint:ci": { "dependsOn": ["^lint:ci"] },
+    "lint": { "dependsOn": ["^build", "^lint"] },
+    "lint:ci": { "dependsOn": ["^build:ci", "^lint:ci"] },
     "test": {
       "dependsOn": ["^test"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
