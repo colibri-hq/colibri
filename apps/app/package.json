@@ -80,7 +80,7 @@
   "devDependencies": {
     "@playwright/test": "^1.57.0",
     "@sveltejs/adapter-auto": "catalog:",
-    "@sveltejs/adapter-node": "^5.5.1",
+    "@sveltejs/adapter-node": "^5.5.2",
     "@sveltejs/kit": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",
