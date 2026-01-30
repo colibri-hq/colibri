@@ -116,7 +116,7 @@
     "@simplewebauthn/server": "^13.2.2",
     "@zip.js/zip.js": "^2.8.15",
     "esm-env": "catalog:",
-    "fast-xml-parser": "^5.3.3",
+    "fast-xml-parser": "^5.3.4",
     "file-type": "^21.3.0",
     "he": "^1.2.0",
     "jsonwebtoken": "catalog:",
