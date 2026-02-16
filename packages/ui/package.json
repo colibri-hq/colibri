@@ -89,7 +89,7 @@
     "@fontsource/titillium-web": "catalog:",
     "@humanspeak/svelte-markdown": "^0.8.14",
     "@lucide/svelte": "^0.562.0",
-    "bits-ui": "^2.15.4",
+    "bits-ui": "^2.15.5",
     "blurhash": "^2.0.5",
     "esm-env": "catalog:",
     "qrcode": "^1.5.4",
