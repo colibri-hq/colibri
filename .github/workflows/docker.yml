@@ -96,7 +96,7 @@ jobs:
           provenance: mode=max
           sbom: true
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@v4
         with:
           subject-name: ghcr.io/${{ github.repository }}${{ matrix.image_suffix }}
           subject-digest: ${{ steps.push.outputs.digest }}
