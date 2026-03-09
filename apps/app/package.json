@@ -67,7 +67,7 @@
     "svelte-gravatar": "^1.0.3",
     "svelte-headlessui": "^0.0.46",
     "svelte-reactive-debounce": "^0.0.2",
-    "svelte-sonner": "^1.0.7",
+    "svelte-sonner": "^1.0.8",
     "svelte-transition": "^0.0.17",
     "tailwind-merge": "catalog:",
     "trpc-sveltekit": "^3.6.3",
@@ -80,7 +80,7 @@
   "devDependencies": {
     "@playwright/test": "^1.57.0",
     "@sveltejs/adapter-auto": "catalog:",
-    "@sveltejs/adapter-node": "^5.5.1",
+    "@sveltejs/adapter-node": "^5.5.4",
     "@sveltejs/kit": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",
