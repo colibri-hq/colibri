@@ -7,9 +7,9 @@ catalog:
   '@fontsource-variable/material-symbols-outlined': ^5.2.31
   '@fontsource/neuton': ^5.2.7
   '@fontsource/titillium-web': ^5.2.8
-  '@sveltejs/adapter-auto': ^7.0.0
-  '@sveltejs/kit': ^2.49.5
-  '@sveltejs/vite-plugin-svelte': ^6.2.4
+  '@sveltejs/adapter-auto': ^7.0.1
+  '@sveltejs/kit': ^2.55.0
+  '@sveltejs/vite-plugin-svelte': ^7.0.0
   '@tailwindcss/vite': ^4.1.18
   '@trpc/client': ^10.45.4
   '@trpc/server': ^10.45.4
@@ -30,8 +30,8 @@ catalog:
   oxfmt: ^0.24.0
   oxlint: ^1.39.0
   rimraf: ^6.1.2
-  svelte: ^5.46.4
-  svelte-check: ^4.3.5
+  svelte: ^5.53.12
+  svelte-check: ^4.4.5
   tailwind-merge: ^3.4.0
   tailwindcss: ^4.1.18
   turndown: ^7.2.2
